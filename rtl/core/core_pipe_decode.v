@@ -22,6 +22,9 @@ output wire                 s2_eat_4      // Decode eats 4 bytes
 // Common parameters and width definitions.
 `include "core_common.vh"
 
+// Generated decoder
+`include "core_pipe_decode.vh"
+
 assign s2_eat_2 = s1_16bit;
 assign s2_eat_4 = s1_32bit;
 

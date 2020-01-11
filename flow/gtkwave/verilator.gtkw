@@ -1,0 +1,260 @@
+[*]
+[*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
+[*] Sat Jan 11 18:41:55 2020
+[*]
+[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/verilator/waves.vcd"
+[dumpfile_mtime] "Sat Jan 11 18:41:01 2020"
+[dumpfile_size] 97545
+[savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/verilator.gtkw"
+[timestart] 1
+[size] 1920 1025
+[pos] -1 -1
+*-6.481968 511 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[treeopen] TOP.core_top.
+[treeopen] TOP.core_top.i_core_pipe_fetch.
+[sst_width] 223
+[signals_width] 431
+[sst_expanded] 1
+[sst_vpaned_height] 301
+@28
+TOP.core_top.i_core_pipe_fetch.g_clk
+TOP.core_top.i_core_pipe_fetch.g_resetn
+@800200
+-Pipeline - Fetch
+@c00200
+-Memory Bus - Instructions
+@28
+TOP.core_top.i_core_pipe_fetch.n_imem_req
+TOP.core_top.i_core_pipe_fetch.imem_req
+TOP.core_top.i_core_pipe_fetch.imem_gnt
+@22
+TOP.core_top.i_core_pipe_fetch.imem_addr[63:0]
+TOP.core_top.i_core_pipe_fetch.imem_rdata[63:0]
+@28
+TOP.core_top.i_core_pipe_fetch.imem_err
+TOP.core_top.i_core_pipe_fetch.imem_recv
+@22
+TOP.core_top.i_core_pipe_fetch.n_imem_addr[63:0]
+@1401200
+-Memory Bus - Instructions
+@c00200
+-Buffer
+@28
+TOP.core_top.i_core_pipe_fetch.buf_ready
+@24
+TOP.core_top.i_core_pipe_fetch.n_buf_depth[4:0]
+TOP.core_top.i_core_pipe_fetch.buf_depth[4:0]
+@22
+TOP.core_top.i_core_pipe_fetch.buf_data_in[63:0]
+TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.d_buffer[95:0]
+@28
+TOP.core_top.i_core_pipe_fetch.buf_drain_2
+TOP.core_top.i_core_pipe_fetch.buf_drain_4
+TOP.core_top.i_core_pipe_fetch.buf_error_in
+TOP.core_top.i_core_pipe_fetch.buf_fill_2
+TOP.core_top.i_core_pipe_fetch.buf_fill_4
+TOP.core_top.i_core_pipe_fetch.buf_fill_6
+TOP.core_top.i_core_pipe_fetch.buf_fill_8
+TOP.core_top.i_core_pipe_fetch.buf_flush
+TOP.core_top.i_core_pipe_fetch.buf_error_out[1:0]
+@22
+TOP.core_top.i_core_pipe_fetch.buf_data_out[31:0]
+@c00200
+-Buffer
+@28
+TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.g_clk
+TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.g_resetn
+@22
+TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.data_in[63:0]
+TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.data_out[31:0]
+@28
+TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.drain_2
+TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.drain_4
+TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.fill_2
+TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.fill_4
+TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.fill_6
+TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.fill_8
+TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.flush
+@22
+TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.n_d_buffer_in_pre_shift[95:0]
+TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.n_d_buffer_in_shift_up[95:0]
+TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.n_d_buffer_out_shift_down[95:0]
+TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.n_d_buffer[95:0]
+TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.d_buffer[95:0]
+@1401200
+-Buffer
+-Buffer
+@c00200
+-Control Flow
+@28
+TOP.core_top.i_core_pipe_fetch.cf_ack
+@22
+TOP.core_top.i_core_pipe_fetch.cf_cause[4:0]
+TOP.core_top.i_core_pipe_fetch.cf_target[63:0]
+@28
+TOP.core_top.i_core_pipe_fetch.cf_valid
+@1401200
+-Control Flow
+@c00200
+-Events
+@28
+TOP.core_top.i_core_pipe_fetch.e_cf_change
+TOP.core_top.i_core_pipe_fetch.e_imem_req
+TOP.core_top.i_core_pipe_fetch.e_eat_2
+TOP.core_top.i_core_pipe_fetch.e_eat_4
+@1401200
+-Events
+@c00200
+-Fetch -> Decode
+@28
+TOP.core_top.i_core_pipe_fetch.s1_ferr[1:0]
+@22
+TOP.core_top.i_core_pipe_fetch.s1_instr[31:0]
+TOP.core_top.i_core_pipe_fetch.s1_pc[63:0]
+@28
+TOP.core_top.i_core_pipe_fetch.s2_eat_2
+TOP.core_top.i_core_pipe_fetch.s2_eat_4
+@22
+TOP.core_top.i_core_pipe_fetch.n_s1_pc[63:0]
+@1401200
+-Fetch -> Decode
+@1000200
+-Pipeline - Fetch
+@c00200
+-Instruction Decode
+@28
+TOP.core_top.i_core_pipe_decode.dec_add
+TOP.core_top.i_core_pipe_decode.dec_addi
+TOP.core_top.i_core_pipe_decode.dec_addiw
+TOP.core_top.i_core_pipe_decode.dec_addw
+TOP.core_top.i_core_pipe_decode.dec_and
+TOP.core_top.i_core_pipe_decode.dec_andi
+TOP.core_top.i_core_pipe_decode.dec_auipc
+TOP.core_top.i_core_pipe_decode.dec_beq
+TOP.core_top.i_core_pipe_decode.dec_bge
+TOP.core_top.i_core_pipe_decode.dec_bgeu
+TOP.core_top.i_core_pipe_decode.dec_blt
+TOP.core_top.i_core_pipe_decode.dec_bltu
+TOP.core_top.i_core_pipe_decode.dec_bne
+TOP.core_top.i_core_pipe_decode.dec_c_add
+TOP.core_top.i_core_pipe_decode.dec_c_addi
+TOP.core_top.i_core_pipe_decode.dec_c_addi4spn
+TOP.core_top.i_core_pipe_decode.dec_c_addw
+TOP.core_top.i_core_pipe_decode.dec_c_and
+TOP.core_top.i_core_pipe_decode.dec_c_andi
+TOP.core_top.i_core_pipe_decode.dec_c_beqz
+TOP.core_top.i_core_pipe_decode.dec_c_bnez
+TOP.core_top.i_core_pipe_decode.dec_c_j
+TOP.core_top.i_core_pipe_decode.dec_c_jal
+TOP.core_top.i_core_pipe_decode.dec_c_li
+TOP.core_top.i_core_pipe_decode.dec_c_lui
+TOP.core_top.i_core_pipe_decode.dec_c_lw
+TOP.core_top.i_core_pipe_decode.dec_c_lwsp
+TOP.core_top.i_core_pipe_decode.dec_c_mv
+TOP.core_top.i_core_pipe_decode.dec_c_or
+TOP.core_top.i_core_pipe_decode.dec_c_slli
+TOP.core_top.i_core_pipe_decode.dec_c_srai
+TOP.core_top.i_core_pipe_decode.dec_c_srli
+TOP.core_top.i_core_pipe_decode.dec_c_sub
+TOP.core_top.i_core_pipe_decode.dec_c_subw
+TOP.core_top.i_core_pipe_decode.dec_c_sw
+TOP.core_top.i_core_pipe_decode.dec_c_swsp
+TOP.core_top.i_core_pipe_decode.dec_c_xor
+TOP.core_top.i_core_pipe_decode.dec_csrrc
+TOP.core_top.i_core_pipe_decode.dec_csrrci
+TOP.core_top.i_core_pipe_decode.dec_csrrs
+TOP.core_top.i_core_pipe_decode.dec_csrrsi
+TOP.core_top.i_core_pipe_decode.dec_csrrw
+TOP.core_top.i_core_pipe_decode.dec_csrrwi
+TOP.core_top.i_core_pipe_decode.dec_div
+TOP.core_top.i_core_pipe_decode.dec_divu
+TOP.core_top.i_core_pipe_decode.dec_divuw
+TOP.core_top.i_core_pipe_decode.dec_divw
+TOP.core_top.i_core_pipe_decode.dec_ebreak
+TOP.core_top.i_core_pipe_decode.dec_ecall
+TOP.core_top.i_core_pipe_decode.dec_fence
+TOP.core_top.i_core_pipe_decode.dec_fence_i
+TOP.core_top.i_core_pipe_decode.dec_jal
+TOP.core_top.i_core_pipe_decode.dec_jalr
+TOP.core_top.i_core_pipe_decode.dec_lb
+TOP.core_top.i_core_pipe_decode.dec_lbu
+TOP.core_top.i_core_pipe_decode.dec_ld
+TOP.core_top.i_core_pipe_decode.dec_lh
+TOP.core_top.i_core_pipe_decode.dec_lhu
+TOP.core_top.i_core_pipe_decode.dec_lui
+TOP.core_top.i_core_pipe_decode.dec_lw
+TOP.core_top.i_core_pipe_decode.dec_lwu
+TOP.core_top.i_core_pipe_decode.dec_mret
+TOP.core_top.i_core_pipe_decode.dec_mul
+TOP.core_top.i_core_pipe_decode.dec_mulh
+TOP.core_top.i_core_pipe_decode.dec_mulhsu
+TOP.core_top.i_core_pipe_decode.dec_mulhu
+TOP.core_top.i_core_pipe_decode.dec_mulw
+TOP.core_top.i_core_pipe_decode.dec_or
+TOP.core_top.i_core_pipe_decode.dec_ori
+TOP.core_top.i_core_pipe_decode.dec_rem
+TOP.core_top.i_core_pipe_decode.dec_remu
+TOP.core_top.i_core_pipe_decode.dec_remuw
+TOP.core_top.i_core_pipe_decode.dec_remw
+TOP.core_top.i_core_pipe_decode.dec_sb
+TOP.core_top.i_core_pipe_decode.dec_sd
+TOP.core_top.i_core_pipe_decode.dec_sh
+TOP.core_top.i_core_pipe_decode.dec_sll
+TOP.core_top.i_core_pipe_decode.dec_slli
+TOP.core_top.i_core_pipe_decode.dec_slliw
+TOP.core_top.i_core_pipe_decode.dec_sllw
+TOP.core_top.i_core_pipe_decode.dec_slt
+TOP.core_top.i_core_pipe_decode.dec_slti
+TOP.core_top.i_core_pipe_decode.dec_sltiu
+TOP.core_top.i_core_pipe_decode.dec_sltu
+TOP.core_top.i_core_pipe_decode.dec_sra
+TOP.core_top.i_core_pipe_decode.dec_srai
+TOP.core_top.i_core_pipe_decode.dec_sraiw
+TOP.core_top.i_core_pipe_decode.dec_sraw
+TOP.core_top.i_core_pipe_decode.dec_srl
+TOP.core_top.i_core_pipe_decode.dec_srli
+TOP.core_top.i_core_pipe_decode.dec_srliw
+TOP.core_top.i_core_pipe_decode.dec_srlw
+TOP.core_top.i_core_pipe_decode.dec_sub
+TOP.core_top.i_core_pipe_decode.dec_subw
+TOP.core_top.i_core_pipe_decode.dec_sw
+TOP.core_top.i_core_pipe_decode.dec_wfi
+TOP.core_top.i_core_pipe_decode.dec_xor
+TOP.core_top.i_core_pipe_decode.dec_xori
+@1401200
+-Instruction Decode
+@800200
+-Field Decode
+@28
+TOP.core_top.i_core_pipe_decode.dec_aqrl[1:0]
+@22
+TOP.core_top.i_core_pipe_decode.dec_bimm12hi[6:0]
+TOP.core_top.i_core_pipe_decode.dec_bimm12lo[4:0]
+TOP.core_top.i_core_pipe_decode.dec_fm[3:0]
+@28
+TOP.core_top.i_core_pipe_decode.dec_funct3[2:0]
+@22
+TOP.core_top.i_core_pipe_decode.dec_imm12[11:0]
+TOP.core_top.i_core_pipe_decode.dec_imm12hi[6:0]
+TOP.core_top.i_core_pipe_decode.dec_imm12lo[4:0]
+TOP.core_top.i_core_pipe_decode.dec_imm20[19:0]
+TOP.core_top.i_core_pipe_decode.dec_jimm20[19:0]
+TOP.core_top.i_core_pipe_decode.dec_pred[3:0]
+@25
+TOP.core_top.i_core_pipe_decode.dec_rd[4:0]
+@28
+TOP.core_top.i_core_pipe_decode.dec_rm[2:0]
+@25
+TOP.core_top.i_core_pipe_decode.dec_rs1[4:0]
+TOP.core_top.i_core_pipe_decode.dec_rs2[4:0]
+TOP.core_top.i_core_pipe_decode.dec_rs3[4:0]
+@22
+TOP.core_top.i_core_pipe_decode.dec_shamt[5:0]
+TOP.core_top.i_core_pipe_decode.dec_shamtw[4:0]
+TOP.core_top.i_core_pipe_decode.dec_succ[3:0]
+TOP.core_top.i_core_pipe_decode.dec_zimm[4:0]
+@1000200
+-Field Decode
+[pattern_trace] 1
+[pattern_trace] 0

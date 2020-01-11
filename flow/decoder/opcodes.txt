@@ -1,0 +1,133 @@
+# format of a line in this file:
+# <instruction name> <args> <opcode>
+#
+# <opcode> is given by specifying one or more range/value pairs:
+# hi..lo=value or bit=value or arg=value (e.g. 6..2=0x45 10=1 rd=0)
+#
+# <args> is one of rd, rs1, rs2, rs3, imm20, imm12, imm12lo, imm12hi,
+# shamtw, shamt, rm
+
+beq     bimm12hi rs1 rs2 bimm12lo 14..12=0 6..2=0x18 1..0=3
+bne     bimm12hi rs1 rs2 bimm12lo 14..12=1 6..2=0x18 1..0=3
+blt     bimm12hi rs1 rs2 bimm12lo 14..12=4 6..2=0x18 1..0=3
+bge     bimm12hi rs1 rs2 bimm12lo 14..12=5 6..2=0x18 1..0=3
+bltu    bimm12hi rs1 rs2 bimm12lo 14..12=6 6..2=0x18 1..0=3
+bgeu    bimm12hi rs1 rs2 bimm12lo 14..12=7 6..2=0x18 1..0=3
+
+jalr    rd rs1 imm12              14..12=0 6..2=0x19 1..0=3
+
+jal     rd jimm20                          6..2=0x1b 1..0=3
+
+lui     rd imm20 6..2=0x0D 1..0=3
+auipc   rd imm20 6..2=0x05 1..0=3
+
+addi    rd rs1 imm12           14..12=0 6..2=0x04 1..0=3
+slli    rd rs1 31..26=0  shamt 14..12=1 6..2=0x04 1..0=3
+slti    rd rs1 imm12           14..12=2 6..2=0x04 1..0=3
+sltiu   rd rs1 imm12           14..12=3 6..2=0x04 1..0=3
+xori    rd rs1 imm12           14..12=4 6..2=0x04 1..0=3
+srli    rd rs1 31..26=0  shamt 14..12=5 6..2=0x04 1..0=3
+srai    rd rs1 31..26=16 shamt 14..12=5 6..2=0x04 1..0=3
+ori     rd rs1 imm12           14..12=6 6..2=0x04 1..0=3
+andi    rd rs1 imm12           14..12=7 6..2=0x04 1..0=3
+
+add     rd rs1 rs2 31..25=0  14..12=0 6..2=0x0C 1..0=3
+sub     rd rs1 rs2 31..25=32 14..12=0 6..2=0x0C 1..0=3
+sll     rd rs1 rs2 31..25=0  14..12=1 6..2=0x0C 1..0=3
+slt     rd rs1 rs2 31..25=0  14..12=2 6..2=0x0C 1..0=3
+sltu    rd rs1 rs2 31..25=0  14..12=3 6..2=0x0C 1..0=3
+xor     rd rs1 rs2 31..25=0  14..12=4 6..2=0x0C 1..0=3
+srl     rd rs1 rs2 31..25=0  14..12=5 6..2=0x0C 1..0=3
+sra     rd rs1 rs2 31..25=32 14..12=5 6..2=0x0C 1..0=3
+or      rd rs1 rs2 31..25=0  14..12=6 6..2=0x0C 1..0=3
+and     rd rs1 rs2 31..25=0  14..12=7 6..2=0x0C 1..0=3
+
+addiw   rd rs1 imm12            14..12=0 6..2=0x06 1..0=3
+slliw   rd rs1 31..25=0  shamtw 14..12=1 6..2=0x06 1..0=3
+srliw   rd rs1 31..25=0  shamtw 14..12=5 6..2=0x06 1..0=3
+sraiw   rd rs1 31..25=32 shamtw 14..12=5 6..2=0x06 1..0=3
+
+addw    rd rs1 rs2 31..25=0  14..12=0 6..2=0x0E 1..0=3
+subw    rd rs1 rs2 31..25=32 14..12=0 6..2=0x0E 1..0=3
+sllw    rd rs1 rs2 31..25=0  14..12=1 6..2=0x0E 1..0=3
+srlw    rd rs1 rs2 31..25=0  14..12=5 6..2=0x0E 1..0=3
+sraw    rd rs1 rs2 31..25=32 14..12=5 6..2=0x0E 1..0=3
+
+lb      rd rs1       imm12 14..12=0 6..2=0x00 1..0=3
+lh      rd rs1       imm12 14..12=1 6..2=0x00 1..0=3
+lw      rd rs1       imm12 14..12=2 6..2=0x00 1..0=3
+ld      rd rs1       imm12 14..12=3 6..2=0x00 1..0=3
+lbu     rd rs1       imm12 14..12=4 6..2=0x00 1..0=3
+lhu     rd rs1       imm12 14..12=5 6..2=0x00 1..0=3
+lwu     rd rs1       imm12 14..12=6 6..2=0x00 1..0=3
+
+sb     imm12hi rs1 rs2 imm12lo 14..12=0 6..2=0x08 1..0=3
+sh     imm12hi rs1 rs2 imm12lo 14..12=1 6..2=0x08 1..0=3
+sw     imm12hi rs1 rs2 imm12lo 14..12=2 6..2=0x08 1..0=3
+sd     imm12hi rs1 rs2 imm12lo 14..12=3 6..2=0x08 1..0=3
+
+fence       fm            pred succ     rs1 14..12=0 rd 6..2=0x03 1..0=3
+fence.i     imm12                       rs1 14..12=1 rd 6..2=0x03 1..0=3
+
+# RV32M
+mul     rd rs1 rs2 31..25=1 14..12=0 6..2=0x0C 1..0=3
+mulh    rd rs1 rs2 31..25=1 14..12=1 6..2=0x0C 1..0=3
+mulhsu  rd rs1 rs2 31..25=1 14..12=2 6..2=0x0C 1..0=3
+mulhu   rd rs1 rs2 31..25=1 14..12=3 6..2=0x0C 1..0=3
+div     rd rs1 rs2 31..25=1 14..12=4 6..2=0x0C 1..0=3
+divu    rd rs1 rs2 31..25=1 14..12=5 6..2=0x0C 1..0=3
+rem     rd rs1 rs2 31..25=1 14..12=6 6..2=0x0C 1..0=3
+remu    rd rs1 rs2 31..25=1 14..12=7 6..2=0x0C 1..0=3
+
+# RV64M
+mulw    rd rs1 rs2 31..25=1 14..12=0 6..2=0x0E 1..0=3
+divw    rd rs1 rs2 31..25=1 14..12=4 6..2=0x0E 1..0=3
+divuw   rd rs1 rs2 31..25=1 14..12=5 6..2=0x0E 1..0=3
+remw    rd rs1 rs2 31..25=1 14..12=6 6..2=0x0E 1..0=3
+remuw   rd rs1 rs2 31..25=1 14..12=7 6..2=0x0E 1..0=3
+
+# SYSTEM
+ecall     11..7=0 19..15=0 31..20=0x000 14..12=0 6..2=0x1C 1..0=3
+ebreak    11..7=0 19..15=0 31..20=0x001 14..12=0 6..2=0x1C 1..0=3
+mret      11..7=0 19..15=0 31..20=0x302 14..12=0 6..2=0x1C 1..0=3
+wfi       11..7=0 19..15=0 31..20=0x105 14..12=0 6..2=0x1C 1..0=3
+csrrw     rd      rs1      imm12        14..12=1 6..2=0x1C 1..0=3
+csrrs     rd      rs1      imm12        14..12=2 6..2=0x1C 1..0=3
+csrrc     rd      rs1      imm12        14..12=3 6..2=0x1C 1..0=3
+csrrwi    rd      rs1      imm12        14..12=5 6..2=0x1C 1..0=3
+csrrsi    rd      rs1      imm12        14..12=6 6..2=0x1C 1..0=3
+csrrci    rd      rs1      imm12        14..12=7 6..2=0x1C 1..0=3
+
+
+# compressed instructions
+
+# C0 encoding space
+c.addi4spn 1..0=0 15..13=0 12=ignore 11..2=ignore
+c.lw       1..0=0 15..13=2 12=ignore 11..2=ignore
+c.sw       1..0=0 15..13=6 12=ignore 11..2=ignore
+
+# C1 encoding space
+c.addi     1..0=1 15..13=0 12=ignore 11..2=ignore
+c.jal      1..0=1 15..13=1 12=ignore 11..2=ignore # c.addiw for RV64
+c.li       1..0=1 15..13=2 12=ignore 11..2=ignore
+c.lui      1..0=1 15..13=3 12=ignore 11..2=ignore # c.addi16sp when rd=2
+c.srli     1..0=1 15..13=4 12=ignore 11..10=0 9..2=ignore
+c.srai     1..0=1 15..13=4 12=ignore 11..10=1 9..2=ignore
+c.andi     1..0=1 15..13=4 12=ignore 11..10=2 9..2=ignore
+c.sub      1..0=1 15..13=4 12=0      11..10=3 9..7=ignore 6..5=0 4..2=ignore
+c.xor      1..0=1 15..13=4 12=0      11..10=3 9..7=ignore 6..5=1 4..2=ignore
+c.or       1..0=1 15..13=4 12=0      11..10=3 9..7=ignore 6..5=2 4..2=ignore
+c.and      1..0=1 15..13=4 12=0      11..10=3 9..7=ignore 6..5=3 4..2=ignore
+c.subw     1..0=1 15..13=4 12=1      11..10=3 9..7=ignore 6..5=0 4..2=ignore
+c.addw     1..0=1 15..13=4 12=1      11..10=3 9..7=ignore 6..5=1 4..2=ignore
+c.j        1..0=1 15..13=5 12=ignore 11..2=ignore
+c.beqz     1..0=1 15..13=6 12=ignore 11..2=ignore
+c.bnez     1..0=1 15..13=7 12=ignore 11..2=ignore
+
+# C2 encoding space
+c.slli     1..0=2 15..13=0 12=ignore 11..2=ignore
+c.lwsp     1..0=2 15..13=2 12=ignore 11..2=ignore
+c.mv       1..0=2 15..13=4 12=0      11..2=ignore # !rs2 = c.jr
+c.add      1..0=2 15..13=4 12=1      11..2=ignore # !rs1 = c.ebreak; !rs2=c.jalr
+c.swsp     1..0=2 15..13=6 12=ignore 11..2=ignore
+
