@@ -14,7 +14,7 @@ output wire                 cf_ack      , // Control flow change acknwoledged
 input  wire [         XL:0] cf_target   , // Control flow change destination
 input  wire [ CF_CAUSE_R:0] cf_cause    , // Control flow change cause
 
-output reg                  imem_req    , // Memory request
+output wire                 imem_req    , // Memory request
 output reg  [ MEM_ADDR_R:0] imem_addr   , // Memory request address
 input  wire                 imem_gnt    , // Memory response valid
 input  wire                 imem_err    , // Memory response error
@@ -57,6 +57,9 @@ assign  cf_ack      = imem_req && imem_gnt || !imem_req;
 // Are we recieving a memory response this cycle?
 reg                 imem_recv  ;
 
+reg                 imem_req_r ;
+assign              imem_req   = imem_req_r && buf_ready;
+
 // Next instruction memory fetch request enable.
 wire                n_imem_req  = buf_ready;
 
@@ -65,11 +68,11 @@ wire [MEM_ADDR_R:0] n_imem_addr = imem_addr + 8;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
-        imem_req    <= 1'b0;
+        imem_req_r  <= 1'b0;
         imem_recv   <= 1'b0;
         imem_addr   <= PC_RESET_ADDRESS;
     end else begin
-        imem_req    <= n_imem_req;
+        imem_req_r  <= n_imem_req;
         imem_recv   <= imem_req && imem_gnt;
         if(e_cf_change) begin
             imem_addr <= cf_target;
@@ -86,7 +89,8 @@ end
 // When to flush the instruction fetch buffer?
 wire        buf_flush       = e_cf_change   ;
 
-wire [ 4:0] buf_depth       ; // How many bytes are in the buffer?
+wire [ 4:0]   buf_depth     ; // How many bytes are in the buffer?
+wire [ 4:0] n_buf_depth     ; //
 
 wire [63:0] buf_data_in     = imem_rdata    ;
 wire        buf_error_in    = imem_err      ;
@@ -103,7 +107,7 @@ wire        buf_drain_2     = s1_valid && s2_eat_2;
 wire        buf_drain_4     = s1_valid && s2_eat_4;
 
 // Is the buffer ready to accept more data?
-wire        buf_ready       = buf_depth  <= 4;
+wire        buf_ready       = n_buf_depth  < 4;
 
 // Is there currently a 16 or 32 bit instruction in the buffer?
 wire        buf_16bit       = buf_depth >= 2 && buf_data_out[1:0] != 2'b11;
@@ -149,6 +153,7 @@ core_pipe_fetch_buffer i_core_pipe_fetch_buffer (
 .g_resetn    (g_resetn        ), // Global active low sync reset.
 .flush       (buf_flush       ), // Flush data from the buffer.
 .depth       (buf_depth       ), // How many bytes are in the buffer?
+.n_depth     (n_buf_depth     ), //
 .data_in     (buf_data_in     ), // Data in
 .error_in    (buf_error_in    ), // Tag with error?
 .fill_2      (buf_fill_2      ), // Load top 2 bytes of input data.

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VARIANTS="rv64i rv64im rv64imc"
+VARIANTS="rv32i rv32im rv32imc rv64i rv64im"
 
 OBJCOPY=$RISCV/bin/riscv64-unknown-elf-objcopy
 OBJDUMP=$RISCV/bin/riscv64-unknown-elf-objdump
@@ -14,7 +14,9 @@ for V in $VARIANTS
 do
 
     cd extern/riscv-compliance
-    make RISCV_TARGET=riscvOVPsim RISCV_DEVICE=$V
+    make -B RISCV_PREFIX=riscv64-unknown-elf- \
+            RISCV_TARGET=riscvOVPsim \
+            RISCV_DEVICE=$V
     cd -
 
     SRC_DIR=$REPO_HOME/extern/riscv-compliance/work/$V

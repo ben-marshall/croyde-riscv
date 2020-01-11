@@ -12,6 +12,7 @@ input  wire         g_resetn    , // Global active low sync reset.
 
 input  wire         flush       , // Flush data from the buffer.
 output reg  [ 4:0]  depth       , // How many bytes are in the buffer?
+output wire [ 4:0]  n_depth     , // Buffer depth for next cycle.
 
 input  wire [63:0]  data_in     , // Data in
 input  wire         error_in    , // Tag with error?
@@ -57,7 +58,7 @@ wire [3:0] bd_sub = {
     1'b0
 };
 
-wire [4:0] n_depth = depth + bd_add - bd_sub;
+assign n_depth = depth + bd_add - bd_sub;
 
 always @(posedge g_clk) begin
     if(!g_resetn || flush) begin
