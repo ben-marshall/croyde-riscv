@@ -63,7 +63,8 @@ wire                 cf_ack      ; // Control flow change acknwoledged
 wire [         XL:0] cf_target   ; // Control flow change destination
 wire [ CF_CAUSE_R:0] cf_cause    ; // Control flow change cause
 
-wire                 s1_valid    ; // Fetch -> Decode data valid?
+wire                 s1_16bit    ; // 16 bit instruction?
+wire                 s1_32bit    ; // 32 bit instruction?
 wire [  FD_IBUF_R:0] s1_instr    ; // Instruction to be decoded
 wire [         XL:0] s1_pc       ; // Program Counter
 wire [   FD_ERR_R:0] s1_ferr     ; // Fetch bus error?
@@ -92,12 +93,31 @@ core_pipe_fetch i_core_pipe_fetch (
 .imem_gnt     (imem_gnt     ), // Memory response valid
 .imem_err     (imem_err     ), // Memory response error
 .imem_rdata   (imem_rdata   ), // Memory response read data
-.s1_valid     (s1_valid     ), // Fetch -> Decode data valid?
+.s1_16bit     (s1_16bit     ), // 16 bit instruction?
+.s1_32bit     (s1_32bit     ), // 32 bit instruction?
 .s1_instr     (s1_instr     ), // Instruction to be decoded
 .s1_pc        (s1_pc        ), // Program Counter
 .s1_ferr      (s1_ferr      ), // Fetch bus error?
 .s2_eat_2     (s2_eat_2     ), // Decode eats 2 bytes
 .s2_eat_4     (s2_eat_4     )  // Decode eats 4 bytes
+);
+
+
+//
+// Instance: core_pipe_decode
+//
+//  Pipeline decode / operand gather stage.
+//
+core_pipe_decode i_core_pipe_decode(
+.g_clk       (g_clk       ), // Global clock
+.g_resetn    (g_resetn    ), // Global active low sync reset.
+.s1_16bit    (s1_16bit    ), // 16 bit instruction?
+.s1_32bit    (s1_32bit    ), // 32 bit instruction?
+.s1_instr    (s1_instr    ), // Instruction to be decoded
+.s1_pc       (s1_pc       ), // Program Counter
+.s1_ferr     (s1_ferr     ), // Fetch bus error?
+.s2_eat_2    (s2_eat_2    ), // Decode eats 2 bytes
+.s2_eat_4    (s2_eat_4    )  // Decode eats 4 bytes
 );
 
 endmodule

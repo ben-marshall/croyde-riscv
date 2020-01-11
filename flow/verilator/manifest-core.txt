@@ -1,3 +1,4 @@
 $REPO_HOME/rtl/core/core_top.v
 $REPO_HOME/rtl/core/core_pipe_fetch.v
 $REPO_HOME/rtl/core/core_pipe_fetch_buffer.v
+$REPO_HOME/rtl/core/core_pipe_decode.v

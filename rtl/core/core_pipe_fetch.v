@@ -20,9 +20,10 @@ input  wire                 imem_gnt    , // Memory response valid
 input  wire                 imem_err    , // Memory response error
 input  wire [ MEM_DATA_R:0] imem_rdata  , // Memory response read data
 
-output wire                 s1_valid    , // Fetch -> Decode data valid?
+output wire                 s1_16bit    , // 16 bit instruction?
+output wire                 s1_32bit    , // 32 bit instruction?
 output wire [  FD_IBUF_R:0] s1_instr    , // Instruction to be decoded
-output wire [         XL:0] s1_pc       , // Program Counter
+output reg  [         XL:0] s1_pc       , // Program Counter
 output wire [   FD_ERR_R:0] s1_ferr     , // Fetch bus error?
 input  wire                 s2_eat_2    , // Decode eats 2 bytes
 input  wire                 s2_eat_4      // Decode eats 4 bytes
@@ -43,6 +44,9 @@ parameter   PC_RESET_ADDRESS      = 64'h80000000;
 wire e_cf_change    = cf_valid && cf_ack;
 
 wire e_imem_req     = imem_req && imem_gnt;
+
+wire e_eat_2        = s2_eat_2;
+wire e_eat_4        = s2_eat_4;
 
 //
 // Control flow change bus
@@ -83,6 +87,22 @@ always @(posedge g_clk) begin
 end
 
 //
+// Program Counter Tracking
+// ------------------------------------------------------------
+
+wire [XL:0] n_s1_pc = s1_pc + {61'b0, s1_32bit,s1_16bit, 1'b0};
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        s1_pc <= PC_RESET_ADDRESS;
+    end else if(e_cf_change) begin
+        s1_pc <= cf_target;
+    end else if(e_eat_2 || e_eat_4) begin
+        s1_pc <= n_s1_pc;
+    end
+end
+
+//
 // Buffer interfacing
 // ------------------------------------------------------------
 
@@ -103,18 +123,17 @@ reg         buf_fill_8      ; // Load top 8 bytes of input data.
 wire [31:0] buf_data_out    ; // Data out of the buffer.
 wire [ 1:0] buf_error_out   ; // Is data tagged with fetch error?
 
-wire        buf_drain_2     = s1_valid && s2_eat_2;
-wire        buf_drain_4     = s1_valid && s2_eat_4;
+wire        buf_drain_2     = s1_16bit;
+wire        buf_drain_4     = s1_32bit;
 
 // Is the buffer ready to accept more data?
-wire        buf_ready       = n_buf_depth  < 4;
+wire        buf_ready       = n_buf_depth  <= 4;
 
 // Is there currently a 16 or 32 bit instruction in the buffer?
-wire        buf_16bit       = buf_depth >= 2 && buf_data_out[1:0] != 2'b11;
-wire        buf_32bit       = buf_depth >= 4 && buf_data_out[1:0] == 2'b11;
+assign      s1_16bit       = buf_depth >= 2 && buf_data_out[1:0] != 2'b11;
+assign      s1_32bit       = buf_depth >= 4 && buf_data_out[1:0] == 2'b11;
 
 // Can we present a valid instruction to the decode stage?
-assign      s1_valid        = buf_16bit || buf_32bit;
 assign      s1_instr        = buf_data_out[31:0];
 assign      s1_ferr         = buf_error_out[1:0];
 

@@ -60,6 +60,8 @@ wire [3:0] bd_sub = {
 
 assign n_depth = depth + bd_add - bd_sub;
 
+wire [4:0] shf_up = depth - bd_sub;
+
 always @(posedge g_clk) begin
     if(!g_resetn || flush) begin
         depth <= 0;
@@ -82,18 +84,20 @@ wire [BR:0] n_d_buffer_in_pre_shift     =
     fill_2  ? {80'b0, data_in[15:0]}    :
     fill_4  ? {64'b0, data_in[31:0]}    :
     fill_6  ? {48'b0, data_in[47:0]}    :
-              {32'b0, data_in      }    ;
+    fill_8  ? {32'b0, data_in      }    :
+                                0       ;
 
 wire [ER:0] n_e_buffer_in_pre_shift     =
     fill_2  ? { 5'b0, {1{error_in}}}    :
     fill_4  ? { 4'b0, {2{error_in}}}    :
     fill_6  ? { 3'b0, {3{error_in}}}    :
-              { 2'b0, {4{error_in}}}    ;
+    fill_8  ? { 2'b0, {4{error_in}}}    :
+                                0       ;
 
 // Shift the bytes-to-load up to their new position in the buffer register.
-wire [BR:0] n_d_buffer_in_shift_up    = n_d_buffer_in_pre_shift << (8*depth);
+wire [BR:0] n_d_buffer_in_shift_up    = n_d_buffer_in_pre_shift << (8*shf_up);
 
-wire [ER:0] n_e_buffer_in_shift_up    = n_e_buffer_in_pre_shift << (  depth);
+wire [ER:0] n_e_buffer_in_shift_up    = n_e_buffer_in_pre_shift << (  shf_up);
 
 // Shift current buffer data down by the number of bits being drained.
 wire [BR:0] n_d_buffer_out_shift_down =
