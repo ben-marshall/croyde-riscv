@@ -1,0 +1,11 @@
+site_name: uc64
+theme: readthedocs
+nav:
+  - Home: index.md
+  - Project Organisation: project-organisation.md
+  - Requirements: functional-requirements.md
+  - Instruction Listing: instruction-listing.md
+  - Pipeline: pipeline.md
+  - Memory Interfaces: memory-interface.md
+  - Todo: todo.md
+  - Stories: stories.md

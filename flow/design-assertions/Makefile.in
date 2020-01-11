@@ -1,0 +1,90 @@
+
+DESIGN_ASSERTION_BMC_DEPTH  = 20
+
+DESIGN_ASSERTION_TOP        = core_top
+
+DESIGN_ASSERTIONS           =
+
+DESIGN_MACROS               =
+
+DA_DIR = $(REPO_WORK)/design-assertions
+
+define map_da_dir
+$(DA_DIR)/${1}
+endef
+
+define map_da_tcl
+$(call map_da_dir,${1})/${1}.tcl
+endef
+
+define map_da_smt2
+$(call map_da_dir,${1})/${1}.smt2
+endef
+
+define map_da_vcd
+$(call map_da_dir,${1})/${1}.vcd
+endef
+
+define map_da_bmc_log
+$(call map_da_dir,${1})/${1}_bmc.log
+endef
+
+define map_da_cov_log
+$(call map_da_dir,${1})/${1}_cov.log
+endef
+
+define map_da_log
+$(call map_da_dir,${1})/${1}.log
+endef
+
+#
+# Create a new set of targets for a single set of designer assertions.
+#
+define target_da
+
+$(call map_da_tcl,${1}) :
+	@mkdir -p $(dir $(call map_da_tcl,${1}))
+	echo "yosys -import" >  $${@}
+	echo "read_verilog -formal -D${1} \\" >> $${@}
+	echo "    -I$(REPO_HOME)/rtl/core \\" >> $${@}
+	echo "    $(REPO_HOME)/rtl/core/*.v" >> $${@}
+	echo "prep" >> $${@}
+	echo "write_smt2 -wires \\" >> $${@}
+	echo "    $(call map_da_smt2,${1})" >> $${@}
+
+$(call map_da_smt2,${1}) : $(CORE_RTL_SRCS) $(call map_da_tcl,${1})
+	yosys -QTq \
+	    -l $(call map_da_log,${1}) \
+	    -c $(call map_da_tcl,${1})
+
+$(call map_da_bmc_log,${1}) : $(call map_da_smt2,${1})
+	yosys-smtbmc \
+	    -s boolector \
+	    -t $(DESIGN_ASSERTION_BMC_DEPTH) \
+	    -m $(DESIGN_ASSERTION_TOP) \
+	    --dump-vcd $(call map_da_vcd,${1}) \
+	    $(call map_da_smt2,${1}) \
+	| tee $(call map_da_bmc_log,${1})
+
+$(call map_da_cov_log,${1}) : $(call map_da_smt2,${1})
+	yosys-smtbmc \
+	    -s boolector \
+	    -t $(DESIGN_ASSERTION_BMC_DEPTH) \
+	    -m $(DESIGN_ASSERTION_TOP) \
+	    -c \
+	    $(call map_da_smt2,${1}) \
+	| tee $(call map_da_cov_log,${1})
+
+
+bmc-da-${1} : $(call map_da_smt2,${1}) \
+              $(call map_da_bmc_log,${1}) \
+              $(call map_da_cov_log,${1}) \
+
+DESIGN_ASSERTIONS += bmc-da-${1}
+
+endef
+
+$(foreach DMA, $(DESIGN_MACROS),$(eval $(call target_da,$(DMA))) )
+
+design-assertions: $(DESIGN_ASSERTIONS)
+

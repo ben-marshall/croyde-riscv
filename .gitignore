@@ -1,0 +1,12 @@
+*.*.swo
+*.*.swp
+*.eps
+*.pdf
+*.swo
+*.swp
+*.vim
+
+*__pycache__*
+
+work/*
+.~*
