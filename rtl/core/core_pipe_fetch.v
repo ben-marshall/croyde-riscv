@@ -24,6 +24,7 @@ output wire                 s1_16bit    , // 16 bit instruction?
 output wire                 s1_32bit    , // 32 bit instruction?
 output wire [  FD_IBUF_R:0] s1_instr    , // Instruction to be decoded
 output reg  [         XL:0] s1_pc       , // Program Counter
+output wire [         XL:0] s1_npc      , // Next Program Counter
 output wire [   FD_ERR_R:0] s1_ferr     , // Fetch bus error?
 input  wire                 s2_eat_2    , // Decode eats 2 bytes
 input  wire                 s2_eat_4      // Decode eats 4 bytes
@@ -91,6 +92,8 @@ end
 // ------------------------------------------------------------
 
 wire [XL:0] n_s1_pc = s1_pc + {61'b0, s1_32bit,s1_16bit, 1'b0};
+
+assign      s1_npc  = n_s1_pc;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin

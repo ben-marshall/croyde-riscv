@@ -67,9 +67,20 @@ wire                 s1_16bit    ; // 16 bit instruction?
 wire                 s1_32bit    ; // 32 bit instruction?
 wire [  FD_IBUF_R:0] s1_instr    ; // Instruction to be decoded
 wire [         XL:0] s1_pc       ; // Program Counter
+wire [         XL:0] s1_npc      ; // Next Program Counter
 wire [   FD_ERR_R:0] s1_ferr     ; // Fetch bus error?
 wire                 s2_eat_2    ; // Decode eats 2 bytes
 wire                 s2_eat_4    ; // Decode eats 4 bytes
+
+wire [ REG_ADDR_R:0] s2_rs1_addr ; // RS1 Address
+wire [         XL:0] s2_rs1_data ; // RS1 Read Data (Forwarded)
+wire [ REG_ADDR_R:0] s2_rs2_addr ; // RS2 Address
+wire [         XL:0] s2_rs2_data ; // RS2 Read Data (Forwarded)
+
+wire [         XL:0] s2_opr_a    ;
+wire [         XL:0] s2_opr_b    ;
+wire [         XL:0] s2_opr_c    ;
+wire [ REG_ADDR_R:0] s2_rd       ;
 
 //
 // Submodule instances.
@@ -97,6 +108,7 @@ core_pipe_fetch i_core_pipe_fetch (
 .s1_32bit     (s1_32bit     ), // 32 bit instruction?
 .s1_instr     (s1_instr     ), // Instruction to be decoded
 .s1_pc        (s1_pc        ), // Program Counter
+.s1_npc       (s1_npc       ), // Next Program Counter
 .s1_ferr      (s1_ferr      ), // Fetch bus error?
 .s2_eat_2     (s2_eat_2     ), // Decode eats 2 bytes
 .s2_eat_4     (s2_eat_4     )  // Decode eats 4 bytes
@@ -115,9 +127,18 @@ core_pipe_decode i_core_pipe_decode(
 .s1_32bit    (s1_32bit    ), // 32 bit instruction?
 .s1_instr    (s1_instr    ), // Instruction to be decoded
 .s1_pc       (s1_pc       ), // Program Counter
+.s1_npc      (s1_npc      ), // Next Program Counter
 .s1_ferr     (s1_ferr     ), // Fetch bus error?
 .s2_eat_2    (s2_eat_2    ), // Decode eats 2 bytes
-.s2_eat_4    (s2_eat_4    )  // Decode eats 4 bytes
+.s2_eat_4    (s2_eat_4    ), // Decode eats 4 bytes
+.s2_rs1_addr (s2_rs1_addr ), // RS1 Address
+.s2_rs1_data (s2_rs1_data ), // RS1 Read Data (Forwarded)
+.s2_rs2_addr (s2_rs2_addr ), // RS2 Address
+.s2_rs2_data (s2_rs2_data ), // RS2 Read Data (Forwarded)
+.s2_opr_a    (s2_opr_a    ),
+.s2_opr_b    (s2_opr_b    ),
+.s2_opr_c    (s2_opr_c    ),
+.s2_rd       (s2_rd       ) 
 );
 
 endmodule

@@ -26,3 +26,5 @@ localparam  FD_IBUF_R   = FD_IBUF_W   - 1;
 localparam  FD_ERR_W    = FD_IBUF_W   /16;
 localparam  FD_ERR_R    = FD_ERR_W    - 1;
 
+localparam  REG_ADDR_W  = 5             ;
+localparam  REG_ADDR_R  = REG_ADDR_W - 1;
