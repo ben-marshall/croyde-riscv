@@ -28,3 +28,88 @@ localparam  FD_ERR_R    = FD_ERR_W    - 1;
 
 localparam  REG_ADDR_W  = 5             ;
 localparam  REG_ADDR_R  = REG_ADDR_W - 1;
+
+//
+// ALU Op codes
+
+localparam ALU_OP_W         = 4;
+localparam ALU_OP_R         = ALU_OP_W - 1;
+
+localparam ALU_OP_NOP       = 4'h0;
+localparam ALU_OP_ADD       = 4'h1;
+localparam ALU_OP_SUB       = 4'h2;
+localparam ALU_OP_SLL       = 4'h3;
+localparam ALU_OP_SLR       = 4'h4;
+localparam ALU_OP_SRA       = 4'h5;
+localparam ALU_OP_AND       = 4'h6;
+localparam ALU_OP_OR        = 4'h7;
+localparam ALU_OP_NOT       = 4'h8;
+localparam ALU_OP_XOR       = 4'h9;
+localparam ALU_OP_SLT       = 4'hA;
+localparam ALU_OP_SLTU      = 4'hB;
+
+//
+// MUL / DIV Opcodes
+
+localparam MDU_OP_W         = 4;
+localparam MDU_OP_R         = MDU_OP_W - 1;
+
+localparam MDU_OP_NOP       = 4'h0;
+localparam MDU_OP_MUL       = 4'h1;
+localparam MDU_OP_MULH      = 4'h2;
+localparam MDU_OP_MULHSU    = 4'h3;
+localparam MDU_OP_MULHU     = 4'h4;
+localparam MDU_OP_DIV       = 4'h5;
+localparam MDU_OP_DIVU      = 4'h6;
+localparam MDU_OP_REM       = 4'h7;
+localparam MDU_OP_REMU      = 4'h8;
+
+//
+// Load/Store opcodes
+
+localparam LSU_OP_W         = 5;
+localparam LSU_OP_R         = LSU_OP_W - 1;
+
+localparam LSU_OP_NOP       = 5'b0_000_0;
+localparam LSU_OP_LB        = 5'b0_001_1;
+localparam LSU_OP_LBU       = 5'b0_001_0;
+localparam LSU_OP_LH        = 5'b0_010_1;
+localparam LSU_OP_LHU       = 5'b0_010_0;
+localparam LSU_OP_LW        = 5'b0_011_1;
+localparam LSU_OP_LWU       = 5'b0_011_0;
+localparam LSU_OP_LD        = 5'b0_100_1;
+localparam LSU_OP_SB        = 5'b1_001_0;
+localparam LSU_OP_SH        = 5'b1_010_0;
+localparam LSU_OP_SW        = 5'b1_011_0;
+localparam LSU_OP_SD        = 5'b1_100_0;
+
+//
+// CSR Opcodes
+
+localparam CSR_OP_W         = 4;
+localparam CSR_OP_R         = CSR_OP_W - 1;
+
+localparam CSR_OP_NOP       = 4'b000;
+localparam CSR_OP_RD        = 4'b001;
+localparam CSR_OP_SET       = 4'b010;
+localparam CSR_OP_CLR       = 4'b100;
+
+//
+//  CFU Opcodes
+
+localparam CFU_OP_W         = 4;
+localparam CFU_OP_R         = CFU_OP_W - 1;
+
+localparam CFU_OP_NOP       = 4'h0;
+localparam CFU_OP_J         = 4'h1;
+localparam CFU_OP_JAL       = 4'h2;
+localparam CFU_OP_BEQ       = 4'h3;
+localparam CFU_OP_BNE       = 4'h4;
+localparam CFU_OP_BLT       = 4'h5;
+localparam CFU_OP_BLTU      = 4'h6;
+localparam CFU_OP_BGE       = 4'h7;
+localparam CFU_OP_BGEU      = 4'h8;
+localparam CFU_OP_MRET      = 4'h9;
+localparam CFU_OP_EBREAK    = 4'hA;
+localparam CFU_OP_ECALL     = 4'hB;
+

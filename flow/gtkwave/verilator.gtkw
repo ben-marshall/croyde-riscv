@@ -1,10 +1,10 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Mon Jan 13 18:32:54 2020
+[*] Sat Jan 18 18:10:17 2020
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/uc64/work/verilator/waves.vcd"
-[dumpfile_mtime] "Mon Jan 13 18:31:24 2020"
-[dumpfile_size] 102368
+[dumpfile_mtime] "Sat Jan 18 18:09:47 2020"
+[dumpfile_size] 114809
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/verilator.gtkw"
 [timestart] 1
 [size] 1920 1025
@@ -131,7 +131,7 @@ TOP.core_top.i_core_pipe_decode.s2_rs1_addr[4:0]
 TOP.core_top.i_core_pipe_decode.s2_rs1_data[63:0]
 TOP.core_top.i_core_pipe_decode.s2_rs2_addr[4:0]
 TOP.core_top.i_core_pipe_decode.s2_rs2_data[63:0]
-@29
+@28
 TOP.core_top.i_core_pipe_decode.sel_opr_a_pc
 TOP.core_top.i_core_pipe_decode.sel_opr_a_rs1
 TOP.core_top.i_core_pipe_decode.sel_opr_b_imm
@@ -274,6 +274,13 @@ TOP.core_top.i_core_pipe_decode.dec_succ[3:0]
 TOP.core_top.i_core_pipe_decode.dec_zimm[4:0]
 @1401200
 -Field Decode
+@22
+TOP.core_top.i_core_pipe_decode.n_s2_opr_a[63:0]
+TOP.core_top.i_core_pipe_decode.n_s2_opr_b[63:0]
+@23
+TOP.core_top.i_core_pipe_decode.n_s2_opr_c[63:0]
+@22
+TOP.core_top.i_core_pipe_decode.n_s2_rd[4:0]
 @1000200
 -Pipeline - Decode
 [pattern_trace] 1

@@ -63,6 +63,11 @@ wire                 cf_ack      ; // Control flow change acknwoledged
 wire [         XL:0] cf_target   ; // Control flow change destination
 wire [ CF_CAUSE_R:0] cf_cause    ; // Control flow change cause
 
+wire                 s2_cf_valid ; // Control flow change?
+wire                 s2_cf_ack   ; // Control flow change acknwoledged
+wire [         XL:0] s2_cf_target; // Control flow change destination
+wire [ CF_CAUSE_R:0] s2_cf_cause ; // Control flow change cause
+
 wire                 s1_16bit    ; // 16 bit instruction?
 wire                 s1_32bit    ; // 32 bit instruction?
 wire [  FD_IBUF_R:0] s1_instr    ; // Instruction to be decoded
@@ -77,10 +82,20 @@ wire [         XL:0] s2_rs1_data ; // RS1 Read Data (Forwarded)
 wire [ REG_ADDR_R:0] s2_rs2_addr ; // RS2 Address
 wire [         XL:0] s2_rs2_data ; // RS2 Read Data (Forwarded)
 
+wire                 s2_valid    ;
+wire                 s3_ready    ;
+wire [         XL:0] s2_pc       ;
 wire [         XL:0] s2_opr_a    ;
 wire [         XL:0] s2_opr_b    ;
 wire [         XL:0] s2_opr_c    ;
 wire [ REG_ADDR_R:0] s2_rd       ;
+wire [   ALU_OP_R:0] s2_alu_op   ;
+wire [   ALU_OP_R:0] s2_lsu_op   ;
+wire [   ALU_OP_R:0] s2_mdu_op   ;
+wire [   ALU_OP_R:0] s2_csr_op   ;
+wire [   ALU_OP_R:0] s2_cfu_op   ;
+wire                 s2_op_w     ;
+wire [         32:0] s2_instr    ;
 
 //
 // Submodule instances.
@@ -131,14 +146,28 @@ core_pipe_decode i_core_pipe_decode(
 .s1_ferr     (s1_ferr     ), // Fetch bus error?
 .s2_eat_2    (s2_eat_2    ), // Decode eats 2 bytes
 .s2_eat_4    (s2_eat_4    ), // Decode eats 4 bytes
+.s2_cf_valid (s2_cf_valid ), // Control flow change?
+.s2_cf_ack   (s2_cf_ack   ), // Control flow change acknwoledged
+.s2_cf_target(s2_cf_target), // Control flow change destination
+.s2_cf_cause (s2_cf_cause ), // Control flow change cause
 .s2_rs1_addr (s2_rs1_addr ), // RS1 Address
 .s2_rs1_data (s2_rs1_data ), // RS1 Read Data (Forwarded)
 .s2_rs2_addr (s2_rs2_addr ), // RS2 Address
 .s2_rs2_data (s2_rs2_data ), // RS2 Read Data (Forwarded)
-.s2_opr_a    (s2_opr_a    ),
-.s2_opr_b    (s2_opr_b    ),
-.s2_opr_c    (s2_opr_c    ),
-.s2_rd       (s2_rd       ) 
+.s2_valid    (s2_valid    ), // 
+.s3_ready    (s3_ready    ), // 
+.s2_pc       (s2_pc       ), // 
+.s2_opr_a    (s2_opr_a    ), // 
+.s2_opr_b    (s2_opr_b    ), // 
+.s2_opr_c    (s2_opr_c    ), // 
+.s2_rd       (s2_rd       ), // 
+.s2_alu_op   (s2_alu_op   ), // 
+.s2_lsu_op   (s2_lsu_op   ), // 
+.s2_mdu_op   (s2_mdu_op   ), // 
+.s2_csr_op   (s2_csr_op   ), // 
+.s2_cfu_op   (s2_cfu_op   ), // 
+.s2_op_w     (s2_op_w     ), // 
+.s2_instr    (s2_instr    )  // 
 );
 
 endmodule
