@@ -18,15 +18,15 @@ input  wire [   FD_ERR_R:0] s1_ferr     , // Fetch bus error?
 output wire                 s2_eat_2    , // Decode eats 2 bytes
 output wire                 s2_eat_4    , // Decode eats 4 bytes
 
-output wire                 s2_cf_valid , // Control flow change?
-input  wire                 s2_cf_ack   , // Control flow change acknwoledged
-output wire [         XL:0] s2_cf_target, // Control flow change destination
-output wire [ CF_CAUSE_R:0] s2_cf_cause , // Control flow change cause
+output wire                 s1_cf_valid , // Control flow change?
+input  wire                 s1_cf_ack   , // Control flow change acknwoledged
+output wire [         XL:0] s1_cf_target, // Control flow change destination
+output wire [ CF_CAUSE_R:0] s1_cf_cause , // Control flow change cause
 
-output wire [ REG_ADDR_R:0] s2_rs1_addr , // RS1 Address
-input  wire [         XL:0] s2_rs1_data , // RS1 Read Data (Forwarded)
-output wire [ REG_ADDR_R:0] s2_rs2_addr , // RS2 Address
-input  wire [         XL:0] s2_rs2_data , // RS2 Read Data (Forwarded)
+output wire [ REG_ADDR_R:0] s1_rs1_addr , // RS1 Address
+input  wire [         XL:0] s1_rs1_data , // RS1 Read Data (Forwarded)
+output wire [ REG_ADDR_R:0] s1_rs2_addr , // RS2 Address
+input  wire [         XL:0] s1_rs2_data , // RS2 Read Data (Forwarded)
 
 output wire                 s2_valid    ,
 input  wire                 s3_ready    ,
@@ -57,8 +57,8 @@ output reg  [         32:0] s2_instr
 
 //
 // TODO: Stalls to delay eating of 16/32 bit instructions.
-assign s2_eat_2     = s1_16bit && !s2_cf_wait;
-assign s2_eat_4     = s1_32bit && !s2_cf_wait;
+assign s2_eat_2     = s1_16bit && !s1_cf_wait;
+assign s2_eat_4     = s1_32bit && !s1_cf_wait;
 
 //
 // Next pipeline stage value selection
@@ -169,15 +169,15 @@ wire sel_opr_c_rs2  =
 
 
 assign n_s2_opr_a   =
-    {64{sel_opr_a_rs1}} & s2_rs1_data |
+    {64{sel_opr_a_rs1}} & s1_rs1_data |
     {64{sel_opr_a_pc }} & s1_pc       ;
 
 assign n_s2_opr_b   =
-    {64{sel_opr_b_rs2}} & s2_rs2_data |
+    {64{sel_opr_b_rs2}} & s1_rs2_data |
     {64{sel_opr_b_imm}} & opr_b_imm   ;
 
 assign n_s2_opr_c   =
-    {64{sel_opr_c_rs2}} & s2_rs2_data |
+    {64{sel_opr_c_rs2}} & s1_rs2_data |
     {64{sel_opr_c_imm}} & opr_c_imm   |
     {64{sel_opr_c_npc}} & s1_npc      ;
 
@@ -350,13 +350,13 @@ wire [CFU_OP_R:0] n_cfu_op =
 // Offset used when calculating jumps taken from the decode stage.
 wire [XL:0] decode_cf_offset = {32'b0, imm_c_j};
 
-assign s2_cf_target = s1_pc + decode_cf_offset;
+assign s1_cf_target = s1_pc + decode_cf_offset;
 
-assign s2_cf_valid  = dec_jalr || dec_jal || dec_c_jal || dec_c_j;
+assign s1_cf_valid  = dec_jalr || dec_jal || dec_c_jal || dec_c_j;
 
-wire   s2_cf_taken  = s2_cf_valid && s2_cf_ack;
+wire   s1_cf_taken  = s1_cf_valid && s1_cf_ack;
 
-wire   s2_cf_wait   = s2_cf_valid && !s2_cf_ack;
+wire   s1_cf_wait   = s1_cf_valid && !s1_cf_ack;
 
 
 //

@@ -63,23 +63,23 @@ wire                 cf_ack      ; // Control flow change acknwoledged
 wire [         XL:0] cf_target   ; // Control flow change destination
 wire [ CF_CAUSE_R:0] cf_cause    ; // Control flow change cause
 
-wire                 s2_cf_valid ; // DE Control flow change?
-wire                 s2_cf_ack   ; // DE Control flow change acknwoledged
-wire [         XL:0] s2_cf_target; // DE Control flow change destination
-wire [ CF_CAUSE_R:0] s2_cf_cause ; // DE Control flow change cause
+wire                 s1_cf_valid ; // DE Control flow change?
+wire                 s1_cf_ack   ; // DE Control flow change acknwoledged
+wire [         XL:0] s1_cf_target; // DE Control flow change destination
+wire [ CF_CAUSE_R:0] s1_cf_cause ; // DE Control flow change cause
 
-wire                 s3_cf_valid ; // EX Control flow change?
-wire                 s3_cf_ack   ; // EX Control flow change acknwoledged
-wire [         XL:0] s3_cf_target; // EX Control flow change destination
-wire [ CF_CAUSE_R:0] s3_cf_cause ; // EX Control flow change cause
+wire                 s2_cf_valid ; // EX Control flow change?
+wire                 s2_cf_ack   ; // EX Control flow change acknwoledged
+wire [         XL:0] s2_cf_target; // EX Control flow change destination
+wire [ CF_CAUSE_R:0] s2_cf_cause ; // EX Control flow change cause
 
-assign cf_valid     = s2_cf_valid || s3_cf_valid;
+assign cf_valid     = s1_cf_valid || s2_cf_valid;
 
+assign s1_cf_ack    = cf_ack;
 assign s2_cf_ack    = cf_ack;
-assign s3_cf_ack    = cf_ack;
 
-assign cf_cause     = s3_cf_valid ? s3_cf_cause     : s2_cf_cause   ;
-assign cf_target    = s3_cf_valid ? s3_cf_target    : s2_cf_target  ;
+assign cf_cause     = s2_cf_valid ? s2_cf_cause     : s1_cf_cause   ;
+assign cf_target    = s2_cf_valid ? s2_cf_target    : s1_cf_target  ;
 
 //
 // Inter-stage wiring
@@ -94,10 +94,10 @@ wire [   FD_ERR_R:0] s1_ferr     ; // Fetch bus error?
 wire                 s2_eat_2    ; // Decode eats 2 bytes
 wire                 s2_eat_4    ; // Decode eats 4 bytes
 
-wire [ REG_ADDR_R:0] s2_rs1_addr ; // RS1 Address
-wire [         XL:0] s2_rs1_data ; // RS1 Read Data (Forwarded)
-wire [ REG_ADDR_R:0] s2_rs2_addr ; // RS2 Address
-wire [         XL:0] s2_rs2_data ; // RS2 Read Data (Forwarded)
+wire [ REG_ADDR_R:0] s1_rs1_addr ; // RS1 Address
+wire [         XL:0] s1_rs1_data ; // RS1 Read Data (Forwarded)
+wire [ REG_ADDR_R:0] s1_rs2_addr ; // RS2 Address
+wire [         XL:0] s1_rs2_data ; // RS2 Read Data (Forwarded)
 
 wire                 s2_valid    ;
 wire                 s3_ready    ;
@@ -113,6 +113,10 @@ wire [   ALU_OP_R:0] s2_csr_op   ;
 wire [   ALU_OP_R:0] s2_cfu_op   ;
 wire                 s2_op_w     ;
 wire [         32:0] s2_instr    ;
+
+wire                 s2_rd_wen   ;
+wire [ REG_ADDR_R:0] s2_rd_addr  ;
+wire [         XL:0] s2_rd_wdata ;
 
 //
 // Submodule instances.
@@ -163,14 +167,14 @@ core_pipe_decode i_core_pipe_decode(
 .s1_ferr     (s1_ferr     ), // Fetch bus error?
 .s2_eat_2    (s2_eat_2    ), // Decode eats 2 bytes
 .s2_eat_4    (s2_eat_4    ), // Decode eats 4 bytes
-.s2_cf_valid (s2_cf_valid ), // Control flow change?
-.s2_cf_ack   (s2_cf_ack   ), // Control flow change acknwoledged
-.s2_cf_target(s2_cf_target), // Control flow change destination
-.s2_cf_cause (s2_cf_cause ), // Control flow change cause
-.s2_rs1_addr (s2_rs1_addr ), // RS1 Address
-.s2_rs1_data (s2_rs1_data ), // RS1 Read Data (Forwarded)
-.s2_rs2_addr (s2_rs2_addr ), // RS2 Address
-.s2_rs2_data (s2_rs2_data ), // RS2 Read Data (Forwarded)
+.s1_cf_valid (s1_cf_valid ), // Control flow change?
+.s1_cf_ack   (s1_cf_ack   ), // Control flow change acknwoledged
+.s1_cf_target(s1_cf_target), // Control flow change destination
+.s1_cf_cause (s1_cf_cause ), // Control flow change cause
+.s1_rs1_addr (s1_rs1_addr ), // RS1 Address
+.s1_rs1_data (s1_rs1_data ), // RS1 Read Data (Forwarded)
+.s1_rs2_addr (s1_rs2_addr ), // RS2 Address
+.s1_rs2_data (s1_rs2_data ), // RS2 Read Data (Forwarded)
 .s2_valid    (s2_valid    ), // 
 .s3_ready    (s3_ready    ), // 
 .s2_pc       (s2_pc       ), // 
@@ -185,6 +189,23 @@ core_pipe_decode i_core_pipe_decode(
 .s2_cfu_op   (s2_cfu_op   ), // 
 .s2_op_w     (s2_op_w     ), // 
 .s2_instr    (s2_instr    )  // 
+);
+
+//
+// instance: core_regfile
+//
+//  Core register file. 2 read, 1 write.
+//
+core_regfile i_core_regfile (
+.g_clk    (g_clk       ),
+.g_resetn (g_resetn    ),
+.rs1_addr (s1_rs1_addr ),
+.rs2_addr (s1_rs2_addr ),
+.rs1_data (s1_rs1_data ),
+.rs2_data (s1_rs2_data ),
+.rd_wen   (s2_rd_wen   ),
+.rd_addr  (s2_rd       ),
+.rd_wdata (s2_rd_wdata ) 
 );
 
 endmodule

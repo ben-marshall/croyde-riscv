@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sun Jan 26 17:40:57 2020
+[*] Sun Jan 26 18:23:54 2020
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/uc64/work/verilator/waves.vcd"
-[dumpfile_mtime] "Sun Jan 26 17:38:54 2020"
-[dumpfile_size] 182413
+[dumpfile_mtime] "Sun Jan 26 18:19:26 2020"
+[dumpfile_size] 195870
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/verilator.gtkw"
-[timestart] 1
+[timestart] 116
 [size] 1920 1025
 [pos] -1 -1
-*-8.105254 288 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-6.733938 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.core_top.
 [treeopen] TOP.core_top.i_core_pipe_fetch.
@@ -135,6 +135,43 @@ TOP.core_top.i_core_pipe_fetch.n_s1_pc[63:0]
 -Fetch -> Decode
 @1000200
 -Pipeline - Fetch
+@c00201
+-GPRs
+@23
+TOP.core_top.i_core_regfile.regs(0)[63:0]
+TOP.core_top.i_core_regfile.regs(1)[63:0]
+TOP.core_top.i_core_regfile.regs(2)[63:0]
+TOP.core_top.i_core_regfile.regs(3)[63:0]
+TOP.core_top.i_core_regfile.regs(4)[63:0]
+TOP.core_top.i_core_regfile.regs(5)[63:0]
+TOP.core_top.i_core_regfile.regs(6)[63:0]
+TOP.core_top.i_core_regfile.regs(7)[63:0]
+TOP.core_top.i_core_regfile.regs(8)[63:0]
+TOP.core_top.i_core_regfile.regs(9)[63:0]
+TOP.core_top.i_core_regfile.regs(10)[63:0]
+TOP.core_top.i_core_regfile.regs(11)[63:0]
+TOP.core_top.i_core_regfile.regs(12)[63:0]
+TOP.core_top.i_core_regfile.regs(13)[63:0]
+TOP.core_top.i_core_regfile.regs(14)[63:0]
+TOP.core_top.i_core_regfile.regs(15)[63:0]
+TOP.core_top.i_core_regfile.regs(16)[63:0]
+TOP.core_top.i_core_regfile.regs(17)[63:0]
+TOP.core_top.i_core_regfile.regs(18)[63:0]
+TOP.core_top.i_core_regfile.regs(19)[63:0]
+TOP.core_top.i_core_regfile.regs(20)[63:0]
+TOP.core_top.i_core_regfile.regs(21)[63:0]
+TOP.core_top.i_core_regfile.regs(22)[63:0]
+TOP.core_top.i_core_regfile.regs(23)[63:0]
+TOP.core_top.i_core_regfile.regs(24)[63:0]
+TOP.core_top.i_core_regfile.regs(25)[63:0]
+TOP.core_top.i_core_regfile.regs(26)[63:0]
+TOP.core_top.i_core_regfile.regs(27)[63:0]
+TOP.core_top.i_core_regfile.regs(28)[63:0]
+TOP.core_top.i_core_regfile.regs(29)[63:0]
+TOP.core_top.i_core_regfile.regs(30)[63:0]
+TOP.core_top.i_core_regfile.regs(31)[63:0]
+@1401201
+-GPRs
 @800200
 -Pipeline - Decode
 @28
@@ -158,10 +195,6 @@ TOP.core_top.i_core_pipe_decode.s1_pc[63:0]
 TOP.core_top.i_core_pipe_decode.n_s2_opr_a[63:0]
 TOP.core_top.i_core_pipe_decode.n_s2_opr_b[63:0]
 TOP.core_top.i_core_pipe_decode.n_s2_opr_c[63:0]
-TOP.core_top.i_core_pipe_decode.s2_rs1_addr[4:0]
-TOP.core_top.i_core_pipe_decode.s2_rs1_data[63:0]
-TOP.core_top.i_core_pipe_decode.s2_rs2_addr[4:0]
-TOP.core_top.i_core_pipe_decode.s2_rs2_data[63:0]
 @28
 TOP.core_top.i_core_pipe_decode.sel_opr_a_pc
 TOP.core_top.i_core_pipe_decode.sel_opr_a_rs1
@@ -277,17 +310,6 @@ TOP.core_top.i_core_pipe_decode.dec_xori
 -Instruction Decode
 @800200
 -Decode Stage Control Flow
-@28
-TOP.core_top.i_core_pipe_decode.s2_cf_ack
-@22
-TOP.core_top.i_core_pipe_decode.s2_cf_cause[4:0]
-@28
-TOP.core_top.i_core_pipe_decode.s2_cf_taken
-@22
-TOP.core_top.i_core_pipe_decode.s2_cf_target[63:0]
-@28
-TOP.core_top.i_core_pipe_decode.s2_cf_valid
-TOP.core_top.i_core_pipe_decode.s2_cf_wait
 @1000200
 -Decode Stage Control Flow
 @c00200
@@ -332,9 +354,7 @@ TOP.core_top.i_core_pipe_decode.n_s2_rd[4:0]
 TOP.core_top.i_core_pipe_decode.n_s2_op_w
 @24
 TOP.core_top.i_core_pipe_decode.n_alu_op[3:0]
-@25
 TOP.core_top.i_core_pipe_decode.n_cfu_op[3:0]
-@24
 TOP.core_top.i_core_pipe_decode.n_csr_op[3:0]
 TOP.core_top.i_core_pipe_decode.n_lsu_op[4:0]
 TOP.core_top.i_core_pipe_decode.n_mdu_op[3:0]
