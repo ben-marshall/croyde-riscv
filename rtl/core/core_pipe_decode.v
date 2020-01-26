@@ -72,6 +72,24 @@ wire [ REG_ADDR_R:0] n_s2_rd        ;
 wire [         XL:0] opr_b_imm      ;
 wire [         XL:0] opr_c_imm      ;
 
+wire [         31:0] imm_i32        ;
+wire [         11:0] imm_csr_addr   ;
+wire [          4:0] imm_csr_mask   ;
+wire [         31:0] imm32_s        ;
+wire [         31:0] imm32_b        ;
+wire [         31:0] imm32_u        ;
+wire [         31:0] imm32_j        ;
+wire [         31:0] imm_addi16sp   ;
+wire [         31:0] imm_addi4spn   ;
+wire [         31:0] imm_c_lsw      ;
+wire [         31:0] imm_c_addi     ;
+wire [         31:0] imm_c_lui      ;
+wire [         31:0] imm_c_shamt    ;
+wire [         31:0] imm_c_lwsp     ;
+wire [         31:0] imm_c_swsp     ;
+wire [         31:0] imm_c_j        ;
+wire [         31:0] imm_c_bz       ;
+
 //
 // Operand A
 
@@ -330,7 +348,7 @@ wire [CFU_OP_R:0] n_cfu_op =
 // ------------------------------------------------------------
 
 // Offset used when calculating jumps taken from the decode stage.
-wire [XL:0] decode_cf_offset;
+wire [XL:0] decode_cf_offset = {32'b0, imm_c_j};
 
 assign s2_cf_target = s1_pc + decode_cf_offset;
 
@@ -339,6 +357,32 @@ assign s2_cf_valid  = dec_jalr || dec_jal || dec_c_jal || dec_c_j;
 wire   s2_cf_taken  = s2_cf_valid && s2_cf_ack;
 
 wire   s2_cf_wait   = s2_cf_valid && !s2_cf_ack;
+
+
+//
+// Submodule instances
+// ------------------------------------------------------------
+
+core_pipe_decode_immediates i_core_pipe_decode_immediates (
+.instr        (s1_instr     ),   // Input encoded instruction.
+.imm_i32      (imm_i32      ),
+.imm_csr_addr (imm_csr_addr ),
+.imm_csr_mask (imm_csr_mask ),
+.imm32_s      (imm32_s      ),
+.imm32_b      (imm32_b      ),
+.imm32_u      (imm32_u      ),
+.imm32_j      (imm32_j      ),
+.imm_addi16sp (imm_addi16sp ),
+.imm_addi4spn (imm_addi4spn ),
+.imm_c_lsw    (imm_c_lsw    ),
+.imm_c_addi   (imm_c_addi   ),
+.imm_c_lui    (imm_c_lui    ),
+.imm_c_shamt  (imm_c_shamt  ),
+.imm_c_lwsp   (imm_c_lwsp   ),
+.imm_c_swsp   (imm_c_swsp   ),
+.imm_c_j      (imm_c_j      ),
+.imm_c_bz     (imm_c_bz     ) 
+);
 
 endmodule
 
