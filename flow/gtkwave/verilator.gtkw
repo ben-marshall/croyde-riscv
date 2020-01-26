@@ -1,19 +1,19 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sat Jan 18 18:10:17 2020
+[*] Sun Jan 26 17:26:58 2020
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/uc64/work/verilator/waves.vcd"
-[dumpfile_mtime] "Sat Jan 18 18:09:47 2020"
-[dumpfile_size] 114809
+[dumpfile_mtime] "Sun Jan 26 17:26:44 2020"
+[dumpfile_size] 119131
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/verilator.gtkw"
 [timestart] 1
 [size] 1920 1025
 [pos] -1 -1
-*-6.481968 93 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-6.416787 264 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.core_top.
 [treeopen] TOP.core_top.i_core_pipe_fetch.
-[sst_width] 223
+[sst_width] 305
 [signals_width] 431
 [sst_expanded] 1
 [sst_vpaned_height] 301
@@ -22,7 +22,6 @@ TOP.core_top.i_core_pipe_fetch.g_clk
 TOP.core_top.i_core_pipe_fetch.g_resetn
 @800200
 -Pipeline - Fetch
-@c00200
 -Memory Bus - Instructions
 @28
 TOP.core_top.i_core_pipe_fetch.n_imem_req
@@ -36,11 +35,17 @@ TOP.core_top.i_core_pipe_fetch.imem_err
 TOP.core_top.i_core_pipe_fetch.imem_recv
 @22
 TOP.core_top.i_core_pipe_fetch.n_imem_addr[63:0]
-@1401200
--Memory Bus - Instructions
-@c00200
--Buffer
+@24
+TOP.core_top.i_core_pipe_fetch.n_reqs_outstanding[1:0]
+TOP.core_top.i_core_pipe_fetch.reqs_outstanding[1:0]
 @28
+TOP.core_top.i_core_pipe_fetch.ignore_rsp
+TOP.core_top.i_core_pipe_fetch.rsps_ignore[1:0]
+@1000200
+-Memory Bus - Instructions
+@800200
+-Buffer
+@29
 TOP.core_top.i_core_pipe_fetch.buf_ready
 @24
 TOP.core_top.i_core_pipe_fetch.n_buf_depth[4:0]
@@ -52,6 +57,7 @@ TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.d_buffer[95:0]
 TOP.core_top.i_core_pipe_fetch.buf_drain_2
 TOP.core_top.i_core_pipe_fetch.buf_drain_4
 TOP.core_top.i_core_pipe_fetch.buf_error_in
+TOP.core_top.i_core_pipe_fetch.buf_fill_en
 TOP.core_top.i_core_pipe_fetch.buf_fill_2
 TOP.core_top.i_core_pipe_fetch.buf_fill_4
 TOP.core_top.i_core_pipe_fetch.buf_fill_6
@@ -60,6 +66,8 @@ TOP.core_top.i_core_pipe_fetch.buf_flush
 TOP.core_top.i_core_pipe_fetch.buf_error_out[1:0]
 @22
 TOP.core_top.i_core_pipe_fetch.buf_data_out[31:0]
+@28
+TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.update_buffer
 @c00200
 -Buffer
 @28
@@ -84,8 +92,9 @@ TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.n_d_buffer[95:0]
 TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.d_buffer[95:0]
 @1401200
 -Buffer
+@1000200
 -Buffer
-@c00200
+@800200
 -Control Flow
 @28
 TOP.core_top.i_core_pipe_fetch.cf_ack
@@ -94,16 +103,21 @@ TOP.core_top.i_core_pipe_fetch.cf_cause[4:0]
 TOP.core_top.i_core_pipe_fetch.cf_target[63:0]
 @28
 TOP.core_top.i_core_pipe_fetch.cf_valid
-@1401200
+@22
+TOP.core_top.i_core_pipe_fetch.n_s1_pc[63:0]
+TOP.core_top.i_core_pipe_fetch.s1_npc[63:0]
+TOP.core_top.i_core_pipe_fetch.s1_pc[63:0]
+@1000200
 -Control Flow
-@c00200
+@800200
 -Events
 @28
 TOP.core_top.i_core_pipe_fetch.e_cf_change
 TOP.core_top.i_core_pipe_fetch.e_imem_req
+TOP.core_top.i_core_pipe_fetch.e_imem_recv
 TOP.core_top.i_core_pipe_fetch.e_eat_2
 TOP.core_top.i_core_pipe_fetch.e_eat_4
-@1401200
+@1000200
 -Events
 @c00200
 -Fetch -> Decode
@@ -123,6 +137,23 @@ TOP.core_top.i_core_pipe_fetch.n_s1_pc[63:0]
 -Pipeline - Fetch
 @800200
 -Pipeline - Decode
+@28
+TOP.core_top.i_core_pipe_decode.s2_eat_2
+TOP.core_top.i_core_pipe_decode.s2_eat_4
+@800200
+-Stage Input
+@28
+TOP.core_top.i_core_pipe_decode.s1_16bit
+TOP.core_top.i_core_pipe_decode.s1_32bit
+TOP.core_top.i_core_pipe_decode.s1_ferr[1:0]
+@22
+TOP.core_top.i_core_pipe_decode.s1_instr[31:0]
+TOP.core_top.i_core_pipe_decode.s1_npc[63:0]
+TOP.core_top.i_core_pipe_decode.s1_pc[63:0]
+@1000200
+-Stage Input
+@c00200
+-Operand Selection
 @22
 TOP.core_top.i_core_pipe_decode.n_s2_opr_a[63:0]
 TOP.core_top.i_core_pipe_decode.n_s2_opr_b[63:0]
@@ -139,6 +170,8 @@ TOP.core_top.i_core_pipe_decode.sel_opr_b_rs2
 TOP.core_top.i_core_pipe_decode.sel_opr_c_imm
 TOP.core_top.i_core_pipe_decode.sel_opr_c_npc
 TOP.core_top.i_core_pipe_decode.sel_opr_c_rs2
+@1401200
+-Operand Selection
 @c00200
 -Instruction Decode
 @28
@@ -242,6 +275,21 @@ TOP.core_top.i_core_pipe_decode.dec_xor
 TOP.core_top.i_core_pipe_decode.dec_xori
 @1401200
 -Instruction Decode
+@800200
+-Decode Stage Control Flow
+@28
+TOP.core_top.i_core_pipe_decode.s2_cf_ack
+@22
+TOP.core_top.i_core_pipe_decode.s2_cf_cause[4:0]
+@28
+TOP.core_top.i_core_pipe_decode.s2_cf_taken
+@22
+TOP.core_top.i_core_pipe_decode.s2_cf_target[63:0]
+@28
+TOP.core_top.i_core_pipe_decode.s2_cf_valid
+TOP.core_top.i_core_pipe_decode.s2_cf_wait
+@1000200
+-Decode Stage Control Flow
 @c00200
 -Field Decode
 @28
@@ -277,10 +325,17 @@ TOP.core_top.i_core_pipe_decode.dec_zimm[4:0]
 @22
 TOP.core_top.i_core_pipe_decode.n_s2_opr_a[63:0]
 TOP.core_top.i_core_pipe_decode.n_s2_opr_b[63:0]
-@23
 TOP.core_top.i_core_pipe_decode.n_s2_opr_c[63:0]
-@22
+@24
 TOP.core_top.i_core_pipe_decode.n_s2_rd[4:0]
+@28
+TOP.core_top.i_core_pipe_decode.n_s2_op_w
+@24
+TOP.core_top.i_core_pipe_decode.n_alu_op[3:0]
+TOP.core_top.i_core_pipe_decode.n_cfu_op[3:0]
+TOP.core_top.i_core_pipe_decode.n_csr_op[3:0]
+TOP.core_top.i_core_pipe_decode.n_lsu_op[4:0]
+TOP.core_top.i_core_pipe_decode.n_mdu_op[3:0]
 @1000200
 -Pipeline - Decode
 [pattern_trace] 1

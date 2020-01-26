@@ -14,6 +14,7 @@ input  wire         flush       , // Flush data from the buffer.
 output reg  [ 4:0]  depth       , // How many bytes are in the buffer?
 output wire [ 4:0]  n_depth     , // Buffer depth for next cycle.
 
+input  wire         fill_en     , // Buffer fill enable.
 input  wire [63:0]  data_in     , // Data in
 input  wire         error_in    , // Tag with error?
 input  wire         fill_2      , // Load top 2 bytes of input data.
@@ -58,14 +59,14 @@ wire [3:0] bd_sub = {
     1'b0
 };
 
-assign n_depth = depth + bd_add - bd_sub;
+assign n_depth = flush ? 0 : depth + bd_add - bd_sub;
 
 wire [4:0] shf_up = depth - bd_sub;
 
 always @(posedge g_clk) begin
     if(!g_resetn || flush) begin
         depth <= 0;
-    end else begin
+    end else if(update_buffer) begin
         depth <= n_depth;
     end
 end
@@ -76,8 +77,9 @@ end
 // ------------------------------------------------------------------
 
 // Does the buffer need updating this cycle?
-wire update_buffer = fill_2  || fill_4  || fill_6  || fill_8  ||
-                     drain_2 || drain_4 ;
+wire update_buffer = 
+    (fill_en && (fill_2  || fill_4  || fill_6  || fill_8))  ||
+    drain_2 || drain_4 ;
 
 // Which bytes of the input data should be selected?
 wire [BR:0] n_d_buffer_in_pre_shift     =
@@ -117,6 +119,9 @@ wire [ER:0] n_e_buffer = n_e_buffer_in_shift_up | n_e_buffer_out_shift_down;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
+        d_buffer <= 0;
+        e_buffer <= 0;
+    end else if (flush) begin
         d_buffer <= 0;
         e_buffer <= 0;
     end else if(update_buffer) begin

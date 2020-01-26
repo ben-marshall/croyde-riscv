@@ -45,6 +45,7 @@ parameter   PC_RESET_ADDRESS      = 64'h80000000;
 wire e_cf_change    = cf_valid && cf_ack;
 
 wire e_imem_req     = imem_req && imem_gnt;
+wire e_imem_recv    = imem_recv;
 
 wire e_eat_2        = s2_eat_2;
 wire e_eat_4        = s2_eat_4;
@@ -63,7 +64,7 @@ assign  cf_ack      = imem_req && imem_gnt || !imem_req;
 reg                 imem_recv  ;
 
 reg                 imem_req_r ;
-assign              imem_req   = imem_req_r && buf_ready;
+assign              imem_req   = imem_req_r;
 
 // Next instruction memory fetch request enable.
 wire                n_imem_req  = buf_ready;
@@ -106,6 +107,39 @@ always @(posedge g_clk) begin
 end
 
 //
+// When to ignore pending responses.
+// ------------------------------------------------------------
+
+reg  [1:0]   rsps_ignore        ;
+reg  [1:0]   reqs_outstanding   ;
+
+wire [1:0] n_reqs_outstanding   = reqs_outstanding + e_imem_req - e_imem_recv;
+
+wire         ignore_rsp         = |rsps_ignore;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        
+        reqs_outstanding    <= 2'b00;
+        rsps_ignore         <= 2'b00;
+
+    end else begin
+
+        reqs_outstanding    <= n_reqs_outstanding;
+
+        if(|rsps_ignore) begin
+            
+            rsps_ignore <= rsps_ignore - 1;
+
+        end else if(e_cf_change) begin
+            
+            rsps_ignore <= n_reqs_outstanding;
+
+        end
+    end
+end
+
+//
 // Buffer interfacing
 // ------------------------------------------------------------
 
@@ -118,6 +152,8 @@ wire [ 4:0] n_buf_depth     ; //
 wire [63:0] buf_data_in     = imem_rdata    ;
 wire        buf_error_in    = imem_err      ;
 
+wire        buf_fill_en     = imem_recv && !ignore_rsp;
+
 reg         buf_fill_2      ; // Load top 2 bytes of input data.
 reg         buf_fill_4      ; // Load top 4 bytes of input data.
 reg         buf_fill_6      ; // Load top 6 bytes of input data.
@@ -126,8 +162,8 @@ reg         buf_fill_8      ; // Load top 8 bytes of input data.
 wire [31:0] buf_data_out    ; // Data out of the buffer.
 wire [ 1:0] buf_error_out   ; // Is data tagged with fetch error?
 
-wire        buf_drain_2     = s1_16bit;
-wire        buf_drain_4     = s1_32bit;
+wire        buf_drain_2     = s1_16bit && s2_eat_2;
+wire        buf_drain_4     = s1_32bit && s2_eat_4;
 
 // Is the buffer ready to accept more data?
 wire        buf_ready       = n_buf_depth  <= 4;
@@ -178,6 +214,7 @@ core_pipe_fetch_buffer i_core_pipe_fetch_buffer (
 .n_depth     (n_buf_depth     ), //
 .data_in     (buf_data_in     ), // Data in
 .error_in    (buf_error_in    ), // Tag with error?
+.fill_en     (buf_fill_en     ), // Buffer fill enable.
 .fill_2      (buf_fill_2      ), // Load top 2 bytes of input data.
 .fill_4      (buf_fill_4      ), // Load top 4 bytes of input data.
 .fill_6      (buf_fill_6      ), // Load top 6 bytes of input data.

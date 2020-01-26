@@ -52,6 +52,15 @@ output reg  [         32:0] s2_instr
 `include "core_pipe_decode.vh"
 
 //
+// Pipeline stage progression.
+// ------------------------------------------------------------
+
+//
+// TODO: Stalls to delay eating of 16/32 bit instructions.
+assign s2_eat_2     = s1_16bit && !s2_cf_wait;
+assign s2_eat_4     = s1_32bit && !s2_cf_wait;
+
+//
 // Next pipeline stage value selection
 // ------------------------------------------------------------
 
@@ -154,16 +163,22 @@ assign n_s2_opr_c   =
     {64{sel_opr_c_imm}} & opr_c_imm   |
     {64{sel_opr_c_npc}} & s1_npc      ;
 
+//
+// TODO: decode 16-bit destination registers.
 assign n_s2_rd      = dec_rd;
 
-assign s2_eat_2     = s1_16bit;
-assign s2_eat_4     = s1_32bit;
-
+//
+// Is this decoded instruction explicitly operating on a word, rather than
+// the full XLEN=64 bit register?
 wire   n_s2_op_w    =
     dec_addiw     || dec_slliw     || dec_srliw     || dec_sraiw     ||
     dec_addw      || dec_subw      || dec_sllw      || dec_srlw      ||
     dec_sraw      || dec_c_subw    || dec_mulw      || dec_divw      ||
     dec_divuw     || dec_remw      || dec_remuw     || dec_c_addw    ;
+
+//
+// Uop decoding.
+// ------------------------------------------------------------
 
 //
 // ALU Op code select
@@ -310,7 +325,20 @@ wire [CFU_OP_R:0] n_cfu_op =
     {CFU_OP_W{dec_wfi       }} & CFU_OP_NOP     |
     {CFU_OP_W{dec_fence_i   }} & CFU_OP_NOP     ;
 
+//
+// Decode stage control flow change raising
+// ------------------------------------------------------------
 
+// Offset used when calculating jumps taken from the decode stage.
+wire [XL:0] decode_cf_offset;
+
+assign s2_cf_target = s1_pc + decode_cf_offset;
+
+assign s2_cf_valid  = dec_jalr || dec_jal || dec_c_jal || dec_c_j;
+
+wire   s2_cf_taken  = s2_cf_valid && s2_cf_ack;
+
+wire   s2_cf_wait   = s2_cf_valid && !s2_cf_ack;
 
 endmodule
 

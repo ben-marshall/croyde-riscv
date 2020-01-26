@@ -55,7 +55,7 @@ assign imem_strb    = {MEM_STRB_W{1'b0}};
 assign imem_wdata   = {MEM_DATA_W{1'b0}};
 
 //
-// Inter-stage wiring
+// Control flow change busses
 // ------------------------------------------------------------
 
 wire                 cf_valid    ; // Control flow change?
@@ -63,10 +63,27 @@ wire                 cf_ack      ; // Control flow change acknwoledged
 wire [         XL:0] cf_target   ; // Control flow change destination
 wire [ CF_CAUSE_R:0] cf_cause    ; // Control flow change cause
 
-wire                 s2_cf_valid ; // Control flow change?
-wire                 s2_cf_ack   ; // Control flow change acknwoledged
-wire [         XL:0] s2_cf_target; // Control flow change destination
-wire [ CF_CAUSE_R:0] s2_cf_cause ; // Control flow change cause
+wire                 s2_cf_valid ; // DE Control flow change?
+wire                 s2_cf_ack   ; // DE Control flow change acknwoledged
+wire [         XL:0] s2_cf_target; // DE Control flow change destination
+wire [ CF_CAUSE_R:0] s2_cf_cause ; // DE Control flow change cause
+
+wire                 s3_cf_valid ; // EX Control flow change?
+wire                 s3_cf_ack   ; // EX Control flow change acknwoledged
+wire [         XL:0] s3_cf_target; // EX Control flow change destination
+wire [ CF_CAUSE_R:0] s3_cf_cause ; // EX Control flow change cause
+
+assign cf_valid     = s2_cf_valid || s3_cf_valid;
+
+assign s2_cf_ack    = cf_ack;
+assign s3_cf_ack    = cf_ack;
+
+assign cf_cause     = s3_cf_valid ? s3_cf_cause     : s2_cf_cause   ;
+assign cf_target    = s3_cf_valid ? s3_cf_target    : s2_cf_target  ;
+
+//
+// Inter-stage wiring
+// ------------------------------------------------------------
 
 wire                 s1_16bit    ; // 16 bit instruction?
 wire                 s1_32bit    ; // 32 bit instruction?
