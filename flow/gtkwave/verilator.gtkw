@@ -1,12 +1,12 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sun Jan 26 18:23:54 2020
+[*] Sun Feb  2 12:15:20 2020
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/uc64/work/verilator/waves.vcd"
-[dumpfile_mtime] "Sun Jan 26 18:19:26 2020"
+[dumpfile_mtime] "Sun Feb  2 12:13:42 2020"
 [dumpfile_size] 195870
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/verilator.gtkw"
-[timestart] 116
+[timestart] 1
 [size] 1920 1025
 [pos] -1 -1
 *-6.733938 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
@@ -16,7 +16,7 @@
 [sst_width] 305
 [signals_width] 431
 [sst_expanded] 1
-[sst_vpaned_height] 301
+[sst_vpaned_height] 123
 @28
 TOP.core_top.i_core_pipe_fetch.g_clk
 TOP.core_top.i_core_pipe_fetch.g_resetn
@@ -135,9 +135,9 @@ TOP.core_top.i_core_pipe_fetch.n_s1_pc[63:0]
 -Fetch -> Decode
 @1000200
 -Pipeline - Fetch
-@c00201
+@c00200
 -GPRs
-@23
+@22
 TOP.core_top.i_core_regfile.regs(0)[63:0]
 TOP.core_top.i_core_regfile.regs(1)[63:0]
 TOP.core_top.i_core_regfile.regs(2)[63:0]
@@ -170,7 +170,7 @@ TOP.core_top.i_core_regfile.regs(28)[63:0]
 TOP.core_top.i_core_regfile.regs(29)[63:0]
 TOP.core_top.i_core_regfile.regs(30)[63:0]
 TOP.core_top.i_core_regfile.regs(31)[63:0]
-@1401201
+@1401200
 -GPRs
 @800200
 -Pipeline - Decode
@@ -344,6 +344,8 @@ TOP.core_top.i_core_pipe_decode.dec_succ[3:0]
 TOP.core_top.i_core_pipe_decode.dec_zimm[4:0]
 @1401200
 -Field Decode
+@800200
+-Next Stage Values
 @22
 TOP.core_top.i_core_pipe_decode.n_s2_opr_a[63:0]
 TOP.core_top.i_core_pipe_decode.n_s2_opr_b[63:0]
@@ -358,6 +360,29 @@ TOP.core_top.i_core_pipe_decode.n_cfu_op[3:0]
 TOP.core_top.i_core_pipe_decode.n_csr_op[3:0]
 TOP.core_top.i_core_pipe_decode.n_lsu_op[4:0]
 TOP.core_top.i_core_pipe_decode.n_mdu_op[3:0]
+@1000200
+-Next Stage Values
+@800201
+-EX Stage
+@23
+TOP.core_top.i_core_pipe_decode.s2_alu_op[3:0]
+TOP.core_top.i_core_pipe_decode.s2_cfu_op[3:0]
+TOP.core_top.i_core_pipe_decode.s2_csr_op[3:0]
+TOP.core_top.i_core_pipe_decode.s2_instr[32:0]
+TOP.core_top.i_core_pipe_decode.s2_lsu_op[3:0]
+TOP.core_top.i_core_pipe_decode.s2_mdu_op[3:0]
+@29
+TOP.core_top.i_core_pipe_decode.s2_op_w
+@23
+TOP.core_top.i_core_pipe_decode.s2_opr_a[63:0]
+TOP.core_top.i_core_pipe_decode.s2_opr_b[63:0]
+TOP.core_top.i_core_pipe_decode.s2_opr_c[63:0]
+TOP.core_top.i_core_pipe_decode.s2_pc[63:0]
+TOP.core_top.i_core_pipe_decode.s2_rd[4:0]
+@29
+TOP.core_top.i_core_pipe_decode.s2_valid
+@1000201
+-EX Stage
 @1000200
 -Pipeline - Decode
 [pattern_trace] 1

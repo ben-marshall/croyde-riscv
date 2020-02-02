@@ -99,24 +99,61 @@ wire [         XL:0] s1_rs1_data ; // RS1 Read Data (Forwarded)
 wire [ REG_ADDR_R:0] s1_rs2_addr ; // RS2 Address
 wire [         XL:0] s1_rs2_data ; // RS2 Read Data (Forwarded)
 
-wire                 s2_valid    ;
-wire                 s3_ready    ;
-wire [         XL:0] s2_pc       ;
-wire [         XL:0] s2_opr_a    ;
-wire [         XL:0] s2_opr_b    ;
-wire [         XL:0] s2_opr_c    ;
-wire [ REG_ADDR_R:0] s2_rd       ;
-wire [   ALU_OP_R:0] s2_alu_op   ;
-wire [   ALU_OP_R:0] s2_lsu_op   ;
-wire [   ALU_OP_R:0] s2_mdu_op   ;
-wire [   ALU_OP_R:0] s2_csr_op   ;
-wire [   ALU_OP_R:0] s2_cfu_op   ;
-wire                 s2_op_w     ;
-wire [         32:0] s2_instr    ;
+wire                 s2_valid    ; // Decode instr ready for execute
+wire                 s2_ready    ; // Execute ready for new instr.
+wire [         XL:0] s2_pc       ; // Execute stage PC
+wire [         XL:0] s2_opr_a    ; // EX stage operand a
+wire [         XL:0] s2_opr_b    ; //    "       "     b
+wire [         XL:0] s2_opr_c    ; //    "       "     c
+wire [ REG_ADDR_R:0] s2_rd       ; // EX stage destination reg address.
+wire [   ALU_OP_R:0] s2_alu_op   ; // ALU operation
+wire [   LSU_OP_R:0] s2_lsu_op   ; // LSU operation
+wire [   MDU_OP_R:0] s2_mdu_op   ; // Mul/Div Operation
+wire [   CSR_OP_R:0] s2_csr_op   ; // CSR operation
+wire [   CFU_OP_R:0] s2_cfu_op   ; // Control flow unit operation
+wire                 s2_op_w     ; // Is the operation on a word?
+wire [         31:0] s2_instr    ; // Encoded instruction for trace.
 
 wire                 s2_rd_wen   ;
 wire [ REG_ADDR_R:0] s2_rd_addr  ;
 wire [         XL:0] s2_rd_wdata ;
+
+
+wire                 csr_en      ; // CSR Access Enable
+wire                 csr_wr      ; // CSR Write Enable
+wire                 csr_wr_set  ; // CSR Write - Set
+wire                 csr_wr_clr  ; // CSR Write - Clear
+wire [         11:0] csr_addr    ; // Address of the CSR to access.
+wire [         XL:0] csr_wdata   ; // Data to be written to a CSR
+wire [         XL:0] csr_rdata   ; // CSR read data
+               
+wire [         XL:0] csr_mepc    ; // Current EPC.
+wire [         XL:0] csr_mtvec   ; // Current MTVEC.
+               
+wire                 exec_mret   ; // MRET instruction executed.
+               
+wire                 mstatus_mie ; // Global interrupt enable.
+wire                 mie_meie    ; // External interrupt enable.
+wire                 mie_mtie    ; // Timer interrupt enable.
+wire                 mie_msie    ; // Software interrupt enable.
+               
+wire                 mip_meip    ; // External interrupt pending
+wire                 mip_mtip    ; // Timer interrupt pending
+wire                 mip_msip    ; // Software interrupt pending
+               
+wire [         63:0] ctr_time    ; // The time counter value.
+wire [         63:0] ctr_cycle   ; // The cycle counter value.
+wire [         63:0] ctr_instret ; // The instret counter value.
+               
+wire                 inhibit_cy  ; // Stop cycle counter incrementing.
+wire                 inhibit_tm  ; // Stop time counter incrementing.
+wire                 inhibit_ir  ; // Stop instret incrementing.
+               
+wire                 trap_cpu    ; // A trap occured due to CPU
+wire                 trap_int    ; // A trap occured due to interrupt
+wire [          5:0] trap_cause  ; // A trap occured due to interrupt
+wire [         XL:0] trap_mtval  ; // Value associated with the trap.
+wire [         XL:0] trap_pc     ; // PC value associated with the trap.
 
 //
 // Submodule instances.
@@ -176,7 +213,7 @@ core_pipe_decode i_core_pipe_decode(
 .s1_rs2_addr (s1_rs2_addr ), // RS2 Address
 .s1_rs2_data (s1_rs2_data ), // RS2 Read Data (Forwarded)
 .s2_valid    (s2_valid    ), // 
-.s3_ready    (s3_ready    ), // 
+.s2_ready    (s2_ready    ), // 
 .s2_pc       (s2_pc       ), // 
 .s2_opr_a    (s2_opr_a    ), // 
 .s2_opr_b    (s2_opr_b    ), // 
@@ -189,6 +226,53 @@ core_pipe_decode i_core_pipe_decode(
 .s2_cfu_op   (s2_cfu_op   ), // 
 .s2_op_w     (s2_op_w     ), // 
 .s2_instr    (s2_instr    )  // 
+);
+
+
+//
+// Instance: core_pipe_exec
+//
+//  Top level for the execute stage of the pipeline.
+//
+core_pipe_exec i_core_pipe_exec(
+.g_clk          (g_clk          ), // Global clock
+.g_resetn       (g_resetn       ), // Global active low sync reset.
+.s2_valid       (s2_valid       ), // Decode instr ready for execute
+.s2_ready       (s2_ready       ), // Execute ready for new instr.
+.s2_pc          (s2_pc          ), // Execute stage PC
+.s2_opr_a       (s2_opr_a       ), // EX stage operand a
+.s2_opr_b       (s2_opr_b       ), //    "       "     b
+.s2_opr_c       (s2_opr_c       ), //    "       "     c
+.s2_rd          (s2_rd          ), // EX stage destination reg address.
+.s2_alu_op      (s2_alu_op      ), // ALU operation
+.s2_lsu_op      (s2_lsu_op      ), // LSU operation
+.s2_mdu_op      (s2_mdu_op      ), // Mul/Div Operation
+.s2_csr_op      (s2_csr_op      ), // CSR operation
+.s2_cfu_op      (s2_cfu_op      ), // Control flow unit operation
+.s2_op_w        (s2_op_w        ), // Is the operation on a word?
+.s2_instr       (s2_instr       ), // Encoded instruction for trace.
+.s2_rd_wen      (s2_rd_wen      ), // GPR write enable
+.s2_rd_addr     (s2_rd_addr     ), // GPR write address
+.s2_rd_wdata    (s2_rd_wdata    ), // GPR write data
+.csr_en         (csr_en         ), // CSR Access Enable
+.csr_wr         (csr_wr         ), // CSR Write Enable
+.csr_wr_set     (csr_wr_set     ), // CSR Write - Set
+.csr_wr_clr     (csr_wr_clr     ), // CSR Write - Clear
+.csr_addr       (csr_addr       ), // Address of the CSR to access.
+.csr_wdata      (csr_wdata      ), // Data to be written to a CSR
+.csr_rdata      (csr_rdata      ), // CSR read data
+.s2_cf_valid    (s2_cf_valid    ), // EX Control flow change?
+.s2_cf_ack      (s2_cf_ack      ), // EX Control flow acknwoledged
+.s2_cf_target   (s2_cf_target   ), // EX Control flow destination
+.s2_cf_cause    (s2_cf_cause    ), // EX Control flow change cause
+.dmem_req       (dmem_req       ), // Memory request
+.dmem_addr      (dmem_addr      ), // Memory request address
+.dmem_wen       (dmem_wen       ), // Memory request write enable
+.dmem_strb      (dmem_strb      ), // Memory request write strobe
+.dmem_wdata     (dmem_wdata     ), // Memory write data.
+.dmem_gnt       (dmem_gnt       ), // Memory response valid
+.dmem_err       (dmem_err       ), // Memory response error
+.dmem_rdata     (dmem_rdata     )  // Memory response read data
 );
 
 //
@@ -206,6 +290,45 @@ core_regfile i_core_regfile (
 .rd_wen   (s2_rd_wen   ),
 .rd_addr  (s2_rd       ),
 .rd_wdata (s2_rd_wdata ) 
+);
+
+
+//
+// module: i_core_csrs
+//
+//  Responsible for keeping control/status registers up to date.
+//
+core_csrs i_core_csrs (
+.g_clk            (g_clk            ), // global clock
+.g_resetn         (g_resetn         ), // synchronous reset
+.csr_en           (csr_en           ), // CSR Access Enable
+.csr_wr           (csr_wr           ), // CSR Write Enable
+.csr_wr_set       (csr_wr_set       ), // CSR Write - Set
+.csr_wr_clr       (csr_wr_clr       ), // CSR Write - Clear
+.csr_addr         (csr_addr         ), // Address of the CSR to access.
+.csr_wdata        (csr_wdata        ), // Data to be written to a CSR
+.csr_rdata        (csr_rdata        ), // CSR read data
+.csr_mepc         (csr_mepc         ), // Current EPC.
+.csr_mtvec        (csr_mtvec        ), // Current MTVEC.
+.exec_mret        (exec_mret        ), // MRET instruction executed.
+.mstatus_mie      (mstatus_mie      ), // Global interrupt enable.
+.mie_meie         (mie_meie         ), // External interrupt enable.
+.mie_mtie         (mie_mtie         ), // Timer interrupt enable.
+.mie_msie         (mie_msie         ), // Software interrupt enable.
+.mip_meip         (mip_meip         ), // External interrupt pending
+.mip_mtip         (mip_mtip         ), // Timer interrupt pending
+.mip_msip         (mip_msip         ), // Software interrupt pending
+.ctr_time         (ctr_time         ), // The time counter value.
+.ctr_cycle        (ctr_cycle        ), // The cycle counter value.
+.ctr_instret      (ctr_instret      ), // The instret counter value.
+.inhibit_cy       (inhibit_cy       ), // Stop cycle counter incrementing.
+.inhibit_tm       (inhibit_tm       ), // Stop time counter incrementing.
+.inhibit_ir       (inhibit_ir       ), // Stop instret incrementing.
+.trap_cpu         (trap_cpu         ), // A trap occured due to CPU
+.trap_int         (trap_int         ), // A trap occured due to interrupt
+.trap_cause       (trap_cause       ), // A trap occured due to interrupt
+.trap_mtval       (trap_mtval       ), // Value associated with the trap.
+.trap_pc          (trap_pc          )  // PC value associated with the trap.
 );
 
 endmodule

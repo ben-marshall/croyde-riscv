@@ -28,20 +28,20 @@ input  wire [         XL:0] s1_rs1_data , // RS1 Read Data (Forwarded)
 output wire [ REG_ADDR_R:0] s1_rs2_addr , // RS2 Address
 input  wire [         XL:0] s1_rs2_data , // RS2 Read Data (Forwarded)
 
-output wire                 s2_valid    ,
-input  wire                 s3_ready    ,
-output reg  [         XL:0] s2_pc       ,
-output reg  [         XL:0] s2_opr_a    ,
-output reg  [         XL:0] s2_opr_b    ,
-output reg  [         XL:0] s2_opr_c    ,
-output reg  [ REG_ADDR_R:0] s2_rd       ,
-output reg  [   ALU_OP_R:0] s2_alu_op   ,
-output reg  [   ALU_OP_R:0] s2_lsu_op   ,
-output reg  [   ALU_OP_R:0] s2_mdu_op   ,
-output reg  [   ALU_OP_R:0] s2_csr_op   ,
-output reg  [   ALU_OP_R:0] s2_cfu_op   ,
-output reg                  s2_op_w     ,
-output reg  [         32:0] s2_instr
+output wire                 s2_valid    , // Decode instr ready for execute
+input  wire                 s2_ready    , // Execute ready for new instr.
+output reg  [         XL:0] s2_pc       , // Execute stage PC
+output reg  [         XL:0] s2_opr_a    , // EX stage operand a
+output reg  [         XL:0] s2_opr_b    , //    "       "     b
+output reg  [         XL:0] s2_opr_c    , //    "       "     c
+output reg  [ REG_ADDR_R:0] s2_rd       , // EX stage destination reg address.
+output reg  [   ALU_OP_R:0] s2_alu_op   , // ALU operation
+output reg  [   LSU_OP_R:0] s2_lsu_op   , // LSU operation
+output reg  [   MDU_OP_R:0] s2_mdu_op   , // Mul/Div Operation
+output reg  [   CSR_OP_R:0] s2_csr_op   , // CSR operation
+output reg  [   CFU_OP_R:0] s2_cfu_op   , // Control flow unit operation
+output reg                  s2_op_w     , // Is the operation on a word?
+output reg  [         31:0] s2_instr      // Encoded instruction for trace.
 
 );
 
@@ -57,8 +57,8 @@ output reg  [         32:0] s2_instr
 
 //
 // TODO: Stalls to delay eating of 16/32 bit instructions.
-assign s2_eat_2     = s1_16bit && !s1_cf_wait;
-assign s2_eat_4     = s1_32bit && !s1_cf_wait;
+assign s2_eat_2     = s1_16bit && !s1_cf_wait && s2_ready;
+assign s2_eat_4     = s1_32bit && !s1_cf_wait && s2_ready;
 
 //
 // Next pipeline stage value selection
@@ -354,9 +354,52 @@ assign s1_cf_target = s1_pc + decode_cf_offset;
 
 assign s1_cf_valid  = dec_jalr || dec_jal || dec_c_jal || dec_c_j;
 
+// TODO: Tracking of "done"ness for very delayed control flow changes.
 wire   s1_cf_taken  = s1_cf_valid && s1_cf_ack;
 
 wire   s1_cf_wait   = s1_cf_valid && !s1_cf_ack;
+
+//
+// Decode -> Execute stage registers
+// ------------------------------------------------------------
+
+wire        flush_de_pipereg = 1'b0;
+
+assign      s2_valid    = (s1_16bit || s1_32bit) && 
+                          (!s1_cf_valid || s1_cf_taken);
+
+wire [XL:0] n_s2_pc     = s1_pc;
+wire [31:0] n_s2_instr  = {s1_16bit ? 16'b0 : s1_instr[31:16], s1_instr[15:0]};
+
+always @(posedge g_clk) begin
+    if(!g_resetn || flush_de_pipereg) begin
+        s2_pc       <= 0            ;
+        s2_opr_a    <= 0            ;
+        s2_opr_b    <= 0            ;
+        s2_opr_c    <= 0            ;
+        s2_rd       <= 0            ;
+        s2_alu_op   <= 0            ;
+        s2_lsu_op   <= 0            ;
+        s2_mdu_op   <= 0            ;
+        s2_csr_op   <= 0            ;
+        s2_cfu_op   <= 0            ;
+        s2_op_w     <= 0            ;
+        s2_instr    <= 0            ;
+    end else if(s2_valid && s2_ready) begin
+        s2_pc       <= n_s2_pc      ;
+        s2_opr_a    <= n_s2_opr_a   ;
+        s2_opr_b    <= n_s2_opr_b   ;
+        s2_opr_c    <= n_s2_opr_c   ;
+        s2_rd       <= n_s2_rd      ;
+        s2_alu_op   <= n_alu_op     ;
+        s2_lsu_op   <= n_lsu_op     ;
+        s2_mdu_op   <= n_mdu_op     ;
+        s2_csr_op   <= n_csr_op     ;
+        s2_cfu_op   <= n_cfu_op     ;
+        s2_op_w     <= n_s2_op_w    ;
+        s2_instr    <= n_s2_instr   ;
+    end
+end
 
 
 //

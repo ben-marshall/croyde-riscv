@@ -30,6 +30,25 @@ localparam  REG_ADDR_W  = 5             ;
 localparam  REG_ADDR_R  = REG_ADDR_W - 1;
 
 //
+// CSR Trap codes
+
+localparam TRAP_NONE    = 6'b111111;
+localparam TRAP_IALIGN  = 6'b0 ;
+localparam TRAP_IACCESS = 6'b1 ;
+localparam TRAP_IOPCODE = 6'd2 ;
+localparam TRAP_BREAKPT = 6'd3 ;
+localparam TRAP_LDALIGN = 6'd4 ;
+localparam TRAP_LDACCESS= 6'd5 ;
+localparam TRAP_STALIGN = 6'd6 ;
+localparam TRAP_STACCESS= 6'd7 ;
+localparam TRAP_ECALLM  = 6'd11;
+
+localparam TRAP_INT_MSI = 6'd3 ;
+localparam TRAP_INT_MTI = 6'd7 ;
+localparam TRAP_INT_MEI = 6'd11;
+
+
+//
 // ALU Op codes
 
 localparam ALU_OP_W         = 4;
