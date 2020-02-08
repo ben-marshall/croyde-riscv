@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sun Feb  2 12:15:20 2020
+[*] Sat Feb  8 21:53:33 2020
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/uc64/work/verilator/waves.vcd"
-[dumpfile_mtime] "Sun Feb  2 12:13:42 2020"
-[dumpfile_size] 195870
+[dumpfile_mtime] "Sat Feb  8 21:53:13 2020"
+[dumpfile_size] 91375
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/verilator.gtkw"
 [timestart] 1
 [size] 1920 1025
 [pos] -1 -1
-*-6.733938 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-5.349673 106 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.core_top.
 [treeopen] TOP.core_top.i_core_pipe_fetch.
@@ -344,7 +344,7 @@ TOP.core_top.i_core_pipe_decode.dec_succ[3:0]
 TOP.core_top.i_core_pipe_decode.dec_zimm[4:0]
 @1401200
 -Field Decode
-@800200
+@c00201
 -Next Stage Values
 @22
 TOP.core_top.i_core_pipe_decode.n_s2_opr_a[63:0]
@@ -357,33 +357,40 @@ TOP.core_top.i_core_pipe_decode.n_s2_op_w
 @24
 TOP.core_top.i_core_pipe_decode.n_alu_op[3:0]
 TOP.core_top.i_core_pipe_decode.n_cfu_op[3:0]
+@c00024
 TOP.core_top.i_core_pipe_decode.n_csr_op[3:0]
+@28
+(0)TOP.core_top.i_core_pipe_decode.n_csr_op[3:0]
+(1)TOP.core_top.i_core_pipe_decode.n_csr_op[3:0]
+(2)TOP.core_top.i_core_pipe_decode.n_csr_op[3:0]
+(3)TOP.core_top.i_core_pipe_decode.n_csr_op[3:0]
+@1401200
+-group_end
+@24
 TOP.core_top.i_core_pipe_decode.n_lsu_op[4:0]
 TOP.core_top.i_core_pipe_decode.n_mdu_op[3:0]
-@1000200
+@1401201
 -Next Stage Values
-@800201
+@800200
 -EX Stage
-@23
+@28
+TOP.core_top.i_core_pipe_decode.s2_valid
+TOP.core_top.i_core_pipe_exec.s2_ready
+@22
 TOP.core_top.i_core_pipe_decode.s2_alu_op[3:0]
 TOP.core_top.i_core_pipe_decode.s2_cfu_op[3:0]
 TOP.core_top.i_core_pipe_decode.s2_csr_op[3:0]
-TOP.core_top.i_core_pipe_decode.s2_instr[32:0]
-TOP.core_top.i_core_pipe_decode.s2_lsu_op[3:0]
 TOP.core_top.i_core_pipe_decode.s2_mdu_op[3:0]
-@29
+@28
 TOP.core_top.i_core_pipe_decode.s2_op_w
-@23
+@22
 TOP.core_top.i_core_pipe_decode.s2_opr_a[63:0]
 TOP.core_top.i_core_pipe_decode.s2_opr_b[63:0]
 TOP.core_top.i_core_pipe_decode.s2_opr_c[63:0]
 TOP.core_top.i_core_pipe_decode.s2_pc[63:0]
 TOP.core_top.i_core_pipe_decode.s2_rd[4:0]
-@29
-TOP.core_top.i_core_pipe_decode.s2_valid
-@1000201
--EX Stage
 @1000200
+-EX Stage
 -Pipeline - Decode
 [pattern_trace] 1
 [pattern_trace] 0
