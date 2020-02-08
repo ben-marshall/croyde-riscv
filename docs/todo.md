@@ -5,12 +5,32 @@
 
 ## RTL
 
-**Fetch:**
-- [ ] Data fetch buffer
-- [ ] Bus driving logic
-- [ ] Fetch -> Decode pipeline driving.
+- [ ] Fix flushing of fetch -> decode register such that we loose a
+      branch instruction if a decode-stage branch is taken when execute is
+      not ready to recieve it.
 
-**Decode:**
-- [ ] Instruction decode
-- [ ] Register access logic
-- [ ] Pipeline registers
+  - [ ] Decode CF valid should not be asserted until the EX stage is
+        ready.
+
+- [ ] Execute stage ready signal.
+
+  - [ ] Decode stage to EX stage register progression
+
+- [ ] Execute stage FU integration.
+
+  - [ ] CSR unit
+
+  - [ ] Branch unit
+
+  - [ ] Load/Store unit
+
+  - [ ] ALU
+
+  - [ ] MDU
+
+## Verif
+
+- [ ] RTL signal tracking from fetch to execute and retirement.
+
+- [ ] riscv-formal wrapper.
+
