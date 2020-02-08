@@ -319,7 +319,23 @@ wire [LSU_OP_R:0] n_lsu_op =
 //
 // CSR Opcode select
 
-wire [CSR_OP_R:0] n_csr_op = CSR_OP_NOP;
+wire [CSR_OP_R:0] n_csr_op;
+
+wire    rd_zero     = dec_rd    == 5'b0;
+wire    rs1_zero    = dec_rs1   == 5'b0;
+
+assign  n_csr_op[CSR_OP_RD ] = !rd_zero && (
+    dec_csrrw  || dec_csrrc  || dec_csrrs  ||
+    dec_csrrwi || dec_csrrci || dec_csrrsi
+);
+
+assign  n_csr_op[CSR_OP_WR ] = !rs1_zero && (
+    dec_csrrw  || dec_csrrc  || dec_csrrs  ||
+    dec_csrrwi || dec_csrrci || dec_csrrsi
+);
+
+assign  n_csr_op[CSR_OP_SET] = dec_csrrs || dec_csrrsi;
+assign  n_csr_op[CSR_OP_CLR] = dec_csrrc || dec_csrrci;
 
 //
 //  CFU Opcode select
@@ -352,7 +368,11 @@ wire [XL:0] decode_cf_offset = {32'b0, imm_c_j};
 
 assign s1_cf_target = s1_pc + decode_cf_offset;
 
-assign s1_cf_valid  = dec_jalr || dec_jal || dec_c_jal || dec_c_j;
+// Cannot assert control flow change valid until execute is ready.
+// This stops fetch from flushing the fetch->decode register before
+// execute is ready to accept the decode stage instruction.
+assign s1_cf_valid  = 
+    s2_ready && (dec_jalr || dec_jal || dec_c_jal || dec_c_j);
 
 // TODO: Tracking of "done"ness for very delayed control flow changes.
 wire   s1_cf_taken  = s1_cf_valid && s1_cf_ack;

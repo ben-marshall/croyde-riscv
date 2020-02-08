@@ -108,10 +108,10 @@ localparam LSU_OP_SD        = 5'b1_100_0;
 localparam CSR_OP_W         = 4;
 localparam CSR_OP_R         = CSR_OP_W - 1;
 
-localparam CSR_OP_NOP       = 4'b000;
-localparam CSR_OP_RD        = 4'b001;
-localparam CSR_OP_SET       = 4'b010;
-localparam CSR_OP_CLR       = 4'b100;
+localparam CSR_OP_RD        = 0;
+localparam CSR_OP_WR        = 1;
+localparam CSR_OP_SET       = 2;
+localparam CSR_OP_CLR       = 3;
 
 //
 //  CFU Opcodes
