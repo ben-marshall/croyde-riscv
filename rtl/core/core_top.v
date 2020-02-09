@@ -126,6 +126,7 @@ wire                 csr_wr_clr  ; // CSR Write - Clear
 wire [         11:0] csr_addr    ; // Address of the CSR to access.
 wire [         XL:0] csr_wdata   ; // Data to be written to a CSR
 wire [         XL:0] csr_rdata   ; // CSR read data
+wire                 csr_error   ; // CSR access error
                
 wire [         XL:0] csr_mepc    ; // Current EPC.
 wire [         XL:0] csr_mtvec   ; // Current MTVEC.
@@ -263,6 +264,7 @@ core_pipe_exec i_core_pipe_exec(
 .csr_rdata      (csr_rdata      ), // CSR read data
 .csr_mepc       (csr_mepc       ), // Current MEPC  value
 .csr_mtvec      (csr_mtvec      ), // Current MTVEC value
+.csr_error      (csr_error      ), // CSR access error.
 .s2_cf_valid    (s2_cf_valid    ), // EX Control flow change?
 .s2_cf_ack      (s2_cf_ack      ), // EX Control flow acknwoledged
 .s2_cf_target   (s2_cf_target   ), // EX Control flow destination
@@ -310,6 +312,7 @@ core_csrs i_core_csrs (
 .csr_addr         (csr_addr         ), // Address of the CSR to access.
 .csr_wdata        (csr_wdata        ), // Data to be written to a CSR
 .csr_rdata        (csr_rdata        ), // CSR read data
+.csr_error        (csr_error        ), // CSR access error.
 .csr_mepc         (csr_mepc         ), // Current EPC.
 .csr_mtvec        (csr_mtvec        ), // Current MTVEC.
 .exec_mret        (exec_mret        ), // MRET instruction executed.

@@ -34,7 +34,8 @@ output wire                 csr_wr_set  , // CSR Write - Set
 output wire                 csr_wr_clr  , // CSR Write - Clear
 output wire [         11:0] csr_addr    , // Address of the CSR to access.
 output wire [         XL:0] csr_wdata   , // Data to be written to a CSR
-output wire [         XL:0] csr_rdata   , // CSR read data
+input  wire [         XL:0] csr_rdata   , // CSR read data
+input  wire                 csr_error   , // CSR access error.
 
 input  wire [         XL:0] csr_mepc    , // Current MEPC  value
 input  wire [         XL:0] csr_mtvec   , // Current MTVEC value

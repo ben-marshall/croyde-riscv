@@ -16,6 +16,7 @@ input              csr_wr_clr       , // CSR Write - Clear
 input       [11:0] csr_addr         , // Address of the CSR to access.
 input       [XL:0] csr_wdata        , // Data to be written to a CSR
 output wire [XL:0] csr_rdata        , // CSR read data
+output wire        csr_error        , // Bad CSR access
 
 output wire [XL:0] csr_mepc         , // Current EPC.
 output wire [XL:0] csr_mtvec        , // Current MTVEC.
@@ -73,8 +74,6 @@ localparam CSR_ADDR_MCYCLEH     = 12'hB80;
 localparam CSR_ADDR_MINSTRETH   = 12'hB82;
 
 localparam CSR_ADDR_MCOUNTIN    = 12'h320;
-
-localparam CSR_ADDR_SATP        = 12'h180;
 
 localparam CSR_ADDR_MSTATUS     = 12'h300;
 localparam CSR_ADDR_MISA        = 12'h301;
@@ -504,6 +503,7 @@ wire   valid_addr     =
     read_mcountin   ;
 
 wire invalid_addr = !valid_addr;
+assign csr_error = invalid_addr && csr_wr;
 
 assign csr_rdata =
     {64{read_mstatus  }} & reg_mstatus          |

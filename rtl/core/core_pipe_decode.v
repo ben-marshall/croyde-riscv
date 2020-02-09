@@ -348,9 +348,9 @@ assign  n_csr_op[CSR_OP_RD ] = !rd_zero && (
     dec_csrrwi || dec_csrrci || dec_csrrsi
 );
 
-assign  n_csr_op[CSR_OP_WR ] = !rs1_zero && (
+assign  n_csr_op[CSR_OP_WR ] = (
     dec_csrrw  || dec_csrrc  || dec_csrrs  ||
-    dec_csrrwi || dec_csrrci || dec_csrrsi
+    dec_csrrwi || (dec_csrrci || dec_csrrsi) && |imm_csr_mask
 );
 
 assign  n_csr_op[CSR_OP_SET] = dec_csrrs || dec_csrrsi;
