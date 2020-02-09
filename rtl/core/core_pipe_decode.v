@@ -236,7 +236,7 @@ wire [ALU_OP_R:0] n_alu_op =
     {ALU_OP_W{dec_slti      }} & ALU_OP_SLT     |
     {ALU_OP_W{dec_sltiu     }} & ALU_OP_SLTU    |
     {ALU_OP_W{dec_xori      }} & ALU_OP_XOR     |
-    {ALU_OP_W{dec_srli      }} & ALU_OP_SLR     |
+    {ALU_OP_W{dec_srli      }} & ALU_OP_SRL     |
     {ALU_OP_W{dec_srai      }} & ALU_OP_SRA     |
     {ALU_OP_W{dec_ori       }} & ALU_OP_OR      |
     {ALU_OP_W{dec_andi      }} & ALU_OP_AND     |
@@ -246,22 +246,22 @@ wire [ALU_OP_R:0] n_alu_op =
     {ALU_OP_W{dec_slt       }} & ALU_OP_SLT     |
     {ALU_OP_W{dec_sltu      }} & ALU_OP_SLTU    |
     {ALU_OP_W{dec_xor       }} & ALU_OP_XOR     |
-    {ALU_OP_W{dec_srl       }} & ALU_OP_SLR     |
+    {ALU_OP_W{dec_srl       }} & ALU_OP_SRL     |
     {ALU_OP_W{dec_sra       }} & ALU_OP_SRA     |
     {ALU_OP_W{dec_or        }} & ALU_OP_OR      |
     {ALU_OP_W{dec_and       }} & ALU_OP_AND     |
     {ALU_OP_W{dec_addiw     }} & ALU_OP_ADD     |
     {ALU_OP_W{dec_slliw     }} & ALU_OP_SLL     |
-    {ALU_OP_W{dec_srliw     }} & ALU_OP_SLR     |
+    {ALU_OP_W{dec_srliw     }} & ALU_OP_SRL     |
     {ALU_OP_W{dec_sraiw     }} & ALU_OP_SRA     |
     {ALU_OP_W{dec_addw      }} & ALU_OP_ADD     |
     {ALU_OP_W{dec_subw      }} & ALU_OP_SUB     |
     {ALU_OP_W{dec_sllw      }} & ALU_OP_SLL     |
-    {ALU_OP_W{dec_srlw      }} & ALU_OP_SLR     |
+    {ALU_OP_W{dec_srlw      }} & ALU_OP_SRL     |
     {ALU_OP_W{dec_sraw      }} & ALU_OP_SRA     |
     {ALU_OP_W{dec_c_li      }} & ALU_OP_OR      |
     {ALU_OP_W{dec_c_lui     }} & ALU_OP_OR      |
-    {ALU_OP_W{dec_c_srli    }} & ALU_OP_SLR     |
+    {ALU_OP_W{dec_c_srli    }} & ALU_OP_SRL     |
     {ALU_OP_W{dec_c_srai    }} & ALU_OP_SRA     |
     {ALU_OP_W{dec_c_andi    }} & ALU_OP_AND     |
     {ALU_OP_W{dec_c_sub     }} & ALU_OP_SUB     |
@@ -373,11 +373,8 @@ wire [XL:0] decode_cf_offset = {32'b0, imm_c_j};
 
 assign s1_cf_target = s1_pc + decode_cf_offset;
 
-// Cannot assert control flow change valid until execute is ready.
-// This stops fetch from flushing the fetch->decode register before
-// execute is ready to accept the decode stage instruction.
-assign s1_cf_valid  = 
-    s2_ready && (dec_jalr || dec_jal || dec_c_jal || dec_c_j);
+// Control flow changes from decode caused by direct jumps.
+assign s1_cf_valid  = (dec_jalr || dec_jal || dec_c_jal || dec_c_j);
 
 // TODO: Tracking of "done"ness for very delayed control flow changes.
 wire   s1_cf_taken  = s1_cf_valid && s1_cf_ack;
@@ -390,8 +387,8 @@ wire   s1_cf_wait   = s1_cf_valid && !s1_cf_ack;
 
 wire        flush_de_pipereg = 1'b0;
 
-assign      s2_valid    = (s1_16bit || s1_32bit) && 
-                          (!s1_cf_valid || s1_cf_taken);
+assign      s2_valid    = ( s1_16bit    || s1_32bit   ) && 
+                          (!s1_cf_valid || s1_cf_taken) ;
 
 wire [XL:0] n_s2_pc     = s1_pc;
 wire [31:0] n_s2_instr  = {s1_16bit ? 16'b0 : s1_instr[31:16], s1_instr[15:0]};

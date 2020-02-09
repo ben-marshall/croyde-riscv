@@ -36,6 +36,9 @@ output wire [         11:0] csr_addr    , // Address of the CSR to access.
 output wire [         XL:0] csr_wdata   , // Data to be written to a CSR
 output wire [         XL:0] csr_rdata   , // CSR read data
 
+input  wire [         XL:0] csr_mepc    , // Current MEPC  value
+input  wire [         XL:0] csr_mtvec   , // Current MTVEC value
+
 output wire                 s2_cf_valid , // EX Control flow change?
 input  wire                 s2_cf_ack   , // EX Control flow acknwoledged
 output wire [         XL:0] s2_cf_target, // EX Control flow destination
@@ -59,11 +62,43 @@ input  wire [ MEM_DATA_R:0] dmem_rdata    // Memory response read data
 // Events
 // ------------------------------------------------------------
 
-// New instruction arrived this cycle.
+// New instruction will arrive on the next cycle.
 wire    e_new_instr = s2_valid && s2_ready;
 
 // Control flow change occured this cycle.
 wire    e_cf_change = s2_cf_valid && s2_cf_ack;
+
+
+//
+// ALU Interfacing
+// ------------------------------------------------------------
+
+wire [    XL:0] alu_opr_a   = s2_opr_a                   ;
+wire [    XL:0] alu_opr_b   = s2_opr_b                   ;
+
+wire            alu_word    = s2_op_w                    ;
+
+wire            alu_op_nop  = s2_alu_op == ALU_OP_NOP    ;
+wire            alu_op_add  = s2_alu_op == ALU_OP_ADD    ;
+wire            alu_op_sub  = s2_alu_op == ALU_OP_SUB    ;
+wire            alu_op_xor  = s2_alu_op == ALU_OP_XOR    ;
+wire            alu_op_or   = s2_alu_op == ALU_OP_OR     ;
+wire            alu_op_and  = s2_alu_op == ALU_OP_AND    ;
+wire            alu_op_slt  = s2_alu_op == ALU_OP_SLT    ;
+wire            alu_op_sltu = s2_alu_op == ALU_OP_SLTU   ;
+wire            alu_op_srl  = s2_alu_op == ALU_OP_SRL    ;
+wire            alu_op_sll  = s2_alu_op == ALU_OP_SLL    ;
+wire            alu_op_sra  = s2_alu_op == ALU_OP_SRA    ;
+
+wire            alu_cmp_eq  ;
+
+wire [    XL:0] alu_add_out ;
+wire [    XL:0] alu_result  ;
+
+wire            alu_gpr_wen = !alu_op_nop && cfu_op_nop;
+
+// ALU only ever takes one cycle.
+wire            op_done_alu = 1'b1;
 
 //
 // CFU Interfacing
@@ -90,6 +125,13 @@ wire    cfu_op_always_done  = cfu_op_j      || cfu_op_jal   ;
 wire    cfu_conditional     = cfu_op_beq    || cfu_op_bne   || cfu_op_blt   ||
                               cfu_op_bltu   || cfu_op_bge   || cfu_op_bgeu  ;
 
+// Is a conditional branch taken?
+wire    cfu_taken           =
+    cfu_op_beq &&  alu_cmp_eq   ||
+    cfu_op_bne && !alu_cmp_eq    ;
+
+wire    cfu_not_taken       = cfu_conditional && !cfu_taken;
+
 // Jump directly to the EPC register
 wire    cfu_goto_epc        = cfu_op_mret                           ;
 
@@ -97,11 +139,40 @@ wire    cfu_goto_epc        = cfu_op_mret                           ;
 wire    cfu_goto_mtvec      = cfu_op_ecall  || cfu_op_ebreak        ;
 
 // Has the CFU finished executing it's given instruction.
-wire    op_done_cfu         = cfu_op_nop    || cfu_op_always_done   ;
+wire    op_done_cfu         = cfu_op_nop    || cfu_op_always_done   ||
+                              cfu_taken     && (e_cf_change || cf_done)||
+                              cfu_not_taken ;
 
 // Does the CFU need to write anything back to the GPRs?
-wire        cfu_gpr_wen     = 1'b0;
-wire [XL:0] cfu_gpr_wdata   = 64'b0;
+// - Only on a jump and link instruction.
+wire        cfu_gpr_wen     = cfu_op_jal;
+wire [XL:0] cfu_gpr_wdata   = s2_opr_c  ;
+
+//
+// Control flow bus
+// ------------------------------------------------------------
+
+// Control flow change completed for the current instruction. Used to
+// stop accidentially triggering multiple CF changes to the same address.
+reg       cf_done ;
+wire    n_cf_done = e_new_instr ? 1'b0 : cf_done || e_cf_change;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        cf_done <= 1'b0;
+    end else begin
+        cf_done <= n_cf_done;
+    end
+end
+
+assign  s2_cf_valid         = cfu_taken && !cf_done;
+
+assign  s2_cf_target        = 
+    cfu_conditional ? alu_add_out   :
+    cfu_goto_epc    ? csr_mepc      :
+                      csr_mtvec     ;
+
+assign  s2_cf_cause         = 0     ;   // TODO
 
 //
 // CSR Interfacing
@@ -133,22 +204,60 @@ wire [XL:0] csr_gpr_wdata   = csr_rdata;
 // Is the stage ready for a new instruction?
 // ------------------------------------------------------------
 
-assign  s2_ready    = op_done_csr && op_done_cfu;
+assign  s2_ready    = op_done_csr && op_done_cfu && op_done_alu;
 
 //
 // GPR Writeback
 // ------------------------------------------------------------
 
+// GPR Writeback completed for the current instruction. Used to
+// stop accidentially triggering multiple writebacks for the same instruction
+reg       rd_done ;
+wire    n_rd_done = e_new_instr ? 1'b0 : rd_done || s2_rd_wen;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        rd_done <= 1'b0;
+    end else begin
+        rd_done <= n_rd_done;
+    end
+end
+
 assign s2_rd_addr   = s2_rd;
 
-assign s2_rd_wen    = cfu_gpr_wen || csr_gpr_wen;
+assign s2_rd_wen    = !rd_done && (cfu_gpr_wen || csr_gpr_wen || alu_gpr_wen);
 
-assign s2_rd_wdata  = {64{cfu_gpr_wen}} & cfu_gpr_wdata |
-                      {64{csr_gpr_wen}} & csr_gpr_wdata ;
+assign s2_rd_wdata  = {XLEN{cfu_gpr_wen}} & cfu_gpr_wdata   |
+                      {XLEN{csr_gpr_wen}} & csr_gpr_wdata   |
+                      {XLEN{alu_gpr_wen}} & alu_result      ;
 
 //
 // Submodule Instances
 // ------------------------------------------------------------
 
+
+//
+// instance: core_pipe_exec_alu
+//
+//  Integer ALU module
+//
+core_pipe_exec_alu i_core_pipe_exec_alu (
+.opr_a   (alu_opr_a   ), // Input operand A
+.opr_b   (alu_opr_b   ), // Input operand B
+.word    (alu_word    ), // Operate on low 32-bits of XL.
+.op_add  (alu_op_add  ), // Select output of adder
+.op_sub  (alu_op_sub  ), // Subtract opr_a from opr_b else add
+.op_xor  (alu_op_xor  ), // Select XOR operation result
+.op_or   (alu_op_or   ), // Select OR
+.op_and  (alu_op_and  ), //        AND
+.op_slt  (alu_op_slt  ), // Set less than
+.op_sltu (alu_op_sltu ), //                Unsigned
+.op_srl  (alu_op_srl  ), // Shift right logical
+.op_sll  (alu_op_sll  ), // Shift left logical
+.op_sra  (alu_op_sra  ), // Shift right arithmetic
+.add_out (alu_add_out ), // Result of adding opr_a and opr_b
+.cmp_eq  (alu_cmp_eq  ), // Does opr_a == opr_b
+.result  (alu_result  )  // Operation result
+);
 
 endmodule
