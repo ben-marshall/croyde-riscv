@@ -195,6 +195,11 @@ wire   n_s2_op_w    =
     dec_divuw     || dec_remw      || dec_remuw     || dec_c_addw    ;
 
 //
+// Operand immediate selection
+
+assign opr_c_imm = |n_csr_op ? {52'b0, imm_csr_addr} : 0;
+
+//
 // Uop decoding.
 // ------------------------------------------------------------
 

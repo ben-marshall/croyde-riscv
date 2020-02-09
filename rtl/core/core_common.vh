@@ -108,6 +108,7 @@ localparam LSU_OP_SD        = 5'b1_100_0;
 localparam CSR_OP_W         = 4;
 localparam CSR_OP_R         = CSR_OP_W - 1;
 
+localparam CSR_OP_NOP       = 4'b0000;
 localparam CSR_OP_RD        = 0;
 localparam CSR_OP_WR        = 1;
 localparam CSR_OP_SET       = 2;

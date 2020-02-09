@@ -9,7 +9,7 @@
       branch instruction if a decode-stage branch is taken when execute is
       not ready to recieve it.
 
-  - [ ] Decode CF valid should not be asserted until the EX stage is
+  - [X] Decode CF valid should not be asserted until the EX stage is
         ready.
 
 - [ ] Execute stage ready signal.
@@ -27,6 +27,10 @@
   - [ ] ALU
 
   - [ ] MDU
+
+- [ ] Execute stage data writeback selection
+
+  - [ ] Stop multiple writebacks in the same instruction.
 
 ## Verif
 
