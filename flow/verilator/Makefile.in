@@ -9,6 +9,10 @@ VL_ARGS     = +IMEM=$(REPO_WORK)/riscv-compliance/rv32imc/C-ADD.elf.srec
 VL_CORE_MANIFEST    = $(REPO_HOME)/flow/verilator/manifest-core.txt
 VL_VERIF_MANIFEST   = $(REPO_HOME)/flow/verilator/manifest-verif.txt
 
+VL_CORE_RTL_SRC     = $(shell cat $(VL_CORE_MANIFEST) | envsubst)
+
+$(info $(VL_CORE_RTL_SRC))
+
 VL_TOP      = core_top
 
 VL_CSRC_DIR=$(REPO_HOME)/verif/verilator
@@ -20,7 +24,7 @@ VL_FLAGS = --cc -CFLAGS "-O2" --Mdir $(VL_DIR) -O3 -CFLAGS -g\
 
 .PHONY: $(VL_CSRC)
 
-$(VL_OUT) : $(VL_VERIF_MANIFEST) $(VL_CORE_MANIFEST_FILE)
+$(VL_OUT) : $(VL_VERIF_MANIFEST) $(VL_CORE_MANIFEST) $(VL_CORE_RTL_SRC)
 	@mkdir -p $(dir $(VL_OUT))
 	$(VERILATOR) \
         $(VL_FLAGS) \
