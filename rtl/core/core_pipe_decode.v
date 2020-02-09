@@ -182,8 +182,15 @@ assign n_s2_opr_c   =
     {64{sel_opr_c_npc}} & s1_npc      ;
 
 //
+// Register operands
 // TODO: decode 16-bit destination registers.
 assign n_s2_rd      = dec_rd;
+
+wire [REG_ADDR_R:0] dec_16bit_rs1; 
+wire [REG_ADDR_R:0] dec_16bit_rs2;
+
+assign s1_rs1_addr  = s1_16bit ? dec_16bit_rs1 : dec_rs1 ;
+assign s1_rs2_addr  = s1_16bit ? dec_16bit_rs2 : dec_rs2 ;
 
 //
 // Is this decoded instruction explicitly operating on a word, rather than
@@ -198,6 +205,13 @@ wire   n_s2_op_w    =
 // Operand immediate selection
 
 assign opr_c_imm = |n_csr_op ? {52'b0, imm_csr_addr} : 0;
+
+wire   op_imm    = s1_instr[6:0] == 7'b0010011;
+
+wire    [XL:0]  sext_imm_i32 = {{32{imm_i32[31]}}, imm_i32};
+
+assign opr_b_imm = op_imm ? sext_imm_i32 : 0;
+
 
 //
 // Uop decoding.

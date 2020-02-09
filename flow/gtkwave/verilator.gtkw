@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sun Feb  9 15:30:19 2020
+[*] Sun Feb  9 15:45:04 2020
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/uc64/work/verilator/waves.vcd"
-[dumpfile_mtime] "Sun Feb  9 15:29:10 2020"
-[dumpfile_size] 169632
+[dumpfile_mtime] "Sun Feb  9 15:44:34 2020"
+[dumpfile_size] 183943
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/verilator.gtkw"
-[timestart] 116
+[timestart] 264
 [size] 1920 1025
 [pos] -1 -1
-*-6.349673 294 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-4.864246 314 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.core_top.
 [treeopen] TOP.core_top.i_core_pipe_exec.
@@ -171,12 +171,12 @@ TOP.core_top.i_core_regfile.regs(30)[63:0]
 TOP.core_top.i_core_regfile.regs(31)[63:0]
 @1401200
 -GPRs
-@c00200
+@800200
 -Pipeline - Decode
 @28
 TOP.core_top.i_core_pipe_decode.s2_eat_2
 TOP.core_top.i_core_pipe_decode.s2_eat_4
-@c00200
+@800200
 -Stage Input
 @28
 TOP.core_top.i_core_pipe_decode.s1_16bit
@@ -186,9 +186,9 @@ TOP.core_top.i_core_pipe_decode.s1_ferr[1:0]
 TOP.core_top.i_core_pipe_decode.s1_instr[31:0]
 TOP.core_top.i_core_pipe_decode.s1_npc[63:0]
 TOP.core_top.i_core_pipe_decode.s1_pc[63:0]
-@1401200
+@1000200
 -Stage Input
-@c00200
+@800200
 -Operand Selection
 @22
 TOP.core_top.i_core_pipe_decode.n_s2_opr_a[63:0]
@@ -202,7 +202,15 @@ TOP.core_top.i_core_pipe_decode.sel_opr_b_rs2
 TOP.core_top.i_core_pipe_decode.sel_opr_c_imm
 TOP.core_top.i_core_pipe_decode.sel_opr_c_npc
 TOP.core_top.i_core_pipe_decode.sel_opr_c_rs2
-@1401200
+@24
+TOP.core_top.i_core_pipe_decode.s1_rs1_addr[4:0]
+@22
+TOP.core_top.i_core_pipe_decode.s1_rs1_data[63:0]
+@24
+TOP.core_top.i_core_pipe_decode.s1_rs2_addr[4:0]
+@22
+TOP.core_top.i_core_pipe_decode.s1_rs2_data[63:0]
+@1000200
 -Operand Selection
 @c00200
 -Instruction Decode
@@ -370,7 +378,7 @@ TOP.core_top.i_core_pipe_decode.n_lsu_op[4:0]
 TOP.core_top.i_core_pipe_decode.n_mdu_op[3:0]
 @1401200
 -Next Stage Values
-@800200
+@c00200
 -EX Stage
 @28
 TOP.core_top.i_core_pipe_decode.s2_valid
@@ -388,9 +396,9 @@ TOP.core_top.i_core_pipe_decode.s2_opr_b[63:0]
 TOP.core_top.i_core_pipe_decode.s2_opr_c[63:0]
 TOP.core_top.i_core_pipe_decode.s2_pc[63:0]
 TOP.core_top.i_core_pipe_decode.s2_rd[4:0]
-@1000200
--EX Stage
 @1401200
+-EX Stage
+@1000200
 -Pipeline - Decode
 @800200
 -Pipeline - Execte
@@ -412,6 +420,9 @@ TOP.core_top.i_core_pipe_exec.csr_wdata[63:0]
 TOP.core_top.i_core_pipe_exec.csr_wr
 TOP.core_top.i_core_pipe_exec.csr_wr_clr
 TOP.core_top.i_core_pipe_exec.csr_wr_set
+@23
+TOP.core_top.i_core_pipe_exec.csr_mepc[63:0]
+TOP.core_top.i_core_pipe_exec.csr_mtvec[63:0]
 @1000200
 -CSR Interface
 @28
@@ -419,6 +430,10 @@ TOP.core_top.i_core_pipe_exec.s2_valid
 TOP.core_top.i_core_pipe_exec.s2_ready
 @22
 TOP.core_top.i_core_pipe_exec.s2_instr[31:0]
+@2022
+^1 /home/ben/projects/riscv/cores/uc64/work/riscv-compliance/rv32imc/C-ADD.elf.gtkwl
+TOP.core_top.i_core_pipe_exec.s2_instr[31:0]
+@22
 TOP.core_top.i_core_pipe_exec.s2_pc[63:0]
 TOP.core_top.i_core_pipe_exec.s2_alu_op[3:0]
 TOP.core_top.i_core_pipe_exec.s2_cfu_op[3:0]
@@ -431,7 +446,7 @@ TOP.core_top.i_core_pipe_exec.s2_op_w
 TOP.core_top.i_core_pipe_exec.s2_opr_a[63:0]
 TOP.core_top.i_core_pipe_exec.s2_opr_b[63:0]
 TOP.core_top.i_core_pipe_exec.s2_opr_c[63:0]
-@c00201
+@c00200
 -Memory - Data
 @22
 TOP.core_top.i_core_pipe_exec.dmem_addr[63:0]
@@ -447,7 +462,7 @@ TOP.core_top.i_core_pipe_exec.dmem_strb[3:0]
 TOP.core_top.i_core_pipe_exec.dmem_wdata[63:0]
 @28
 TOP.core_top.i_core_pipe_exec.dmem_wen
-@1401201
+@1401200
 -Memory - Data
 @c00200
 -Execute - Control Flow
@@ -459,7 +474,7 @@ TOP.core_top.i_core_pipe_exec.s2_cf_cause[4:0]
 TOP.core_top.i_core_pipe_exec.s2_cf_target[63:0]
 @1401200
 -Execute - Control Flow
-@800200
+@c00200
 -ALU
 @28
 TOP.core_top.i_core_pipe_exec.alu_op_nop
@@ -480,7 +495,7 @@ TOP.core_top.i_core_pipe_exec.alu_add_out[63:0]
 TOP.core_top.i_core_pipe_exec.alu_opr_a[63:0]
 TOP.core_top.i_core_pipe_exec.alu_opr_b[63:0]
 TOP.core_top.i_core_pipe_exec.alu_result[63:0]
-@1000200
+@1401200
 -ALU
 @800200
 -GPR Writeback
