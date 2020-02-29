@@ -209,8 +209,11 @@ assign opr_c_imm = |n_csr_op ? {52'b0, imm_csr_addr} : 0;
 wire   op_imm    = s1_instr[6:0] == 7'b0010011;
 
 wire    [XL:0]  sext_imm_i32 = {{32{imm_i32[31]}}, imm_i32};
+wire    [XL:0]  sext_imm32_j = {{32{imm32_j[31]}}, imm32_j};
 
-assign opr_b_imm = op_imm ? sext_imm_i32 : 0;
+assign opr_b_imm = op_imm   ? sext_imm_i32  :   
+                   dec_jal  ? sext_imm32_j  :
+                              0             ;
 
 
 //

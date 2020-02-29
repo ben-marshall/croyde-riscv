@@ -128,6 +128,7 @@ wire    cfu_conditional     = cfu_op_beq    || cfu_op_bne   || cfu_op_blt   ||
 
 // Is a conditional branch taken?
 wire    cfu_taken           =
+    cfu_op_always_done          ||
     cfu_op_beq &&  alu_cmp_eq   ||
     cfu_op_bne && !alu_cmp_eq    ;
 
@@ -184,10 +185,12 @@ end
 
 assign  s2_cf_valid         = (cf_excep || cfu_taken) && !cf_done;
 
+wire cf_target_sel_alu = cfu_conditional || cfu_op_always_done;
+
 assign  s2_cf_target        = 
-    cfu_conditional ? alu_add_out   :
-    cfu_goto_mepc   ? csr_mepc      :
-                      csr_mtvec     ;
+    cf_target_sel_alu   ?   alu_add_out   :
+    cfu_goto_mepc       ?   csr_mepc      :
+                            csr_mtvec     ;
 
 assign  s2_cf_cause         = 0     ;   // TODO
 

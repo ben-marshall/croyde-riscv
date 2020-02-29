@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sun Feb  9 16:01:25 2020
+[*] Sat Feb 29 16:37:16 2020
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/uc64/work/verilator/waves.vcd"
-[dumpfile_mtime] "Sun Feb  9 16:01:12 2020"
-[dumpfile_size] 185224
+[dumpfile_mtime] "Sat Feb 29 16:37:11 2020"
+[dumpfile_size] 133001
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/verilator.gtkw"
 [timestart] 1
 [size] 1920 1025
 [pos] -1 -1
-*-7.647671 357 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-7.647671 863 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.core_top.
 [treeopen] TOP.core_top.i_core_pipe_exec.
@@ -17,7 +17,7 @@
 [sst_width] 305
 [signals_width] 431
 [sst_expanded] 1
-[sst_vpaned_height] 123
+[sst_vpaned_height] 187
 @28
 TOP.core_top.i_core_pipe_fetch.g_clk
 TOP.core_top.i_core_pipe_fetch.g_resetn
@@ -419,9 +419,7 @@ TOP.core_top.i_core_pipe_exec.csr_wdata[63:0]
 @28
 TOP.core_top.i_core_pipe_exec.csr_wr
 TOP.core_top.i_core_pipe_exec.csr_wr_clr
-@29
 TOP.core_top.i_core_pipe_exec.csr_wr_set
-@28
 TOP.core_top.i_core_pipe_exec.csr_error
 @22
 TOP.core_top.i_core_pipe_exec.csr_mepc[63:0]
@@ -434,7 +432,7 @@ TOP.core_top.i_core_pipe_exec.s2_ready
 @22
 TOP.core_top.i_core_pipe_exec.s2_instr[31:0]
 @2022
-^1 /home/ben/projects/riscv/cores/uc64/work/riscv-compliance/rv32imc/C-ADD.elf.gtkwl
+^1 (null)
 TOP.core_top.i_core_pipe_exec.s2_instr[31:0]
 @22
 TOP.core_top.i_core_pipe_exec.s2_pc[63:0]
@@ -467,15 +465,28 @@ TOP.core_top.i_core_pipe_exec.dmem_wdata[63:0]
 TOP.core_top.i_core_pipe_exec.dmem_wen
 @1401200
 -Memory - Data
-@c00200
+@800200
+-Execute - Exceptions
+@28
+TOP.core_top.i_core_pipe_exec.cf_excep
+TOP.core_top.i_core_pipe_exec.excep_cfu_bad_target
+TOP.core_top.i_core_pipe_exec.excep_csr_error
+TOP.core_top.i_core_pipe_exec.excep_ebreak
+TOP.core_top.i_core_pipe_exec.excep_ecall
+@1000200
+-Execute - Exceptions
+@800200
 -Execute - Control Flow
 @28
+TOP.core_top.i_core_pipe_exec.cfu_conditional
+TOP.core_top.i_core_pipe_exec.cfu_goto_epc
+TOP.core_top.i_core_pipe_exec.cfu_goto_mtvec
 TOP.core_top.i_core_pipe_exec.s2_cf_valid
 TOP.core_top.i_core_pipe_exec.s2_cf_ack
 @22
 TOP.core_top.i_core_pipe_exec.s2_cf_cause[4:0]
 TOP.core_top.i_core_pipe_exec.s2_cf_target[63:0]
-@1401200
+@1000200
 -Execute - Control Flow
 @c00200
 -ALU
@@ -510,6 +521,60 @@ TOP.core_top.i_core_pipe_exec.s2_rd_addr[4:0]
 TOP.core_top.i_core_pipe_exec.s2_rd_wdata[63:0]
 @1000200
 -GPR Writeback
+@c00201
+-CSRs
+@22
+TOP.core_top.i_core_csrs.reg_marchid[63:0]
+TOP.core_top.i_core_csrs.reg_mcause[63:0]
+TOP.core_top.i_core_csrs.reg_mcause_cause[62:0]
+@28
+TOP.core_top.i_core_csrs.reg_mcause_interrupt
+@22
+TOP.core_top.i_core_csrs.reg_mcountin[63:0]
+TOP.core_top.i_core_csrs.reg_medeleg[63:0]
+TOP.core_top.i_core_csrs.reg_mepc[63:0]
+TOP.core_top.i_core_csrs.reg_mepc_mepc[62:0]
+@28
+TOP.core_top.i_core_csrs.reg_mepc_warl
+@22
+TOP.core_top.i_core_csrs.reg_mhartid[63:0]
+TOP.core_top.i_core_csrs.reg_mideleg[63:0]
+TOP.core_top.i_core_csrs.reg_mie[63:0]
+TOP.core_top.i_core_csrs.reg_mimpid[63:0]
+TOP.core_top.i_core_csrs.reg_mip[63:0]
+TOP.core_top.i_core_csrs.reg_misa[63:0]
+TOP.core_top.i_core_csrs.reg_misa_extensions[61:0]
+@28
+TOP.core_top.i_core_csrs.reg_misa_mxl[1:0]
+@22
+TOP.core_top.i_core_csrs.reg_mscratch[63:0]
+TOP.core_top.i_core_csrs.reg_mstatus[63:0]
+@28
+TOP.core_top.i_core_csrs.reg_mstatus_fs[1:0]
+TOP.core_top.i_core_csrs.reg_mstatus_mie
+TOP.core_top.i_core_csrs.reg_mstatus_mpie
+TOP.core_top.i_core_csrs.reg_mstatus_mpp[1:0]
+TOP.core_top.i_core_csrs.reg_mstatus_mprv
+TOP.core_top.i_core_csrs.reg_mstatus_mxr
+TOP.core_top.i_core_csrs.reg_mstatus_sd
+TOP.core_top.i_core_csrs.reg_mstatus_sie
+TOP.core_top.i_core_csrs.reg_mstatus_spie
+TOP.core_top.i_core_csrs.reg_mstatus_spp
+TOP.core_top.i_core_csrs.reg_mstatus_sum
+TOP.core_top.i_core_csrs.reg_mstatus_tsr
+TOP.core_top.i_core_csrs.reg_mstatus_tvm
+TOP.core_top.i_core_csrs.reg_mstatus_tw
+TOP.core_top.i_core_csrs.reg_mstatus_uie
+TOP.core_top.i_core_csrs.reg_mstatus_upie
+TOP.core_top.i_core_csrs.reg_mstatus_wpri3
+TOP.core_top.i_core_csrs.reg_mstatus_wpri4
+TOP.core_top.i_core_csrs.reg_mstatus_xs[1:0]
+@22
+TOP.core_top.i_core_csrs.reg_mtval[63:0]
+TOP.core_top.i_core_csrs.reg_mtvec[63:0]
+@1401201
+-CSRs
+@1000200
 -Pipeline - Execte
 [pattern_trace] 1
 [pattern_trace] 0
