@@ -134,7 +134,7 @@ wire    cfu_taken           =
 wire    cfu_not_taken       = cfu_conditional && !cfu_taken;
 
 // Jump directly to the EPC register
-wire    cfu_goto_epc        = cfu_op_mret                           ;
+wire    cfu_goto_mepc       = cfu_op_mret                           ;
 
 // Jump directly to the MTVEC CSR register
 wire    cfu_goto_mtvec      = cfu_op_ecall  || cfu_op_ebreak        ;
@@ -148,6 +148,22 @@ wire    op_done_cfu         = cfu_op_nop    || cfu_op_always_done   ||
 // - Only on a jump and link instruction.
 wire        cfu_gpr_wen     = cfu_op_jal;
 wire [XL:0] cfu_gpr_wdata   = s2_opr_c  ;
+
+//
+// Exception condition raising
+// ------------------------------------------------------------
+
+wire excep_csr_error        = csr_error && csr_en   ;
+
+wire excep_cfu_bad_target   = 1'b0                  ;
+
+wire excep_ecall            = cfu_op_ecall          ;
+
+wire excep_ebreak           = cfu_op_ebreak         ;
+
+
+wire cf_excep   = excep_csr_error || excep_cfu_bad_target   ||
+                  excep_ecall     || excep_ebreak           ;
 
 //
 // Control flow bus
@@ -166,11 +182,11 @@ always @(posedge g_clk) begin
     end
 end
 
-assign  s2_cf_valid         = cfu_taken && !cf_done;
+assign  s2_cf_valid         = (cf_excep || cfu_taken) && !cf_done;
 
 assign  s2_cf_target        = 
     cfu_conditional ? alu_add_out   :
-    cfu_goto_epc    ? csr_mepc      :
+    cfu_goto_mepc   ? csr_mepc      :
                       csr_mtvec     ;
 
 assign  s2_cf_cause         = 0     ;   // TODO

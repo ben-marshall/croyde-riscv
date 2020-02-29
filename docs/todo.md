@@ -12,13 +12,15 @@
   - [X] Decode CF valid should not be asserted until the EX stage is
         ready.
 
-- [ ] Execute stage ready signal.
+- [X] Execute stage ready signal.
 
-  - [ ] Decode stage to EX stage register progression
+  - [X] Decode stage to EX stage register progression
 
 - [ ] Execute stage FU integration.
 
-  - [ ] CSR unit
+  - [X] CSR unit
+
+    - [X] CSR based exceptions
 
   - [ ] Branch unit
 
