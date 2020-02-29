@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VARIANTS="rv32i rv32im rv32imc rv64i rv64im"
+VARIANTS="rv64i rv64im"
 
 OBJCOPY=$RISCV/bin/riscv64-unknown-elf-objcopy
 OBJDUMP=$RISCV/bin/riscv64-unknown-elf-objdump
@@ -30,7 +30,7 @@ do
         chmod -x $F.srec
         BNAME=`basename $F`
         grep "80.*:" $F.objdump \
-            | grep -v ">:" | cut -c 11- | sed 's/\t//' \
+            | grep -v ">:" | cut -c 14- | sed 's/\t//' \
             | sort | uniq | sed 's/ +/ /' | sed 's/\t/ /' \
             | sed 's/\(^....    \)    /0000\1/' \
             > $DEST/$V/$BNAME.gtkwl
