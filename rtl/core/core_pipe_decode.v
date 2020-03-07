@@ -9,6 +9,7 @@ module core_pipe_decode (
 input  wire                 g_clk       , // Global clock
 input  wire                 g_resetn    , // Global active low sync reset.
 
+input  wire                 s1_flush    , // Flush this stage's pipeline reg.
 input  wire                 s1_16bit    , // 16 bit instruction?
 input  wire                 s1_32bit    , // 32 bit instruction?
 input  wire [  FD_IBUF_R:0] s1_instr    , // Instruction to be decoded
@@ -386,7 +387,9 @@ wire [CFU_OP_R:0] n_cfu_op =
 // ------------------------------------------------------------
 
 // Offset used when calculating jumps taken from the decode stage.
-wire [XL:0] decode_cf_offset = {32'b0, imm_c_j};
+wire [XL:0] decode_cf_offset = 
+    {64{dec_jalr || dec_jal  }} & {{32{imm32_j[31]}}, imm32_j} |
+    {64{dec_c_j  || dec_c_jal}} & {{32{imm_c_j[31]}}, imm_c_j} ;
 
 assign s1_cf_target = s1_pc + decode_cf_offset;
 
@@ -402,8 +405,6 @@ wire   s1_cf_wait   = s1_cf_valid && !s1_cf_ack;
 // Decode -> Execute stage registers
 // ------------------------------------------------------------
 
-wire        flush_de_pipereg = 1'b0;
-
 assign      s2_valid    = ( s1_16bit    || s1_32bit   ) && 
                           (!s1_cf_valid || s1_cf_taken) ;
 
@@ -411,7 +412,7 @@ wire [XL:0] n_s2_pc     = s1_pc;
 wire [31:0] n_s2_instr  = {s1_16bit ? 16'b0 : s1_instr[31:16], s1_instr[15:0]};
 
 always @(posedge g_clk) begin
-    if(!g_resetn || flush_de_pipereg) begin
+    if(!g_resetn || s1_flush) begin
         s2_pc       <= 0            ;
         s2_opr_a    <= 0            ;
         s2_opr_b    <= 0            ;

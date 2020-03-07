@@ -81,6 +81,8 @@ assign s2_cf_ack    = cf_ack;
 assign cf_cause     = s2_cf_valid ? s2_cf_cause     : s1_cf_cause   ;
 assign cf_target    = s2_cf_valid ? s2_cf_target    : s1_cf_target  ;
 
+wire   s1_flush     = cf_valid && cf_ack;
+
 //
 // Inter-stage wiring
 // ------------------------------------------------------------
@@ -197,6 +199,7 @@ core_pipe_fetch i_core_pipe_fetch (
 core_pipe_decode i_core_pipe_decode(
 .g_clk       (g_clk       ), // Global clock
 .g_resetn    (g_resetn    ), // Global active low sync reset.
+.s1_flush    (s1_flush    ), // Flush decode->execute pipe reg.
 .s1_16bit    (s1_16bit    ), // 16 bit instruction?
 .s1_32bit    (s1_32bit    ), // 32 bit instruction?
 .s1_instr    (s1_instr    ), // Instruction to be decoded
