@@ -5,12 +5,15 @@
 
 ## RTL
 
-- [ ] Fix flushing of fetch -> decode register such that we loose a
+- [X] Fix flushing of fetch -> decode register such that we loose a
       branch instruction if a decode-stage branch is taken when execute is
       not ready to recieve it.
 
   - [X] Decode CF valid should not be asserted until the EX stage is
         ready.
+
+- [ ] Fix fetch so that it only ever asks for addresses on a 64-bit boundary
+      and loads that data into the buffer as appropriate.
 
 - [X] Execute stage ready signal.
 
