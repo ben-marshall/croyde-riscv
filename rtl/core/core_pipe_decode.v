@@ -159,7 +159,7 @@ wire sel_opr_c_imm  =
     dec_beq       || dec_bne       || dec_c_beqz    || dec_c_bnez    ||
     dec_blt       || dec_bge       || dec_bltu      || dec_bgeu      ||
     dec_csrrw     || dec_csrrs     || dec_csrrc     || dec_csrrwi    ||
-    dec_csrrsi    || dec_csrrci    ;
+    dec_csrrsi    || dec_csrrci    || dec_auipc     ;
 
 wire sel_opr_c_npc  =
     dec_jalr      || dec_jal       || dec_c_jal     || dec_fence_i   ;
@@ -208,6 +208,8 @@ wire   n_s2_op_w    =
 assign opr_c_imm = 
     |n_csr_op            ? {52'b0, imm_csr_addr}        : 
     n_cfu_op_conditional ? {{32{imm32_b[31]}},imm32_b}  :
+    dec_auipc            ? {{32{imm32_u[31]}},imm32_u}  :
+    dec_lui              ? {{32{imm32_u[31]}},imm32_u}  :
                            0                            ;
 
 wire   op_imm    = s1_instr[6:0] == 7'b0010011;
