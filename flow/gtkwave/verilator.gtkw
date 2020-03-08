@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sat Mar  7 12:31:44 2020
+[*] Sun Mar  8 11:20:46 2020
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/uc64/work/verilator/waves.vcd"
-[dumpfile_mtime] "Sat Mar  7 12:30:51 2020"
-[dumpfile_size] 262150
+[dumpfile_mtime] "Sun Mar  8 11:17:00 2020"
+[dumpfile_size] 297424
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/verilator.gtkw"
-[timestart] 403
+[timestart] 1
 [size] 1920 1025
 [pos] -1 -1
-*-8.173869 846 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-10.294271 1006 826 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.core_top.
 [treeopen] TOP.core_top.i_core_pipe_exec.
@@ -119,25 +119,24 @@ TOP.core_top.i_core_pipe_fetch.e_eat_2
 TOP.core_top.i_core_pipe_fetch.e_eat_4
 @1401200
 -Events
-@800201
+@800200
 -Fetch -> Decode
-@29
+@28
 TOP.core_top.i_core_pipe_fetch.s1_ferr[1:0]
-@23
+@22
 TOP.core_top.i_core_pipe_fetch.s1_instr[31:0]
-@2023
+@2022
 ^1 /home/ben/projects/riscv/cores/uc64/work/riscv-compliance/rv64i/ADDIW.elf.gtkwl
 TOP.core_top.i_core_pipe_fetch.s1_instr[31:0]
-@23
+@22
 TOP.core_top.i_core_pipe_fetch.s1_pc[63:0]
-@29
+@28
 TOP.core_top.i_core_pipe_fetch.s2_eat_2
 TOP.core_top.i_core_pipe_fetch.s2_eat_4
-@23
+@22
 TOP.core_top.i_core_pipe_fetch.n_s1_pc[63:0]
-@1000201
--Fetch -> Decode
 @1000200
+-Fetch -> Decode
 -Pipeline - Fetch
 @c00200
 -GPRs
@@ -482,19 +481,30 @@ TOP.core_top.i_core_pipe_exec.excep_ebreak
 TOP.core_top.i_core_pipe_exec.excep_ecall
 @1401200
 -Execute - Exceptions
-@c00200
+@800200
 -Execute - Control Flow
 @28
-TOP.core_top.i_core_pipe_exec.cfu_conditional
+TOP.core_top.i_core_pipe_exec.cfu_op_beq
+TOP.core_top.i_core_pipe_exec.cfu_op_bge
+TOP.core_top.i_core_pipe_exec.cfu_op_bgeu
+TOP.core_top.i_core_pipe_exec.cfu_op_blt
+TOP.core_top.i_core_pipe_exec.cfu_op_bltu
+TOP.core_top.i_core_pipe_exec.cfu_op_bne
+TOP.core_top.i_core_pipe_exec.cfu_op_ebreak
+TOP.core_top.i_core_pipe_exec.cfu_op_ecall
+TOP.core_top.i_core_pipe_exec.cfu_op_j
+TOP.core_top.i_core_pipe_exec.cfu_op_jal
+TOP.core_top.i_core_pipe_exec.cfu_op_mret
+TOP.core_top.i_core_pipe_exec.cfu_op_nop
 TOP.core_top.i_core_pipe_exec.cfu_goto_mtvec
 TOP.core_top.i_core_pipe_exec.s2_cf_valid
 TOP.core_top.i_core_pipe_exec.s2_cf_ack
 @22
 TOP.core_top.i_core_pipe_exec.s2_cf_cause[4:0]
 TOP.core_top.i_core_pipe_exec.s2_cf_target[63:0]
-@1401200
+@1000200
 -Execute - Control Flow
-@800200
+@c00200
 -ALU
 @28
 TOP.core_top.i_core_pipe_exec.alu_op_nop
@@ -516,6 +526,22 @@ TOP.core_top.i_core_pipe_exec.alu_opr_a[63:0]
 TOP.core_top.i_core_pipe_exec.alu_opr_b[63:0]
 TOP.core_top.i_core_pipe_exec.alu_result[63:0]
 @800200
+-Set Less Than
+@28
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.op_slt
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.op_sltu
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.sel_slt
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.slt_lsb
+@22
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.slt_result[63:0]
+@28
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.slt_signed
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.slt_signed_w
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.slt_unsigned
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.slt_unsigned_w
+@1000200
+-Set Less Than
+@800200
 -Shifter
 @24
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.shift_amt[5:0]
@@ -524,8 +550,9 @@ TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.shift_in[63:0]
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.shift_result[63:0]
 @1000200
 -Shifter
+@1401200
 -ALU
-@c00200
+@800200
 -GPR Writeback
 @28
 TOP.core_top.i_core_pipe_exec.s2_rd_wen
@@ -533,8 +560,21 @@ TOP.core_top.i_core_pipe_exec.s2_rd_wen
 TOP.core_top.i_core_pipe_exec.s2_rd_addr[4:0]
 @22
 TOP.core_top.i_core_pipe_exec.s2_rd_wdata[63:0]
-@1401200
+@1000200
 -GPR Writeback
+@800201
+-CSR Bus
+@23
+TOP.core_top.i_core_pipe_exec.csr_addr[11:0]
+@29
+TOP.core_top.i_core_pipe_exec.csr_en
+TOP.core_top.i_core_pipe_exec.csr_error
+TOP.core_top.i_core_pipe_exec.csr_read_en
+TOP.core_top.i_core_pipe_exec.csr_wr
+TOP.core_top.i_core_pipe_exec.csr_wr_clr
+TOP.core_top.i_core_pipe_exec.csr_wr_set
+@1000201
+-CSR Bus
 @c00200
 -CSRs
 @22

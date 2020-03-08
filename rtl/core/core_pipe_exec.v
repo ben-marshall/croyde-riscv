@@ -92,6 +92,7 @@ wire            alu_op_sll  = s2_alu_op == ALU_OP_SLL    ;
 wire            alu_op_sra  = s2_alu_op == ALU_OP_SRA    ;
 
 wire            alu_cmp_eq  ;
+wire            alu_cmp_lt  ;
 
 wire [    XL:0] alu_add_out ;
 wire [    XL:0] alu_result  ;
@@ -126,11 +127,20 @@ wire    cfu_op_always_done  = cfu_op_j      || cfu_op_jal   ;
 wire    cfu_conditional     = cfu_op_beq    || cfu_op_bne   || cfu_op_blt   ||
                               cfu_op_bltu   || cfu_op_bge   || cfu_op_bgeu  ;
 
+wire    cfu_op_blt_taken    = cfu_op_blt    &&  alu_cmp_lt;
+wire    cfu_op_bltu_taken   = cfu_op_bltu   &&  alu_cmp_lt;
+wire    cfu_op_bge_taken    = cfu_op_bge    && !alu_cmp_lt;
+wire    cfu_op_bgeu_taken   = cfu_op_bgeu   && !alu_cmp_lt;
+
 // Is a conditional branch taken?
 wire    cfu_taken           =
     cfu_op_always_done          ||
     cfu_op_beq &&  alu_cmp_eq   ||
-    cfu_op_bne && !alu_cmp_eq    ;
+    cfu_op_bne && !alu_cmp_eq   ||
+    cfu_op_blt_taken            ||
+    cfu_op_bltu_taken           ||
+    cfu_op_bge_taken            ||
+    cfu_op_bgeu_taken           ;
 
 wire    cfu_not_taken       = cfu_conditional && !cfu_taken;
 
@@ -217,7 +227,7 @@ assign  csr_wdata   =  s2_opr_b                         ;
 wire    op_done_csr = csr_op_nop || csr_en              ;
 
 // Does the CSR FU need to write anything back to the GPRs?
-wire        csr_gpr_wen     = 1'b0;
+wire        csr_gpr_wen     = csr_read_en && !csr_error ;
 wire [XL:0] csr_gpr_wdata   = csr_rdata;
 
 //
@@ -277,6 +287,7 @@ core_pipe_exec_alu i_core_pipe_exec_alu (
 .op_sra  (alu_op_sra  ), // Shift right arithmetic
 .add_out (alu_add_out ), // Result of adding opr_a and opr_b
 .cmp_eq  (alu_cmp_eq  ), // Does opr_a == opr_b
+.cmp_lt  (alu_cmp_lt  ), // Does opr_a <  opr_b
 .result  (alu_result  )  // Operation result
 );
 

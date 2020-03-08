@@ -23,6 +23,7 @@ input  wire             op_sra  , // Shift right arithmetic
 
 output wire [   XL:0]   add_out , // Result of adding opr_a and opr_b
 output wire             cmp_eq  , // Result of opr_a == opr_b
+output wire             cmp_lt  , // Result of opr_a <  opr_b
 
 output wire [   XL:0]   result    // Operation result
 
@@ -55,8 +56,19 @@ wire [XL:0] addsub_result   = {addsub_upper, addsub_output[31:0]}   ;
 // SLT / SLTU
 // ------------------------------------------------------------
 
-// TODO: Implement SLT comparisons.
-wire        slt_lsb         = 1'b0;
+wire        slt_signed      = opr_a[XL] ^ add_out[XL];
+
+wire        slt_signed_w    = opr_a[31] ^ add_out[31];
+
+wire        slt_unsigned    = 1'b0;
+
+wire        slt_unsigned_w  = 1'b0;
+
+wire        slt_lsb         = 
+    (op_slt  && (word ? slt_signed_w   : slt_signed  )) ||
+    (op_sltu && (word ? slt_unsigned_w : slt_unsigned)) ;
+
+assign      cmp_lt          = slt_lsb;
 
 wire [XL:0] slt_result      = {{XL{1'b0}}, slt_lsb};
 
