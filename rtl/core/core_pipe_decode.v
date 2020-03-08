@@ -205,7 +205,10 @@ wire   n_s2_op_w    =
 //
 // Operand immediate selection
 
-assign opr_c_imm = |n_csr_op ? {52'b0, imm_csr_addr} : 0;
+assign opr_c_imm = 
+    |n_csr_op            ? {52'b0, imm_csr_addr}        : 
+    n_cfu_op_conditional ? {{32{imm32_b[31]}},imm32_b}  :
+                           0                            ;
 
 wire   op_imm    = s1_instr[6:0] == 7'b0010011;
 
@@ -362,6 +365,10 @@ assign  n_csr_op[CSR_OP_CLR] = dec_csrrc || dec_csrrci;
 
 //
 //  CFU Opcode select
+    
+wire n_cfu_op_conditional = 
+    dec_beq    || dec_bne    || dec_c_beqz || dec_c_bnez || dec_blt    ||
+    dec_bge    || dec_bltu   || dec_bgeu   ;
 
 wire [CFU_OP_R:0] n_cfu_op =
     {CFU_OP_W{dec_beq       }} & CFU_OP_BEQ     |

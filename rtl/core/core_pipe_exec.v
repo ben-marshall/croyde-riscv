@@ -132,9 +132,10 @@ wire    cfu_op_bltu_taken   = cfu_op_bltu   &&  alu_cmp_lt;
 wire    cfu_op_bge_taken    = cfu_op_bge    && !alu_cmp_lt;
 wire    cfu_op_bgeu_taken   = cfu_op_bgeu   && !alu_cmp_lt;
 
+wire [XL:0] cfu_bcmp_taret  = s2_pc + s2_opr_c;
+
 // Is a conditional branch taken?
-wire    cfu_taken           =
-    cfu_op_always_done          ||
+wire    cfu_cond_taken      =
     cfu_op_beq &&  alu_cmp_eq   ||
     cfu_op_bne && !alu_cmp_eq   ||
     cfu_op_blt_taken            ||
@@ -142,7 +143,7 @@ wire    cfu_taken           =
     cfu_op_bge_taken            ||
     cfu_op_bgeu_taken           ;
 
-wire    cfu_not_taken       = cfu_conditional && !cfu_taken;
+wire    cfu_not_taken       = cfu_conditional && !cfu_cond_taken;
 
 // Jump directly to the EPC register
 wire    cfu_goto_mepc       = cfu_op_mret                           ;
@@ -152,7 +153,7 @@ wire    cfu_goto_mtvec      = cfu_op_ecall  || cfu_op_ebreak        ;
 
 // Has the CFU finished executing it's given instruction.
 wire    op_done_cfu         = cfu_op_nop    || cfu_op_always_done   ||
-                              cfu_taken     && (e_cf_change || cf_done)||
+                              cfu_cond_taken&& (e_cf_change || cf_done)||
                               cfu_not_taken ;
 
 // Does the CFU need to write anything back to the GPRs?
@@ -193,14 +194,14 @@ always @(posedge g_clk) begin
     end
 end
 
-assign  s2_cf_valid         = (cf_excep || cfu_taken) && !cf_done;
-
-wire cf_target_sel_alu = cfu_conditional || cfu_op_always_done;
+assign  s2_cf_valid         =
+    (cf_excep || cfu_cond_taken || cfu_op_always_done) && !cf_done;
 
 assign  s2_cf_target        = 
-    cf_target_sel_alu   ?   alu_add_out   :
-    cfu_goto_mepc       ?   csr_mepc      :
-                            csr_mtvec     ;
+    cfu_conditional     ?   cfu_bcmp_taret  :
+    cfu_op_always_done  ?   alu_add_out     :
+    cfu_goto_mepc       ?   csr_mepc        :
+                            csr_mtvec       ;
 
 assign  s2_cf_cause         = 0     ;   // TODO
 
