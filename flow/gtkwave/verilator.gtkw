@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sun Mar  8 11:40:25 2020
+[*] Sun Mar 15 17:32:43 2020
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/uc64/work/verilator/waves.vcd"
-[dumpfile_mtime] "Sun Mar  8 11:39:48 2020"
-[dumpfile_size] 277776
+[dumpfile_mtime] "Sun Mar 15 17:30:54 2020"
+[dumpfile_size] 259735
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/verilator.gtkw"
-[timestart] 1
+[timestart] 885
 [size] 1920 1025
 [pos] -1 -1
-*-9.475235 886 886 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-6.158429 1007 946 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.core_top.
 [treeopen] TOP.core_top.i_core_pipe_exec.
@@ -175,7 +175,7 @@ TOP.core_top.i_core_regfile.regs(30)[63:0]
 TOP.core_top.i_core_regfile.regs(31)[63:0]
 @1401200
 -GPRs
-@c00200
+@800200
 -Pipeline - Decode
 @28
 TOP.core_top.i_core_pipe_decode.s2_eat_2
@@ -186,13 +186,16 @@ TOP.core_top.i_core_pipe_decode.s2_eat_4
 TOP.core_top.i_core_pipe_decode.s1_16bit
 TOP.core_top.i_core_pipe_decode.s1_32bit
 TOP.core_top.i_core_pipe_decode.s1_ferr[1:0]
+@2022
+^1 /home/ben/projects/riscv/cores/uc64/work/riscv-compliance/rv64i/ADDIW.elf.gtkwl
+TOP.core_top.i_core_pipe_decode.s1_instr[31:0]
 @22
 TOP.core_top.i_core_pipe_decode.s1_instr[31:0]
 TOP.core_top.i_core_pipe_decode.s1_npc[63:0]
 TOP.core_top.i_core_pipe_decode.s1_pc[63:0]
 @1000200
 -Stage Input
-@c00200
+@800200
 -Operand Selection
 @22
 TOP.core_top.i_core_pipe_decode.n_s2_opr_a[63:0]
@@ -214,7 +217,8 @@ TOP.core_top.i_core_pipe_decode.s1_rs1_data[63:0]
 TOP.core_top.i_core_pipe_decode.s1_rs2_addr[4:0]
 @22
 TOP.core_top.i_core_pipe_decode.s1_rs2_data[63:0]
-@1401200
+TOP.core_top.i_core_pipe_decode.opr_b_imm[63:0]
+@1000200
 -Operand Selection
 @c00200
 -Instruction Decode
@@ -402,6 +406,7 @@ TOP.core_top.i_core_pipe_decode.s2_pc[63:0]
 TOP.core_top.i_core_pipe_decode.s2_rd[4:0]
 @1401200
 -EX Stage
+@1000200
 -Pipeline - Decode
 @800200
 -Pipeline - Execte
@@ -431,13 +436,13 @@ TOP.core_top.i_core_pipe_exec.csr_mtvec[63:0]
 -CSR Interface
 @800200
 -State Inputs
-@29
+@28
 TOP.core_top.i_core_pipe_exec.s2_valid
 TOP.core_top.i_core_pipe_exec.s2_ready
-@2023
+@2022
 ^1 /home/ben/projects/riscv/cores/uc64/work/riscv-compliance/rv64i/ADDIW.elf.gtkwl
 TOP.core_top.i_core_pipe_exec.s2_instr[31:0]
-@23
+@22
 TOP.core_top.i_core_pipe_exec.s2_instr[31:0]
 TOP.core_top.i_core_pipe_exec.s2_pc[63:0]
 TOP.core_top.i_core_pipe_exec.s2_alu_op[3:0]
@@ -445,9 +450,9 @@ TOP.core_top.i_core_pipe_exec.s2_cfu_op[3:0]
 TOP.core_top.i_core_pipe_exec.s2_csr_op[3:0]
 TOP.core_top.i_core_pipe_exec.s2_lsu_op[4:0]
 TOP.core_top.i_core_pipe_exec.s2_mdu_op[3:0]
-@29
+@28
 TOP.core_top.i_core_pipe_exec.s2_op_w
-@23
+@22
 TOP.core_top.i_core_pipe_exec.s2_opr_a[63:0]
 TOP.core_top.i_core_pipe_exec.s2_opr_b[63:0]
 TOP.core_top.i_core_pipe_exec.s2_opr_c[63:0]
@@ -483,6 +488,8 @@ TOP.core_top.i_core_pipe_exec.excep_ecall
 -Execute - Exceptions
 @800200
 -Execute - Control Flow
+@c00201
+-CFU OP
 @28
 TOP.core_top.i_core_pipe_exec.cfu_op_beq
 TOP.core_top.i_core_pipe_exec.cfu_op_bge
@@ -496,6 +503,9 @@ TOP.core_top.i_core_pipe_exec.cfu_op_j
 TOP.core_top.i_core_pipe_exec.cfu_op_jal
 TOP.core_top.i_core_pipe_exec.cfu_op_mret
 TOP.core_top.i_core_pipe_exec.cfu_op_nop
+@1401201
+-CFU OP
+@28
 TOP.core_top.i_core_pipe_exec.cfu_goto_mtvec
 TOP.core_top.i_core_pipe_exec.s2_cf_valid
 TOP.core_top.i_core_pipe_exec.s2_cf_ack
@@ -525,7 +535,7 @@ TOP.core_top.i_core_pipe_exec.alu_add_out[63:0]
 TOP.core_top.i_core_pipe_exec.alu_opr_a[63:0]
 TOP.core_top.i_core_pipe_exec.alu_opr_b[63:0]
 TOP.core_top.i_core_pipe_exec.alu_result[63:0]
-@800200
+@c00200
 -Set Less Than
 @28
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.op_slt
@@ -539,18 +549,17 @@ TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.slt_signed
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.slt_signed_w
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.slt_unsigned
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.slt_unsigned_w
-@1000200
+@1401200
 -Set Less Than
-@800200
+@c00200
 -Shifter
 @24
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.shift_amt[5:0]
 @22
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.shift_in[63:0]
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.shift_result[63:0]
-@1000200
--Shifter
 @1401200
+-Shifter
 -ALU
 @800200
 -GPR Writeback

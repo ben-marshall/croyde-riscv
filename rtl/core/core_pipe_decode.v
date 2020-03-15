@@ -73,7 +73,7 @@ wire [ REG_ADDR_R:0] n_s2_rd        ;
 wire [         XL:0] opr_b_imm      ;
 wire [         XL:0] opr_c_imm      ;
 
-wire [         31:0] imm_i32        ;
+wire [         31:0] imm32_i        ;
 wire [         11:0] imm_csr_addr   ;
 wire [          4:0] imm_csr_mask   ;
 wire [         31:0] imm32_s        ;
@@ -212,13 +212,25 @@ assign opr_c_imm =
     dec_lui              ? {{32{imm32_u[31]}},imm32_u}  :
                            0                            ;
 
-wire   op_imm    = s1_instr[6:0] == 7'b0010011;
-
-wire    [XL:0]  sext_imm_i32 = {{32{imm_i32[31]}}, imm_i32};
+wire    [XL:0]  sext_imm32_u = {{32{imm32_u[31]}}, imm32_u};
+wire    [XL:0]  sext_imm32_i = {{32{imm32_i[31]}}, imm32_i};
+wire    [XL:0]  sext_imm32_s = {{32{imm32_s[31]}}, imm32_s};
 wire    [XL:0]  sext_imm32_j = {{32{imm32_j[31]}}, imm32_j};
 
-assign opr_b_imm = op_imm   ? sext_imm_i32  :   
-                   dec_jal  ? sext_imm32_j  :
+wire    major_op_load        = s1_instr[6:0] == 7'b0000011;
+wire    major_op_store       = s1_instr[6:0] == 7'b0100011;
+wire    major_op_imm         = s1_instr[6:0] == 7'b0010011;
+
+wire    use_imm_sext_imm32_u = dec_lui      || dec_auipc        ;
+
+wire    use_imm_sext_imm32_i = dec_jalr     || major_op_load    ||
+                               major_op_imm ;
+
+assign opr_b_imm = 
+    use_imm_sext_imm32_u    ? sext_imm32_u  :
+    use_imm_sext_imm32_i    ? sext_imm32_i  :
+    major_op_store          ? sext_imm32_s  :
+    dec_jal                 ? sext_imm32_j  :
                               0             ;
 
 
@@ -457,7 +469,7 @@ end
 
 core_pipe_decode_immediates i_core_pipe_decode_immediates (
 .instr        (s1_instr     ),   // Input encoded instruction.
-.imm_i32      (imm_i32      ),
+.imm32_i      (imm32_i      ),
 .imm_csr_addr (imm_csr_addr ),
 .imm_csr_mask (imm_csr_mask ),
 .imm32_s      (imm32_s      ),

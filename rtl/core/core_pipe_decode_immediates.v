@@ -9,7 +9,7 @@ module core_pipe_decode_immediates (
 
 input  wire [31:0] instr        ,   // Input encoded instruction.
 
-output wire [31:0] imm_i32      ,
+output wire [31:0] imm32_i      ,
 output wire [11:0] imm_csr_addr ,
 output wire [ 4:0] imm_csr_mask ,
 output wire [31:0] imm32_s      ,
@@ -29,7 +29,7 @@ output wire [31:0] imm_c_bz
 
 );
 
-assign imm_i32 = {{20{instr[31]}}, instr[31:20]};
+assign imm32_i = {{20{instr[31]}}, instr[31:20]};
 
 assign imm_csr_addr = instr[31:20];
 
