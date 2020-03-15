@@ -103,6 +103,35 @@ wire            alu_gpr_wen = !alu_op_nop && cfu_op_nop;
 wire            op_done_alu = 1'b1;
 
 //
+// Load Store Unit Interfacing.
+// ------------------------------------------------------------
+
+wire        lsu_done            = 1'b0                      ;
+
+wire        lsu_nop             =  s2_lsu_op == 0           ;
+
+wire        lsu_valid           = |s2_lsu_op && !lsu_done   ;
+wire [XL:0] lsu_wdata           =  s2_opr_c                 ;
+wire        lsu_load            =  s2_lsu_op[  4]           ;
+wire        lsu_store           = !s2_lsu_op[  4]           ;
+wire        lsu_double          =  s2_lsu_op[3:1] == 3'd4   ;
+wire        lsu_word            =  s2_lsu_op[3:1] == 3'd3   ;
+wire        lsu_half            =  s2_lsu_op[3:1] == 3'd2   ;
+wire        lsu_byte            =  s2_lsu_op[3:1] == 3'd1   ;
+wire        lsu_sext            =  s2_lsu_op[  0]           ;
+
+wire        lsu_ready           ; // Read data ready
+wire        lsu_trap_bus        ; // Bus error
+wire        lsu_trap_addr       ; // Address alignment error
+wire [XL:0] lsu_rdata           ; // Read data
+
+wire        lsu_gpr_wen         = lsu_ready && lsu_load;
+wire [XL:0] lsu_gpr_wdata       = lsu_rdata ;
+
+wire        op_done_lsu         =
+    lsu_nop || lsu_done || (lsu_valid && lsu_ready);
+
+//
 // CFU Interfacing
 // ------------------------------------------------------------
 
@@ -236,7 +265,8 @@ wire [XL:0] csr_gpr_wdata   = csr_rdata;
 // Is the stage ready for a new instruction?
 // ------------------------------------------------------------
 
-assign  s2_ready    = op_done_csr && op_done_cfu && op_done_alu;
+assign  s2_ready    = op_done_csr && op_done_cfu &&
+                      op_done_alu && op_done_lsu ;
 
 //
 // GPR Writeback
@@ -257,10 +287,13 @@ end
 
 assign s2_rd_addr   = s2_rd;
 
-assign s2_rd_wen    = !rd_done && (cfu_gpr_wen || csr_gpr_wen || alu_gpr_wen);
+assign s2_rd_wen    = !rd_done && (
+    cfu_gpr_wen || csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen
+);
 
 assign s2_rd_wdata  = {XLEN{cfu_gpr_wen}} & cfu_gpr_wdata   |
                       {XLEN{csr_gpr_wen}} & csr_gpr_wdata   |
+                      {XLEN{lsu_gpr_wen}} & lsu_gpr_wdata   |
                       {XLEN{alu_gpr_wen}} & alu_result      ;
 
 //
@@ -291,6 +324,38 @@ core_pipe_exec_alu i_core_pipe_exec_alu (
 .cmp_eq  (alu_cmp_eq  ), // Does opr_a == opr_b
 .cmp_lt  (alu_cmp_lt  ), // Does opr_a <  opr_b
 .result  (alu_result  )  // Operation result
+);
+
+
+//
+// instance: core_pipe_exec_lsu
+//
+//  Responsible for all data memory accesses
+//
+core_pipe_exec_lsu i_core_pipe_exec_lsu (
+.g_clk      (g_clk        ), // Global clock enable.
+.g_resetn   (g_resetn     ), // Global synchronous reset
+.valid      (lsu_valid    ), // Inputs are valid
+.wdata      (lsu_wdata    ), // Data being written (if any)
+.load       (lsu_load     ), //
+.store      (lsu_store    ), //
+.d_double   (lsu_double   ), //
+.d_word     (lsu_word     ), //
+.d_half     (lsu_half     ), //
+.d_byte     (lsu_byte     ), //
+.sext       (lsu_sext     ), // Sign extend read data
+.ready      (lsu_ready    ), // Read data ready
+.trap_bus   (lsu_trap_bus ), // Bus error
+.trap_addr  (lsu_trap_addr), // Address alignment error
+.rdata      (lsu_rdata    ), // Read data
+.dmem_req   (dmem_req     ), // Memory request
+.dmem_addr  (dmem_addr    ), // Memory request address
+.dmem_wen   (dmem_wen     ), // Memory request write enable
+.dmem_strb  (dmem_strb    ), // Memory request write strobe
+.dmem_wdata (dmem_wdata   ), // Memory write data.
+.dmem_gnt   (dmem_gnt     ), // Memory response valid
+.dmem_err   (dmem_err     ), // Memory response error
+.dmem_rdata (dmem_rdata   )  // Memory response read data
 );
 
 endmodule
