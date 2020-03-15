@@ -77,7 +77,7 @@ wire    e_cf_change = s2_cf_valid && s2_cf_ack;
 wire [    XL:0] alu_opr_a   = s2_opr_a                   ;
 wire [    XL:0] alu_opr_b   = s2_opr_b                   ;
 
-wire            alu_word    = s2_op_w                    ;
+wire            alu_word    = s2_op_w && !lsu_valid      ;
 
 wire            alu_op_nop  = s2_alu_op == ALU_OP_NOP    ;
 wire            alu_op_add  = s2_alu_op == ALU_OP_ADD    ;
@@ -110,10 +110,11 @@ wire        lsu_done            = 1'b0                      ;
 
 wire        lsu_nop             =  s2_lsu_op == 0           ;
 
-wire        lsu_valid           = |s2_lsu_op && !lsu_done   ;
+wire        lsu_valid           = s2_valid && |s2_lsu_op && !lsu_done;
+wire [XL:0] lsu_addr            = alu_add_out               ;
 wire [XL:0] lsu_wdata           =  s2_opr_c                 ;
-wire        lsu_load            =  s2_lsu_op[  4]           ;
-wire        lsu_store           = !s2_lsu_op[  4]           ;
+wire        lsu_load            = !s2_lsu_op[  4]           ;
+wire        lsu_store           =  s2_lsu_op[  4]           ;
 wire        lsu_double          =  s2_lsu_op[3:1] == 3'd4   ;
 wire        lsu_word            =  s2_lsu_op[3:1] == 3'd3   ;
 wire        lsu_half            =  s2_lsu_op[3:1] == 3'd2   ;
@@ -336,6 +337,7 @@ core_pipe_exec_lsu i_core_pipe_exec_lsu (
 .g_clk      (g_clk        ), // Global clock enable.
 .g_resetn   (g_resetn     ), // Global synchronous reset
 .valid      (lsu_valid    ), // Inputs are valid
+.addr       (lsu_addr     ), // Address.
 .wdata      (lsu_wdata    ), // Data being written (if any)
 .load       (lsu_load     ), //
 .store      (lsu_store    ), //

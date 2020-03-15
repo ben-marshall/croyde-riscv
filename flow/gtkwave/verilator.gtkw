@@ -1,21 +1,21 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sun Mar 15 18:15:20 2020
+[*] Sun Mar 15 18:48:17 2020
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/uc64/work/verilator/waves.vcd"
-[dumpfile_mtime] "Sun Mar 15 18:13:46 2020"
-[dumpfile_size] 365551
+[dumpfile_mtime] "Sun Mar 15 18:47:54 2020"
+[dumpfile_size] 367467
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/verilator.gtkw"
-[timestart] 1086
+[timestart] 1622
 [size] 1920 1025
 [pos] -1 -1
-*-7.367192 -1 1286 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-6.282132 1681 1286 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.core_top.
 [treeopen] TOP.core_top.i_core_pipe_exec.
 [treeopen] TOP.core_top.i_core_pipe_fetch.
 [sst_width] 305
-[signals_width] 458
+[signals_width] 590
 [sst_expanded] 1
 [sst_vpaned_height] 187
 @28
@@ -23,6 +23,7 @@ TOP.core_top.i_core_pipe_fetch.g_clk
 TOP.core_top.i_core_pipe_fetch.g_resetn
 @800200
 -Pipeline - Fetch
+@c00200
 -Memory Bus - Instructions
 @28
 TOP.core_top.i_core_pipe_fetch.n_imem_req
@@ -42,9 +43,27 @@ TOP.core_top.i_core_pipe_fetch.reqs_outstanding[1:0]
 @28
 TOP.core_top.i_core_pipe_fetch.ignore_rsp
 TOP.core_top.i_core_pipe_fetch.rsps_ignore[1:0]
-@1000200
+@1401200
 -Memory Bus - Instructions
 @800200
+-Memory Bus - Data
+@22
+TOP.core_top.dmem_addr[63:0]
+@28
+TOP.core_top.dmem_err
+TOP.core_top.dmem_gnt
+@22
+TOP.core_top.dmem_rdata[63:0]
+@28
+TOP.core_top.dmem_req
+@22
+TOP.core_top.dmem_strb[7:0]
+TOP.core_top.dmem_wdata[63:0]
+@28
+TOP.core_top.dmem_wen
+@1000200
+-Memory Bus - Data
+@c00200
 -Buffer
 @28
 TOP.core_top.i_core_pipe_fetch.buf_ready
@@ -93,7 +112,6 @@ TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.n_d_buffer[95:0]
 TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.d_buffer[95:0]
 @1401200
 -Buffer
-@1000200
 -Buffer
 @800200
 -Control Flow
@@ -434,7 +452,7 @@ TOP.core_top.i_core_pipe_exec.csr_mepc[63:0]
 TOP.core_top.i_core_pipe_exec.csr_mtvec[63:0]
 @1401200
 -CSR Interface
-@c00200
+@800200
 -State Inputs
 @28
 TOP.core_top.i_core_pipe_exec.s2_valid
@@ -456,7 +474,7 @@ TOP.core_top.i_core_pipe_exec.s2_op_w
 TOP.core_top.i_core_pipe_exec.s2_opr_a[63:0]
 TOP.core_top.i_core_pipe_exec.s2_opr_b[63:0]
 TOP.core_top.i_core_pipe_exec.s2_opr_c[63:0]
-@1401200
+@1000200
 -State Inputs
 @c00200
 -Execute - Exceptions
@@ -542,9 +560,9 @@ TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_alu.shift_result[63:0]
 @1401200
 -Shifter
 -ALU
-@800200
+@800201
 -LSU
-@28
+@29
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.g_clk
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.g_resetn
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.valid
@@ -555,34 +573,32 @@ TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.d_byte
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.d_double
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.d_half
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.d_word
-@c00200
+@800201
 -Memory - Data
-@22
-TOP.core_top.i_core_pipe_exec.dmem_addr[63:0]
-@28
-TOP.core_top.i_core_pipe_exec.dmem_err
-TOP.core_top.i_core_pipe_exec.dmem_gnt
-@22
-TOP.core_top.i_core_pipe_exec.dmem_rdata[63:0]
-@28
+@29
 TOP.core_top.i_core_pipe_exec.dmem_req
-@22
-TOP.core_top.i_core_pipe_exec.dmem_strb[3:0]
-TOP.core_top.i_core_pipe_exec.dmem_wdata[63:0]
-@28
+TOP.core_top.i_core_pipe_exec.dmem_gnt
+@23
+TOP.core_top.i_core_pipe_exec.dmem_addr[63:0]
+TOP.core_top.i_core_pipe_exec.dmem_rdata[63:0]
+@29
 TOP.core_top.i_core_pipe_exec.dmem_wen
-@1401200
+@23
+TOP.core_top.i_core_pipe_exec.dmem_wdata[63:0]
+@29
+TOP.core_top.i_core_pipe_exec.dmem_err
+@1000201
 -Memory - Data
 @29
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.ready
-@22
+@23
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.rdata[63:0]
-@28
+@29
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.trap_addr
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.trap_bus
-@22
+@23
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.wdata[63:0]
-@1000200
+@1000201
 -LSU
 @800200
 -GPR Writeback

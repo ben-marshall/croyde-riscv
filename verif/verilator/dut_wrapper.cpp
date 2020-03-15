@@ -27,6 +27,16 @@ dut_wrapper::dut_wrapper (
     this -> imem_agent -> mem_gnt   = &this -> dut -> imem_gnt  ;
     this -> imem_agent -> mem_err   = &this -> dut -> imem_err  ;
     this -> imem_agent -> mem_rdata = &this -> dut -> imem_rdata;
+    
+    this -> dmem_agent               = new core_mem_agent(mem);
+    this -> dmem_agent -> mem_req   = &this -> dut -> dmem_req  ;
+    this -> dmem_agent -> mem_addr  = &this -> dut -> dmem_addr ;
+    this -> dmem_agent -> mem_wen   = &this -> dut -> dmem_wen  ;
+    this -> dmem_agent -> mem_strb  = &this -> dut -> dmem_strb ;
+    this -> dmem_agent -> mem_wdata = &this -> dut -> dmem_wdata;
+    this -> dmem_agent -> mem_gnt   = &this -> dut -> dmem_gnt  ;
+    this -> dmem_agent -> mem_err   = &this -> dut -> dmem_err  ;
+    this -> dmem_agent -> mem_rdata = &this -> dut -> dmem_rdata;
 
     Verilated::traceEverOn(this -> dump_waves);
 
@@ -53,6 +63,7 @@ void dut_wrapper::dut_set_reset() {
     this -> dut -> g_clk        = 0;
 
     this -> imem_agent -> set_reset();
+    this -> dmem_agent -> set_reset();
 
 }
     
@@ -62,6 +73,7 @@ void dut_wrapper::dut_clear_reset() {
     this -> dut -> g_resetn = 1;
     
     this -> imem_agent -> clear_reset();
+    this -> dmem_agent -> clear_reset();
 
 }
 
@@ -86,6 +98,7 @@ void dut_wrapper::dut_step_clk() {
         
         // Drive interface agents
         this -> imem_agent -> drive_signals();
+        this -> dmem_agent -> drive_signals();
 
         this -> dut -> eval();
 
@@ -103,6 +116,7 @@ void dut_wrapper::dut_step_clk() {
 void dut_wrapper::posedge_gclk () {
 
     this -> imem_agent -> posedge_clk();
+    this -> dmem_agent -> posedge_clk();
 
     // Do we need to capture a trace item?
     if(this -> dut -> trs_valid) {

@@ -67,7 +67,7 @@ public:
     }
 
     void set_dmem_max_stall (uint32_t stall) {
-        //dmem_agent -> max_req_stall = stall;
+        dmem_agent -> max_req_stall = stall;
     }
 
 protected:
