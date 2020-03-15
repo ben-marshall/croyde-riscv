@@ -1,4 +1,5 @@
 
+#include <iostream>
 #include <cstdint>
 #include <map>
 
@@ -95,6 +96,8 @@ public:
                 rdata[i] = this -> read_byte(a);
             } else {
                 return false;
+                std::cout<<"Out of range read: " << std::hex<<addr <<
+                    std::endl;
             }
         }
         return true;
@@ -116,6 +119,8 @@ public:
                     this -> write_byte(a, wdata[i]);
                 }
             } else {
+                std::cout<<"Out of range write: " << std::hex<<addr <<
+                    std::endl;
                 return false;
             }
         }

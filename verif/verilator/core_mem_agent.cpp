@@ -75,6 +75,12 @@ void core_mem_agent::posedge_clk(){
             n_mem_rdata = rsp -> data_dword();
         }
 
+        if(n_mem_err) {
+            std::cout   << "Error accessing address: " 
+                        << std::hex<<rsp->addr()
+                        << std::endl;
+        }
+
         //
         // Clean up the requests/responses.
         delete req;

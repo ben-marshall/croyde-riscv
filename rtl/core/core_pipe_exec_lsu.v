@@ -20,7 +20,7 @@ input   wire                  d_half      , //
 input   wire                  d_byte      , //
 input   wire                  sext        , // Sign extend read data
 
-output  wire                  ready       , // Read data ready
+output  reg                   ready       , // Read data ready
 output  wire                  trap_bus    , // Bus error
 output  wire                  trap_addr   , // Address alignment error
 output  wire [          XL:0] rdata       , // Read data
@@ -39,7 +39,13 @@ input  wire [   MEM_DATA_R:0] dmem_rdata    // Memory response read data
 // Common parameters and width definitions.
 `include "core_common.vh"
 
-assign ready = valid && dmem_gnt;
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        ready <= 1'b0;
+    end else begin
+        ready <= valid && dmem_gnt;
+    end
+end
 
 //
 // Transaction validity

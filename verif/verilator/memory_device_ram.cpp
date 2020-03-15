@@ -8,7 +8,7 @@ bool memory_device_ram::read_word (
     uint32_t * dout
 ){
     
-    if(this -> in_range(addr, 4)) {
+    if(this -> in_range(addr, 3)) {
         
         *dout = 
             (uint32_t)this -> memory[addr+3] << 24 |
@@ -19,7 +19,9 @@ bool memory_device_ram::read_word (
         return true;
 
     } else {
+
         return false;
+
     }
 }
     
@@ -38,7 +40,7 @@ bool memory_device_ram::write_byte (
     uint64_t addr,
     uint8_t  data
 ){
-    if(this -> in_range(addr, 1)) {
+    if(this -> in_range(addr, 0)) {
         
         this -> memory[addr] = data;
 
