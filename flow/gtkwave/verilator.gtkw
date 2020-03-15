@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sun Mar 15 17:32:43 2020
+[*] Sun Mar 15 17:44:20 2020
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/uc64/work/verilator/waves.vcd"
-[dumpfile_mtime] "Sun Mar 15 17:30:54 2020"
-[dumpfile_size] 259735
+[dumpfile_mtime] "Sun Mar 15 17:43:03 2020"
+[dumpfile_size] 359674
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/verilator.gtkw"
-[timestart] 885
+[timestart] 1291
 [size] 1920 1025
 [pos] -1 -1
-*-6.158429 1007 946 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-7.008454 1366 1286 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.core_top.
 [treeopen] TOP.core_top.i_core_pipe_exec.
@@ -445,7 +445,9 @@ TOP.core_top.i_core_pipe_exec.s2_instr[31:0]
 @22
 TOP.core_top.i_core_pipe_exec.s2_instr[31:0]
 TOP.core_top.i_core_pipe_exec.s2_pc[63:0]
+@23
 TOP.core_top.i_core_pipe_exec.s2_alu_op[3:0]
+@22
 TOP.core_top.i_core_pipe_exec.s2_cfu_op[3:0]
 TOP.core_top.i_core_pipe_exec.s2_csr_op[3:0]
 TOP.core_top.i_core_pipe_exec.s2_lsu_op[4:0]
@@ -488,7 +490,6 @@ TOP.core_top.i_core_pipe_exec.excep_ecall
 -Execute - Exceptions
 @800200
 -Execute - Control Flow
-@c00201
 -CFU OP
 @28
 TOP.core_top.i_core_pipe_exec.cfu_op_beq
@@ -503,7 +504,7 @@ TOP.core_top.i_core_pipe_exec.cfu_op_j
 TOP.core_top.i_core_pipe_exec.cfu_op_jal
 TOP.core_top.i_core_pipe_exec.cfu_op_mret
 TOP.core_top.i_core_pipe_exec.cfu_op_nop
-@1401201
+@1000200
 -CFU OP
 @28
 TOP.core_top.i_core_pipe_exec.cfu_goto_mtvec
@@ -573,11 +574,11 @@ TOP.core_top.i_core_pipe_exec.s2_rd_wdata[63:0]
 -GPR Writeback
 @800200
 -CSR Bus
-@22
-TOP.core_top.i_core_pipe_exec.csr_gpr_wdata[63:0]
 @28
 TOP.core_top.i_core_pipe_exec.csr_gpr_wen
 @22
+TOP.core_top.i_core_pipe_exec.csr_wdata[63:0]
+TOP.core_top.i_core_pipe_exec.csr_rdata[63:0]
 TOP.core_top.i_core_pipe_exec.csr_addr[11:0]
 @28
 TOP.core_top.i_core_pipe_exec.csr_en
@@ -588,7 +589,7 @@ TOP.core_top.i_core_pipe_exec.csr_wr_clr
 TOP.core_top.i_core_pipe_exec.csr_wr_set
 @1000200
 -CSR Bus
-@c00200
+@800200
 -CSRs
 @22
 TOP.core_top.i_core_csrs.reg_marchid[63:0]
@@ -639,9 +640,8 @@ TOP.core_top.i_core_csrs.reg_mstatus_xs[1:0]
 @22
 TOP.core_top.i_core_csrs.reg_mtval[63:0]
 TOP.core_top.i_core_csrs.reg_mtvec[63:0]
-@1401200
--CSRs
 @1000200
+-CSRs
 -Pipeline - Execte
 [pattern_trace] 1
 [pattern_trace] 0

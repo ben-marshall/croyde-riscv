@@ -121,7 +121,8 @@ wire    cfu_op_ebreak       = s2_cfu_op     == CFU_OP_EBREAK;
 wire    cfu_op_ecall        = s2_cfu_op     == CFU_OP_ECALL ;
 
 // EX stage CFU doesn't need to do any blocking for these instructions.
-wire    cfu_op_always_done  = cfu_op_j      || cfu_op_jal   ;
+wire    cfu_op_always_done  = cfu_op_j      || cfu_op_jal   || cfu_op_mret  ||
+                              cfu_op_ebreak || cfu_op_ecall ;
 
 // Conditional control flow changes.
 wire    cfu_conditional     = cfu_op_beq    || cfu_op_bne   || cfu_op_blt   ||
@@ -198,9 +199,9 @@ assign  s2_cf_valid         =
     (cf_excep || cfu_cond_taken || cfu_op_always_done) && !cf_done;
 
 assign  s2_cf_target        = 
+    cfu_goto_mepc       ?   csr_mepc        :
     cfu_conditional     ?   cfu_bcmp_taret  :
     cfu_op_always_done  ?   alu_add_out     :
-    cfu_goto_mepc       ?   csr_mepc        :
                             csr_mtvec       ;
 
 assign  s2_cf_cause         = 0     ;   // TODO
@@ -223,7 +224,7 @@ assign  csr_wr_clr  =  s2_csr_op[CSR_OP_CLR] && csr_wr  ;
 wire    csr_read_en =  s2_csr_op[CSR_OP_RD ]            ;
 
 assign  csr_addr    =  s2_opr_c[11:0]                   ;
-assign  csr_wdata   =  s2_opr_b                         ;
+assign  csr_wdata   =  s2_opr_a                         ;
 
 wire    op_done_csr = csr_op_nop || csr_en              ;
 
