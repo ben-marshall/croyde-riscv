@@ -3,7 +3,7 @@ VL_DIR   = $(REPO_WORK)/verilator
 VL_OUT   = $(REPO_WORK)/verilator/verilated
 
 VL_WAVES    = $(VL_DIR)/waves.vcd
-VL_TIMEOUT  = 200
+VL_TIMEOUT  = 2000
 VL_ARGS     = +IMEM=$(REPO_WORK)/riscv-compliance/rv64i/ADDIW.elf.srec
 
 VL_CORE_MANIFEST    = $(REPO_HOME)/flow/verilator/manifest-core.txt
