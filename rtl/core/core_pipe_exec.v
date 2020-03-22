@@ -230,6 +230,7 @@ assign  s2_cf_valid         =
 
 assign  s2_cf_target        = 
     cfu_goto_mepc       ?   csr_mepc        :
+    cfu_goto_mtvec      ?   csr_mtvec       :
     cfu_conditional     ?   cfu_bcmp_taret  :
     cfu_op_always_done  ?   alu_add_out     :
                             csr_mtvec       ;
