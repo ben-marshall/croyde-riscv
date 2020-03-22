@@ -43,7 +43,7 @@ always @(posedge g_clk) begin
     if(!g_resetn) begin
         ready <= 1'b0;
     end else begin
-        ready <= valid && dmem_gnt;
+        ready <= (valid && dmem_gnt) && !ready;
     end
 end
 
@@ -89,13 +89,13 @@ assign      rdata          =
 //
 // Simple bus assignments.
 
-assign  trap_bus     = dmem_err;
+assign  trap_bus     = dmem_err && ready;
 
 assign  trap_addr    = addr_err;
 
 assign  dmem_wen     = store;
 
-assign  dmem_req     = valid && txn_okay;
+assign  dmem_req     = valid && txn_okay && !ready;
 
 assign  dmem_addr    = {addr[XL:3], 3'b000};
 
