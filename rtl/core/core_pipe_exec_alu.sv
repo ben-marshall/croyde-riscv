@@ -60,8 +60,10 @@ wire        slt_signed      = opr_a[XL] ^ add_out[XL];
 
 wire        slt_signed_w    = opr_a[31] ^ add_out[31];
 
+// TODO
 wire        slt_unsigned    = 1'b0;
 
+// TODO
 wire        slt_unsigned_w  = 1'b0;
 
 wire        slt_lsb         = 
