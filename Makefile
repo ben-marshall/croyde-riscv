@@ -26,6 +26,7 @@ OBJCOPY         = $(RISCV)/bin/riscv$(RISCV_XLEN)-unknown-elf-objcopy
 
 include $(REPO_HOME)/flow/verilator/Makefile.in
 include $(REPO_HOME)/flow/design-assertions/Makefile.in
+include $(REPO_HOME)/flow/synthesis/Makefile.in
 
 clean:
 	rm -rf work/*
