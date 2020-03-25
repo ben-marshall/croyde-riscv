@@ -1,4 +1,6 @@
 
+`include "core_interfaces.svh"
+
 //
 // Module: core_top 
 //
@@ -45,14 +47,20 @@ assign trs_valid = 1'b0;
 assign trs_instr = 32'b0;
 assign trs_pc    = 64'b0;
 
-
 //
-// Constant assignments.
+// Memory Interface Unpacking
 // ------------------------------------------------------------
 
-assign imem_wen     = 1'b0;
-assign imem_strb    = {MEM_STRB_W{1'b0}};
-assign imem_wdata   = {MEM_DATA_W{1'b0}};
+core_mem_if if_imem();
+
+assign imem_req         = if_imem.req   ;
+assign imem_addr        = if_imem.addr  ;
+assign imem_wen         = if_imem.wen   ;
+assign imem_strb        = if_imem.strb  ;
+assign imem_wdata       = if_imem.wdata ;
+assign if_imem.gnt      = imem_gnt      ;
+assign if_imem.err      = imem_err      ;
+assign if_imem.rdata    = imem_rdata    ;
 
 //
 // Control flow change busses
@@ -133,30 +141,30 @@ wire                 csr_error   ; // CSR access error
 wire [         XL:0] csr_mepc    ; // Current EPC.
 wire [         XL:0] csr_mtvec   ; // Current MTVEC.
                
-wire                 exec_mret   ; // MRET instruction executed.
+wire                 exec_mret   =0; // MRET instruction executed.
                
 wire                 mstatus_mie ; // Global interrupt enable.
 wire                 mie_meie    ; // External interrupt enable.
 wire                 mie_mtie    ; // Timer interrupt enable.
 wire                 mie_msie    ; // Software interrupt enable.
                
-wire                 mip_meip    ; // External interrupt pending
-wire                 mip_mtip    ; // Timer interrupt pending
-wire                 mip_msip    ; // Software interrupt pending
+wire                 mip_meip    =0; // External interrupt pending
+wire                 mip_mtip    =0; // Timer interrupt pending
+wire                 mip_msip    =0; // Software interrupt pending
                
-wire [         63:0] ctr_time    ; // The time counter value.
-wire [         63:0] ctr_cycle   ; // The cycle counter value.
-wire [         63:0] ctr_instret ; // The instret counter value.
+wire [         63:0] ctr_time    =0; // The time counter value.
+wire [         63:0] ctr_cycle   =0; // The cycle counter value.
+wire [         63:0] ctr_instret =0; // The instret counter value.
                
 wire                 inhibit_cy  ; // Stop cycle counter incrementing.
 wire                 inhibit_tm  ; // Stop time counter incrementing.
 wire                 inhibit_ir  ; // Stop instret incrementing.
                
-wire                 trap_cpu    ; // A trap occured due to CPU
-wire                 trap_int    ; // A trap occured due to interrupt
-wire [          5:0] trap_cause  ; // A trap occured due to interrupt
-wire [         XL:0] trap_mtval  ; // Value associated with the trap.
-wire [         XL:0] trap_pc     ; // PC value associated with the trap.
+wire                 trap_cpu    =0; // A trap occured due to CPU
+wire                 trap_int    =0; // A trap occured due to interrupt
+wire [          5:0] trap_cause  =0; // A trap occured due to interrupt
+wire [         XL:0] trap_mtval  =0; // Value associated with the trap.
+wire [         XL:0] trap_pc     =0; // PC value associated with the trap.
 
 //
 // Submodule instances.
@@ -175,11 +183,7 @@ core_pipe_fetch i_core_pipe_fetch (
 .cf_ack       (cf_ack       ), // Control flow change acknwoledged
 .cf_target    (cf_target    ), // Control flow change destination
 .cf_cause     (cf_cause     ), // Control flow change cause
-.imem_req     (imem_req     ), // Memory request
-.imem_addr    (imem_addr    ), // Memory request address
-.imem_gnt     (imem_gnt     ), // Memory response valid
-.imem_err     (imem_err     ), // Memory response error
-.imem_rdata   (imem_rdata   ), // Memory response read data
+.if_imem      (if_imem      ), // Memory request
 .s1_16bit     (s1_16bit     ), // 16 bit instruction?
 .s1_32bit     (s1_32bit     ), // 32 bit instruction?
 .s1_instr     (s1_instr     ), // Instruction to be decoded

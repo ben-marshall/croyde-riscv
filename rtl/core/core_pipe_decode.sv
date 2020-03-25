@@ -187,8 +187,8 @@ assign n_s2_opr_c   =
 // TODO: decode 16-bit destination registers.
 assign n_s2_rd      = dec_rd;
 
-wire [REG_ADDR_R:0] dec_16bit_rs1; 
-wire [REG_ADDR_R:0] dec_16bit_rs2;
+wire [REG_ADDR_R:0] dec_16bit_rs1 = 0; 
+wire [REG_ADDR_R:0] dec_16bit_rs2 = 0;
 
 assign s1_rs1_addr  = s1_16bit ? dec_16bit_rs1 : dec_rs1 ;
 assign s1_rs2_addr  = s1_16bit ? dec_16bit_rs2 : dec_rs2 ;
@@ -421,6 +421,8 @@ assign s1_cf_valid  = (dec_jalr || dec_jal || dec_c_jal || dec_c_j);
 wire   s1_cf_taken  = s1_cf_valid && s1_cf_ack;
 
 wire   s1_cf_wait   = s1_cf_valid && !s1_cf_ack;
+
+assign s1_cf_cause  = 0;
 
 //
 // Decode -> Execute stage registers
