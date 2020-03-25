@@ -47,10 +47,10 @@ output reg  [         31:0] s2_instr      // Encoded instruction for trace.
 );
 
 // Common parameters and width definitions.
-`include "core_common.vh"
+`include "core_common.svh"
 
 // Generated decoder
-`include "core_pipe_decode.vh"
+`include "core_pipe_decode.svh"
 
 //
 // Pipeline stage progression.

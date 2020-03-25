@@ -33,7 +33,7 @@ input  wire                 s2_eat_4      // Decode eats 4 bytes
 
 
 // Common parameters and width definitions.
-`include "core_common.vh"
+`include "core_common.svh"
 
 // Inital address of the program counter post reset.
 parameter   PC_RESET_ADDRESS      = 64'h80000000;

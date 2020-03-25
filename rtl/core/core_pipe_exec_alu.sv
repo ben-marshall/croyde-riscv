@@ -30,7 +30,7 @@ output wire [   XL:0]   result    // Operation result
 );
 
 // Common parameters and width definitions.
-`include "core_common.vh"
+`include "core_common.svh"
 
 //
 // Miscellaneous

@@ -57,7 +57,7 @@ input  wire [ MEM_DATA_R:0] dmem_rdata    // Memory response read data
 );
 
 // Common parameters and width definitions.
-`include "core_common.vh"
+`include "core_common.svh"
 
 //
 // Events

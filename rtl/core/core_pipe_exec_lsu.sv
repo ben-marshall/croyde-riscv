@@ -37,7 +37,7 @@ input  wire [   MEM_DATA_R:0] dmem_rdata    // Memory response read data
 );
 
 // Common parameters and width definitions.
-`include "core_common.vh"
+`include "core_common.svh"
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin

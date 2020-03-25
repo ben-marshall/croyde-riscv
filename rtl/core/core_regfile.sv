@@ -25,7 +25,7 @@ input  wire [        XL:0] rd_wdata
 );
 
 // Common parameters and width definitions.
-`include "core_common.vh"
+`include "core_common.svh"
 
 wire [XL:0] regs[31:0];
 

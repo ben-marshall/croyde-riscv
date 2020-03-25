@@ -29,7 +29,7 @@ input  wire         drain_4       // Drain 4 bytes of data.
 
 );
 
-`include "core_common.vh"
+`include "core_common.svh"
 
 localparam BUFFER_DEPTH_BITS    = 96;
 localparam BR                   = BUFFER_DEPTH_BITS - 1;

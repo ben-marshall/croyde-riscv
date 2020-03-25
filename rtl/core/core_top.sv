@@ -35,7 +35,7 @@ output wire [         XL:0] trs_pc         // Instruction trace PC
 
 
 // Common parameters and width definitions.
-`include "core_common.vh"
+`include "core_common.svh"
 
 // Inital address of the program counter post reset.
 parameter   PC_RESET_ADDRESS      = 64'h80000000;
