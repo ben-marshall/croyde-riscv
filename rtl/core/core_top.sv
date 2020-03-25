@@ -62,6 +62,17 @@ assign if_imem.gnt      = imem_gnt      ;
 assign if_imem.err      = imem_err      ;
 assign if_imem.rdata    = imem_rdata    ;
 
+core_mem_if if_dmem();
+
+assign dmem_req         = if_dmem.req   ;
+assign dmem_addr        = if_dmem.addr  ;
+assign dmem_wen         = if_dmem.wen   ;
+assign dmem_strb        = if_dmem.strb  ;
+assign dmem_wdata       = if_dmem.wdata ;
+assign if_dmem.gnt      = dmem_gnt      ;
+assign if_dmem.err      = dmem_err      ;
+assign if_dmem.rdata    = dmem_rdata    ;
+
 //
 // Control flow change busses
 // ------------------------------------------------------------
@@ -183,7 +194,7 @@ core_pipe_fetch i_core_pipe_fetch (
 .cf_ack       (cf_ack       ), // Control flow change acknwoledged
 .cf_target    (cf_target    ), // Control flow change destination
 .cf_cause     (cf_cause     ), // Control flow change cause
-.if_imem      (if_imem      ), // Memory request
+.if_imem      (if_imem      ), // Memory requests
 .s1_16bit     (s1_16bit     ), // 16 bit instruction?
 .s1_32bit     (s1_32bit     ), // 32 bit instruction?
 .s1_instr     (s1_instr     ), // Instruction to be decoded
@@ -276,14 +287,7 @@ core_pipe_exec i_core_pipe_exec(
 .s2_cf_ack      (s2_cf_ack      ), // EX Control flow acknwoledged
 .s2_cf_target   (s2_cf_target   ), // EX Control flow destination
 .s2_cf_cause    (s2_cf_cause    ), // EX Control flow change cause
-.dmem_req       (dmem_req       ), // Memory request
-.dmem_addr      (dmem_addr      ), // Memory request address
-.dmem_wen       (dmem_wen       ), // Memory request write enable
-.dmem_strb      (dmem_strb      ), // Memory request write strobe
-.dmem_wdata     (dmem_wdata     ), // Memory write data.
-.dmem_gnt       (dmem_gnt       ), // Memory response valid
-.dmem_err       (dmem_err       ), // Memory response error
-.dmem_rdata     (dmem_rdata     )  // Memory response read data
+.if_dmem        (if_dmem        )  // Memory requests
 );
 
 //

@@ -1,4 +1,6 @@
 
+`include "core_interfaces.svh"
+
 //
 // Module: core_pipe_exec
 //
@@ -45,14 +47,7 @@ input  wire                 s2_cf_ack   , // EX Control flow acknwoledged
 output wire [         XL:0] s2_cf_target, // EX Control flow destination
 output wire [ CF_CAUSE_R:0] s2_cf_cause , // EX Control flow change cause
 
-output wire                 dmem_req    , // Memory request
-output wire [ MEM_ADDR_R:0] dmem_addr   , // Memory request address
-output wire                 dmem_wen    , // Memory request write enable
-output wire [ MEM_STRB_R:0] dmem_strb   , // Memory request write strobe
-output wire [ MEM_DATA_R:0] dmem_wdata  , // Memory write data.
-input  wire                 dmem_gnt    , // Memory response valid
-input  wire                 dmem_err    , // Memory response error
-input  wire [ MEM_DATA_R:0] dmem_rdata    // Memory response read data
+core_mem_if.REQ             if_dmem       // Data memory bus.
 
 );
 
@@ -351,14 +346,7 @@ core_pipe_exec_lsu i_core_pipe_exec_lsu (
 .trap_bus   (lsu_trap_bus ), // Bus error
 .trap_addr  (lsu_trap_addr), // Address alignment error
 .rdata      (lsu_rdata    ), // Read data
-.dmem_req   (dmem_req     ), // Memory request
-.dmem_addr  (dmem_addr    ), // Memory request address
-.dmem_wen   (dmem_wen     ), // Memory request write enable
-.dmem_strb  (dmem_strb    ), // Memory request write strobe
-.dmem_wdata (dmem_wdata   ), // Memory write data.
-.dmem_gnt   (dmem_gnt     ), // Memory response valid
-.dmem_err   (dmem_err     ), // Memory response error
-.dmem_rdata (dmem_rdata   )  // Memory response read data
+.if_dmem    (if_dmem      )  // Memory requests
 );
 
 endmodule

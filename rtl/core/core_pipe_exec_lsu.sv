@@ -1,4 +1,6 @@
 
+`include "core_interfaces.svh"
+
 //
 // Module: core_pipe_exec_lsu
 //
@@ -25,14 +27,7 @@ output  wire                  trap_bus    , // Bus error
 output  wire                  trap_addr   , // Address alignment error
 output  wire [          XL:0] rdata       , // Read data
 
-output wire                   dmem_req    , // Memory request
-output wire [   MEM_ADDR_R:0] dmem_addr   , // Memory request address
-output wire                   dmem_wen    , // Memory request write enable
-output wire [   MEM_STRB_R:0] dmem_strb   , // Memory request write strobe
-output wire [   MEM_DATA_R:0] dmem_wdata  , // Memory write data.
-input  wire                   dmem_gnt    , // Memory response valid
-input  wire                   dmem_err    , // Memory response error
-input  wire [   MEM_DATA_R:0] dmem_rdata    // Memory response read data
+core_mem_if.REQ               if_dmem       // Data memory bus.
 
 );
 
@@ -43,7 +38,7 @@ always @(posedge g_clk) begin
     if(!g_resetn) begin
         ready <= 1'b0;
     end else begin
-        ready <= (valid && dmem_gnt) && !ready;
+        ready <= (valid && if_dmem.gnt) && !ready;
     end
 end
 
@@ -65,7 +60,7 @@ wire [ 5:0] data_shift     = {addr[2:0], 3'b000};
 //
 // Read data positioning.
 
-wire [XL:0] rdata_shifted  = dmem_rdata >> data_shift;
+wire [XL:0] rdata_shifted  = if_dmem.rdata >> data_shift;
 
 wire [XL:0] mask_ls_byte   = {{56{d_byte}},  8'b0};
 wire [XL:0] mask_ls_half   = {{48{d_byte}}, 16'b0};
@@ -83,63 +78,63 @@ assign      rdata          =
     d_byte      ? rdata_byte    :
     d_half      ? rdata_half    :
     d_word      ? rdata_word    :
-                  dmem_rdata    ;
+                  if_dmem.rdata ;
 
 
 //
 // Simple bus assignments.
 
-assign  trap_bus     = dmem_err && ready;
+assign  trap_bus        = if_dmem.err && ready;
 
-assign  trap_addr    = addr_err;
+assign  trap_addr       = addr_err;
 
-assign  dmem_wen     = store;
+assign  if_dmem.wen     = store;
 
-assign  dmem_req     = valid && txn_okay && !ready;
+assign  if_dmem.req     = valid && txn_okay && !ready;
 
-assign  dmem_addr    = {addr[XL:3], 3'b000};
+assign  if_dmem.addr    = {addr[XL:3], 3'b000};
 
-assign  dmem_wdata   = wdata    << data_shift           ;
+assign  if_dmem.wdata   = wdata    << data_shift           ;
 
-assign  dmem_strb[7] = d_double                         ||
-                       d_word   &&  addr[  2]           ||
-                       d_half   &&  addr[2:1] == 2'd3   ||
-                       d_byte   &&  addr[2:0] == 3'd7   ;
+assign  if_dmem.strb[7] =   d_double                         ||
+                            d_word   &&  addr[  2]           ||
+                            d_half   &&  addr[2:1] == 2'd3   ||
+                            d_byte   &&  addr[2:0] == 3'd7   ;
 
-assign  dmem_strb[6] = d_double                         ||
-                       d_word   &&  addr[  2]           ||
-                       d_half   &&  addr[2:1] == 2'd3   ||
-                       d_byte   &&  addr[2:0] == 3'd6   ;
+assign  if_dmem.strb[6] =   d_double                         ||
+                            d_word   &&  addr[  2]           ||
+                            d_half   &&  addr[2:1] == 2'd3   ||
+                            d_byte   &&  addr[2:0] == 3'd6   ;
 
-assign  dmem_strb[5] = d_double                         ||
-                       d_word   &&  addr[  2]           ||
-                       d_half   &&  addr[2:1] == 2'd2   ||
-                       d_byte   &&  addr[2:0] == 3'd5   ;
+assign  if_dmem.strb[5] =   d_double                         ||
+                            d_word   &&  addr[  2]           ||
+                            d_half   &&  addr[2:1] == 2'd2   ||
+                            d_byte   &&  addr[2:0] == 3'd5   ;
 
-assign  dmem_strb[4] = d_double                         ||
-                       d_word   &&  addr[  2]           ||
-                       d_half   &&  addr[2:1] == 2'd2   ||
-                       d_byte   &&  addr[2:0] == 3'd4   ;
+assign  if_dmem.strb[4] =   d_double                         ||
+                            d_word   &&  addr[  2]           ||
+                            d_half   &&  addr[2:1] == 2'd2   ||
+                            d_byte   &&  addr[2:0] == 3'd4   ;
 
-assign  dmem_strb[3] = d_double                         ||
-                       d_word   && !addr[  2]           ||
-                       d_half   &&  addr[2:1] == 2'd1   ||
-                       d_byte   &&  addr[2:0] == 3'd3   ;
+assign  if_dmem.strb[3] =   d_double                         ||
+                            d_word   && !addr[  2]           ||
+                            d_half   &&  addr[2:1] == 2'd1   ||
+                            d_byte   &&  addr[2:0] == 3'd3   ;
 
-assign  dmem_strb[2] = d_double                         ||
-                       d_word   && !addr[  2]           ||
-                       d_half   &&  addr[2:1] == 2'd1   ||
-                       d_byte   &&  addr[2:0] == 3'd2   ;
+assign  if_dmem.strb[2] =   d_double                         ||
+                            d_word   && !addr[  2]           ||
+                            d_half   &&  addr[2:1] == 2'd1   ||
+                            d_byte   &&  addr[2:0] == 3'd2   ;
 
-assign  dmem_strb[1] = d_double                         ||
-                       d_word   && !addr[  2]           ||
-                       d_half   &&  addr[2:1] == 2'd0   ||
-                       d_byte   &&  addr[2:0] == 3'd1   ;
+assign  if_dmem.strb[1] =   d_double                         ||
+                            d_word   && !addr[  2]           ||
+                            d_half   &&  addr[2:1] == 2'd0   ||
+                            d_byte   &&  addr[2:0] == 3'd1   ;
 
-assign  dmem_strb[0] = d_double                         ||
-                       d_word   && !addr[  2]           ||
-                       d_half   &&  addr[2:1] == 2'd0   ||
-                       d_byte   &&  addr[2:0] == 3'd0   ;
+assign  if_dmem.strb[0] =   d_double                         ||
+                            d_word   && !addr[  2]           ||
+                            d_half   &&  addr[2:1] == 2'd0   ||
+                            d_byte   &&  addr[2:0] == 3'd0   ;
 
 endmodule
 
