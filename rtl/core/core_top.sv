@@ -29,6 +29,10 @@ input  wire                 dmem_gnt     , // Memory response valid
 input  wire                 dmem_err     , // Memory response error
 input  wire [ MEM_DATA_R:0] dmem_rdata   , // Memory response read data
 
+`ifdef RVFI
+core_rvfi.OUT               rvfi         , // Formal checker interface.
+`endif
+
 output wire                 trs_valid    , // Instruction trace valid
 output wire [         31:0] trs_instr    , // Instruction trace data
 output wire [         XL:0] trs_pc         // Instruction trace PC
@@ -209,6 +213,9 @@ core_pipe_decode i_core_pipe_decode(
 core_pipe_exec i_core_pipe_exec(
 .g_clk          (g_clk          ), // Global clock
 .g_resetn       (g_resetn       ), // Global active low sync reset.
+`ifdef RVFI
+.rvfi           (rvfi           ), // Formal checker interface.
+`endif
 .s2             (s2             ), // Decode -> Execute
 .s2_rd_wen      (s2_rd_wen      ), // GPR write enable
 .s2_rd_addr     (s2_rd_addr     ), // GPR write address

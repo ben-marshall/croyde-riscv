@@ -1,3 +1,6 @@
 [submodule "extern/riscv-compliance"]
 	path = extern/riscv-compliance
 	url = git@github.com:riscv/riscv-compliance.git
+[submodule "extern/riscv-formal"]
+	path = extern/riscv-formal
+	url = https://github.com/SymbioticEDA/riscv-formal.git

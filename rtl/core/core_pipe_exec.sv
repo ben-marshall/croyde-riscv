@@ -11,6 +11,10 @@ module core_pipe_exec (
 input  wire                 g_clk       , // Global clock
 input  wire                 g_resetn    , // Global active low sync reset.
 
+`ifdef RVFI
+core_rvfi.IN                rvfi        , // Formal checker interface.
+`endif
+
 core_pipe_de.EXECUTE        s2          , // Decode -> execute pipe interface
 
 output wire                 s2_rd_wen   , // GPR write enable
@@ -34,7 +38,7 @@ input  wire                 s2_cf_ack   , // EX Control flow acknwoledged
 output wire [         XL:0] s2_cf_target, // EX Control flow destination
 output wire [ CF_CAUSE_R:0] s2_cf_cause , // EX Control flow change cause
 
-core_mem_if.REQ             if_dmem       // Data memory bus.
+core_mem_if.REQ             if_dmem     , // Data memory bus.
 
 );
 
@@ -335,5 +339,38 @@ core_pipe_exec_lsu i_core_pipe_exec_lsu (
 .rdata      (lsu_rdata    ), // Read data
 .if_dmem    (if_dmem      )  // Memory requests
 );
+
+`ifdef RVFI
+
+//
+// RVFI
+// ------------------------------------------------------------
+
+assign rvfi.n_valid         = e_new_instr   ;
+assign rvfi.n_insn          = s2.instr      ;
+assign rvfi.n_intr          = 1'b0          ;
+assign rvfi.n_trap          = cfu_goto_mepc ;
+
+assign rvfi.n_rs1_addr      = 0     ;
+assign rvfi.n_rs2_addr      = 0     ;
+assign rvfi.n_rs1_rdata     = 0     ;
+assign rvfi.n_rs2_rdata     = 0     ;
+
+assign rvfi.n_rd_valid      = s2_rd_wen     ;
+assign rvfi.n_rd_addr       = s2_rd_addr    ;
+assign rvfi.n_rd_wdata      = s2_rd_wdata   ;
+
+assign rvfi.n_pc_rdata      = s2.pc ;
+assign rvfi.n_pc_wdata      = 0     ;
+
+assign rvfi.n_mem_req_valid = 0     ;
+assign rvfi.n_mem_rsp_valid = 0     ;
+assign rvfi.n_mem_addr      = dmem.addr     ;
+assign rvfi.n_mem_rmask     = dmem.strb     ;
+assign rvfi.n_mem_wmask     = dmem.strb     ;
+assign rvfi.n_mem_rdata     = dmem.rdata    ;
+assign rvfi.n_mem_wdata     = dmem.wdata    ;
+
+`endif
 
 endmodule
