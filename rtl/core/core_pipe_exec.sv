@@ -11,20 +11,7 @@ module core_pipe_exec (
 input  wire                 g_clk       , // Global clock
 input  wire                 g_resetn    , // Global active low sync reset.
 
-input  wire                 s2_valid    , // Decode instr ready for execute
-output wire                 s2_ready    , // Execute ready for new instr.
-input  wire [         XL:0] s2_pc       , // Execute stage PC
-input  wire [         XL:0] s2_opr_a    , // EX stage operand a
-input  wire [         XL:0] s2_opr_b    , //    "       "     b
-input  wire [         XL:0] s2_opr_c    , //    "       "     c
-input  wire [ REG_ADDR_R:0] s2_rd       , // EX stage destination reg address.
-input  wire [   ALU_OP_R:0] s2_alu_op   , // ALU operation
-input  wire [   LSU_OP_R:0] s2_lsu_op   , // LSU operation
-input  wire [   MDU_OP_R:0] s2_mdu_op   , // Mul/Div Operation
-input  wire [   CSR_OP_R:0] s2_csr_op   , // CSR operation
-input  wire [   CFU_OP_R:0] s2_cfu_op   , // Control flow unit operation
-input  wire                 s2_op_w     , // Is the operation on a word?
-input  wire [         31:0] s2_instr    , // Encoded instruction for trace.
+core_pipe_de.EXECUTE        s2          , // Decode -> execute pipe interface
 
 output wire                 s2_rd_wen   , // GPR write enable
 output wire [ REG_ADDR_R:0] s2_rd_addr  , // GPR write address
@@ -59,7 +46,7 @@ core_mem_if.REQ             if_dmem       // Data memory bus.
 // ------------------------------------------------------------
 
 // New instruction will arrive on the next cycle.
-wire    e_new_instr = s2_valid && s2_ready;
+wire    e_new_instr = s2.valid && s2.ready;
 
 // Control flow change occured this cycle.
 wire    e_cf_change = s2_cf_valid && s2_cf_ack;
@@ -69,22 +56,22 @@ wire    e_cf_change = s2_cf_valid && s2_cf_ack;
 // ALU Interfacing
 // ------------------------------------------------------------
 
-wire [    XL:0] alu_opr_a   = s2_opr_a                   ;
-wire [    XL:0] alu_opr_b   = s2_opr_b                   ;
+wire [    XL:0] alu_opr_a   = s2.opr_a                   ;
+wire [    XL:0] alu_opr_b   = s2.opr_b                   ;
 
-wire            alu_word    = s2_op_w && !lsu_valid      ;
+wire            alu_word    = s2.op_w && !lsu_valid      ;
 
-wire            alu_op_nop  = s2_alu_op == ALU_OP_NOP    ;
-wire            alu_op_add  = s2_alu_op == ALU_OP_ADD    ;
-wire            alu_op_sub  = s2_alu_op == ALU_OP_SUB    ;
-wire            alu_op_xor  = s2_alu_op == ALU_OP_XOR    ;
-wire            alu_op_or   = s2_alu_op == ALU_OP_OR     ;
-wire            alu_op_and  = s2_alu_op == ALU_OP_AND    ;
-wire            alu_op_slt  = s2_alu_op == ALU_OP_SLT    ;
-wire            alu_op_sltu = s2_alu_op == ALU_OP_SLTU   ;
-wire            alu_op_srl  = s2_alu_op == ALU_OP_SRL    ;
-wire            alu_op_sll  = s2_alu_op == ALU_OP_SLL    ;
-wire            alu_op_sra  = s2_alu_op == ALU_OP_SRA    ;
+wire            alu_op_nop  = s2.alu_op == ALU_OP_NOP    ;
+wire            alu_op_add  = s2.alu_op == ALU_OP_ADD    ;
+wire            alu_op_sub  = s2.alu_op == ALU_OP_SUB    ;
+wire            alu_op_xor  = s2.alu_op == ALU_OP_XOR    ;
+wire            alu_op_or   = s2.alu_op == ALU_OP_OR     ;
+wire            alu_op_and  = s2.alu_op == ALU_OP_AND    ;
+wire            alu_op_slt  = s2.alu_op == ALU_OP_SLT    ;
+wire            alu_op_sltu = s2.alu_op == ALU_OP_SLTU   ;
+wire            alu_op_srl  = s2.alu_op == ALU_OP_SRL    ;
+wire            alu_op_sll  = s2.alu_op == ALU_OP_SLL    ;
+wire            alu_op_sra  = s2.alu_op == ALU_OP_SRA    ;
 
 wire            alu_cmp_eq  ;
 wire            alu_cmp_lt  ;
@@ -103,18 +90,18 @@ wire            op_done_alu = 1'b1;
 
 wire        lsu_done            = 1'b0                      ;
 
-wire        lsu_nop             =  s2_lsu_op == 0           ;
+wire        lsu_nop             =  s2.lsu_op == 0           ;
 
-wire        lsu_valid           = s2_valid && |s2_lsu_op && !lsu_done;
+wire        lsu_valid           = s2.valid && |s2.lsu_op && !lsu_done;
 wire [XL:0] lsu_addr            = alu_add_out               ;
-wire [XL:0] lsu_wdata           =  s2_opr_c                 ;
-wire        lsu_load            = !s2_lsu_op[  4]           ;
-wire        lsu_store           =  s2_lsu_op[  4]           ;
-wire        lsu_double          =  s2_lsu_op[3:1] == 3'd4   ;
-wire        lsu_word            =  s2_lsu_op[3:1] == 3'd3   ;
-wire        lsu_half            =  s2_lsu_op[3:1] == 3'd2   ;
-wire        lsu_byte            =  s2_lsu_op[3:1] == 3'd1   ;
-wire        lsu_sext            =  s2_lsu_op[  0]           ;
+wire [XL:0] lsu_wdata           =  s2.opr_c                 ;
+wire        lsu_load            = !s2.lsu_op[  4]           ;
+wire        lsu_store           =  s2.lsu_op[  4]           ;
+wire        lsu_double          =  s2.lsu_op[3:1] == 3'd4   ;
+wire        lsu_word            =  s2.lsu_op[3:1] == 3'd3   ;
+wire        lsu_half            =  s2.lsu_op[3:1] == 3'd2   ;
+wire        lsu_byte            =  s2.lsu_op[3:1] == 3'd1   ;
+wire        lsu_sext            =  s2.lsu_op[  0]           ;
 
 wire        lsu_ready           ; // Read data ready
 wire        lsu_trap_bus        ; // Bus error
@@ -131,19 +118,19 @@ wire        op_done_lsu         =
 // CFU Interfacing
 // ------------------------------------------------------------
 
-wire    cfu_op_nop          = s2_cfu_op     == CFU_OP_NOP   ;
+wire    cfu_op_nop          = s2.cfu_op     == CFU_OP_NOP   ;
 
-wire    cfu_op_j            = s2_cfu_op     == CFU_OP_J     ;
-wire    cfu_op_jal          = s2_cfu_op     == CFU_OP_JAL   ;
-wire    cfu_op_beq          = s2_cfu_op     == CFU_OP_BEQ   ;
-wire    cfu_op_bne          = s2_cfu_op     == CFU_OP_BNE   ;
-wire    cfu_op_blt          = s2_cfu_op     == CFU_OP_BLT   ;
-wire    cfu_op_bltu         = s2_cfu_op     == CFU_OP_BLTU  ;
-wire    cfu_op_bge          = s2_cfu_op     == CFU_OP_BGE   ;
-wire    cfu_op_bgeu         = s2_cfu_op     == CFU_OP_BGEU  ;
-wire    cfu_op_mret         = s2_cfu_op     == CFU_OP_MRET  ;
-wire    cfu_op_ebreak       = s2_cfu_op     == CFU_OP_EBREAK;
-wire    cfu_op_ecall        = s2_cfu_op     == CFU_OP_ECALL ;
+wire    cfu_op_j            = s2.cfu_op     == CFU_OP_J     ;
+wire    cfu_op_jal          = s2.cfu_op     == CFU_OP_JAL   ;
+wire    cfu_op_beq          = s2.cfu_op     == CFU_OP_BEQ   ;
+wire    cfu_op_bne          = s2.cfu_op     == CFU_OP_BNE   ;
+wire    cfu_op_blt          = s2.cfu_op     == CFU_OP_BLT   ;
+wire    cfu_op_bltu         = s2.cfu_op     == CFU_OP_BLTU  ;
+wire    cfu_op_bge          = s2.cfu_op     == CFU_OP_BGE   ;
+wire    cfu_op_bgeu         = s2.cfu_op     == CFU_OP_BGEU  ;
+wire    cfu_op_mret         = s2.cfu_op     == CFU_OP_MRET  ;
+wire    cfu_op_ebreak       = s2.cfu_op     == CFU_OP_EBREAK;
+wire    cfu_op_ecall        = s2.cfu_op     == CFU_OP_ECALL ;
 
 // EX stage CFU doesn't need to do any blocking for these instructions.
 wire    cfu_op_always_done  = cfu_op_j      || cfu_op_jal   || cfu_op_mret  ||
@@ -158,7 +145,7 @@ wire    cfu_op_bltu_taken   = cfu_op_bltu   &&  alu_cmp_lt;
 wire    cfu_op_bge_taken    = cfu_op_bge    && !alu_cmp_lt;
 wire    cfu_op_bgeu_taken   = cfu_op_bgeu   && !alu_cmp_lt;
 
-wire [XL:0] cfu_bcmp_taret  = s2_pc + s2_opr_c;
+wire [XL:0] cfu_bcmp_taret  = s2.pc + s2.opr_c;
 
 // Is a conditional branch taken?
 wire    cfu_cond_taken      =
@@ -185,7 +172,7 @@ wire    op_done_cfu         = cfu_op_nop    || cfu_op_always_done   ||
 // Does the CFU need to write anything back to the GPRs?
 // - Only on a jump and link instruction.
 wire        cfu_gpr_wen     = cfu_op_jal;
-wire [XL:0] cfu_gpr_wdata   = s2_opr_c  ;
+wire [XL:0] cfu_gpr_wdata   = s2.opr_c  ;
 
 //
 // Exception condition raising
@@ -236,21 +223,21 @@ assign  s2_cf_cause         = 0     ;   // TODO
 // CSR Interfacing
 // ------------------------------------------------------------
 
-wire    csr_op_nop  = s2_csr_op == CSR_OP_NOP;
+wire    csr_op_nop  = s2.csr_op == CSR_OP_NOP;
 
 //
 // CSR Interface bus assignments
 
-assign  csr_en      = |s2_csr_op                        ;
-assign  csr_wr      =  s2_csr_op[CSR_OP_WR ]            ;
-assign  csr_wr_set  =  s2_csr_op[CSR_OP_SET] && csr_wr  ;
-assign  csr_wr_clr  =  s2_csr_op[CSR_OP_CLR] && csr_wr  ;
+assign  csr_en      = |s2.csr_op                        ;
+assign  csr_wr      =  s2.csr_op[CSR_OP_WR ]            ;
+assign  csr_wr_set  =  s2.csr_op[CSR_OP_SET] && csr_wr  ;
+assign  csr_wr_clr  =  s2.csr_op[CSR_OP_CLR] && csr_wr  ;
 
 // Enable writeback of a read CSR value?.
-wire    csr_read_en =  s2_csr_op[CSR_OP_RD ]            ;
+wire    csr_read_en =  s2.csr_op[CSR_OP_RD ]            ;
 
-assign  csr_addr    =  s2_opr_c[11:0]                   ;
-assign  csr_wdata   =  s2_opr_a                         ;
+assign  csr_addr    =  s2.opr_c[11:0]                   ;
+assign  csr_wdata   =  s2.opr_a                         ;
 
 wire    op_done_csr = csr_op_nop || csr_en              ;
 
@@ -262,7 +249,7 @@ wire [XL:0] csr_gpr_wdata   = csr_rdata;
 // Is the stage ready for a new instruction?
 // ------------------------------------------------------------
 
-assign  s2_ready    = op_done_csr && op_done_cfu &&
+assign  s2.ready    = op_done_csr && op_done_cfu &&
                       op_done_alu && op_done_lsu ;
 
 //
@@ -282,7 +269,7 @@ always @(posedge g_clk) begin
     end
 end
 
-assign s2_rd_addr   = s2_rd;
+assign s2_rd_addr   = s2.rd;
 
 assign s2_rd_wen    = !rd_done && (
     cfu_gpr_wen || csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen

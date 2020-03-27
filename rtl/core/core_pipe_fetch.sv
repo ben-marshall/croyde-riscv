@@ -17,15 +17,7 @@ input  wire [         XL:0] cf_target   , // Control flow change destination
 input  wire [ CF_CAUSE_R:0] cf_cause    , // Control flow change cause
 
 core_mem_if.REQ             if_imem     , // Instruction memory bus.
-
-output wire                 s1_16bit    , // 16 bit instruction?
-output wire                 s1_32bit    , // 32 bit instruction?
-output wire [  FD_IBUF_R:0] s1_instr    , // Instruction to be decoded
-output reg  [         XL:0] s1_pc       , // Program Counter
-output wire [         XL:0] s1_npc      , // Next Program Counter
-output wire [   FD_ERR_R:0] s1_ferr     , // Fetch bus error?
-input  wire                 s2_eat_2    , // Decode eats 2 bytes
-input  wire                 s2_eat_4      // Decode eats 4 bytes
+core_pipe_fd.FETCH          s1            // Fetch -> decode interface.
 
 );
 
@@ -53,8 +45,8 @@ wire e_cf_change    = cf_valid && cf_ack;
 wire e_imem_req     = if_imem.req && if_imem.gnt;
 wire e_imem_recv    = imem_recv;
 
-wire e_eat_2        = s2_eat_2;
-wire e_eat_4        = s2_eat_4;
+wire e_eat_2        = s1.eat_2;
+wire e_eat_4        = s1.eat_4;
 
 //
 // Control flow change bus
@@ -98,17 +90,17 @@ end
 // Program Counter Tracking
 // ------------------------------------------------------------
 
-wire [XL:0] n_s1_pc = s1_pc + {61'b0, s1_32bit,s1_16bit, 1'b0};
+wire [XL:0] n_s1_pc = s1.pc + {61'b0, s1.i32bit, s1.i16bit, 1'b0};
 
-assign      s1_npc  = n_s1_pc;
+assign      s1.npc  = n_s1_pc;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
-        s1_pc <= PC_RESET_ADDRESS;
+        s1.pc <= PC_RESET_ADDRESS;
     end else if(e_cf_change) begin
-        s1_pc <= cf_target;
+        s1.pc <= cf_target;
     end else if(e_eat_2 || e_eat_4) begin
-        s1_pc <= n_s1_pc;
+        s1.pc <= n_s1_pc;
     end
 end
 
@@ -168,19 +160,19 @@ reg         buf_fill_8      ; // Load top 8 bytes of input data.
 wire [31:0] buf_data_out    ; // Data out of the buffer.
 wire [ 1:0] buf_error_out   ; // Is data tagged with fetch error?
 
-wire        buf_drain_2     = s1_16bit && s2_eat_2;
-wire        buf_drain_4     = s1_32bit && s2_eat_4;
+wire        buf_drain_2     = s1.i16bit && s1.eat_2;
+wire        buf_drain_4     = s1.i32bit && s1.eat_4;
 
 // Is the buffer ready to accept more data?
 wire        buf_ready       = n_buf_depth  <= 4;
 
 // Is there currently a 16 or 32 bit instruction in the buffer?
-assign      s1_16bit       = buf_depth >= 2 && buf_data_out[1:0] != 2'b11;
-assign      s1_32bit       = buf_depth >= 4 && buf_data_out[1:0] == 2'b11;
+assign      s1.i16bit       = buf_depth >= 2 && buf_data_out[1:0] != 2'b11;
+assign      s1.i32bit       = buf_depth >= 4 && buf_data_out[1:0] == 2'b11;
 
 // Can we present a valid instruction to the decode stage?
-assign      s1_instr        = buf_data_out[31:0];
-assign      s1_ferr         = buf_error_out[1:0];
+assign      s1.instr        = buf_data_out[31:0];
+assign      s1.ferr         = buf_error_out[1:0];
 
 
 always @(posedge g_clk) begin

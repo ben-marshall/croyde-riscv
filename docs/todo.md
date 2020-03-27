@@ -5,37 +5,24 @@
 
 ## RTL
 
-- [X] Fix flushing of fetch -> decode register such that we loose a
-      branch instruction if a decode-stage branch is taken when execute is
-      not ready to recieve it.
-
-  - [X] Decode CF valid should not be asserted until the EX stage is
-        ready.
-
 - [ ] Fix fetch so that it only ever asks for addresses on a 64-bit boundary
       and loads that data into the buffer as appropriate.
 
-- [X] Execute stage ready signal.
+- [X] Fetch -> Decode SV Interface
 
-  - [X] Decode stage to EX stage register progression
+- [X] Decode -> Execute SV Interface
 
-- [ ] Execute stage FU integration.
+- [ ] Execute -> Trace SV Interface
 
-  - [X] CSR unit
+- [ ] Memory interface Formal checkers
 
-    - [X] CSR based exceptions
+- [ ] ALU
 
-  - [ ] Branch unit
+  - [ ] SLTU[.w]
 
-  - [ ] Load/Store unit
+  - [ ] Shifts
 
-  - [ ] ALU
-
-  - [ ] MDU
-
-- [ ] Execute stage data writeback selection
-
-  - [ ] Stop multiple writebacks in the same instruction.
+- [ ] CSR bus converted to interface.
 
 ## Verif
 
