@@ -1,6 +1,4 @@
 
-`include "core_interfaces.svh"
-
 //
 // Module: core_pipe_fetch
 //
@@ -16,8 +14,23 @@ output wire                 cf_ack      , // Control flow change acknwoledged
 input  wire [         XL:0] cf_target   , // Control flow change destination
 input  wire [ CF_CAUSE_R:0] cf_cause    , // Control flow change cause
 
-core_mem_if.REQ             if_imem     , // Instruction memory bus.
-core_pipe_fd.FETCH          s1            // Fetch -> decode interface.
+output wire                 imem_req    , // Memory request
+output reg  [ MEM_ADDR_R:0] imem_addr   , // Memory request address
+output wire                 imem_wen    , // Memory request write enable
+output wire [ MEM_STRB_R:0] imem_strb   , // Memory request write strobe
+output wire [ MEM_DATA_R:0] imem_wdata  , // Memory write data.
+input  wire                 imem_gnt    , // Memory response valid
+input  wire                 imem_err    , // Memory response error
+input  wire [ MEM_DATA_R:0] imem_rdata  , // Memory response read data
+
+output wire                 s1_i16bit   , // 16 bit instruction?
+output wire                 s1_i32bit   , // 32 bit instruction?
+output wire [  FD_IBUF_R:0] s1_instr    , // Instruction to be decoded
+output reg  [         XL:0] s1_pc       , // Program Counter
+output wire [         XL:0] s1_npc      , // Next Program Counter
+output wire [   FD_ERR_R:0] s1_ferr     , // Fetch bus error?
+input  wire                 s1_eat_2    , // Decode eats 2 bytes
+input  wire                 s1_eat_4      // Decode eats 4 bytes
 
 );
 
@@ -32,9 +45,9 @@ parameter   PC_RESET_ADDRESS      = 64'h80000000;
 // Constant assignments.
 // ------------------------------------------------------------
 
-assign if_imem.wen     = 1'b0;
-assign if_imem.strb    = {MEM_STRB_W{1'b0}};
-assign if_imem.wdata   = {MEM_DATA_W{1'b0}};
+assign imem_wen     = 1'b0;
+assign imem_strb    = {MEM_STRB_W{1'b0}};
+assign imem_wdata   = {MEM_DATA_W{1'b0}};
 
 //
 // Event tracking
@@ -42,17 +55,17 @@ assign if_imem.wdata   = {MEM_DATA_W{1'b0}};
 
 wire e_cf_change    = cf_valid && cf_ack;
 
-wire e_imem_req     = if_imem.req && if_imem.gnt;
+wire e_imem_req     = imem_req && imem_gnt;
 wire e_imem_recv    = imem_recv;
 
-wire e_eat_2        = s1.eat_2;
-wire e_eat_4        = s1.eat_4;
+wire e_eat_2        = s1_eat_2;
+wire e_eat_4        = s1_eat_4;
 
 //
 // Control flow change bus
 // ------------------------------------------------------------
 
-assign  cf_ack      = if_imem.req && if_imem.gnt || !if_imem.req;
+assign  cf_ack      = imem_req && imem_gnt || !imem_req;
 
 //
 // Instruction fetch address tracking.
@@ -62,26 +75,26 @@ assign  cf_ack      = if_imem.req && if_imem.gnt || !if_imem.req;
 reg                 imem_recv  ;
 
 reg                 imem_req_r ;
-assign              if_imem.req   = imem_req_r;
+assign              imem_req   = imem_req_r;
 
 // Next instruction memory fetch request enable.
 wire                n_imem_req  = buf_ready;
 
 // Next instruction fetch address
-wire [MEM_ADDR_R:0] n_imem_addr = if_imem.addr + 8;
+wire [MEM_ADDR_R:0] n_imem_addr = imem_addr + 8;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         imem_req_r  <= 1'b0;
         imem_recv   <= 1'b0;
-        if_imem.addr   <= PC_RESET_ADDRESS;
+        imem_addr   <= PC_RESET_ADDRESS;
     end else begin
         imem_req_r  <= n_imem_req;
-        imem_recv   <= if_imem.req && if_imem.gnt;
+        imem_recv   <= imem_req && imem_gnt;
         if(e_cf_change) begin
-            if_imem.addr <= cf_target;
+            imem_addr <= cf_target;
         end else if(e_imem_req) begin
-            if_imem.addr <= n_imem_addr;
+            imem_addr <= n_imem_addr;
         end
     end
 end
@@ -90,17 +103,17 @@ end
 // Program Counter Tracking
 // ------------------------------------------------------------
 
-wire [XL:0] n_s1_pc = s1.pc + {61'b0, s1.i32bit, s1.i16bit, 1'b0};
+wire [XL:0] n_s1_pc = s1_pc + {61'b0, s1_i32bit, s1_i16bit, 1'b0};
 
-assign      s1.npc  = n_s1_pc;
+assign      s1_npc  = n_s1_pc;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
-        s1.pc <= PC_RESET_ADDRESS;
+        s1_pc <= PC_RESET_ADDRESS;
     end else if(e_cf_change) begin
-        s1.pc <= cf_target;
+        s1_pc <= cf_target;
     end else if(e_eat_2 || e_eat_4) begin
-        s1.pc <= n_s1_pc;
+        s1_pc <= n_s1_pc;
     end
 end
 
@@ -147,8 +160,8 @@ wire        buf_flush       = e_cf_change   ;
 wire [ 4:0]   buf_depth     ; // How many bytes are in the buffer?
 wire [ 4:0] n_buf_depth     ; //
 
-wire [63:0] buf_data_in     = if_imem.rdata    ;
-wire        buf_error_in    = if_imem.err      ;
+wire [63:0] buf_data_in     = imem_rdata    ;
+wire        buf_error_in    = imem_err      ;
 
 wire        buf_fill_en     = imem_recv && !ignore_rsp;
 
@@ -160,19 +173,19 @@ reg         buf_fill_8      ; // Load top 8 bytes of input data.
 wire [31:0] buf_data_out    ; // Data out of the buffer.
 wire [ 1:0] buf_error_out   ; // Is data tagged with fetch error?
 
-wire        buf_drain_2     = s1.i16bit && s1.eat_2;
-wire        buf_drain_4     = s1.i32bit && s1.eat_4;
+wire        buf_drain_2     = s1_i16bit && s1_eat_2;
+wire        buf_drain_4     = s1_i32bit && s1_eat_4;
 
 // Is the buffer ready to accept more data?
 wire        buf_ready       = n_buf_depth  <= 4;
 
 // Is there currently a 16 or 32 bit instruction in the buffer?
-assign      s1.i16bit       = buf_depth >= 2 && buf_data_out[1:0] != 2'b11;
-assign      s1.i32bit       = buf_depth >= 4 && buf_data_out[1:0] == 2'b11;
+assign      s1_i16bit       = buf_depth >= 2 && buf_data_out[1:0] != 2'b11;
+assign      s1_i32bit       = buf_depth >= 4 && buf_data_out[1:0] == 2'b11;
 
 // Can we present a valid instruction to the decode stage?
-assign      s1.instr        = buf_data_out[31:0];
-assign      s1.ferr         = buf_error_out[1:0];
+assign      s1_instr        = buf_data_out[31:0];
+assign      s1_ferr         = buf_error_out[1:0];
 
 
 always @(posedge g_clk) begin

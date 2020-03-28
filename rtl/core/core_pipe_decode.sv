@@ -9,7 +9,14 @@ module core_pipe_decode (
 input  wire                 g_clk       , // Global clock
 input  wire                 g_resetn    , // Global active low sync reset.
 
-core_pipe_fd.DECODE         s1          , // Fetch -> decode interface.
+input  wire                 s1_i16bit   , // 16 bit instruction?
+input  wire                 s1_i32bit   , // 32 bit instruction?
+input  wire [  FD_IBUF_R:0] s1_instr    , // Instruction to be decoded
+input  wire [         XL:0] s1_pc       , // Program Counter
+input  wire [         XL:0] s1_npc      , // Next Program Counter
+input  wire [   FD_ERR_R:0] s1_ferr     , // Fetch bus error?
+output wire                 s1_eat_2    , // Decode eats 2 bytes
+output wire                 s1_eat_4    , // Decode eats 4 bytes
 
 input  wire                 s1_flush    , // Stage 1 flush
 
@@ -23,7 +30,20 @@ input  wire [         XL:0] s1_rs1_data , // RS1 Read Data (Forwarded)
 output wire [ REG_ADDR_R:0] s1_rs2_addr , // RS2 Address
 input  wire [         XL:0] s1_rs2_data , // RS2 Read Data (Forwarded)
 
-core_pipe_de.DECODE         s2            // Decode -> execute pipe interface
+output wire                 s2_valid    , // Decode instr ready for execute
+input  wire                 s2_ready    , // Execute ready for new instr.
+output reg  [         XL:0] s2_pc       , // Execute stage PC
+output reg  [         XL:0] s2_opr_a    , // EX stage operand a
+output reg  [         XL:0] s2_opr_b    , //    "       "     b
+output reg  [         XL:0] s2_opr_c    , //    "       "     c
+output reg  [ REG_ADDR_R:0] s2_rd       , // EX stage destination reg address.
+output reg  [   ALU_OP_R:0] s2_alu_op   , // ALU operation
+output reg  [   LSU_OP_R:0] s2_lsu_op   , // LSU operation
+output reg  [   MDU_OP_R:0] s2_mdu_op   , // Mul/Div Operation
+output reg  [   CSR_OP_R:0] s2_csr_op   , // CSR operation
+output reg  [   CFU_OP_R:0] s2_cfu_op   , // Control flow unit operation
+output reg                  s2_op_w     , // Is the operation on a word?
+output reg  [         31:0] s2_instr      // Encoded instruction for trace.
 
 );
 
@@ -39,8 +59,8 @@ core_pipe_de.DECODE         s2            // Decode -> execute pipe interface
 
 //
 // TODO: Stalls to delay eating of 16/32 bit instructions.
-assign s1.eat_2     = s1.i16bit && !s1_cf_wait && s2.ready;
-assign s1.eat_4     = s1.i32bit && !s1_cf_wait && s2.ready;
+assign s1_eat_2     = s1_i16bit && !s1_cf_wait && s2_ready;
+assign s1_eat_4     = s1_i32bit && !s1_cf_wait && s2_ready;
 
 //
 // Next pipeline stage value selection
@@ -152,7 +172,7 @@ wire sel_opr_c_rs2  =
 
 assign n_s2_opr_a   =
     {64{sel_opr_a_rs1}} & s1_rs1_data |
-    {64{sel_opr_a_pc }} & s1.pc       ;
+    {64{sel_opr_a_pc }} & s1_pc       ;
 
 assign n_s2_opr_b   =
     {64{sel_opr_b_rs2}} & s1_rs2_data |
@@ -161,7 +181,7 @@ assign n_s2_opr_b   =
 assign n_s2_opr_c   =
     {64{sel_opr_c_rs2}} & s1_rs2_data |
     {64{sel_opr_c_imm}} & opr_c_imm   |
-    {64{sel_opr_c_npc}} & s1.npc      ;
+    {64{sel_opr_c_npc}} & s1_npc      ;
 
 //
 // Register operands
@@ -171,8 +191,8 @@ assign n_s2_rd      = dec_rd;
 wire [REG_ADDR_R:0] dec_16bit_rs1 = 0; 
 wire [REG_ADDR_R:0] dec_16bit_rs2 = 0;
 
-assign s1_rs1_addr  = s1.i16bit ? dec_16bit_rs1 : dec_rs1 ;
-assign s1_rs2_addr  = s1.i16bit ? dec_16bit_rs2 : dec_rs2 ;
+assign s1_rs1_addr  = s1_i16bit ? dec_16bit_rs1 : dec_rs1 ;
+assign s1_rs2_addr  = s1_i16bit ? dec_16bit_rs2 : dec_rs2 ;
 
 //
 // Is this decoded instruction explicitly operating on a word, rather than
@@ -198,9 +218,9 @@ wire    [XL:0]  sext_imm32_i = {{32{imm32_i[31]}}, imm32_i};
 wire    [XL:0]  sext_imm32_s = {{32{imm32_s[31]}}, imm32_s};
 wire    [XL:0]  sext_imm32_j = {{32{imm32_j[31]}}, imm32_j};
 
-wire    major_op_load        = s1.instr[6:0] == 7'b0000011;
-wire    major_op_store       = s1.instr[6:0] == 7'b0100011;
-wire    major_op_imm         = s1.instr[6:0] == 7'b0010011;
+wire    major_op_load        = s1_instr[6:0] == 7'b0000011;
+wire    major_op_store       = s1_instr[6:0] == 7'b0100011;
+wire    major_op_imm         = s1_instr[6:0] == 7'b0010011;
 
 wire    use_imm_sext_imm32_u = dec_lui      || dec_auipc        ;
 
@@ -393,7 +413,7 @@ wire [XL:0] decode_cf_offset =
     {64{dec_jalr || dec_jal  }} & {{32{imm32_j[31]}}, imm32_j} |
     {64{dec_c_j  || dec_c_jal}} & {{32{imm_c_j[31]}}, imm_c_j} ;
 
-assign s1_cf_target = s1.pc + decode_cf_offset;
+assign s1_cf_target = s1_pc + decode_cf_offset;
 
 // Control flow changes from decode caused by direct jumps.
 assign s1_cf_valid  = (dec_jalr || dec_jal || dec_c_jal || dec_c_j);
@@ -409,41 +429,41 @@ assign s1_cf_cause  = 0;
 // Decode -> Execute stage registers
 // ------------------------------------------------------------
 
-assign      s2.valid    = ( s1.i16bit   || s1.i32bit  ) && 
+assign      s2_valid    = ( s1_i16bit   || s1_i32bit  ) && 
                           (!s1_cf_valid || s1_cf_taken) ;
 
-wire [XL:0] n_s2_pc     = s1.pc;
+wire [XL:0] n_s2_pc     = s1_pc;
 wire [31:0] n_s2_instr  = {
-    s1.i16bit ? 16'b0 : s1.instr[31:16], s1.instr[15:0]
+    s1_i16bit ? 16'b0 : s1_instr[31:16], s1_instr[15:0]
 };
 
 always @(posedge g_clk) begin
     if(!g_resetn || s1_flush) begin
-        s2.pc       <= 0            ;
-        s2.opr_a    <= 0            ;
-        s2.opr_b    <= 0            ;
-        s2.opr_c    <= 0            ;
-        s2.rd       <= 0            ;
-        s2.alu_op   <= 0            ;
-        s2.lsu_op   <= 0            ;
-        s2.mdu_op   <= 0            ;
-        s2.csr_op   <= 0            ;
-        s2.cfu_op   <= 0            ;
-        s2.op_w     <= 0            ;
-        s2.instr    <= 0            ;
-    end else if(s2.valid && s2.ready) begin
-        s2.pc       <= n_s2_pc      ;
-        s2.opr_a    <= n_s2_opr_a   ;
-        s2.opr_b    <= n_s2_opr_b   ;
-        s2.opr_c    <= n_s2_opr_c   ;
-        s2.rd       <= n_s2_rd      ;
-        s2.alu_op   <= n_alu_op     ;
-        s2.lsu_op   <= n_lsu_op     ;
-        s2.mdu_op   <= n_mdu_op     ;
-        s2.csr_op   <= n_csr_op     ;
-        s2.cfu_op   <= n_cfu_op     ;
-        s2.op_w     <= n_s2_op_w    ;
-        s2.instr    <= n_s2_instr   ;
+        s2_pc       <= 0            ;
+        s2_opr_a    <= 0            ;
+        s2_opr_b    <= 0            ;
+        s2_opr_c    <= 0            ;
+        s2_rd       <= 0            ;
+        s2_alu_op   <= 0            ;
+        s2_lsu_op   <= 0            ;
+        s2_mdu_op   <= 0            ;
+        s2_csr_op   <= 0            ;
+        s2_cfu_op   <= 0            ;
+        s2_op_w     <= 0            ;
+        s2_instr    <= 0            ;
+    end else if(s2_valid && s2_ready) begin
+        s2_pc       <= n_s2_pc      ;
+        s2_opr_a    <= n_s2_opr_a   ;
+        s2_opr_b    <= n_s2_opr_b   ;
+        s2_opr_c    <= n_s2_opr_c   ;
+        s2_rd       <= n_s2_rd      ;
+        s2_alu_op   <= n_alu_op     ;
+        s2_lsu_op   <= n_lsu_op     ;
+        s2_mdu_op   <= n_mdu_op     ;
+        s2_csr_op   <= n_csr_op     ;
+        s2_cfu_op   <= n_cfu_op     ;
+        s2_op_w     <= n_s2_op_w    ;
+        s2_instr    <= n_s2_instr   ;
     end
 end
 
@@ -453,7 +473,7 @@ end
 // ------------------------------------------------------------
 
 core_pipe_decode_immediates i_core_pipe_decode_immediates (
-.instr        (s1.instr     ),   // Input encoded instruction.
+.instr        (s1_instr     ),   // Input encoded instruction.
 .imm32_i      (imm32_i      ),
 .imm_csr_addr (imm_csr_addr ),
 .imm_csr_mask (imm_csr_mask ),

@@ -1,6 +1,4 @@
 
-`include "core_interfaces.svh"
-
 //
 // Module: core_top 
 //
@@ -30,7 +28,7 @@ input  wire                 dmem_err     , // Memory response error
 input  wire [ MEM_DATA_R:0] dmem_rdata   , // Memory response read data
 
 `ifdef RVFI
-core_rvfi.OUT               rvfi         , // Formal checker interface.
+`RVFI_OUTPUTS                            , // Formal checker interface.
 `endif
 
 output wire                 trs_valid    , // Instruction trace valid
@@ -50,32 +48,6 @@ parameter   PC_RESET_ADDRESS      = 64'h80000000;
 assign trs_valid = 1'b0;
 assign trs_instr = 32'b0;
 assign trs_pc    = 64'b0;
-
-//
-// Memory Interface Unpacking
-// ------------------------------------------------------------
-
-core_mem_if if_imem();
-
-assign imem_req         = if_imem.req   ;
-assign imem_addr        = if_imem.addr  ;
-assign imem_wen         = if_imem.wen   ;
-assign imem_strb        = if_imem.strb  ;
-assign imem_wdata       = if_imem.wdata ;
-assign if_imem.gnt      = imem_gnt      ;
-assign if_imem.err      = imem_err      ;
-assign if_imem.rdata    = imem_rdata    ;
-
-core_mem_if if_dmem();
-
-assign dmem_req         = if_dmem.req   ;
-assign dmem_addr        = if_dmem.addr  ;
-assign dmem_wen         = if_dmem.wen   ;
-assign dmem_strb        = if_dmem.strb  ;
-assign dmem_wdata       = if_dmem.wdata ;
-assign if_dmem.gnt      = dmem_gnt      ;
-assign if_dmem.err      = dmem_err      ;
-assign if_dmem.rdata    = dmem_rdata    ;
 
 //
 // Control flow change busses
@@ -110,14 +82,34 @@ wire   s1_flush     = cf_valid && cf_ack;
 // Inter-stage wiring
 // ------------------------------------------------------------
 
-core_pipe_fd                s1() ; // Fetch -> decode interface.
+wire                 s1_i16bit   ; // 16 bit instruction?
+wire                 s1_i32bit   ; // 32 bit instruction?
+wire [  FD_IBUF_R:0] s1_instr    ; // Instruction to be decoded
+wire [         XL:0] s1_pc       ; // Program Counter
+wire [         XL:0] s1_npc      ; // Next Program Counter
+wire [   FD_ERR_R:0] s1_ferr     ; // Fetch bus error?
+wire                 s1_eat_2    ; // Decode eats 2 bytes
+wire                 s1_eat_4    ; // Decode eats 4 bytes
 
 wire [ REG_ADDR_R:0] s1_rs1_addr ; // RS1 Address
 wire [         XL:0] s1_rs1_data ; // RS1 Read Data (Forwarded)
 wire [ REG_ADDR_R:0] s1_rs2_addr ; // RS2 Address
 wire [         XL:0] s1_rs2_data ; // RS2 Read Data (Forwarded)
 
-core_pipe_de                s2() ; // Decode -> Execute interface.
+wire                 s2_valid    ; // Decode instr ready for execute
+wire                 s2_ready    ; // Execute ready for new instr.
+wire [         XL:0] s2_pc       ; // Execute stage PC
+wire [         XL:0] s2_opr_a    ; // EX stage operand a
+wire [         XL:0] s2_opr_b    ; //    "       "     b
+wire [         XL:0] s2_opr_c    ; //    "       "     c
+wire [ REG_ADDR_R:0] s2_rd       ; // EX stage destination reg address.
+wire [   ALU_OP_R:0] s2_alu_op   ; // ALU operation
+wire [   LSU_OP_R:0] s2_lsu_op   ; // LSU operation
+wire [   MDU_OP_R:0] s2_mdu_op   ; // Mul/Div Operation
+wire [   CSR_OP_R:0] s2_csr_op   ; // CSR operation
+wire [   CFU_OP_R:0] s2_cfu_op   ; // Control flow unit operation
+wire                 s2_op_w     ; // Is the operation on a word?
+wire [         31:0] s2_instr    ; // Encoded instruction for trace.
 
 wire                 s2_rd_wen   ;
 wire [ REG_ADDR_R:0] s2_rd_addr  ;
@@ -178,8 +170,22 @@ core_pipe_fetch i_core_pipe_fetch (
 .cf_ack       (cf_ack       ), // Control flow change acknwoledged
 .cf_target    (cf_target    ), // Control flow change destination
 .cf_cause     (cf_cause     ), // Control flow change cause
-.if_imem      (if_imem      ), // Memory requests
-.s1           (s1           )  // Fetch -> Decode interface
+.imem_req     (imem_req     ), // Memory request
+.imem_addr    (imem_addr    ), // Memory request address
+.imem_wen     (imem_wen     ), // Memory request write enable
+.imem_strb    (imem_strb    ), // Memory request write strobe
+.imem_wdata   (imem_wdata   ), // Memory write data.
+.imem_gnt     (imem_gnt     ), // Memory response valid
+.imem_err     (imem_err     ), // Memory response error
+.imem_rdata   (imem_rdata   ), // Memory response read data
+.s1_i16bit    (s1_i16bit    ), // 16 bit instruction?
+.s1_i32bit    (s1_i32bit    ), // 32 bit instruction?
+.s1_instr     (s1_instr     ), // Instruction to be decoded
+.s1_pc        (s1_pc        ), // Program Counter
+.s1_npc       (s1_npc       ), // Next Program Counter
+.s1_ferr      (s1_ferr      ), // Fetch bus error?
+.s1_eat_2     (s1_eat_2     ), // Decode eats 2 bytes
+.s1_eat_4     (s1_eat_4     )  // Decode eats 4 bytes
 );
 
 
@@ -189,19 +195,39 @@ core_pipe_fetch i_core_pipe_fetch (
 //  Pipeline decode / operand gather stage.
 //
 core_pipe_decode i_core_pipe_decode(
-.g_clk       (g_clk       ), // Global clock
-.g_resetn    (g_resetn    ), // Global active low sync reset.
-.s1          (s1          ), // Fetch -> Decode interface
-.s1_flush    (s1_flush    ), // Flush stage
-.s1_cf_valid (s1_cf_valid ), // Control flow change?
-.s1_cf_ack   (s1_cf_ack   ), // Control flow change acknwoledged
-.s1_cf_target(s1_cf_target), // Control flow change destination
-.s1_cf_cause (s1_cf_cause ), // Control flow change cause
-.s1_rs1_addr (s1_rs1_addr ), // RS1 Address
-.s1_rs1_data (s1_rs1_data ), // RS1 Read Data (Forwarded)
-.s1_rs2_addr (s1_rs2_addr ), // RS2 Address
-.s1_rs2_data (s1_rs2_data ), // RS2 Read Data (Forwarded)
-.s2          (s2          )  // Decode -> Execute
+.g_clk        (g_clk        ), // Global clock
+.g_resetn     (g_resetn     ), // Global active low sync reset.
+.s1_i16bit    (s1_i16bit    ), // 16 bit instruction?
+.s1_i32bit    (s1_i32bit    ), // 32 bit instruction?
+.s1_instr     (s1_instr     ), // Instruction to be decoded
+.s1_pc        (s1_pc        ), // Program Counter
+.s1_npc       (s1_npc       ), // Next Program Counter
+.s1_ferr      (s1_ferr      ), // Fetch bus error?
+.s1_eat_2     (s1_eat_2     ), // Decode eats 2 bytes
+.s1_eat_4     (s1_eat_4     ), // Decode eats 4 bytes
+.s1_flush     (s1_flush     ), // Flush stage
+.s1_cf_valid  (s1_cf_valid  ), // Control flow change?
+.s1_cf_ack    (s1_cf_ack    ), // Control flow change acknwoledged
+.s1_cf_target (s1_cf_target ), // Control flow change destination
+.s1_cf_cause  (s1_cf_cause  ), // Control flow change cause
+.s1_rs1_addr  (s1_rs1_addr  ), // RS1 Address
+.s1_rs1_data  (s1_rs1_data  ), // RS1 Read Data (Forwarded)
+.s1_rs2_addr  (s1_rs2_addr  ), // RS2 Address
+.s1_rs2_data  (s1_rs2_data  ), // RS2 Read Data (Forwarded)
+.s2_valid     (s2_valid     ), // Decode instr ready for execute
+.s2_ready     (s2_ready     ), // Execute ready for new instr.
+.s2_pc        (s2_pc        ), // Execute stage PC
+.s2_opr_a     (s2_opr_a     ), // EX stage operand a
+.s2_opr_b     (s2_opr_b     ), //    "       "     b
+.s2_opr_c     (s2_opr_c     ), //    "       "     c
+.s2_rd        (s2_rd        ), // EX stage destination reg address.
+.s2_alu_op    (s2_alu_op    ), // ALU operation
+.s2_lsu_op    (s2_lsu_op    ), // LSU operation
+.s2_mdu_op    (s2_mdu_op    ), // Mul/Div Operation
+.s2_csr_op    (s2_csr_op    ), // CSR operation
+.s2_cfu_op    (s2_cfu_op    ), // Control flow unit operation
+.s2_op_w      (s2_op_w      ), // Is the operation on a word?
+.s2_instr     (s2_instr     )  // Encoded instruction for trace.
 );
 
 
@@ -214,9 +240,22 @@ core_pipe_exec i_core_pipe_exec(
 .g_clk          (g_clk          ), // Global clock
 .g_resetn       (g_resetn       ), // Global active low sync reset.
 `ifdef RVFI
-.rvfi           (rvfi           ), // Formal checker interface.
+`RVFI_CONN                       ,
 `endif
-.s2             (s2             ), // Decode -> Execute
+.s2_valid       (s2_valid       ), // Decode instr ready for execute
+.s2_ready       (s2_ready       ), // Execute ready for new instr.
+.s2_pc          (s2_pc          ), // Execute stage PC
+.s2_opr_a       (s2_opr_a       ), // EX stage operand a
+.s2_opr_b       (s2_opr_b       ), //    "       "     b
+.s2_opr_c       (s2_opr_c       ), //    "       "     c
+.s2_rd          (s2_rd          ), // EX stage destination reg address.
+.s2_alu_op      (s2_alu_op      ), // ALU operation
+.s2_lsu_op      (s2_lsu_op      ), // LSU operation
+.s2_mdu_op      (s2_mdu_op      ), // Mul/Div Operation
+.s2_csr_op      (s2_csr_op      ), // CSR operation
+.s2_cfu_op      (s2_cfu_op      ), // Control flow unit operation
+.s2_op_w        (s2_op_w        ), // Is the operation on a word?
+.s2_instr       (s2_instr       ), // Encoded instruction for trace.
 .s2_rd_wen      (s2_rd_wen      ), // GPR write enable
 .s2_rd_addr     (s2_rd_addr     ), // GPR write address
 .s2_rd_wdata    (s2_rd_wdata    ), // GPR write data
@@ -234,7 +273,14 @@ core_pipe_exec i_core_pipe_exec(
 .s2_cf_ack      (s2_cf_ack      ), // EX Control flow acknwoledged
 .s2_cf_target   (s2_cf_target   ), // EX Control flow destination
 .s2_cf_cause    (s2_cf_cause    ), // EX Control flow change cause
-.if_dmem        (if_dmem        )  // Memory requests
+.dmem_req       (dmem_req       ), // Memory request
+.dmem_addr      (dmem_addr      ), // Memory request address
+.dmem_wen       (dmem_wen       ), // Memory request write enable
+.dmem_strb      (dmem_strb      ), // Memory request write strobe
+.dmem_wdata     (dmem_wdata     ), // Memory write data.
+.dmem_gnt       (dmem_gnt       ), // Memory response valid
+.dmem_err       (dmem_err       ), // Memory response error
+.dmem_rdata     (dmem_rdata     )  // Memory response read data
 );
 
 //
