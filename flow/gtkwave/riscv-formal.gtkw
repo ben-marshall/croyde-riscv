@@ -1,15 +1,13 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sat Mar 28 18:01:09 2020
+[*] Sat Mar 28 18:10:06 2020
 [*]
-[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/riscv-formal/insn_add_ch0/engine_0/trace.vcd"
-[dumpfile_mtime] "Sat Mar 28 18:00:13 2020"
-[dumpfile_size] 413487
+[dumpfile] "(null)"
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/riscv-formal.gtkw"
 [timestart] 0
 [size] 1920 1025
 [pos] -1 -1
-*-5.098422 104 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-5.098422 56 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] rvfi_testbench.
 [treeopen] rvfi_testbench.checker_inst.
 [treeopen] rvfi_testbench.wrapper.
@@ -81,9 +79,7 @@ rvfi_testbench.checker_inst.rvfi_rs2_rdata[63:0]
 @24
 rvfi_testbench.checker_inst.rvfi_rs1_addr[4:0]
 rvfi_testbench.checker_inst.spec_rs1_addr[4:0]
-@25
 rvfi_testbench.checker_inst.rvfi_rs2_addr[4:0]
-@24
 rvfi_testbench.checker_inst.spec_rs2_addr[4:0]
 @1000200
 -RS
@@ -100,18 +96,28 @@ rvfi_testbench.checker_inst.spec_rd_wdata[63:0]
 @1000200
 -RD
 -RVFI
+@800201
+-Regfile
+@29
+rvfi_testbench.wrapper.i_dut.i_core_regfile.fwd_rs1
+rvfi_testbench.wrapper.i_dut.i_core_regfile.fwd_rs2
+@23
+rvfi_testbench.wrapper.i_dut.i_core_regfile.rs1_addr[4:0]
+rvfi_testbench.wrapper.i_dut.i_core_regfile.rs1_data[63:0]
+rvfi_testbench.wrapper.i_dut.i_core_regfile.rs2_addr[4:0]
+rvfi_testbench.wrapper.i_dut.i_core_regfile.rs2_data[63:0]
+@1000201
+-Regfile
 @800200
--Decode CF
+-DUT Decode
 @22
-rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_cfu_op[3:0]
-@28
-rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_cfu_op_conditional
-@22
-rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s2_cfu_op[3:0]
-rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s1_npc[63:0]
+rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s1_rs1_addr[4:0]
+rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s1_rs1_data[63:0]
+rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s1_rs2_addr[4:0]
+rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s1_rs2_data[63:0]
 @1000200
--Decode CF
-@c00200
+-DUT Decode
+@800200
 -DUT - Execute
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.g_clk
@@ -340,7 +346,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_rs2_a[4:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_rs2_d[63:0]
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_valid
-@1401200
+@1000200
 -DUT - Execute
 @800200
 -RVFI

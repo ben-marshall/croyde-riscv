@@ -58,6 +58,8 @@ reg rvfi_mem_wmask = 0;
 reg rvfi_mem_rdata = 0;
 reg rvfi_mem_wdata = 0;
 
+reg rvfi_order  = 0;
+
 //
 // Ignore first valid bit after reset.
 reg first_seen;
