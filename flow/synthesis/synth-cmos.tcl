@@ -2,7 +2,16 @@
 yosys -import
 
 # Read in the design
-read_verilog -sv -I$::env(REPO_HOME)/rtl/core $::env(REPO_HOME)/rtl/core/*.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_fetch_buffer.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_fetch.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_decode_immediates.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_decode.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec_alu.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec_lsu.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_csrs.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_regfile.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_top.sv
 
 # Synthesise processes ready for SCC check.
 procs

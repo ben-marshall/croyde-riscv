@@ -1,6 +1,4 @@
 
-`include "core_rvfi.sv"
-
 //
 // module: rvfi_wrapper
 //
@@ -13,7 +11,9 @@ module rvfi_wrapper (
 	`RVFI_OUTPUTS
 );
 
-core_rvfi   core_if      ; // Formal checker interface to the core
+//
+// Common core parameters and constants.
+`include "core_common.svh"
 
 (*keep*)      wire                 g_resetn     = !reset;
 (*keep*)      
@@ -63,7 +63,7 @@ rvfi_fairness i_rvfi_fairness (
 .dmem_gnt     (dmem_gnt     ), // Memory response valid
 .dmem_err     (dmem_err     ), // Memory response error
 .dmem_rdata   (dmem_rdata   ), // Memory response read data
-.rvfi         (rvfi         ), // Formal checker interface.
+`RVFI_CONN                   , // Formal checker interface.
 .trs_valid    (trs_valid    ), // Instruction trace valid
 .trs_instr    (trs_instr    ), // Instruction trace data
 .trs_pc       (trs_pc       )  // Instruction trace PC
@@ -94,7 +94,7 @@ core_top i_dut (
 .dmem_gnt     (dmem_gnt     ), // Memory response valid
 .dmem_err     (dmem_err     ), // Memory response error
 .dmem_rdata   (dmem_rdata   ), // Memory response read data
-.rvfi         (rvfi         ), // Formal checker interface.
+`RVFI_CONN                   , // Formal checker interface.
 .trs_valid    (trs_valid    ), // Instruction trace valid
 .trs_instr    (trs_instr    ), // Instruction trace data
 .trs_pc       (trs_pc       )  // Instruction trace PC

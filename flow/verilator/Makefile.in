@@ -18,7 +18,7 @@ VL_TOP      = core_top
 VL_CSRC_DIR=$(REPO_HOME)/verif/verilator
 
 VL_FLAGS = --cc -CFLAGS "-O2" --Mdir $(VL_DIR) -O3 -CFLAGS -g\
-            -I$(CORE_RTL_DIR) -DRVFI \
+            -I$(CORE_RTL_DIR) \
             --exe --trace \
             --top-module $(VL_TOP) $(VL_BUILD_FLAGS)
 

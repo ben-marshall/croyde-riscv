@@ -8,18 +8,11 @@ RV_FORMAL_GEN   = $(RV_FORMAL_DIR)/checks/genchecks.py
 
 RV_FORMAL_WORK  = $(REPO_WORK)/riscv-formal
 
-RV_FORMAL_IN    = $(REPO_WORK)/verilog.v
-
-$(RV_FORMAL_IN):
-	yosys -QT $(REPO_HOME)/flow/riscv-formal/sv-to-v.tcl
-
-riscv-formal-input: $(RV_FORMAL_IN)
-
 riscv-formal-clean:
 	rm -rf $(RV_FORMAL_WORK)
 	rm -rf $(RV_FORMAL_CORE)
 
-riscv-formal-prepare: $(RV_FORMAL_CFG) $(RV_FORMAL_IN)
+riscv-formal-prepare: $(RV_FORMAL_CFG)
 	mkdir -p $(RV_FORMAL_WORK)
 	mkdir -p $(RV_FORMAL_CORE)
 	cp $(RV_FORMAL_CFG) $(RV_FORMAL_CORE)/.

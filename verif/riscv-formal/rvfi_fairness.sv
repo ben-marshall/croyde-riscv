@@ -28,7 +28,7 @@ input  wire                 dmem_gnt     , // Memory response valid
 input  wire                 dmem_err     , // Memory response error
 input  wire [ MEM_DATA_R:0] dmem_rdata   , // Memory response read data
 
-core_rvfi.IN                rvfi         , // Formal checker interface.
+`RVFI_INPUTS                             , // Formal checker interface.
 
 input  wire                 trs_valid    , // Instruction trace valid
 input  wire [         31:0] trs_instr    , // Instruction trace data
@@ -36,6 +36,9 @@ input  wire [         XL:0] trs_pc         // Instruction trace PC
 
 );
 
+//
+// Common core parameters and constants.
+`include "core_common.svh"
 
 // Assume that we start in reset.
 initial assume(g_resetn == 1'b0);
