@@ -1,0 +1,96 @@
+[*]
+[*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
+[*] Sat Mar 28 13:50:18 2020
+[*]
+[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/riscv-formal/insn_add_ch0/engine_0/trace.vcd"
+[dumpfile_mtime] "Sat Mar 28 13:45:09 2020"
+[dumpfile_size] 415318
+[savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/riscv-formal.gtkw"
+[timestart] 0
+[size] 1920 1025
+[pos] -1 -1
+*-4.516431 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] rvfi_testbench.
+[treeopen] rvfi_testbench.checker_inst.
+[treeopen] rvfi_testbench.wrapper.
+[sst_width] 223
+[signals_width] 262
+[sst_expanded] 1
+[sst_vpaned_height] 290
+@28
+smt_clock
+@420
+smt_step
+@800200
+-RVFI
+@28
+rvfi_testbench.checker_inst.check
+rvfi_testbench.checker_inst.reset
+rvfi_testbench.checker_inst.rvfi_intr
+rvfi_testbench.checker_inst.rvfi_trap
+rvfi_testbench.checker_inst.rvfi_valid
+rvfi_testbench.checker_inst.spec_trap
+rvfi_testbench.checker_inst.spec_valid
+rvfi_testbench.checker_inst.trap
+rvfi_testbench.checker_inst.valid
+@22
+rvfi_testbench.checker_inst.rvfi_insn[31:0]
+@c00200
+-CSR
+@22
+rvfi_testbench.checker_inst.rvfi_csr_mcycle_rdata[63:0]
+rvfi_testbench.checker_inst.rvfi_csr_mcycle_rmask[63:0]
+rvfi_testbench.checker_inst.rvfi_csr_mcycle_wdata[63:0]
+rvfi_testbench.checker_inst.rvfi_csr_mcycle_wmask[63:0]
+rvfi_testbench.checker_inst.rvfi_csr_minstret_rdata[63:0]
+rvfi_testbench.checker_inst.rvfi_csr_minstret_rmask[63:0]
+rvfi_testbench.checker_inst.rvfi_csr_minstret_wdata[63:0]
+rvfi_testbench.checker_inst.rvfi_csr_minstret_wmask[63:0]
+@1401200
+-CSR
+@c00200
+-MEM
+@22
+rvfi_testbench.checker_inst.rvfi_mem_addr[63:0]
+rvfi_testbench.checker_inst.rvfi_mem_rdata[63:0]
+rvfi_testbench.checker_inst.rvfi_mem_rmask[7:0]
+rvfi_testbench.checker_inst.rvfi_mem_wdata[63:0]
+rvfi_testbench.checker_inst.rvfi_mem_wmask[7:0]
+rvfi_testbench.checker_inst.spec_mem_addr[63:0]
+rvfi_testbench.checker_inst.spec_mem_rmask[7:0]
+rvfi_testbench.checker_inst.spec_mem_wdata[63:0]
+rvfi_testbench.checker_inst.spec_mem_wmask[7:0]
+@1401200
+-MEM
+@c00200
+-PC
+@22
+rvfi_testbench.checker_inst.rvfi_pc_rdata[63:0]
+rvfi_testbench.checker_inst.rvfi_pc_wdata[63:0]
+rvfi_testbench.checker_inst.spec_pc_wdata[63:0]
+@1401200
+-PC
+@c00200
+-RS
+@22
+rvfi_testbench.checker_inst.rvfi_rs1_addr[4:0]
+rvfi_testbench.checker_inst.rvfi_rs1_rdata[63:0]
+rvfi_testbench.checker_inst.rvfi_rs2_addr[4:0]
+rvfi_testbench.checker_inst.rvfi_rs2_rdata[63:0]
+rvfi_testbench.checker_inst.spec_rs1_addr[4:0]
+rvfi_testbench.checker_inst.spec_rs2_addr[4:0]
+@1401200
+-RS
+@800201
+-RD
+@23
+rvfi_testbench.checker_inst.rvfi_rd_addr[4:0]
+rvfi_testbench.checker_inst.rvfi_rd_wdata[63:0]
+rvfi_testbench.checker_inst.spec_rd_addr[4:0]
+rvfi_testbench.checker_inst.spec_rd_wdata[63:0]
+@1000201
+-RD
+@1000200
+-RVFI
+[pattern_trace] 1
+[pattern_trace] 0
