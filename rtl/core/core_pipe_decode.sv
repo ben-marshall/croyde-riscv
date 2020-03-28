@@ -447,8 +447,10 @@ wire [31:0] n_s2_instr  = {
     s1_i16bit ? 16'b0 : s1_instr[31:16], s1_instr[15:0]
 };
 
+wire        flush_pipe  = s1_flush && !s1_cf_valid;
+
 always @(posedge g_clk) begin
-    if(!g_resetn || s1_flush) begin
+    if(!g_resetn || flush_pipe) begin
         s2_pc       <= 0            ;
         s2_opr_a    <= 0            ;
         s2_opr_b    <= 0            ;
@@ -510,7 +512,7 @@ core_pipe_decode_immediates i_core_pipe_decode_immediates (
 
 `ifdef RVFI
 always @(posedge g_clk) begin
-    if(!g_resetn || s1_flush) begin
+    if(!g_resetn || flush_pipe) begin
         s2_rs1_a <= 0;
         s2_rs1_d <= 0;
         s2_rs2_a <= 0;

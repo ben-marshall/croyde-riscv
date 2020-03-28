@@ -12,7 +12,7 @@ input g_resetn  ,
 input wire                         n_valid          ,
 input wire [NRET * ILEN   - 1 : 0] n_insn           ,
 input wire [NRET * ILEN   - 1 : 0] n_intr           ,
-input wire [NRET * ILEN   - 1 : 0] n_trap           ,
+input wire                         n_trap           ,
 
 input wire [NRET *    5   - 1 : 0] n_rs1_addr       ,
 input wire [NRET *    5   - 1 : 0] n_rs2_addr       ,
@@ -58,6 +58,16 @@ reg rvfi_mem_wmask = 0;
 reg rvfi_mem_rdata = 0;
 reg rvfi_mem_wdata = 0;
 
+//
+// Ignore first valid bit after reset.
+reg first_seen;
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        first_seen <= 1'b0;
+    end else begin
+        first_seen <= first_seen || n_valid;
+    end
+end
 
 //
 // Logic for updateing the RVFI outputs based on the n_* inputs
@@ -70,7 +80,7 @@ always @(posedge g_clk) begin
     if(!g_resetn) begin
         rvalid <= 1'b0;
     end else begin
-        rvalid <= n_valid;
+        rvalid <= n_valid && first_seen;
     end
 end
 

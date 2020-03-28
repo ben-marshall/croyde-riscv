@@ -9,7 +9,7 @@
 
 parameter   XLEN        = 64;       // Word width of the CPU
 localparam  XL          = XLEN-1;   // For signals which are XLEN wide.
-localparam  ILEN        = 16    ;
+localparam  ILEN        = 32    ;
 localparam  NRET        = 1     ;
 
 parameter   MEM_ADDR_W  = 64;       // Memory address bus width
