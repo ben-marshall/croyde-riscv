@@ -52,11 +52,11 @@ reg rvfi_pc_rdata ;
 reg rvfi_pc_wdata ;
 reg rvfi_rd_addr  ;
 reg rvfi_rd_wdata ;
-reg rvfi_mem_addr ;
-reg rvfi_mem_rmask;
-reg rvfi_mem_wmask;
-reg rvfi_mem_rdata;
-reg rvfi_mem_wdata;
+reg rvfi_mem_addr  = 0;
+reg rvfi_mem_rmask = 0;
+reg rvfi_mem_wmask = 0;
+reg rvfi_mem_rdata = 0;
+reg rvfi_mem_wdata = 0;
 
 
 //

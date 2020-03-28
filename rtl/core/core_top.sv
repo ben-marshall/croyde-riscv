@@ -99,6 +99,7 @@ wire [         XL:0] s1_rs2_data ; // RS2 Read Data (Forwarded)
 wire                 s2_valid    ; // Decode instr ready for execute
 wire                 s2_ready    ; // Execute ready for new instr.
 wire [         XL:0] s2_pc       ; // Execute stage PC
+wire [         XL:0] s2_npc      ; // Decode stage PC
 wire [         XL:0] s2_opr_a    ; // EX stage operand a
 wire [         XL:0] s2_opr_b    ; //    "       "     b
 wire [         XL:0] s2_opr_c    ; //    "       "     c
@@ -110,6 +111,13 @@ wire [   CSR_OP_R:0] s2_csr_op   ; // CSR operation
 wire [   CFU_OP_R:0] s2_cfu_op   ; // Control flow unit operation
 wire                 s2_op_w     ; // Is the operation on a word?
 wire [         31:0] s2_instr    ; // Encoded instruction for trace.
+
+`ifdef RVFI
+wire [ REG_ADDR_R:0] s2_rs1_a    ;
+wire [         XL:0] s2_rs1_d    ;
+wire [ REG_ADDR_R:0] s2_rs2_a    ;
+wire [         XL:0] s2_rs2_d    ;
+`endif
 
 wire                 s2_rd_wen   ;
 wire [ REG_ADDR_R:0] s2_rd_addr  ;
@@ -214,9 +222,16 @@ core_pipe_decode i_core_pipe_decode(
 .s1_rs1_data  (s1_rs1_data  ), // RS1 Read Data (Forwarded)
 .s1_rs2_addr  (s1_rs2_addr  ), // RS2 Address
 .s1_rs2_data  (s1_rs2_data  ), // RS2 Read Data (Forwarded)
+`ifdef RVFI
+.s2_rs1_a     (s2_rs1_a     ),
+.s2_rs1_d     (s2_rs1_d     ),
+.s2_rs2_a     (s2_rs2_a     ),
+.s2_rs2_d     (s2_rs2_d     ),
+`endif
 .s2_valid     (s2_valid     ), // Decode instr ready for execute
 .s2_ready     (s2_ready     ), // Execute ready for new instr.
 .s2_pc        (s2_pc        ), // Execute stage PC
+.s2_npc       (s2_npc       ), // Decode stage PC
 .s2_opr_a     (s2_opr_a     ), // EX stage operand a
 .s2_opr_b     (s2_opr_b     ), //    "       "     b
 .s2_opr_c     (s2_opr_c     ), //    "       "     c
@@ -241,10 +256,15 @@ core_pipe_exec i_core_pipe_exec(
 .g_resetn       (g_resetn       ), // Global active low sync reset.
 `ifdef RVFI
 `RVFI_CONN                       ,
+.s2_rs1_a       (s2_rs1_a       ),
+.s2_rs1_d       (s2_rs1_d       ),
+.s2_rs2_a       (s2_rs2_a       ),
+.s2_rs2_d       (s2_rs2_d       ),
 `endif
 .s2_valid       (s2_valid       ), // Decode instr ready for execute
 .s2_ready       (s2_ready       ), // Execute ready for new instr.
 .s2_pc          (s2_pc          ), // Execute stage PC
+.s2_npc         (s2_npc         ), // Decode stage PC
 .s2_opr_a       (s2_opr_a       ), // EX stage operand a
 .s2_opr_b       (s2_opr_b       ), //    "       "     b
 .s2_opr_c       (s2_opr_c       ), //    "       "     c

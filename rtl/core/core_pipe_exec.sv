@@ -11,11 +11,16 @@ input  wire                 g_resetn    , // Global active low sync reset.
 
 `ifdef RVFI
 `RVFI_OUTPUTS                           , // Formal interface outputs.
+input  wire [ REG_ADDR_R:0] s2_rs1_a    ,
+input  wire [         XL:0] s2_rs1_d    ,
+input  wire [ REG_ADDR_R:0] s2_rs2_a    ,
+input  wire [         XL:0] s2_rs2_d    ,
 `endif
 
 input  wire                 s2_valid    , // Decode instr ready for execute
 output wire                 s2_ready    , // Execute ready for new instr.
 input  wire [         XL:0] s2_pc       , // Execute stage PC
+input  wire [         XL:0] s2_npc      , // Decode stage PC
 input  wire [         XL:0] s2_opr_a    , // EX stage operand a
 input  wire [         XL:0] s2_opr_b    , //    "       "     b
 input  wire [         XL:0] s2_opr_c    , //    "       "     c
@@ -379,15 +384,15 @@ core_rvfi core_rvfi_i (
 .n_insn          (s2_instr         ),
 .n_intr          (1'b0             ),
 .n_trap          (cfu_goto_mepc    ),
-.n_rs1_addr      (0                ),
-.n_rs2_addr      (0                ),
-.n_rs1_rdata     (0                ),
-.n_rs2_rdata     (0                ),
+.n_rs1_addr      (s2_rs1_a         ),
+.n_rs2_addr      (s2_rs2_a         ),
+.n_rs1_rdata     (s2_rs1_d         ),
+.n_rs2_rdata     (s2_rs2_d         ),
 .n_rd_valid      (s2_rd_wen        ),
 .n_rd_addr       (s2_rd_addr       ),
 .n_rd_wdata      (s2_rd_wdata      ),
 .n_pc_rdata      (s2_pc            ),    
-.n_pc_wdata      (0                ),    
+.n_pc_wdata      (s2_npc           ),    
 .n_mem_req_valid (0                ),    
 .n_mem_rsp_valid (0                ),    
 .n_mem_addr      (dmem_addr        ),

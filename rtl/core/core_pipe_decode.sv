@@ -30,9 +30,17 @@ input  wire [         XL:0] s1_rs1_data , // RS1 Read Data (Forwarded)
 output wire [ REG_ADDR_R:0] s1_rs2_addr , // RS2 Address
 input  wire [         XL:0] s1_rs2_data , // RS2 Read Data (Forwarded)
 
+`ifdef RVFI
+output reg  [ REG_ADDR_R:0] s2_rs1_a    ,
+output reg  [         XL:0] s2_rs1_d    ,
+output reg  [ REG_ADDR_R:0] s2_rs2_a    ,
+output reg  [         XL:0] s2_rs2_d    ,
+`endif
+
 output wire                 s2_valid    , // Decode instr ready for execute
 input  wire                 s2_ready    , // Execute ready for new instr.
 output reg  [         XL:0] s2_pc       , // Execute stage PC
+output wire [         XL:0] s2_npc      , // Decode stage PC
 output reg  [         XL:0] s2_opr_a    , // EX stage operand a
 output reg  [         XL:0] s2_opr_b    , //    "       "     b
 output reg  [         XL:0] s2_opr_c    , //    "       "     c
@@ -432,6 +440,8 @@ assign s1_cf_cause  = 0;
 assign      s2_valid    = ( s1_i16bit   || s1_i32bit  ) && 
                           (!s1_cf_valid || s1_cf_taken) ;
 
+assign      s2_npc      = n_s2_pc;
+
 wire [XL:0] n_s2_pc     = s1_pc;
 wire [31:0] n_s2_instr  = {
     s1_i16bit ? 16'b0 : s1_instr[31:16], s1_instr[15:0]
@@ -492,6 +502,27 @@ core_pipe_decode_immediates i_core_pipe_decode_immediates (
 .imm_c_j      (imm_c_j      ),
 .imm_c_bz     (imm_c_bz     ) 
 );
+
+
+//
+// RVFI
+// ------------------------------------------------------------
+
+`ifdef RVFI
+always @(posedge g_clk) begin
+    if(!g_resetn || s1_flush) begin
+        s2_rs1_a <= 0;
+        s2_rs1_d <= 0;
+        s2_rs2_a <= 0;
+        s2_rs2_d <= 0;
+    end else if(s2_valid && s2_ready) begin
+        s2_rs1_a <= s1_rs1_addr;
+        s2_rs1_d <= s1_rs1_data;
+        s2_rs2_a <= s1_rs2_addr;
+        s2_rs2_d <= s1_rs2_data;
+    end
+end
+`endif
 
 endmodule
 
