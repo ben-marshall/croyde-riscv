@@ -1,0 +1,32 @@
+
+RV_FORMAL_DIR   = $(REPO_HOME)/extern/riscv-formal
+RV_FORMAL_CORE  = $(RV_FORMAL_DIR)/cores/uc64
+
+RV_FORMAL_CFG   = $(REPO_HOME)/flow/riscv-formal/checks.cfg
+
+RV_FORMAL_GEN   = $(RV_FORMAL_DIR)/checks/genchecks.py
+
+RV_FORMAL_WORK  = $(REPO_WORK)/riscv-formal
+
+RV_FORMAL_IN    = $(REPO_WORK)/verilog.v
+
+$(RV_FORMAL_IN):
+	yosys -QT $(REPO_HOME)/flow/riscv-formal/sv-to-v.tcl
+
+riscv-formal-input: $(RV_FORMAL_IN)
+
+riscv-formal-clean:
+	rm -rf $(RV_FORMAL_WORK)
+	rm -rf $(RV_FORMAL_CORE)
+
+riscv-formal-prepare: $(RV_FORMAL_CFG) $(RV_FORMAL_IN)
+	mkdir -p $(RV_FORMAL_WORK)
+	mkdir -p $(RV_FORMAL_CORE)
+	cp $(RV_FORMAL_CFG) $(RV_FORMAL_CORE)/.
+	cd $(RV_FORMAL_CORE) && python3 $(RV_FORMAL_GEN)
+	mv $(RV_FORMAL_CORE)/checks/* $(RV_FORMAL_WORK)/.
+	rm -rf $(RV_FORMAL_CORE)
+	sed -i "s+$(RV_FORMAL_CORE)/../../+$(REPO_HOME)/extern/riscv-formal/+" \
+        $(RV_FORMAL_WORK)/*.sby
+	sed -i "s+\$$REPO_HOME+$(REPO_HOME)+g" $(RV_FORMAL_WORK)/*.sby
+	sed -i "s+\$$REPO_WORK+$(REPO_WORK)+g" $(RV_FORMAL_WORK)/*.sby
