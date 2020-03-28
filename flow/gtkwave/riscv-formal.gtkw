@@ -1,21 +1,22 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sat Mar 28 14:16:08 2020
+[*] Sat Mar 28 18:01:09 2020
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/uc64/work/riscv-formal/insn_add_ch0/engine_0/trace.vcd"
-[dumpfile_mtime] "Sat Mar 28 14:14:34 2020"
-[dumpfile_size] 415637
+[dumpfile_mtime] "Sat Mar 28 18:00:13 2020"
+[dumpfile_size] 413487
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/riscv-formal.gtkw"
 [timestart] 0
 [size] 1920 1025
 [pos] -1 -1
-*-5.098422 76 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-5.098422 104 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] rvfi_testbench.
 [treeopen] rvfi_testbench.checker_inst.
 [treeopen] rvfi_testbench.wrapper.
 [treeopen] rvfi_testbench.wrapper.i_dut.
+[treeopen] rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.
 [treeopen] rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.
-[sst_width] 223
+[sst_width] 307
 [signals_width] 410
 [sst_expanded] 1
 [sst_vpaned_height] 290
@@ -72,16 +73,19 @@ rvfi_testbench.checker_inst.rvfi_pc_wdata[63:0]
 rvfi_testbench.checker_inst.spec_pc_wdata[63:0]
 @1401200
 -PC
-@c00200
+@800200
 -RS
 @22
-rvfi_testbench.checker_inst.rvfi_rs1_addr[4:0]
 rvfi_testbench.checker_inst.rvfi_rs1_rdata[63:0]
-rvfi_testbench.checker_inst.rvfi_rs2_addr[4:0]
 rvfi_testbench.checker_inst.rvfi_rs2_rdata[63:0]
+@24
+rvfi_testbench.checker_inst.rvfi_rs1_addr[4:0]
 rvfi_testbench.checker_inst.spec_rs1_addr[4:0]
+@25
+rvfi_testbench.checker_inst.rvfi_rs2_addr[4:0]
+@24
 rvfi_testbench.checker_inst.spec_rs2_addr[4:0]
-@1401200
+@1000200
 -RS
 @800200
 -RD
@@ -97,44 +101,17 @@ rvfi_testbench.checker_inst.spec_rd_wdata[63:0]
 -RD
 -RVFI
 @800200
--S1
-@28
-rvfi_testbench.wrapper.i_dut.s1_flush
+-Decode CF
 @22
-rvfi_testbench.wrapper.i_dut.i_core_pipe_fetch.n_s1_pc[63:0]
+rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_cfu_op[3:0]
 @28
-rvfi_testbench.wrapper.i_dut.i_core_pipe_fetch.s1_eat_2
-rvfi_testbench.wrapper.i_dut.i_core_pipe_fetch.s1_eat_4
-rvfi_testbench.wrapper.i_dut.i_core_pipe_fetch.s1_i16bit
-rvfi_testbench.wrapper.i_dut.i_core_pipe_fetch.s1_i32bit
+rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_cfu_op_conditional
 @22
-rvfi_testbench.wrapper.i_dut.i_core_pipe_fetch.s1_instr[31:0]
-rvfi_testbench.wrapper.i_dut.i_core_pipe_fetch.s1_npc[63:0]
-rvfi_testbench.wrapper.i_dut.i_core_pipe_fetch.s1_pc[63:0]
-@800200
--CF
-@28
-rvfi_testbench.wrapper.i_dut.i_core_pipe_fetch.cf_ack
-@22
-rvfi_testbench.wrapper.i_dut.i_core_pipe_fetch.cf_cause[4:0]
-rvfi_testbench.wrapper.i_dut.i_core_pipe_fetch.cf_target[63:0]
-@28
-rvfi_testbench.wrapper.i_dut.i_core_pipe_fetch.cf_valid
+rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s2_cfu_op[3:0]
+rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s1_npc[63:0]
 @1000200
--CF
--S1
-@800200
--S2
-@22
-rvfi_testbench.wrapper.i_dut.s2_instr[31:0]
-rvfi_testbench.wrapper.i_dut.s2_npc[63:0]
-rvfi_testbench.wrapper.i_dut.s2_pc[63:0]
-@28
-rvfi_testbench.wrapper.i_dut.s2_ready
-rvfi_testbench.wrapper.i_dut.s2_valid
-@1000200
--S2
-@800200
+-Decode CF
+@c00200
 -DUT - Execute
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.g_clk
@@ -294,7 +271,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.rvfi_csr_minstret_wdata[63:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.rvfi_csr_minstret_wmask[63:0]
 @1401200
 -RVFI CSR
-@c00200
+@800200
 -RVFI
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.rvfi_valid
@@ -316,21 +293,24 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.rvfi_mode[1:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.rvfi_order[63:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.rvfi_pc_rdata[63:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.rvfi_pc_wdata[63:0]
+@24
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.rvfi_rd_addr[4:0]
+@22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.rvfi_rd_wdata[63:0]
+@24
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.rvfi_rs1_addr[4:0]
+@22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.rvfi_rs1_rdata[63:0]
+@24
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.rvfi_rs2_addr[4:0]
+@22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.rvfi_rs2_rdata[63:0]
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.rvfi_trap
-@1401200
+@1000200
 -RVFI
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_alu_op[3:0]
-@28
-rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_cf_ack
-@22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_cf_cause[4:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_cf_target[63:0]
 @28
@@ -360,15 +340,16 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_rs2_a[4:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_rs2_d[63:0]
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_valid
-@1000200
+@1401200
 -DUT - Execute
-@c00200
+@800200
 -RVFI
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.first_seen
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.g_clk
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.g_resetn
 @22
+rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.n_insn[31:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.n_mem_addr[63:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.n_mem_rdata[63:0]
 @28
@@ -382,33 +363,26 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.n_mem_wdata[63:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.n_mem_wmask[7:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.n_pc_rdata[63:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.n_pc_wdata[63:0]
+@24
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.n_rd_addr[4:0]
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.n_rd_valid
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.n_rd_wdata[63:0]
+@24
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.n_rs1_addr[4:0]
+@22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.n_rs1_rdata[63:0]
+@24
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.n_rs2_addr[4:0]
+@22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.n_rs2_rdata[63:0]
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.n_valid
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.rvalid
 @22
-rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.rvfi_csr_mcycle_rdata[63:0]
-rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.rvfi_csr_mcycle_rmask[63:0]
-rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.rvfi_csr_mcycle_wdata[63:0]
-rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.rvfi_csr_mcycle_wmask[63:0]
-rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.rvfi_csr_minstret_rdata[63:0]
-rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.rvfi_csr_minstret_rmask[63:0]
-rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.rvfi_csr_minstret_wdata[63:0]
-rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.rvfi_csr_minstret_wmask[63:0]
-@28
-rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.rvfi_halt
-@22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.rvfi_insn[31:0]
 @28
-rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.rvfi_intr
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.rvfi_ixl[1:0]
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.rvfi_mem_addr[63:0]
@@ -431,7 +405,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.rvfi_rs2_rdata[63:0]
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.rvfi_trap
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.core_rvfi_i.rvfi_valid
-@1401200
+@1000200
 -RVFI
 [pattern_trace] 1
 [pattern_trace] 0

@@ -58,23 +58,17 @@ wire                 cf_ack      ; // Control flow change acknwoledged
 wire [         XL:0] cf_target   ; // Control flow change destination
 wire [ CF_CAUSE_R:0] cf_cause    ; // Control flow change cause
 
-wire                 s1_cf_valid ; // DE Control flow change?
-wire                 s1_cf_ack   ; // DE Control flow change acknwoledged
-wire [         XL:0] s1_cf_target; // DE Control flow change destination
-wire [ CF_CAUSE_R:0] s1_cf_cause ; // DE Control flow change cause
-
 wire                 s2_cf_valid ; // EX Control flow change?
 wire                 s2_cf_ack   ; // EX Control flow change acknwoledged
 wire [         XL:0] s2_cf_target; // EX Control flow change destination
 wire [ CF_CAUSE_R:0] s2_cf_cause ; // EX Control flow change cause
 
-assign cf_valid     = s1_cf_valid || s2_cf_valid;
+assign cf_valid     = s2_cf_valid;
 
-assign s1_cf_ack    = cf_ack;
 assign s2_cf_ack    = cf_ack;
 
-assign cf_cause     = s2_cf_valid ? s2_cf_cause     : s1_cf_cause   ;
-assign cf_target    = s2_cf_valid ? s2_cf_target    : s1_cf_target  ;
+assign cf_cause     = s2_cf_cause ;
+assign cf_target    = s2_cf_target;
 
 wire   s1_flush     = cf_valid && cf_ack;
 
@@ -214,10 +208,6 @@ core_pipe_decode i_core_pipe_decode(
 .s1_eat_2     (s1_eat_2     ), // Decode eats 2 bytes
 .s1_eat_4     (s1_eat_4     ), // Decode eats 4 bytes
 .s1_flush     (s1_flush     ), // Flush stage
-.s1_cf_valid  (s1_cf_valid  ), // Control flow change?
-.s1_cf_ack    (s1_cf_ack    ), // Control flow change acknwoledged
-.s1_cf_target (s1_cf_target ), // Control flow change destination
-.s1_cf_cause  (s1_cf_cause  ), // Control flow change cause
 .s1_rs1_addr  (s1_rs1_addr  ), // RS1 Address
 .s1_rs1_data  (s1_rs1_data  ), // RS1 Read Data (Forwarded)
 .s1_rs2_addr  (s1_rs2_addr  ), // RS2 Address

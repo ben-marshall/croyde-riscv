@@ -101,9 +101,13 @@ always @(posedge g_clk) begin
 end
 
 always @(posedge g_clk) begin
-    if(n_rd_valid) begin
-        rvfi_rd_addr     <= n_rd_addr     ;
-        rvfi_rd_wdata    <= n_rd_wdata    ;
+    if(n_rd_valid || n_valid) begin
+        rvfi_rd_addr     <= n_rd_addr       ;
+        if(|n_rd_addr) begin
+            rvfi_rd_wdata    <= n_rd_wdata  ;
+        end else begin
+            rvfi_rd_wdata    <= 0           ;
+        end
     end
 end
 

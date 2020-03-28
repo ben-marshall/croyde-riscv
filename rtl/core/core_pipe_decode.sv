@@ -20,11 +20,6 @@ output wire                 s1_eat_4    , // Decode eats 4 bytes
 
 input  wire                 s1_flush    , // Stage 1 flush
 
-output wire                 s1_cf_valid , // Control flow change?
-input  wire                 s1_cf_ack   , // Control flow change acknwoledged
-output wire [         XL:0] s1_cf_target, // Control flow change destination
-output wire [ CF_CAUSE_R:0] s1_cf_cause , // Control flow change cause
-
 output wire [ REG_ADDR_R:0] s1_rs1_addr , // RS1 Address
 input  wire [         XL:0] s1_rs1_data , // RS1 Read Data (Forwarded)
 output wire [ REG_ADDR_R:0] s1_rs2_addr , // RS2 Address
@@ -67,8 +62,8 @@ output reg  [         31:0] s2_instr      // Encoded instruction for trace.
 
 //
 // TODO: Stalls to delay eating of 16/32 bit instructions.
-assign s1_eat_2     = s1_i16bit && !s1_cf_wait && s2_ready;
-assign s1_eat_4     = s1_i32bit && !s1_cf_wait && s2_ready;
+assign s1_eat_2     = s1_i16bit && s2_ready;
+assign s1_eat_4     = s1_i32bit && s2_ready;
 
 //
 // Next pipeline stage value selection
@@ -421,24 +416,11 @@ wire [XL:0] decode_cf_offset =
     {64{dec_jalr || dec_jal  }} & {{32{imm32_j[31]}}, imm32_j} |
     {64{dec_c_j  || dec_c_jal}} & {{32{imm_c_j[31]}}, imm_c_j} ;
 
-assign s1_cf_target = s1_pc + decode_cf_offset;
-
-// Control flow changes from decode caused by direct jumps.
-assign s1_cf_valid  = (dec_jalr || dec_jal || dec_c_jal || dec_c_j);
-
-// TODO: Tracking of "done"ness for very delayed control flow changes.
-wire   s1_cf_taken  = s1_cf_valid && s1_cf_ack;
-
-wire   s1_cf_wait   = s1_cf_valid && !s1_cf_ack;
-
-assign s1_cf_cause  = 0;
-
 //
 // Decode -> Execute stage registers
 // ------------------------------------------------------------
 
-assign      s2_valid    = ( s1_i16bit   || s1_i32bit  ) && 
-                          (!s1_cf_valid || s1_cf_taken) ;
+assign      s2_valid    = ( s1_i16bit   || s1_i32bit  );
 
 assign      s2_npc      = n_s2_pc;
 
@@ -447,7 +429,7 @@ wire [31:0] n_s2_instr  = {
     s1_i16bit ? 16'b0 : s1_instr[31:16], s1_instr[15:0]
 };
 
-wire        flush_pipe  = s1_flush && !s1_cf_valid;
+wire        flush_pipe  = s1_flush;
 
 always @(posedge g_clk) begin
     if(!g_resetn || flush_pipe) begin
