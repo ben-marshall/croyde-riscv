@@ -69,13 +69,13 @@
 - [ ] insn divw
 - [ ] insn jal
 - [ ] insn jalr
-- [ ] insn lb
-- [ ] insn lbu
-- [ ] insn ld
-- [ ] insn lh
-- [ ] insn lhu
+- [x] insn lb
+- [x] insn lbu
+- [x] insn ld
+- [x] insn lh
+- [x] insn lhu
 - [x] insn lw
-- [ ] insn lwu
+- [x] insn lwu
 - [ ] insn mul
 - [ ] insn mulh
 - [ ] insn mulhsu
@@ -85,9 +85,9 @@
 - [ ] insn remu
 - [ ] insn remuw
 - [ ] insn remw
-- [ ] insn sb
-- [ ] insn sd
-- [ ] insn sh
+- [x] insn sb
+- [x] insn sd
+- [x] insn sh
 - [x] insn slliw
 - [x] insn sllw
 - [x] insn slt

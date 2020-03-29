@@ -69,7 +69,7 @@ wire [ 5:0] data_shift     = {addr[2:0], 3'b000};
 
 wire [XL:0] rdata_shifted  = dmem_rdata >> data_shift;
 
-wire [XL:0] mask_ls_byte   = {56'h0,  8'hF};
+wire [XL:0] mask_ls_byte   = {56'h0,  8'hFF};
 wire [XL:0] mask_ls_half   = {48'h0, 16'hFFFF};
 wire [XL:0] mask_ls_word   = {32'h0, 32'hFFFFFFFF};
 
