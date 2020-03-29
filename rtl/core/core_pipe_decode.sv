@@ -100,7 +100,7 @@ wire [         31:0] imm_c_bz       ;
 wire sel_opr_a_rs1 = 
     dec_beq       || dec_bne       || dec_c_beqz    || dec_c_bnez    ||
     dec_blt       || dec_bge       || dec_bltu      || dec_bgeu      ||
-    dec_jalr      || dec_auipc     || dec_addi      || dec_c_addi4spn||
+    dec_jalr      ||                  dec_addi      || dec_c_addi4spn||
     dec_c_addi    || dec_slli      || dec_c_mv      || dec_c_add     ||
     dec_c_slli    || dec_slti      || dec_sltiu     || dec_xori      ||
     dec_srli      || dec_srai      || dec_ori       || dec_andi      ||
@@ -267,7 +267,6 @@ wire   n_s2_op_w    =
 assign opr_c_imm = 
     |n_csr_op            ? {52'b0, imm_csr_addr}        : 
     n_cfu_op_conditional ? {{32{imm32_b[31]}},imm32_b}  :
-    dec_auipc            ? {{32{imm32_u[31]}},imm32_u}  :
     dec_lui              ? {{32{imm32_u[31]}},imm32_u}  :
                            0                            ;
 
@@ -283,7 +282,7 @@ wire    major_op_imm         = s1_instr[6:0] == 7'b0010011;
 wire    use_imm_sext_imm32_u = dec_lui      || dec_auipc        ;
 
 wire    use_imm_sext_imm32_i = dec_jalr     || major_op_load    ||
-                               major_op_imm ;
+                               major_op_imm || dec_addiw        ;
 
 wire    use_imm_shamt        = dec_slli     || dec_srli         ||
                                dec_slliw    || dec_srliw        ||

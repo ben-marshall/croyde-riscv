@@ -24,8 +24,8 @@
 
 - [ ] csrw mcycle
 - [ ] csrw minstret
-- [ ] insn addiw
-- [ ] insn auipc
+- [x] insn addiw
+- [x] insn auipc
 - [ ] insn beq
 - [ ] insn bge
 - [ ] insn bgeu
