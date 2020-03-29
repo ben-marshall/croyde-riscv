@@ -19,10 +19,13 @@ output wire [31:0] imm32_j      ,
 output wire [31:0] imm_addi16sp ,
 output wire [31:0] imm_addi4spn ,
 output wire [31:0] imm_c_lsw    ,
+output wire [31:0] imm_c_lsd    ,
 output wire [31:0] imm_c_addi   ,
 output wire [31:0] imm_c_lui    ,
 output wire [31:0] imm_c_lwsp   ,
 output wire [31:0] imm_c_swsp   ,
+output wire [31:0] imm_c_ldsp   ,
+output wire [31:0] imm_c_sdsp   ,
 output wire [31:0] imm_c_j      ,
 output wire [31:0] imm_c_bz      
 
@@ -53,6 +56,9 @@ assign imm_addi4spn = {
 assign imm_c_lsw = {
     25'b0,instr[5],instr[12:10], instr[6], 2'b00};
 
+assign imm_c_lsd = {
+    24'b0,instr[6:5],instr[12:10], 3'b000};
+
 assign imm_c_addi = {
     {27{instr[12]}}, instr[6:2]};
 
@@ -64,6 +70,12 @@ assign imm_c_lwsp = {
 
 assign imm_c_swsp = {
     24'b0,instr[8:7], instr[12:9], 2'b0};
+
+assign imm_c_ldsp = {
+    23'b0,instr[4:2], instr[12], instr[6:5], 3'b00};
+
+assign imm_c_sdsp = {
+    23'b0,instr[9:7], instr[12:10], 3'b0};
 
 assign imm_c_j = {
     {21{instr[12]}}, // 11 - sign extended

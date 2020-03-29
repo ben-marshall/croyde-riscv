@@ -86,11 +86,14 @@ wire [         31:0] imm32_u        ;
 wire [         31:0] imm32_j        ;
 wire [         31:0] imm_addi16sp   ;
 wire [         31:0] imm_addi4spn   ;
-wire [         31:0] imm_c_lsw      ;
 wire [         31:0] imm_c_addi     ;
 wire [         31:0] imm_c_lui      ;
+wire [         31:0] imm_c_lsw      ;
 wire [         31:0] imm_c_lwsp     ;
 wire [         31:0] imm_c_swsp     ;
+wire [         31:0] imm_c_lsd      ;
+wire [         31:0] imm_c_ldsp     ;
+wire [         31:0] imm_c_sdsp     ;
 wire [         31:0] imm_c_j        ;
 wire [         31:0] imm_c_bz       ;
 
@@ -119,7 +122,8 @@ wire sel_opr_a_rs1 =
     dec_divu      || dec_rem       || dec_remu      || dec_mulw      ||
     dec_divw      || dec_divuw     || dec_remw      || dec_remuw     ||
     dec_csrrw     || dec_csrrs     || dec_csrrc     || dec_csrrwi    ||
-    dec_csrrsi    || dec_csrrci    || dec_c_addi16sp;
+    dec_csrrsi    || dec_csrrci    || dec_c_addi16sp|| dec_c_sd      ||
+    dec_c_sdsp    || dec_c_ldsp    || dec_c_ld      ;
 
 wire sel_opr_a_pc   =
     dec_jal       ||                  dec_c_j       || dec_auipc     ;
@@ -153,7 +157,8 @@ wire sel_opr_b_imm  =
     dec_lbu       || dec_lhu       || dec_lwu       || dec_sb        ||
     dec_sh        || dec_sw        || dec_c_sw      || dec_sd        ||
     dec_c_lwsp    || dec_c_swsp    || dec_csrrwi    || dec_csrrsi    ||
-    dec_csrrci    || dec_c_addiw   || dec_c_addi16sp; 
+    dec_csrrci    || dec_c_addiw   || dec_c_addi16sp|| dec_c_sd      ||
+    dec_c_sdsp    || dec_c_ldsp    || dec_c_ld      ;
 
 //
 // Operand C
@@ -169,7 +174,7 @@ wire sel_opr_c_npc  =
 
 wire sel_opr_c_rs2  =
     dec_sb        || dec_sh        || dec_sw        || dec_c_sw      ||
-    dec_sd        || dec_c_lwsp    || dec_c_swsp    ;
+    dec_sd        || dec_c_swsp    || dec_c_sd      || dec_c_sdsp    ;
 
 
 assign n_s2_opr_a   =
@@ -198,14 +203,17 @@ wire [4:0] dec_rs1_16 =
     {5{dec_c_jr      }} & {s1_instr[11:7]      } |
     {5{dec_c_slli    }} & {s1_instr[11:7]      } |
     {5{dec_c_swsp    }} & {REG_SP            } |
+    {5{dec_c_sdsp    }} & {REG_SP            } |
     {5{dec_c_addi16sp}} & {REG_SP            } |
     {5{dec_c_addi4spn}} & {REG_SP            } |
     {5{dec_c_lwsp    }} & {REG_SP            } |
+    {5{dec_c_ldsp    }} & {REG_SP            } |
     {5{dec_c_and     }} & {2'b01, s1_instr[9:7]} |
     {5{dec_c_andi    }} & {2'b01, s1_instr[9:7]} |
     {5{dec_c_beqz    }} & {2'b01, s1_instr[9:7]} |
     {5{dec_c_bnez    }} & {2'b01, s1_instr[9:7]} |
     {5{dec_c_lw      }} & {2'b01, s1_instr[9:7]} |
+    {5{dec_c_ld      }} & {2'b01, s1_instr[9:7]} |
     {5{dec_c_or      }} & {2'b01, s1_instr[9:7]} |
     {5{dec_c_srai    }} & {2'b01, s1_instr[9:7]} |
     {5{dec_c_srli    }} & {2'b01, s1_instr[9:7]} |
@@ -213,6 +221,7 @@ wire [4:0] dec_rs1_16 =
     {5{dec_c_addw    }} & {2'b01, s1_instr[9:7]} |
     {5{dec_c_subw    }} & {2'b01, s1_instr[9:7]} |
     {5{dec_c_sw      }} & {2'b01, s1_instr[9:7]} |
+    {5{dec_c_sd      }} & {2'b01, s1_instr[9:7]} |
     {5{dec_c_xor     }} & {2'b01, s1_instr[9:7]} ;
     
 // Source register 2, given a 16-bit instruction
@@ -222,12 +231,14 @@ wire [4:0] dec_rs2_16 =
     {5{dec_c_add     }} & {       s1_instr[6:2]} |
     {5{dec_c_mv      }} & {       s1_instr[6:2]} |
     {5{dec_c_swsp    }} & {       s1_instr[6:2]} |
+    {5{dec_c_sdsp    }} & {       s1_instr[6:2]} |
     {5{dec_c_and     }} & {2'b01, s1_instr[4:2]} |
     {5{dec_c_or      }} & {2'b01, s1_instr[4:2]} |
     {5{dec_c_sub     }} & {2'b01, s1_instr[4:2]} |
     {5{dec_c_addw    }} & {2'b01, s1_instr[4:2]} |
     {5{dec_c_subw    }} & {2'b01, s1_instr[4:2]} |
     {5{dec_c_sw      }} & {2'b01, s1_instr[4:2]} |
+    {5{dec_c_sd      }} & {2'b01, s1_instr[4:2]} |
     {5{dec_c_xor     }} & {2'b01, s1_instr[4:2]} ;
 
 // Destination register, given a 16-bit instruction
@@ -243,9 +254,11 @@ wire [4:0] dec_rd_16 =
     {5{dec_c_li      }} & {s1_instr[11:7]} |
     {5{dec_c_lui     }} & {s1_instr[11:7]} |
     {5{dec_c_lwsp    }} & {s1_instr[11:7]} |
+    {5{dec_c_ldsp    }} & {s1_instr[11:7]} |
     {5{dec_c_mv      }} & {s1_instr[11:7]} |
     {5{dec_c_slli    }} & {s1_instr[11:7]} |
     {5{dec_c_lw      }} & {2'b01, s1_instr[4:2]} |
+    {5{dec_c_ld      }} & {2'b01, s1_instr[4:2]} |
     {5{dec_c_or      }} & {2'b01, s1_instr[9:7]} |
     {5{dec_c_srai    }} & {2'b01, s1_instr[9:7]} |
     {5{dec_c_srli    }} & {2'b01, s1_instr[9:7]} |
@@ -299,7 +312,11 @@ wire    use_imm_shamt        = dec_slli     || dec_srli         ||
                                dec_c_srai   ;
 
 wire    use_imm_c_addi      = dec_c_addi    || dec_c_addiw      ||
-                              dec_c_li      || dec_c_andi       ;
+                              dec_c_li      ;
+
+wire    use_imm_c_lsw       = dec_c_lw      || dec_c_sw         ;
+
+wire    use_imm_c_lsd       = dec_c_ld      || dec_c_sd         ;
 
 wire    [ 5:0] imm_c_shamt  = {s1_instr[12],s1_instr[6:2]};
 wire    [XL:0] imm_shamt    = {58'b0, s1_i16bit ? imm_c_shamt : dec_shamtw};
@@ -313,6 +330,12 @@ assign opr_b_imm =
     dec_c_addi4spn          ? {{32{imm_addi4spn[31]}}, imm_addi4spn} :
     dec_c_addi16sp          ? {{32{imm_addi16sp[31]}}, imm_addi16sp} :
     use_imm_c_addi          ? {{32{imm_c_addi[31]}}, imm_c_addi} :
+    dec_c_lwsp              ? {32'b0, imm_c_lwsp} :
+    dec_c_swsp              ? {32'b0, imm_c_swsp} :
+    use_imm_c_lsw           ? {32'b0, imm_c_lsw } :
+    dec_c_ldsp              ? {32'b0, imm_c_ldsp} :
+    dec_c_sdsp              ? {32'b0, imm_c_sdsp} :
+    use_imm_c_lsd           ? {32'b0, imm_c_lsd } :
     dec_jal                 ? sext_imm32_j  :
                               0             ;
 
@@ -395,6 +418,7 @@ wire [ALU_OP_R:0] n_alu_op =
     {ALU_OP_W{dec_lw        }} & ALU_OP_ADD     |
     {ALU_OP_W{dec_c_lw      }} & ALU_OP_ADD     |
     {ALU_OP_W{dec_ld        }} & ALU_OP_ADD     |
+    {ALU_OP_W{dec_c_ld      }} & ALU_OP_ADD     |
     {ALU_OP_W{dec_lbu       }} & ALU_OP_ADD     |
     {ALU_OP_W{dec_lhu       }} & ALU_OP_ADD     |
     {ALU_OP_W{dec_lwu       }} & ALU_OP_ADD     |
@@ -403,8 +427,11 @@ wire [ALU_OP_R:0] n_alu_op =
     {ALU_OP_W{dec_sw        }} & ALU_OP_ADD     |
     {ALU_OP_W{dec_c_sw      }} & ALU_OP_ADD     |
     {ALU_OP_W{dec_sd        }} & ALU_OP_ADD     |
+    {ALU_OP_W{dec_c_sd      }} & ALU_OP_ADD     |
     {ALU_OP_W{dec_c_lwsp    }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_c_swsp    }} & ALU_OP_ADD     ;
+    {ALU_OP_W{dec_c_swsp    }} & ALU_OP_ADD     |
+    {ALU_OP_W{dec_c_ldsp    }} & ALU_OP_ADD     |
+    {ALU_OP_W{dec_c_sdsp    }} & ALU_OP_ADD     ;
 
 //
 // MUL / DIV Opcode select
@@ -428,6 +455,14 @@ wire [MDU_OP_R:0] n_mdu_op =
 // Load/Store opcode select
 
 wire [LSU_OP_R:0] n_lsu_op =
+    {LSU_OP_W{dec_c_lw      }} & LSU_OP_LW      |
+    {LSU_OP_W{dec_c_lwsp    }} & LSU_OP_LW      |
+    {LSU_OP_W{dec_c_sw      }} & LSU_OP_SW      |
+    {LSU_OP_W{dec_c_swsp    }} & LSU_OP_SW      |
+    {LSU_OP_W{dec_c_ld      }} & LSU_OP_LD      |
+    {LSU_OP_W{dec_c_ldsp    }} & LSU_OP_LD      |
+    {LSU_OP_W{dec_c_sd      }} & LSU_OP_SD      |
+    {LSU_OP_W{dec_c_sdsp    }} & LSU_OP_SD      |
     {LSU_OP_W{dec_lb        }} & LSU_OP_LB      |
     {LSU_OP_W{dec_lbu       }} & LSU_OP_LBU     |
     {LSU_OP_W{dec_lh        }} & LSU_OP_LH      |
@@ -561,6 +596,9 @@ core_pipe_decode_immediates i_core_pipe_decode_immediates (
 .imm_c_lui    (imm_c_lui    ),
 .imm_c_lwsp   (imm_c_lwsp   ),
 .imm_c_swsp   (imm_c_swsp   ),
+.imm_c_lsd    (imm_c_lsd    ),
+.imm_c_ldsp   (imm_c_ldsp   ),
+.imm_c_sdsp   (imm_c_sdsp   ),
 .imm_c_j      (imm_c_j      ),
 .imm_c_bz     (imm_c_bz     ) 
 );

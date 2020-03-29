@@ -45,23 +45,23 @@
 - [ ] insn c.jalr
 - [ ] insn c.j
 - [ ] insn c.jr
-- [ ] insn c.ld
-- [ ] insn c.ldsp
+- [x] insn c.ld
+- [x] insn c.ldsp
 - [x] insn c.li
 - [x] insn c.lui
-- [ ] insn c.lw
-- [ ] insn c.lwsp
+- [x] insn c.lw
+- [x] insn c.lwsp
 - [x] insn c.mv
 - [x] insn c.or
-- [ ] insn c.sd
-- [ ] insn c.sdsp
+- [x] insn c.sd
+- [x] insn c.sdsp
 - [x] insn c.slli
 - [x] insn c.srai
 - [x] insn c.srli
 - [x] insn c.sub
 - [x] insn c.subw
-- [ ] insn c.sw
-- [ ] insn c.swsp
+- [x] insn c.sw
+- [x] insn c.swsp
 - [x] insn c.xor
 - [ ] insn div
 - [ ] insn divu
