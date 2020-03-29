@@ -18,7 +18,6 @@ bltu      | rs1     | rs2     | imm     | SUB    | BLTU   |
 bgeu      | rs1     | rs2     | imm     | SUB    | BGEU   |
 jalr      | rs1     | imm     | npc     | NOP    | JAL    |
 jal       | PC      | imm     | npc     | NOP    | JAL    |
-c.jal     | PC      | imm     | npc     | NOP    | JAL    |
 c.j       | PC      | imm     |         | NOP    | J      |
 ecall     |         |         |         | NOP    | ECALL  |
 ebreak    |         |         |         | NOP    | EBREAK |
@@ -34,7 +33,7 @@ addi      | rs1     | imm     |         | ADD    |
 c.addi4spn| rs1     | imm     |         | ADD    |
 c.addi    | rs1     | imm     |         | ADD    |
 slli      | rs1     | imm     |         | SLL    |
-c.mv      | rs1     | 0       |         | OR     |
+c.mv      | 0       | rs1     |         | OR     |
 c.add     | rs1     | rs2     |         | ADD    |
 c.slli    | rs1     | imm     |         | SLL    |
 slti      | rs1     | imm     |         | SLT    |

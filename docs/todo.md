@@ -32,13 +32,13 @@
 - [ ] insn blt
 - [ ] insn bltu
 - [ ] insn bne
-- [ ] insn c.add
-- [ ] insn c.addi16sp
-- [ ] insn c.addi4spn
-- [ ] insn c.addi
-- [ ] insn c.addiw
-- [ ] insn c.addw
-- [ ] insn c.and
+- [x] insn c.add
+- [x] insn c.addi16sp
+- [x] insn c.addi4spn
+- [x] insn c.addi
+- [x] insn c.addiw
+- [x] insn c.addw
+- [x] insn c.and
 - [ ] insn c.andi
 - [ ] insn c.beqz
 - [ ] insn c.bnez
@@ -51,18 +51,18 @@
 - [ ] insn c.lui
 - [ ] insn c.lw
 - [ ] insn c.lwsp
-- [ ] insn c.mv
-- [ ] insn c.or
+- [x] insn c.mv
+- [x] insn c.or
 - [ ] insn c.sd
 - [ ] insn c.sdsp
 - [x] insn c.slli
 - [x] insn c.srai
 - [x] insn c.srli
-- [ ] insn c.sub
-- [ ] insn c.subw
+- [x] insn c.sub
+- [x] insn c.subw
 - [ ] insn c.sw
 - [ ] insn c.swsp
-- [ ] insn c.xor
+- [x] insn c.xor
 - [ ] insn div
 - [ ] insn divu
 - [ ] insn divuw
