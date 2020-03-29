@@ -316,7 +316,7 @@ wire    use_imm_shamt        = dec_slli     || dec_srli         ||
                                dec_c_srai   ;
 
 wire    use_imm_c_addi      = dec_c_addi    || dec_c_addiw      ||
-                              dec_c_li      ;
+                              dec_c_li      || dec_c_andi       ;
 
 wire    use_imm_c_lsw       = dec_c_lw      || dec_c_sw         ;
 
