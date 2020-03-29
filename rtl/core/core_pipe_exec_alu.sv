@@ -56,15 +56,17 @@ wire [XL:0] addsub_result   = {addsub_upper, addsub_output[31:0]}   ;
 // SLT / SLTU
 // ------------------------------------------------------------
 
-wire        slt_signed      = opr_a[XL] ^ add_out[XL];
-
-wire        slt_signed_w    = opr_a[31] ^ add_out[31];
+// TODO
+wire        slt_signed      = $signed(opr_a) < $signed(opr_b);
 
 // TODO
-wire        slt_unsigned    = 1'b0;
+wire        slt_signed_w    = $signed(opr_a[31:0]) < $signed(opr_b[31:0]);
 
 // TODO
-wire        slt_unsigned_w  = 1'b0;
+wire        slt_unsigned    = $unsigned(opr_a) < $unsigned(opr_b);
+                                                                           
+// TODO                                                                    
+wire        slt_unsigned_w  = $unsigned(opr_a[31:0]) < $unsigned(opr_b[31:0]);
 
 wire        slt_lsb         = 
     (op_slt  && (word ? slt_signed_w   : slt_signed  )) ||
