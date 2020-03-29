@@ -49,6 +49,15 @@ input  wire                 csr_error   , // CSR access error.
 input  wire [         XL:0] csr_mepc    , // Current MEPC  value
 input  wire [         XL:0] csr_mtvec   , // Current MTVEC value
 
+output wire                 exec_mret   , // MRET instruction executed
+output wire                 instr_ret   , // Instruction retired.
+
+output wire                 trap_cpu    , // A trap occured due to CPU
+output wire                 trap_int    , // A trap occured due to interrupt
+output wire [          5:0] trap_cause  , // A trap occured due to interrupt
+output wire [         XL:0] trap_mtval  , // Value associated with the trap.
+output wire [         XL:0] trap_pc     , // PC value associated with the trap.
+
 output wire                 s2_cf_valid , // EX Control flow change?
 input  wire                 s2_cf_ack   , // EX Control flow acknwoledged
 output wire [         XL:0] s2_cf_target, // EX Control flow destination
@@ -256,7 +265,31 @@ assign  s2_cf_target        =
     cfu_op_always_done  ?   cfu_jump_target :
                             csr_mtvec       ;
 
-assign  s2_cf_cause         = 0     ;   // TODO
+assign  s2_cf_cause     = 0     ;   // TODO
+
+assign  exec_mret       = cfu_op_mret && e_new_instr;
+
+assign  instr_ret       = e_new_instr && !cf_excep  ;
+
+assign  trap_cpu        = cf_excep                  ;
+
+assign  trap_int        = 1'b0                      ; // TODO
+
+assign  trap_mtval      = 64'b0                     ; // TODO
+
+assign  trap_pc         = s2_pc                     ;
+
+wire    s2_trap         = 1'b0; // TODO Trap raising from decode.
+wire    [5:0] s2_trap_cause = 0;
+
+assign  trap_cause      =
+    s2_trap                     ?   s2_trap_cause   :
+    lsu_trap_addr && lsu_load   ?   TRAP_LDALIGN    :
+    lsu_trap_bus  && lsu_load   ?   TRAP_LDACCESS   :
+    lsu_trap_addr && lsu_store  ?   TRAP_STALIGN    :
+    lsu_trap_bus  && lsu_store  ?   TRAP_STACCESS   :
+    excep_ecall                 ?   TRAP_ECALLM     :
+                                    0               ;    
 
 //
 // CSR Interfacing

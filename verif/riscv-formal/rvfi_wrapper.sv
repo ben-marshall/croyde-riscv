@@ -15,6 +15,10 @@ module rvfi_wrapper (
 // Common core parameters and constants.
 `include "core_common.svh"
 
+// Base address of the memory mapped IO region.
+parameter   MMIO_BASE_ADDR  = 64'h0000_0000_0000_1000;
+parameter   MMIO_BASE_MASK  = 64'h0000_0000_0000_1FFF;
+
 (*keep*)      wire                 g_resetn     = !reset;
 (*keep*)      
 (*keep*)      wire                 imem_req     ; // Mem request
@@ -44,7 +48,10 @@ module rvfi_wrapper (
 // Fairness and assumptions
 // ------------------------------------------------------------
 
-rvfi_fairness i_rvfi_fairness (
+rvfi_fairness #(
+.MMIO_BASE_ADDR(MMIO_BASE_ADDR),
+.MMIO_BASE_MASK(MMIO_BASE_MASK)
+) i_rvfi_fairness (
 .g_clk        (clock        ), // Global clock
 .g_resetn     (g_resetn     ), // Global active low sync reset.
 .imem_req     (imem_req     ), // Memory request
@@ -75,7 +82,10 @@ rvfi_fairness i_rvfi_fairness (
 // ------------------------------------------------------------
 
 
-core_top i_dut (
+core_top #(
+.MMIO_BASE_ADDR(MMIO_BASE_ADDR),
+.MMIO_BASE_MASK(MMIO_BASE_MASK)
+) i_dut (
 .g_clk        (clock        ), // Global clock
 .g_resetn     (g_resetn     ), // Global active low sync reset.
 .imem_req     (imem_req     ), // Memory request
