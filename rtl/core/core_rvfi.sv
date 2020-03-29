@@ -61,7 +61,15 @@ reg rvfi_mem_wmask;
 reg rvfi_mem_rdata;
 reg rvfi_mem_wdata;
 
-reg rvfi_order  = 0;
+reg         rvfi_order      ;
+initial     rvfi_order      = 0;
+wire [XL:0] n_rvfi_order    = rvfi_order + 1;
+
+always @(posedge g_clk) begin
+    if(n_valid) begin
+        rvfi_order <= n_rvfi_order;
+    end
+end
 
 //
 // Ignore first valid bit after reset.

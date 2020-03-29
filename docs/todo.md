@@ -24,7 +24,6 @@
 
 csrw mcycle ch0/status:FAIL 0 23
 csrw minstret ch0/status:FAIL 0 22
-insn c andi ch0/status:FAIL 0 16
 insn div ch0/status:FAIL 0 15
 insn divu ch0/status:FAIL 0 15
 insn divuw ch0/status:FAIL 0 15
@@ -38,5 +37,3 @@ insn rem ch0/status:FAIL 0 16
 insn remu ch0/status:FAIL 0 16
 insn remuw ch0/status:FAIL 0 16
 insn remw ch0/status:FAIL 0 16
-liveness ch0/status:FAIL 0 23
-unique ch0/status:FAIL 0 24

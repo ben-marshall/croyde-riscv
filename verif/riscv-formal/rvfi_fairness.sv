@@ -58,4 +58,27 @@ always @(posedge g_clk) begin
 
 end
 
+`ifdef CORE_FAIRNESS
+
+reg [4:0] delay_imem;
+reg [4:0] delay_dmem;
+
+localparam MAX_DELAY_IMEM = 5;
+localparam MAX_DELAY_DMEM = 5;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        delay_imem <= 0;
+        delay_dmem <= 0;
+    end else begin
+        delay_imem <= delay_imem + (imem_req && !imem_gnt);
+        delay_dmem <= delay_dmem + (dmem_req && !dmem_gnt);
+    end
+
+    assume(delay_imem < MAX_DELAY_IMEM);
+    assume(delay_dmem < MAX_DELAY_DMEM);
+end
+
+`endif
+
 endmodule
