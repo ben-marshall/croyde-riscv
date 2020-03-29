@@ -18,20 +18,20 @@
 
 ## Verif
 
-- [ ] RTL signal tracking from fetch to execute and retirement.
+- [x] RTL signal tracking from fetch to execute and retirement.
 
-- [ ] riscv-formal wrapper.
+- [x] riscv-formal wrapper.
 
 - [ ] csrw mcycle
 - [ ] csrw minstret
 - [x] insn addiw
 - [x] insn auipc
-- [ ] insn beq
-- [ ] insn bge
-- [ ] insn bgeu
-- [ ] insn blt
-- [ ] insn bltu
-- [ ] insn bne
+- [x] insn beq
+- [x] insn bge
+- [x] insn bgeu
+- [x] insn blt
+- [x] insn bltu
+- [x] insn bne
 - [x] insn c.add
 - [x] insn c.addi16sp
 - [x] insn c.addi4spn
@@ -40,8 +40,8 @@
 - [x] insn c.addw
 - [x] insn c.and
 - [x] insn c.andi
-- [ ] insn c.beqz
-- [ ] insn c.bnez
+- [x] insn c.beqz
+- [x] insn c.bnez
 - [x] insn c.jalr
 - [x] insn c.j
 - [x] insn c.jr

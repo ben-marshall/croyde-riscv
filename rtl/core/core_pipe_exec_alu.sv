@@ -24,6 +24,7 @@ input  wire             op_sra  , // Shift right arithmetic
 output wire [   XL:0]   add_out , // Result of adding opr_a and opr_b
 output wire             cmp_eq  , // Result of opr_a == opr_b
 output wire             cmp_lt  , // Result of opr_a <  opr_b
+output wire             cmp_ltu , // Result of opr_a <  opr_b
 
 output wire [   XL:0]   result    // Operation result
 
@@ -68,13 +69,14 @@ wire        slt_unsigned    = $unsigned(opr_a) < $unsigned(opr_b);
 // TODO                                                                    
 wire        slt_unsigned_w  = $unsigned(opr_a[31:0]) < $unsigned(opr_b[31:0]);
 
-wire        slt_lsb         = 
-    (op_slt  && (word ? slt_signed_w   : slt_signed  )) ||
-    (op_sltu && (word ? slt_unsigned_w : slt_unsigned)) ;
+wire        slt_lsbu        = word ? slt_unsigned_w : slt_unsigned ;
 
+wire        slt_lsb         = word ? slt_signed_w   : slt_signed   ;
+
+assign      cmp_ltu         = slt_lsbu;
 assign      cmp_lt          = slt_lsb;
 
-wire [XL:0] slt_result      = {{XL{1'b0}}, slt_lsb};
+wire [XL:0] slt_result      = {{XL{1'b0}}, op_slt ? slt_lsb : slt_lsbu};
 
 //
 // Bitwise Operations

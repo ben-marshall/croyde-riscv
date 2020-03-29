@@ -102,6 +102,7 @@ wire            alu_op_sra  = s2_alu_op == ALU_OP_SRA    ;
 
 wire            alu_cmp_eq  ;
 wire            alu_cmp_lt  ;
+wire            alu_cmp_ltu ;
 
 wire [    XL:0] alu_add_out ;
 wire [    XL:0] alu_result  ;
@@ -170,10 +171,10 @@ wire    cfu_op_always_done  = cfu_op_j      || cfu_op_jal   || cfu_op_mret  ||
 wire    cfu_conditional     = cfu_op_beq    || cfu_op_bne   || cfu_op_blt   ||
                               cfu_op_bltu   || cfu_op_bge   || cfu_op_bgeu  ;
 
-wire    cfu_op_blt_taken    = cfu_op_blt    &&  alu_cmp_lt;
-wire    cfu_op_bltu_taken   = cfu_op_bltu   &&  alu_cmp_lt;
-wire    cfu_op_bge_taken    = cfu_op_bge    && !alu_cmp_lt;
-wire    cfu_op_bgeu_taken   = cfu_op_bgeu   && !alu_cmp_lt;
+wire    cfu_op_blt_taken    = cfu_op_blt    &&  alu_cmp_lt ;
+wire    cfu_op_bltu_taken   = cfu_op_bltu   &&  alu_cmp_ltu;
+wire    cfu_op_bge_taken    = cfu_op_bge    && !alu_cmp_lt ;
+wire    cfu_op_bgeu_taken   = cfu_op_bgeu   && !alu_cmp_ltu;
 
 wire [XL:0] cfu_bcmp_taret  = s2_pc + s2_opr_c;
 
@@ -345,6 +346,7 @@ core_pipe_exec_alu i_core_pipe_exec_alu (
 .add_out (alu_add_out ), // Result of adding opr_a and opr_b
 .cmp_eq  (alu_cmp_eq  ), // Does opr_a == opr_b
 .cmp_lt  (alu_cmp_lt  ), // Does opr_a <  opr_b
+.cmp_ltu (alu_cmp_ltu ), // Does opr_a <  opr_b
 .result  (alu_result  )  // Operation result
 );
 
