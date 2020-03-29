@@ -325,7 +325,7 @@ wire    use_imm_c_lsd       = dec_c_ld      || dec_c_sd         ;
 wire    use_imm_c_j         = dec_c_j                           ;
 
 wire    [ 5:0] imm_c_shamt  = {s1_instr[12],s1_instr[6:2]};
-wire    [XL:0] imm_shamt    = {58'b0, s1_i16bit ? imm_c_shamt : dec_shamtw};
+wire    [XL:0] imm_shamt    = {58'b0, s1_i16bit ? imm_c_shamt : {1'b0,dec_shamtw}};
 
 assign opr_b_imm = 
     use_imm_sext_imm32_u    ? sext_imm32_u  :
