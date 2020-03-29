@@ -40,8 +40,22 @@ input  wire [         XL:0] trs_pc         // Instruction trace PC
 // Common core parameters and constants.
 `include "core_common.svh"
 
+//
 // Assume that we start in reset.
 initial assume(g_resetn == 1'b0);
 
+//
+// Assume that we do not get memory bus errors
+always @(posedge g_clk) begin
+
+    if($past(imem_req) && $past(imem_gnt)) begin
+        assume(!imem_err);
+    end
+    
+    if($past(dmem_req) && $past(dmem_gnt)) begin
+        assume(!dmem_err);
+    end
+
+end
 
 endmodule

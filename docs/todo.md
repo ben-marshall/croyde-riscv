@@ -74,7 +74,7 @@
 - [ ] insn ld
 - [ ] insn lh
 - [ ] insn lhu
-- [ ] insn lw
+- [x] insn lw
 - [ ] insn lwu
 - [ ] insn mul
 - [ ] insn mulh

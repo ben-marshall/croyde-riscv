@@ -106,7 +106,7 @@ wire            alu_cmp_lt  ;
 wire [    XL:0] alu_add_out ;
 wire [    XL:0] alu_result  ;
 
-wire            alu_gpr_wen = !alu_op_nop && cfu_op_nop;
+wire            alu_gpr_wen = !alu_op_nop && cfu_op_nop && !lsu_valid;
 
 // ALU only ever takes one cycle.
 wire            op_done_alu = 1'b1;
@@ -135,7 +135,9 @@ wire        lsu_trap_bus        ; // Bus error
 wire        lsu_trap_addr       ; // Address alignment error
 wire [XL:0] lsu_rdata           ; // Read data
 
-wire        lsu_gpr_wen         = lsu_ready && lsu_load;
+wire        lsu_gpr_wen         =  lsu_ready    &&  lsu_load        && 
+                                  !lsu_trap_bus && !lsu_trap_addr   ;
+
 wire [XL:0] lsu_gpr_wdata       = lsu_rdata ;
 
 wire        op_done_lsu         =
@@ -215,7 +217,8 @@ wire excep_ebreak           = cfu_op_ebreak         ;
 
 
 wire cf_excep   = excep_csr_error || excep_cfu_bad_target   ||
-                  excep_ecall     || excep_ebreak           ;
+                  excep_ecall     || excep_ebreak           ||
+                  lsu_trap_bus    || lsu_trap_addr          ;
 
 //
 // Control flow bus
@@ -376,6 +379,10 @@ core_pipe_exec_lsu i_core_pipe_exec_lsu (
 // RVFI
 // ------------------------------------------------------------
 
+wire n_mem_req_valid = dmem_req && dmem_gnt ;
+
+wire n_mem_rsp_valid = lsu_ready            ;
+
 core_rvfi core_rvfi_i (
 .g_clk           (g_clk            ),
 .g_resetn        (g_resetn         ),
@@ -383,7 +390,7 @@ core_rvfi core_rvfi_i (
 .n_valid         (e_new_instr      ),
 .n_insn          (s2_instr         ),
 .n_intr          (1'b0             ),
-.n_trap          (cfu_goto_mepc    ),
+.n_trap          (cf_excep         ),
 .n_rs1_addr      (s2_rs1_a         ),
 .n_rs2_addr      (s2_rs2_a         ),
 .n_rs1_rdata     (s2_rs1_d         ),
@@ -393,11 +400,11 @@ core_rvfi core_rvfi_i (
 .n_rd_wdata      (s2_rd_wdata      ),
 .n_pc_rdata      (s2_pc            ),    
 .n_pc_wdata      (s2_npc           ),    
-.n_mem_req_valid (0                ),    
-.n_mem_rsp_valid (0                ),    
+.n_mem_req_valid (n_mem_req_valid  ),    
+.n_mem_rsp_valid (n_mem_rsp_valid  ),    
 .n_mem_addr      (dmem_addr        ),
-.n_mem_rmask     (dmem_strb        ),
-.n_mem_wmask     (dmem_strb        ),
+.n_mem_rmask     (dmem_wen ? 8'b0 : dmem_strb ),
+.n_mem_wmask     (dmem_wen ? dmem_strb : 8'b0 ),
 .n_mem_rdata     (dmem_rdata       ),
 .n_mem_wdata     (dmem_wdata       ) 
 );

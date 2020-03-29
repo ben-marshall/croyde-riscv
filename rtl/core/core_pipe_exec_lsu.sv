@@ -43,9 +43,11 @@ always @(posedge g_clk) begin
     if(!g_resetn) begin
         ready <= 1'b0;
     end else begin
-        ready <= (valid && dmem_gnt) && !ready;
+        ready <= (req_sent || addr_err) && !ready;
     end
 end
+
+wire req_sent = dmem_req && dmem_gnt;
 
 //
 // Transaction validity
@@ -67,9 +69,9 @@ wire [ 5:0] data_shift     = {addr[2:0], 3'b000};
 
 wire [XL:0] rdata_shifted  = dmem_rdata >> data_shift;
 
-wire [XL:0] mask_ls_byte   = {{56{d_byte}},  8'b0};
-wire [XL:0] mask_ls_half   = {{48{d_byte}}, 16'b0};
-wire [XL:0] mask_ls_word   = {{32{d_byte}}, 32'b0};
+wire [XL:0] mask_ls_byte   = {56'h0,  8'hF};
+wire [XL:0] mask_ls_half   = {48'h0, 16'hFFFF};
+wire [XL:0] mask_ls_word   = {32'h0, 32'hFFFFFFFF};
 
 wire [XL:0] sext_byte      = {{56{sext && rdata_shifted[ 7]}},  8'b0};
 wire [XL:0] sext_half      = {{48{sext && rdata_shifted[15]}}, 16'b0};
@@ -91,7 +93,7 @@ assign      rdata          =
 
 assign  trap_bus     = dmem_err && ready;
 
-assign  trap_addr    = addr_err;
+assign  trap_addr    = addr_err && ready;
 
 assign  dmem_wen     = store;
 

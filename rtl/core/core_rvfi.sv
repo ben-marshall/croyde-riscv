@@ -52,11 +52,11 @@ reg rvfi_pc_rdata ;
 reg rvfi_pc_wdata ;
 reg rvfi_rd_addr  ;
 reg rvfi_rd_wdata ;
-reg rvfi_mem_addr  = 0;
-reg rvfi_mem_rmask = 0;
-reg rvfi_mem_wmask = 0;
-reg rvfi_mem_rdata = 0;
-reg rvfi_mem_wdata = 0;
+reg rvfi_mem_addr ;
+reg rvfi_mem_rmask;
+reg rvfi_mem_wmask;
+reg rvfi_mem_rdata;
+reg rvfi_mem_wdata;
 
 reg rvfi_order  = 0;
 
@@ -110,6 +110,19 @@ always @(posedge g_clk) begin
         end else begin
             rvfi_rd_wdata    <= 0           ;
         end
+    end
+end
+
+always @(posedge g_clk) begin
+    if(n_mem_req_valid) begin
+        rvfi_mem_addr   <= n_mem_addr   ;
+        rvfi_mem_rmask  <= n_mem_rmask  ;
+        rvfi_mem_wmask  <= n_mem_wmask  ;
+        rvfi_mem_wdata  <= n_mem_wdata  ;
+    end
+
+    if(n_mem_rsp_valid) begin
+        rvfi_mem_rdata  <= n_mem_rdata  ;
     end
 end
 
