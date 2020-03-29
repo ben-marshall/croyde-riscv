@@ -301,7 +301,7 @@ end
 
 assign s2_rd_addr   = s2_rd;
 
-assign s2_rd_wen    = !rd_done && (
+assign s2_rd_wen    = !rd_done && s2_valid && (
     cfu_gpr_wen || csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen
 );
 
@@ -383,6 +383,8 @@ wire n_mem_req_valid = dmem_req && dmem_gnt ;
 
 wire n_mem_rsp_valid = lsu_ready            ;
 
+wire [4:0] n_rd_addr = s2_rd_wen ? s2_rd_addr : 5'b0;
+
 core_rvfi core_rvfi_i (
 .g_clk           (g_clk            ),
 .g_resetn        (g_resetn         ),
@@ -396,7 +398,7 @@ core_rvfi core_rvfi_i (
 .n_rs1_rdata     (s2_rs1_d         ),
 .n_rs2_rdata     (s2_rs2_d         ),
 .n_rd_valid      (s2_rd_wen        ),
-.n_rd_addr       (s2_rd_addr       ),
+.n_rd_addr       (n_rd_addr        ),
 .n_rd_wdata      (s2_rd_wdata      ),
 .n_pc_rdata      (s2_pc            ),    
 .n_pc_wdata      (s2_npc           ),    

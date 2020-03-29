@@ -102,7 +102,7 @@
 - [x] insn srli
 - [x] insn srliw
 - [x] insn srlw
-- [ ] insn sw
+- [x] insn sw
 - [ ] liveness
 - [ ] unique
 

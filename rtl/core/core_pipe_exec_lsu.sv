@@ -103,42 +103,46 @@ assign  dmem_addr    = {addr[XL:3], 3'b000};
 
 assign  dmem_wdata   = wdata    << data_shift           ;
 
-assign  dmem_strb[7] = d_double                         ||
+assign  dmem_strb    = valid     ? strb : 8'b0          ;
+
+wire    [7:0] strb   ;
+
+assign  strb[7]      = d_double                         ||
                        d_word   &&  addr[  2]           ||
                        d_half   &&  addr[2:1] == 2'd3   ||
                        d_byte   &&  addr[2:0] == 3'd7   ;
 
-assign  dmem_strb[6] = d_double                         ||
+assign  strb[6]      = d_double                         ||
                        d_word   &&  addr[  2]           ||
                        d_half   &&  addr[2:1] == 2'd3   ||
                        d_byte   &&  addr[2:0] == 3'd6   ;
 
-assign  dmem_strb[5] = d_double                         ||
+assign  strb[5]      = d_double                         ||
                        d_word   &&  addr[  2]           ||
                        d_half   &&  addr[2:1] == 2'd2   ||
                        d_byte   &&  addr[2:0] == 3'd5   ;
 
-assign  dmem_strb[4] = d_double                         ||
+assign  strb[4]      = d_double                         ||
                        d_word   &&  addr[  2]           ||
                        d_half   &&  addr[2:1] == 2'd2   ||
                        d_byte   &&  addr[2:0] == 3'd4   ;
 
-assign  dmem_strb[3] = d_double                         ||
+assign  strb[3]      = d_double                         ||
                        d_word   && !addr[  2]           ||
                        d_half   &&  addr[2:1] == 2'd1   ||
                        d_byte   &&  addr[2:0] == 3'd3   ;
 
-assign  dmem_strb[2] = d_double                         ||
+assign  strb[2]      = d_double                         ||
                        d_word   && !addr[  2]           ||
                        d_half   &&  addr[2:1] == 2'd1   ||
                        d_byte   &&  addr[2:0] == 3'd2   ;
 
-assign  dmem_strb[1] = d_double                         ||
+assign  strb[1]      = d_double                         ||
                        d_word   && !addr[  2]           ||
                        d_half   &&  addr[2:1] == 2'd0   ||
                        d_byte   &&  addr[2:0] == 3'd1   ;
 
-assign  dmem_strb[0] = d_double                         ||
+assign  strb[0]      = d_double                         ||
                        d_word   && !addr[  2]           ||
                        d_half   &&  addr[2:1] == 2'd0   ||
                        d_byte   &&  addr[2:0] == 3'd0   ;

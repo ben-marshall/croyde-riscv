@@ -114,7 +114,7 @@ always @(posedge g_clk) begin
 end
 
 always @(posedge g_clk) begin
-    if(n_mem_req_valid) begin
+    if(n_mem_req_valid || n_valid) begin
         rvfi_mem_addr   <= n_mem_addr   ;
         rvfi_mem_rmask  <= n_mem_rmask  ;
         rvfi_mem_wmask  <= n_mem_wmask  ;
