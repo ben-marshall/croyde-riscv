@@ -93,18 +93,22 @@ wire [XL:0] bitwise_result  = {XLEN{op_xor}} & xor_output |
 //  TODO
 // ------------------------------------------------------------
 
-wire [XL:0] shift_in    = opr_a;
-
-wire [XL:0] shift_l5    = shift_amt[5] ? {opr_a   [31:0], 32'b0} : opr_a   ;
-wire [XL:0] shift_l4    = shift_amt[4] ? {shift_l5[47:0], 16'b0} : shift_l5;
-wire [XL:0] shift_l3    = shift_amt[3] ? {shift_l4[55:0],  8'b0} : shift_l4;
-wire [XL:0] shift_l2    = shift_amt[2] ? {shift_l3[59:0],  4'b0} : shift_l3;
-wire [XL:0] shift_l1    = shift_amt[1] ? {shift_l2[61:0],  2'b0} : shift_l2;
-wire [XL:0] shift_l0    = shift_amt[0] ? {shift_l1[62:0],  1'b0} : shift_l1;
-
 wire [ 5:0] shift_amt   = opr_b[5:0];
 
-wire [XL:0] shift_result= shift_l0;
+wire [31:0] shift_rw    = opr_a[31:0] >> shift_amt[4:0];
+wire [31:0] shift_lw    = opr_a[31:0] << shift_amt[4:0];
+wire [XL:0] shift_r     = opr_a       >> shift_amt;
+wire [XL:0] shift_l     = opr_a       << shift_amt;
+wire [XL:0] shift_ra    = $signed(opr_a) >>> shift_amt;
+wire [31:0] shift_raw   = $signed(opr_a[31:0]) >>> shift_amt[4:0];
+
+wire [XL:0] shift_result =
+    {64{op_sll  &&  word}} & {{32{shift_lw [31]}}, shift_lw }  |
+    {64{op_srl  &&  word}} & {{32{shift_rw [31]}}, shift_rw }  |
+    {64{op_sra  &&  word}} & {{32{shift_raw[31]}}, shift_raw}  |
+    {64{op_sll  && !word}} & shift_l                           |
+    {64{op_srl  && !word}} & shift_r                           |
+    {64{op_sra  && !word}} & shift_ra                          ;
 
 
 //

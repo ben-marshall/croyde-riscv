@@ -31,6 +31,10 @@ localparam  FD_ERR_R    = FD_ERR_W    - 1;
 localparam  REG_ADDR_W  = 5             ;
 localparam  REG_ADDR_R  = REG_ADDR_W - 1;
 
+localparam  REG_ZERO    = 5'b0          ;
+localparam  REG_RA      = 5'd1          ;
+localparam  REG_SP      = 5'd2          ;
+
 //
 // CSR Trap codes
 

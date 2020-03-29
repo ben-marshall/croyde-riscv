@@ -21,7 +21,6 @@ output wire [31:0] imm_addi4spn ,
 output wire [31:0] imm_c_lsw    ,
 output wire [31:0] imm_c_addi   ,
 output wire [31:0] imm_c_lui    ,
-output wire [31:0] imm_c_shamt  ,
 output wire [31:0] imm_c_lwsp   ,
 output wire [31:0] imm_c_swsp   ,
 output wire [31:0] imm_c_j      ,
@@ -59,9 +58,6 @@ assign imm_c_addi = {
 
 assign imm_c_lui  = {
     {15{instr[12]}}, instr[6:2],12'b0};
-
-assign imm_c_shamt = {
-    27'b0,instr[6:2]};
 
 assign imm_c_lwsp = {
     24'b0,instr[3:2], instr[12], instr[6:4], 2'b00};

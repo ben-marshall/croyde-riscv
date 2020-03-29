@@ -1,13 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sat Mar 28 18:10:06 2020
+[*] Sun Mar 29 11:45:45 2020
 [*]
-[dumpfile] "(null)"
+[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/riscv-formal/insn_c_slli_ch0/engine_0/trace.vcd"
+[dumpfile_mtime] "Sun Mar 29 11:42:03 2020"
+[dumpfile_size] 410503
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/riscv-formal.gtkw"
-[timestart] 0
+[timestart] 1
 [size] 1920 1025
 [pos] -1 -1
-*-5.098422 56 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-4.273365 95 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] rvfi_testbench.
 [treeopen] rvfi_testbench.checker_inst.
 [treeopen] rvfi_testbench.wrapper.
@@ -96,17 +98,17 @@ rvfi_testbench.checker_inst.spec_rd_wdata[63:0]
 @1000200
 -RD
 -RVFI
-@800201
+@800200
 -Regfile
-@29
+@28
 rvfi_testbench.wrapper.i_dut.i_core_regfile.fwd_rs1
 rvfi_testbench.wrapper.i_dut.i_core_regfile.fwd_rs2
-@23
+@22
 rvfi_testbench.wrapper.i_dut.i_core_regfile.rs1_addr[4:0]
 rvfi_testbench.wrapper.i_dut.i_core_regfile.rs1_data[63:0]
 rvfi_testbench.wrapper.i_dut.i_core_regfile.rs2_addr[4:0]
 rvfi_testbench.wrapper.i_dut.i_core_regfile.rs2_data[63:0]
-@1000201
+@1000200
 -Regfile
 @800200
 -DUT Decode
@@ -122,15 +124,51 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s1_rs2_data[63:0]
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.g_clk
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.g_resetn
-@22
+@c00023
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
 @28
+(0)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(1)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(2)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(3)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(4)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(5)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(6)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(7)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(8)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(9)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(10)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(11)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(12)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(13)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(14)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(15)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(16)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(17)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(18)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(19)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(20)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(21)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(22)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(23)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(24)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(25)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(26)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(27)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(28)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(29)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(30)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+(31)rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
+@1401201
+-group_end
+@28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.e_new_instr
-@c00200
+@800200
 -ALU
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.alu_add_out[63:0]
 @28
+rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_alu.word
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.alu_cmp_eq
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.alu_cmp_lt
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.alu_gpr_wen
@@ -151,7 +189,22 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.alu_opr_b[63:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.alu_result[63:0]
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.alu_word
-@1401200
+@800200
+-Shift
+@28
+rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_alu.sel_shift
+@24
+rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_alu.shift_amt[5:0]
+@22
+rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_alu.shift_l[63:0]
+rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_alu.shift_lw[31:0]
+rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_alu.shift_r[63:0]
+rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_alu.shift_ra[63:0]
+rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_alu.shift_raw[31:0]
+rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_alu.shift_result[63:0]
+rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_alu.shift_rw[31:0]
+@1000200
+-Shift
 -ALU
 @c00200
 -CFU

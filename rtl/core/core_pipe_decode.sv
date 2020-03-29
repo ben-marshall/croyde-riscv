@@ -89,7 +89,6 @@ wire [         31:0] imm_addi4spn   ;
 wire [         31:0] imm_c_lsw      ;
 wire [         31:0] imm_c_addi     ;
 wire [         31:0] imm_c_lui      ;
-wire [         31:0] imm_c_shamt    ;
 wire [         31:0] imm_c_lwsp     ;
 wire [         31:0] imm_c_swsp     ;
 wire [         31:0] imm_c_j        ;
@@ -187,15 +186,71 @@ assign n_s2_opr_c   =
     {64{sel_opr_c_npc}} & s1_npc      ;
 
 //
-// Register operands
-// TODO: decode 16-bit destination registers.
-assign n_s2_rd      = dec_rd;
+// Register Address Decoding
+// -------------------------------------------------------------------------
 
-wire [REG_ADDR_R:0] dec_16bit_rs1 = 0; 
-wire [REG_ADDR_R:0] dec_16bit_rs2 = 0;
+// Source register 1, given a 16-bit instruction
+wire [4:0] dec_rs1_16 = 
+    {5{dec_c_add     }} & {s1_instr[11:7]      } |
+    {5{dec_c_addi    }} & {s1_instr[11:7]      } |
+    {5{dec_c_jalr    }} & {s1_instr[11:7]      } |
+    {5{dec_c_jr      }} & {s1_instr[11:7]      } |
+    {5{dec_c_slli    }} & {s1_instr[11:7]      } |
+    {5{dec_c_swsp    }} & {REG_SP            } |
+    {5{dec_c_addi16sp}} & {REG_SP            } |
+    {5{dec_c_addi4spn}} & {REG_SP            } |
+    {5{dec_c_lwsp    }} & {REG_SP            } |
+    {5{dec_c_and     }} & {2'b01, s1_instr[9:7]} |
+    {5{dec_c_andi    }} & {2'b01, s1_instr[9:7]} |
+    {5{dec_c_beqz    }} & {2'b01, s1_instr[9:7]} |
+    {5{dec_c_bnez    }} & {2'b01, s1_instr[9:7]} |
+    {5{dec_c_lw      }} & {2'b01, s1_instr[9:7]} |
+    {5{dec_c_or      }} & {2'b01, s1_instr[9:7]} |
+    {5{dec_c_srai    }} & {2'b01, s1_instr[9:7]} |
+    {5{dec_c_srli    }} & {2'b01, s1_instr[9:7]} |
+    {5{dec_c_sub     }} & {2'b01, s1_instr[9:7]} |
+    {5{dec_c_sw      }} & {2'b01, s1_instr[9:7]} |
+    {5{dec_c_xor     }} & {2'b01, s1_instr[9:7]} ;
+    
+// Source register 2, given a 16-bit instruction
+wire [4:0] dec_rs2_16 = 
+    {5{dec_c_beqz    }} & {       REG_ZERO   } |
+    {5{dec_c_bnez    }} & {       REG_ZERO   } |
+    {5{dec_c_add     }} & {       s1_instr[6:2]} |
+    {5{dec_c_mv      }} & {       s1_instr[6:2]} |
+    {5{dec_c_swsp    }} & {       s1_instr[6:2]} |
+    {5{dec_c_and     }} & {2'b01, s1_instr[4:2]} |
+    {5{dec_c_or      }} & {2'b01, s1_instr[4:2]} |
+    {5{dec_c_sub     }} & {2'b01, s1_instr[4:2]} |
+    {5{dec_c_sw      }} & {2'b01, s1_instr[4:2]} |
+    {5{dec_c_xor     }} & {2'b01, s1_instr[4:2]} ;
 
-assign s1_rs1_addr  = s1_i16bit ? dec_16bit_rs1 : dec_rs1 ;
-assign s1_rs2_addr  = s1_i16bit ? dec_16bit_rs2 : dec_rs2 ;
+// Destination register, given a 16-bit instruction
+wire [4:0] dec_rd_16 = 
+    {5{dec_c_addi16sp}} & {REG_SP} |
+    {5{dec_c_addi4spn}} & {2'b01, s1_instr[4:2]} |
+    {5{dec_c_and     }} & {2'b01, s1_instr[9:7]} |
+    {5{dec_c_andi    }} & {2'b01, s1_instr[9:7]} |
+    {5{dec_c_jal     }} & {REG_RA} |
+    {5{dec_c_jalr    }} & {REG_RA} |
+    {5{dec_c_add     }} & {s1_instr[11:7]} |
+    {5{dec_c_addi    }} & {s1_instr[11:7]} |
+    {5{dec_c_li      }} & {s1_instr[11:7]} |
+    {5{dec_c_lui     }} & {s1_instr[11:7]} |
+    {5{dec_c_lwsp    }} & {s1_instr[11:7]} |
+    {5{dec_c_mv      }} & {s1_instr[11:7]} |
+    {5{dec_c_slli    }} & {s1_instr[11:7]} |
+    {5{dec_c_lw      }} & {2'b01, s1_instr[4:2]} |
+    {5{dec_c_or      }} & {2'b01, s1_instr[9:7]} |
+    {5{dec_c_srai    }} & {2'b01, s1_instr[9:7]} |
+    {5{dec_c_srli    }} & {2'b01, s1_instr[9:7]} |
+    {5{dec_c_sub     }} & {2'b01, s1_instr[9:7]} |
+    {5{dec_c_xor     }} & {2'b01, s1_instr[9:7]} ;
+
+assign s1_rs1_addr  = s1_i16bit ? dec_rs1_16 : dec_rs1 ;
+assign s1_rs2_addr  = s1_i16bit ? dec_rs2_16 : dec_rs2 ;
+assign n_s2_rd      = s1_i16bit ? dec_rd_16  : dec_rd  ;
+
 
 //
 // Is this decoded instruction explicitly operating on a word, rather than
@@ -230,10 +285,20 @@ wire    use_imm_sext_imm32_u = dec_lui      || dec_auipc        ;
 wire    use_imm_sext_imm32_i = dec_jalr     || major_op_load    ||
                                major_op_imm ;
 
+wire    use_imm_shamt        = dec_slli     || dec_srli         ||
+                               dec_slliw    || dec_srliw        ||
+                               dec_srai     || dec_sraiw        ||
+                               dec_c_slli   || dec_c_srli       ||
+                               dec_c_srai   ;
+
+wire    [ 5:0] imm_c_shamt  = {s1_instr[12],s1_instr[6:2]};
+wire    [XL:0] imm_shamt    = {58'b0, s1_i16bit ? imm_c_shamt : dec_shamtw};
+
 assign opr_b_imm = 
     use_imm_sext_imm32_u    ? sext_imm32_u  :
     use_imm_sext_imm32_i    ? sext_imm32_i  :
     major_op_store          ? sext_imm32_s  :
+    use_imm_shamt           ? imm_shamt     :
     dec_jal                 ? sext_imm32_j  :
                               0             ;
 
@@ -480,7 +545,6 @@ core_pipe_decode_immediates i_core_pipe_decode_immediates (
 .imm_c_lsw    (imm_c_lsw    ),
 .imm_c_addi   (imm_c_addi   ),
 .imm_c_lui    (imm_c_lui    ),
-.imm_c_shamt  (imm_c_shamt  ),
 .imm_c_lwsp   (imm_c_lwsp   ),
 .imm_c_swsp   (imm_c_swsp   ),
 .imm_c_j      (imm_c_j      ),

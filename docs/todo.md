@@ -55,9 +55,9 @@
 - [ ] insn c.or
 - [ ] insn c.sd
 - [ ] insn c.sdsp
-- [ ] insn c.slli
-- [ ] insn c.srai
-- [ ] insn c.srli
+- [x] insn c.slli
+- [x] insn c.srai
+- [x] insn c.srli
 - [ ] insn c.sub
 - [ ] insn c.subw
 - [ ] insn c.sw
@@ -88,20 +88,21 @@
 - [ ] insn sb
 - [ ] insn sd
 - [ ] insn sh
-- [ ] insn slliw
-- [ ] insn sllw
+- [x] insn slliw
+- [x] insn sllw
 - [x] insn slt
 - [x] insn slti
 - [x] insn sltiu
 - [x] insn sltu
-- [ ] insn sra
-- [ ] insn srai
-- [ ] insn sraiw
-- [ ] insn sraw
-- [ ] insn srl
-- [ ] insn srli
-- [ ] insn srliw
-- [ ] insn srlw
+- [x] insn sra
+- [x] insn srai
+- [x] insn sraiw
+- [x] insn sraw
+- [x] insn srl
+- [x] insn srli
+- [x] insn srliw
+- [x] insn srlw
 - [ ] insn sw
 - [ ] liveness
 - [ ] unique
+
