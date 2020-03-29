@@ -42,9 +42,9 @@
 - [x] insn c.andi
 - [ ] insn c.beqz
 - [ ] insn c.bnez
-- [ ] insn c.jalr
-- [ ] insn c.j
-- [ ] insn c.jr
+- [x] insn c.jalr
+- [x] insn c.j
+- [x] insn c.jr
 - [x] insn c.ld
 - [x] insn c.ldsp
 - [x] insn c.li

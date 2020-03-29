@@ -104,7 +104,7 @@ wire sel_opr_a_rs1 =
     dec_beq       || dec_bne       || dec_c_beqz    || dec_c_bnez    ||
     dec_blt       || dec_bge       || dec_bltu      || dec_bgeu      ||
     dec_jalr      || dec_c_addiw   || dec_addi      || dec_c_addi4spn||
-    dec_c_addi    || dec_slli      ||                  dec_c_add     ||
+    dec_c_addi    || dec_slli      || dec_c_jr      || dec_c_add     ||
     dec_c_slli    || dec_slti      || dec_sltiu     || dec_xori      ||
     dec_srli      || dec_srai      || dec_ori       || dec_andi      ||
     dec_add       || dec_sub       || dec_sll       || dec_slt       ||
@@ -123,7 +123,7 @@ wire sel_opr_a_rs1 =
     dec_divw      || dec_divuw     || dec_remw      || dec_remuw     ||
     dec_csrrw     || dec_csrrs     || dec_csrrc     || dec_csrrwi    ||
     dec_csrrsi    || dec_csrrci    || dec_c_addi16sp|| dec_c_sd      ||
-    dec_c_sdsp    || dec_c_ldsp    || dec_c_ld      ;
+    dec_c_sdsp    || dec_c_ldsp    || dec_c_ld      || dec_c_jalr    ;
 
 wire sel_opr_a_pc   =
     dec_jal       ||                  dec_c_j       || dec_auipc     ;
@@ -170,7 +170,8 @@ wire sel_opr_c_imm  =
     dec_csrrsi    || dec_csrrci    || dec_auipc     ;
 
 wire sel_opr_c_npc  =
-    dec_jalr      || dec_jal       ||                  dec_fence_i   ;
+    dec_jalr      || dec_jal       ||                  dec_c_jalr    ||
+    dec_fence_i   ;
 
 wire sel_opr_c_rs2  =
     dec_sb        || dec_sh        || dec_sw        || dec_c_sw      ||
@@ -318,6 +319,8 @@ wire    use_imm_c_lsw       = dec_c_lw      || dec_c_sw         ;
 
 wire    use_imm_c_lsd       = dec_c_ld      || dec_c_sd         ;
 
+wire    use_imm_c_j         = dec_c_j                           ;
+
 wire    [ 5:0] imm_c_shamt  = {s1_instr[12],s1_instr[6:2]};
 wire    [XL:0] imm_shamt    = {58'b0, s1_i16bit ? imm_c_shamt : dec_shamtw};
 
@@ -330,6 +333,7 @@ assign opr_b_imm =
     dec_c_addi4spn          ? {{32{imm_addi4spn[31]}}, imm_addi4spn} :
     dec_c_addi16sp          ? {{32{imm_addi16sp[31]}}, imm_addi16sp} :
     use_imm_c_addi          ? {{32{imm_c_addi[31]}}, imm_c_addi} :
+    use_imm_c_j             ? {{32{imm_c_j   [31]}}, imm_c_j   } :
     dec_c_lwsp              ? {32'b0, imm_c_lwsp} :
     dec_c_swsp              ? {32'b0, imm_c_swsp} :
     use_imm_c_lsw           ? {32'b0, imm_c_lsw } :
@@ -359,6 +363,7 @@ wire [ALU_OP_R:0] n_alu_op =
     {ALU_OP_W{dec_jalr      }} & ALU_OP_ADD     |
     {ALU_OP_W{dec_jal       }} & ALU_OP_ADD     |
     {ALU_OP_W{dec_c_j       }} & ALU_OP_ADD     |
+    {ALU_OP_W{dec_c_jr      }} & ALU_OP_ADD     |
     {ALU_OP_W{dec_ecall     }} & ALU_OP_NOP     |
     {ALU_OP_W{dec_ebreak    }} & ALU_OP_NOP     |
     {ALU_OP_W{dec_mret      }} & ALU_OP_NOP     |
@@ -514,7 +519,9 @@ wire [CFU_OP_R:0] n_cfu_op =
     {CFU_OP_W{dec_bgeu      }} & CFU_OP_BGEU    |
     {CFU_OP_W{dec_jalr      }} & CFU_OP_JALR    |
     {CFU_OP_W{dec_jal       }} & CFU_OP_JAL     |
+    {CFU_OP_W{dec_c_jalr    }} & CFU_OP_JALR    |
     {CFU_OP_W{dec_c_j       }} & CFU_OP_J       |
+    {CFU_OP_W{dec_c_jr      }} & CFU_OP_JALR    |
     {CFU_OP_W{dec_ecall     }} & CFU_OP_ECALL   |
     {CFU_OP_W{dec_ebreak    }} & CFU_OP_EBREAK  |
     {CFU_OP_W{dec_mret      }} & CFU_OP_MRET    |

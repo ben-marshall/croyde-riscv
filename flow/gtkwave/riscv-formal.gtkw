@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sun Mar 29 16:21:34 2020
+[*] Sun Mar 29 16:37:13 2020
 [*]
-[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/riscv-formal/insn_jalr_ch0/engine_0/trace.vcd"
-[dumpfile_mtime] "Sun Mar 29 16:20:50 2020"
-[dumpfile_size] 417310
+[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/riscv-formal/insn_c_jr_ch0/engine_0/trace.vcd"
+[dumpfile_mtime] "Sun Mar 29 16:35:39 2020"
+[dumpfile_size] 416117
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/riscv-formal.gtkw"
 [timestart] 0
 [size] 1920 1025
 [pos] -1 -1
-*-4.273365 54 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-4.268347 55 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] rvfi_testbench.
 [treeopen] rvfi_testbench.checker_inst.
 [treeopen] rvfi_testbench.wrapper.
@@ -38,7 +38,6 @@ rvfi_testbench.checker_inst.trap
 rvfi_testbench.checker_inst.valid
 @22
 rvfi_testbench.checker_inst.rvfi_insn[31:0]
-rvfi_testbench.checker_inst.insn_spec.insn_imm[63:0]
 @c00200
 -CSR
 @22
@@ -196,6 +195,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
 -group_end
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_c[63:0]
+rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.dec_rd_16[4:0]
 @1000200
 -DUT Decode
 @800200
@@ -296,21 +296,21 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_alu.shift_rw[31:0
 -Shift
 @1000200
 -ALU
-@800201
+@800200
 -CFU
-@29
+@28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cf_done
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cf_excep
-@23
+@22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_bcmp_taret[63:0]
-@29
+@28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_cond_taken
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_conditional
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_goto_mepc
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_goto_mtvec
-@23
+@22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_gpr_wdata[63:0]
-@29
+@28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_gpr_wen
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_not_taken
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_op_always_done
@@ -330,7 +330,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_op_j
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_op_jal
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_op_mret
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_op_nop
-@1000201
+@1000200
 -CFU
 @c00200
 -CSR

@@ -16,9 +16,11 @@ blt       | rs1     | rs2     | imm     | SUB    | BLT    |
 bge       | rs1     | rs2     | imm     | SUB    | BGE    |
 bltu      | rs1     | rs2     | imm     | SUB    | BLTU   |
 bgeu      | rs1     | rs2     | imm     | SUB    | BGEU   |
-jalr      | rs1     | imm     | npc     | NOP    | JAL    |
-jal       | PC      | imm     | npc     | NOP    | JAL    |
-c.j       | PC      | imm     |         | NOP    | J      |
+jalr      | rs1     | imm     | npc     | ADD    | JAL    |
+jal       | PC      | imm     | npc     | ADD    | JAL    |
+c.j       | PC      | imm     |         | ADD    | J      |
+c.jr      | rs1     | 0       |         | ADD    | J      |
+c.jalr    | rs1     | imm     | npc     | ADD    | JALR   |
 ecall     |         |         |         | NOP    | ECALL  |
 ebreak    |         |         |         | NOP    | EBREAK |
 mret      | rs1     |         |         | NOP    | MRET   |
