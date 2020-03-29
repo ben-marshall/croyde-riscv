@@ -8,6 +8,8 @@ RV_FORMAL_GEN   = $(RV_FORMAL_DIR)/checks/genchecks.py
 
 RV_FORMAL_WORK  = $(REPO_WORK)/riscv-formal
 
+RV_FORMAL_NJOBS = 4
+
 riscv-formal-clean:
 	rm -rf $(RV_FORMAL_WORK)
 	rm -rf $(RV_FORMAL_CORE)
@@ -23,3 +25,6 @@ riscv-formal-prepare: $(RV_FORMAL_CFG)
         $(RV_FORMAL_WORK)/*.sby
 	sed -i "s+\$$REPO_HOME+$(REPO_HOME)+g" $(RV_FORMAL_WORK)/*.sby
 	sed -i "s+\$$REPO_WORK+$(REPO_WORK)+g" $(RV_FORMAL_WORK)/*.sby
+
+riscv-formal-run:
+	$(MAKE) -j $(RV_FORMAL_NJOBS) -C $(RV_FORMAL_WORK) all
