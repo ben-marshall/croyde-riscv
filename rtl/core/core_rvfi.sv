@@ -23,6 +23,9 @@ input wire                         n_rd_valid       ,
 input wire [NRET *    5   - 1 : 0] n_rd_addr        ,
 input wire [NRET * XLEN   - 1 : 0] n_rd_wdata       ,
 
+input wire                         n_cf_change      ,
+input wire [NRET * XLEN   - 1 : 0] n_cf_target      ,
+
 input wire [NRET * XLEN   - 1 : 0] n_pc_rdata       ,
 input wire [NRET * XLEN   - 1 : 0] n_pc_wdata       ,
 
@@ -96,14 +99,28 @@ always @(posedge g_clk) begin
         rvfi_rs2_addr    <= n_rs2_addr    ;
         rvfi_rs1_rdata   <= n_rs1_rdata   ;
         rvfi_rs2_rdata   <= n_rs2_rdata   ;
-
-        rvfi_pc_rdata    <= n_pc_rdata    ;
-        rvfi_pc_wdata    <= n_pc_wdata    ;
     end
 end
 
 always @(posedge g_clk) begin
-    if(n_rd_valid || n_valid) begin
+    if(n_valid) begin
+        rvfi_pc_rdata    <= n_pc_rdata    ;
+    end
+
+    if(n_valid || n_cf_change) begin
+        rvfi_pc_wdata    <= n_cf_change ? n_cf_target : n_pc_wdata    ;
+    end
+end
+
+reg    hold_rd_data;
+wire n_hold_rd_data = hold_rd_data ? !n_valid : n_rd_valid && !n_valid;
+
+always @(posedge g_clk) begin
+    hold_rd_data <= n_hold_rd_data;
+end
+
+always @(posedge g_clk) begin
+    if(n_rd_valid || (n_valid && !hold_rd_data)) begin
         rvfi_rd_addr     <= n_rd_addr       ;
         if(|n_rd_addr) begin
             rvfi_rd_wdata    <= n_rd_wdata  ;

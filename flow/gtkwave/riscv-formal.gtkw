@@ -1,13 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sun Mar 29 14:32:47 2020
+[*] Sun Mar 29 16:21:34 2020
 [*]
-[dumpfile] "(null)"
+[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/riscv-formal/insn_jalr_ch0/engine_0/trace.vcd"
+[dumpfile_mtime] "Sun Mar 29 16:20:50 2020"
+[dumpfile_size] 417310
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/riscv-formal.gtkw"
 [timestart] 0
 [size] 1920 1025
 [pos] -1 -1
-*-4.268347 71 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-4.273365 54 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] rvfi_testbench.
 [treeopen] rvfi_testbench.checker_inst.
 [treeopen] rvfi_testbench.wrapper.
@@ -50,7 +52,7 @@ rvfi_testbench.checker_inst.rvfi_csr_minstret_wdata[63:0]
 rvfi_testbench.checker_inst.rvfi_csr_minstret_wmask[63:0]
 @1401200
 -CSR
-@800200
+@c00200
 -MEM
 @22
 rvfi_testbench.rvfi_mem_addr[63:0]
@@ -62,17 +64,17 @@ rvfi_testbench.checker_inst.spec_mem_addr[63:0]
 rvfi_testbench.checker_inst.spec_mem_rmask[7:0]
 rvfi_testbench.checker_inst.spec_mem_wdata[63:0]
 rvfi_testbench.checker_inst.spec_mem_wmask[7:0]
-@1000200
+@1401200
 -MEM
-@c00200
+@800200
 -PC
 @22
 rvfi_testbench.checker_inst.rvfi_pc_rdata[63:0]
 rvfi_testbench.checker_inst.rvfi_pc_wdata[63:0]
 rvfi_testbench.checker_inst.spec_pc_wdata[63:0]
-@1401200
+@1000200
 -PC
-@800200
+@c00200
 -RS
 @22
 rvfi_testbench.checker_inst.rvfi_rs1_rdata[63:0]
@@ -82,7 +84,7 @@ rvfi_testbench.checker_inst.rvfi_rs1_addr[4:0]
 rvfi_testbench.checker_inst.spec_rs1_addr[4:0]
 rvfi_testbench.checker_inst.rvfi_rs2_addr[4:0]
 rvfi_testbench.checker_inst.spec_rs2_addr[4:0]
-@1000200
+@1401200
 -RS
 @800200
 -RD
@@ -112,7 +114,7 @@ rvfi_testbench.wrapper.i_dut.i_core_regfile.rs2_addr[4:0]
 rvfi_testbench.wrapper.i_dut.i_core_regfile.rs2_data[63:0]
 @1000200
 -Regfile
-@c00200
+@800200
 -DUT Decode
 @24
 rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s1_rs1_addr[4:0]
@@ -122,7 +124,79 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s1_rs1_data[63:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s1_rs2_addr[4:0]
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s1_rs2_data[63:0]
+rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_a[63:0]
+@c00022
+rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+@28
+(0)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(1)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(2)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(3)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(4)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(5)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(6)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(7)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(8)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(9)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(10)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(11)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(12)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(13)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(14)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(15)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(16)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(17)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(18)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(19)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(20)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(21)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(22)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(23)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(24)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(25)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(26)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(27)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(28)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(29)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(30)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(31)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(32)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(33)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(34)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(35)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(36)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(37)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(38)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(39)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(40)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(41)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(42)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(43)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(44)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(45)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(46)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(47)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(48)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(49)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(50)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(51)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(52)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(53)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(54)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(55)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(56)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(57)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(58)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(59)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(60)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(61)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(62)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
+(63)rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_b[63:0]
 @1401200
+-group_end
+@22
+rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.n_s2_opr_c[63:0]
+@1000200
 -DUT Decode
 @800200
 -DUT - Execute
@@ -168,7 +242,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
 -group_end
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.e_new_instr
-@25
+@24
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_rd_addr[4:0]
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_rd_wdata[63:0]
@@ -178,7 +252,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.alu_gpr_wen
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_gpr_wen
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.csr_gpr_wen
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.lsu_gpr_wen
-@c00200
+@800200
 -ALU
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.alu_add_out[63:0]
@@ -204,7 +278,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.alu_opr_b[63:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.alu_result[63:0]
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.alu_word
-@800200
+@c00200
 -Shift
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_alu.sel_shift
@@ -218,25 +292,25 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_alu.shift_ra[63:0
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_alu.shift_raw[31:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_alu.shift_result[63:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_alu.shift_rw[31:0]
-@1000200
--Shift
 @1401200
+-Shift
+@1000200
 -ALU
-@c00200
+@800201
 -CFU
-@28
+@29
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cf_done
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cf_excep
-@22
+@23
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_bcmp_taret[63:0]
-@28
+@29
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_cond_taken
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_conditional
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_goto_mepc
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_goto_mtvec
-@22
+@23
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_gpr_wdata[63:0]
-@28
+@29
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_gpr_wen
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_not_taken
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_op_always_done
@@ -256,7 +330,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_op_j
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_op_jal
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_op_mret
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.cfu_op_nop
-@1401200
+@1000201
 -CFU
 @c00200
 -CSR
@@ -304,7 +378,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.dmem_wdata[63:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.dmem_wen
 @1401200
 -DMEM
-@800200
+@c00200
 -LSU
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.lsu_addr[63:0]
@@ -327,7 +401,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.lsu_wdata[63:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.lsu_gpr_wdata[63:0]
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.lsu_gpr_wen
-@1000200
+@1401200
 -LSU
 @c00200
 -RVFI CSR

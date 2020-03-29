@@ -67,8 +67,8 @@
 - [ ] insn divu
 - [ ] insn divuw
 - [ ] insn divw
-- [ ] insn jal
-- [ ] insn jalr
+- [x] insn jal
+- [x] insn jalr
 - [x] insn lb
 - [x] insn lbu
 - [x] insn ld

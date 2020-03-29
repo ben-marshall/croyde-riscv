@@ -356,9 +356,9 @@ wire [ALU_OP_R:0] n_alu_op =
     {ALU_OP_W{dec_bge       }} & ALU_OP_SUB     |
     {ALU_OP_W{dec_bltu      }} & ALU_OP_SUB     |
     {ALU_OP_W{dec_bgeu      }} & ALU_OP_SUB     |
-    {ALU_OP_W{dec_jalr      }} & ALU_OP_NOP     |
-    {ALU_OP_W{dec_jal       }} & ALU_OP_NOP     |
-    {ALU_OP_W{dec_c_j       }} & ALU_OP_NOP     |
+    {ALU_OP_W{dec_jalr      }} & ALU_OP_ADD     |
+    {ALU_OP_W{dec_jal       }} & ALU_OP_ADD     |
+    {ALU_OP_W{dec_c_j       }} & ALU_OP_ADD     |
     {ALU_OP_W{dec_ecall     }} & ALU_OP_NOP     |
     {ALU_OP_W{dec_ebreak    }} & ALU_OP_NOP     |
     {ALU_OP_W{dec_mret      }} & ALU_OP_NOP     |
@@ -512,7 +512,7 @@ wire [CFU_OP_R:0] n_cfu_op =
     {CFU_OP_W{dec_bge       }} & CFU_OP_BGE     |
     {CFU_OP_W{dec_bltu      }} & CFU_OP_BLTU    |
     {CFU_OP_W{dec_bgeu      }} & CFU_OP_BGEU    |
-    {CFU_OP_W{dec_jalr      }} & CFU_OP_JAL     |
+    {CFU_OP_W{dec_jalr      }} & CFU_OP_JALR    |
     {CFU_OP_W{dec_jal       }} & CFU_OP_JAL     |
     {CFU_OP_W{dec_c_j       }} & CFU_OP_J       |
     {CFU_OP_W{dec_ecall     }} & CFU_OP_ECALL   |

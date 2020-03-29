@@ -151,6 +151,7 @@ wire    cfu_op_nop          = s2_cfu_op     == CFU_OP_NOP   ;
 
 wire    cfu_op_j            = s2_cfu_op     == CFU_OP_J     ;
 wire    cfu_op_jal          = s2_cfu_op     == CFU_OP_JAL   ;
+wire    cfu_op_jalr         = s2_cfu_op     == CFU_OP_JALR  ;
 wire    cfu_op_beq          = s2_cfu_op     == CFU_OP_BEQ   ;
 wire    cfu_op_bne          = s2_cfu_op     == CFU_OP_BNE   ;
 wire    cfu_op_blt          = s2_cfu_op     == CFU_OP_BLT   ;
@@ -163,7 +164,7 @@ wire    cfu_op_ecall        = s2_cfu_op     == CFU_OP_ECALL ;
 
 // EX stage CFU doesn't need to do any blocking for these instructions.
 wire    cfu_op_always_done  = cfu_op_j      || cfu_op_jal   || cfu_op_mret  ||
-                              cfu_op_ebreak || cfu_op_ecall ;
+                              cfu_op_ebreak || cfu_op_ecall || cfu_op_jalr  ;
 
 // Conditional control flow changes.
 wire    cfu_conditional     = cfu_op_beq    || cfu_op_bne   || cfu_op_blt   ||
@@ -175,6 +176,10 @@ wire    cfu_op_bge_taken    = cfu_op_bge    && !alu_cmp_lt;
 wire    cfu_op_bgeu_taken   = cfu_op_bgeu   && !alu_cmp_lt;
 
 wire [XL:0] cfu_bcmp_taret  = s2_pc + s2_opr_c;
+
+wire [XL:0] cfu_jump_target = alu_add_out & 
+                                 {63'h7FFF_FFFF_FFFF_FFFF,!cfu_op_jalr};
+
 
 // Is a conditional branch taken?
 wire    cfu_cond_taken      =
@@ -188,19 +193,20 @@ wire    cfu_cond_taken      =
 wire    cfu_not_taken       = cfu_conditional && !cfu_cond_taken;
 
 // Jump directly to the EPC register
-wire    cfu_goto_mepc       = cfu_op_mret                           ;
+wire    cfu_goto_mepc       = cfu_op_mret                                ;
 
 // Jump directly to the MTVEC CSR register
-wire    cfu_goto_mtvec      = cfu_op_ecall  || cfu_op_ebreak        ;
+wire    cfu_goto_mtvec      = cfu_op_ecall  || cfu_op_ebreak || cf_excep ;
 
 // Has the CFU finished executing it's given instruction.
-wire    op_done_cfu         = cfu_op_nop    || cfu_op_always_done   ||
-                              cfu_cond_taken&& (e_cf_change || cf_done)||
-                              cfu_not_taken ;
+wire    op_done_cfu         = 
+    cfu_op_nop    || 
+   (cfu_op_always_done || cfu_cond_taken) && (e_cf_change || cf_done) ||
+    cfu_not_taken ;
 
 // Does the CFU need to write anything back to the GPRs?
 // - Only on a jump and link instruction.
-wire        cfu_gpr_wen     = cfu_op_jal;
+wire        cfu_gpr_wen     = cfu_op_jal || cfu_op_jalr;
 wire [XL:0] cfu_gpr_wdata   = s2_opr_c  ;
 
 //
@@ -209,7 +215,9 @@ wire [XL:0] cfu_gpr_wdata   = s2_opr_c  ;
 
 wire excep_csr_error        = csr_error && csr_en   ;
 
-wire excep_cfu_bad_target   = 1'b0                  ;
+wire excep_cfu_bad_target   =
+    cfu_conditional          && cfu_bcmp_taret[0]   ||
+    (cfu_op_j || cfu_op_jal) && cfu_jump_target[0]  ;
 
 wire excep_ecall            = cfu_op_ecall          ;
 
@@ -244,7 +252,7 @@ assign  s2_cf_target        =
     cfu_goto_mepc       ?   csr_mepc        :
     cfu_goto_mtvec      ?   csr_mtvec       :
     cfu_conditional     ?   cfu_bcmp_taret  :
-    cfu_op_always_done  ?   alu_add_out     :
+    cfu_op_always_done  ?   cfu_jump_target :
                             csr_mtvec       ;
 
 assign  s2_cf_cause         = 0     ;   // TODO
@@ -400,6 +408,8 @@ core_rvfi core_rvfi_i (
 .n_rd_valid      (s2_rd_wen        ),
 .n_rd_addr       (n_rd_addr        ),
 .n_rd_wdata      (s2_rd_wdata      ),
+.n_cf_change     (e_cf_change      ),
+.n_cf_target     (s2_cf_target     ),
 .n_pc_rdata      (s2_pc            ),    
 .n_pc_wdata      (s2_npc           ),    
 .n_mem_req_valid (n_mem_req_valid  ),    
