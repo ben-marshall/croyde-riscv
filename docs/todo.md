@@ -39,7 +39,7 @@
 - [x] insn c.addiw
 - [x] insn c.addw
 - [x] insn c.and
-- [ ] insn c.andi
+- [x] insn c.andi
 - [ ] insn c.beqz
 - [ ] insn c.bnez
 - [ ] insn c.jalr
@@ -47,8 +47,8 @@
 - [ ] insn c.jr
 - [ ] insn c.ld
 - [ ] insn c.ldsp
-- [ ] insn c.li
-- [ ] insn c.lui
+- [x] insn c.li
+- [x] insn c.lui
 - [ ] insn c.lw
 - [ ] insn c.lwsp
 - [x] insn c.mv

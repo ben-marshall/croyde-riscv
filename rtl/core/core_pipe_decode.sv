@@ -298,7 +298,8 @@ wire    use_imm_shamt        = dec_slli     || dec_srli         ||
                                dec_c_slli   || dec_c_srli       ||
                                dec_c_srai   ;
 
-wire    use_imm_c_addi      = dec_c_addi    || dec_c_addiw      ;
+wire    use_imm_c_addi      = dec_c_addi    || dec_c_addiw      ||
+                              dec_c_li      || dec_c_andi       ;
 
 wire    [ 5:0] imm_c_shamt  = {s1_instr[12],s1_instr[6:2]};
 wire    [XL:0] imm_shamt    = {58'b0, s1_i16bit ? imm_c_shamt : dec_shamtw};
@@ -308,6 +309,7 @@ assign opr_b_imm =
     use_imm_sext_imm32_i    ? sext_imm32_i  :
     major_op_store          ? sext_imm32_s  :
     use_imm_shamt           ? imm_shamt     :
+    dec_c_lui               ? {{32{imm_c_lui[31]}}, imm_c_lui      } :
     dec_c_addi4spn          ? {{32{imm_addi4spn[31]}}, imm_addi4spn} :
     dec_c_addi16sp          ? {{32{imm_addi16sp[31]}}, imm_addi16sp} :
     use_imm_c_addi          ? {{32{imm_c_addi[31]}}, imm_c_addi} :
