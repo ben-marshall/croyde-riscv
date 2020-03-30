@@ -54,6 +54,14 @@
 
   - [ ] Debug
 
+- [ ] Energy Optimisations
+
+  - [ ] High halves of operand registers.
+
+  - [ ] Register file sign extension bits.
+
+  - [ ] Clock request lines
+
 - [ ] Benchmarking
 
   - [ ] Dhrystone
