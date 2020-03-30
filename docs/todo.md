@@ -30,6 +30,37 @@
     - [ ] insn remuw
     - [ ] insn remw
 
+- [ ] LSU address calculation in decode.
+
+- [ ] Interrupts
+
+  - [ ] Timer
+
+  - [ ] External
+
+  - [ ] SW
+
+  - [ ] NMI
+
+  - [ ] Vectoring
+
+- [ ] MPU
+
+- [ ] Trace
+
+- [ ] Core Complex
+
+  - [ ] Integrated Memories
+
+  - [ ] Debug
+
+- [ ] Benchmarking
+
+  - [ ] Dhrystone
+
+  - [ ] Embench
+
+
 ## Verif
 
 - [x] RTL signal tracking from fetch to execute and retirement.
