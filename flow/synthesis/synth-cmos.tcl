@@ -2,6 +2,8 @@
 yosys -import
 
 # Read in the design
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_counters.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_mmio_mux.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_fetch_buffer.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_fetch.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_decode_immediates.sv
@@ -29,5 +31,5 @@ write_verilog   $::env(SYNTH_DIR)/synth-cmos.v
 flatten
 
 # Statistics: size and latency
-tee -o $::env(SYNTH_DIR)/synth-cmos.rpt stat
+tee -o $::env(SYNTH_DIR)/synth-cmos.rpt stat -tech cmos
 tee -a $::env(SYNTH_DIR)/synth-cmos.rpt ltp  -noff
