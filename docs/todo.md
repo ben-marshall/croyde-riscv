@@ -8,13 +8,27 @@
 - [ ] Fix fetch so that it only ever asks for addresses on a 64-bit boundary
       and loads that data into the buffer as appropriate.
 
-- [ ] Memory interface Formal checkers
-
 - [ ] ALU
 
-  - [ ] SLTU[.w]
+  - [ ] SLTU[.w] optimisation / reuse adder circuit
 
-  - [ ] Shifts
+  - [ ] Shifts / optimise
+
+- [ ] M Extension
+
+    - [ ] insn div
+    - [ ] insn divu
+    - [ ] insn divuw
+    - [ ] insn divw
+    - [ ] insn mul
+    - [ ] insn mulh
+    - [ ] insn mulhsu
+    - [ ] insn mulhu
+    - [ ] insn mulw
+    - [ ] insn rem
+    - [ ] insn remu
+    - [ ] insn remuw
+    - [ ] insn remw
 
 ## Verif
 
@@ -22,18 +36,18 @@
 
 - [x] riscv-formal wrapper.
 
-csrw mcycle ch0/status:FAIL 0 23
-csrw minstret ch0/status:FAIL 0 22
-insn div ch0/status:FAIL 0 15
-insn divu ch0/status:FAIL 0 15
-insn divuw ch0/status:FAIL 0 15
-insn divw ch0/status:FAIL 0 15
-insn mul ch0/status:FAIL 0 17
-insn mulh ch0/status:FAIL 0 18
-insn mulhsu ch0/status:FAIL 0 17
-insn mulhu ch0/status:FAIL 0 17
-insn mulw ch0/status:FAIL 0 17
-insn rem ch0/status:FAIL 0 16
-insn remu ch0/status:FAIL 0 16
-insn remuw ch0/status:FAIL 0 16
-insn remw ch0/status:FAIL 0 16
+- [ ] csrw mcycle
+- [ ] csrw minstret
+- [ ] insn div
+- [ ] insn divu
+- [ ] insn divuw
+- [ ] insn divw
+- [ ] insn mul
+- [ ] insn mulh
+- [ ] insn mulhsu
+- [ ] insn mulhu
+- [ ] insn mulw
+- [ ] insn rem
+- [ ] insn remu
+- [ ] insn remuw
+- [ ] insn remw
