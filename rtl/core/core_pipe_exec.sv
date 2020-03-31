@@ -63,6 +63,10 @@ input  wire                 s2_cf_ack   , // EX Control flow acknwoledged
 output wire [         XL:0] s2_cf_target, // EX Control flow destination
 output wire [ CF_CAUSE_R:0] s2_cf_cause , // EX Control flow change cause
 
+output wire                 trs_valid   , // Instruction trace valid
+output wire [         31:0] trs_instr   , // Instruction trace data
+output wire [         XL:0] trs_pc      , // Instruction trace PC
+
 output reg                  dmem_req    , // Memory request
 output reg  [ MEM_ADDR_R:0] dmem_addr   , // Memory request address
 output wire                 dmem_wen    , // Memory request write enable
@@ -343,7 +347,7 @@ end
 
 assign s2_rd_addr   = s2_rd;
 
-assign s2_rd_wen    = !rd_done && s2_valid && (
+assign s2_rd_wen    = !rd_done && (s2_valid || cfu_gpr_wen) && (
     cfu_gpr_wen || csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen
 );
 
@@ -415,6 +419,14 @@ core_pipe_exec_lsu i_core_pipe_exec_lsu (
 .dmem_err       (dmem_err       ), // Memory response error
 .dmem_rdata     (dmem_rdata     )  // Memory response read data
 );
+
+//
+// Trace
+// ------------------------------------------------------------
+
+assign trs_valid = e_new_instr  ;
+assign trs_pc    = s2_pc        ;
+assign trs_instr = s2_instr     ;
 
 `ifdef RVFI
 

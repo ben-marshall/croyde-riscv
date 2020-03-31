@@ -31,7 +31,7 @@ input  wire         drain_4       // Drain 4 bytes of data.
 
 `include "core_common.svh"
 
-localparam BUFFER_DEPTH_BITS    = 96;
+localparam BUFFER_DEPTH_BITS    = 128;
 localparam BR                   = BUFFER_DEPTH_BITS - 1;
 localparam ER                   = (BUFFER_DEPTH_BITS / 16) - 1;
 
@@ -83,17 +83,17 @@ wire update_buffer =
 
 // Which bytes of the input data should be selected?
 wire [BR:0] n_d_buffer_in_pre_shift     =
-    fill_2  ? {80'b0, data_in[15:0]}    :
-    fill_4  ? {64'b0, data_in[31:0]}    :
-    fill_6  ? {48'b0, data_in[47:0]}    :
-    fill_8  ? {32'b0, data_in      }    :
-                                0       ;
+    fill_2  ? {32'b0, 80'b0, data_in[63:48]} :
+    fill_4  ? {32'b0, 64'b0, data_in[63:32]} :
+    fill_6  ? {32'b0, 48'b0, data_in[63:16]} :
+    fill_8  ? {32'b0, 32'b0, data_in[63: 0]} :
+                                         0   ;
 
 wire [ER:0] n_e_buffer_in_pre_shift     =
-    fill_2  ? { 5'b0, {1{error_in}}}    :
-    fill_4  ? { 4'b0, {2{error_in}}}    :
-    fill_6  ? { 3'b0, {3{error_in}}}    :
-    fill_8  ? { 2'b0, {4{error_in}}}    :
+    fill_2  ? { 7'b0, {1{error_in}}}    :
+    fill_4  ? { 6'b0, {2{error_in}}}    :
+    fill_6  ? { 5'b0, {3{error_in}}}    :
+    fill_8  ? { 4'b0, {4{error_in}}}    :
                                 0       ;
 
 // Shift the bytes-to-load up to their new position in the buffer register.

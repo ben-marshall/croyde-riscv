@@ -1,0 +1,7 @@
+
+TEST_NAME = timer
+TEST_SRC  = $(UNIT_ROOT)/timer/test_timer.c \
+            $(UNIT_ROOT)/timer/test_timer.S
+
+$(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
+

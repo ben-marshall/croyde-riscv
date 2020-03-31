@@ -1,0 +1,114 @@
+
+UNIT_TESTS      = 
+UNIT_ROOT       = $(REPO_HOME)/verif/unit
+UNIT_TEST_BUILD = $(REPO_HOME)/work/unit
+
+UNIT_TESTS_RUN  = 
+
+UNIT_TESTS_CLEAN=
+
+UNIT_TIMEOUT    = 20000
+UNIT_FAIL       = 0x10000086
+UNIT_PASS       = 0x10000090
+
+UNIT_CFLAGS     = -I$(UNIT_ROOT)/share -nostartfiles -O1
+UNIT_CFLAGS    += -march=rv64ic -mabi=lp64
+UNIT_CFLAGS    += -T $(UNIT_ROOT)/share/link.ld
+
+UNIT_SRCS       = $(UNIT_ROOT)/share/boot.S \
+                  $(UNIT_ROOT)/share/util.S \
+                  $(UNIT_ROOT)/share/unit_test.c
+
+define unit_test_elf
+$(UNIT_TEST_BUILD)/${1}/${1}.elf
+endef
+
+define unit_test_objdump
+$(UNIT_TEST_BUILD)/${1}/${1}.objdump
+endef
+
+define unit_test_srec
+$(UNIT_TEST_BUILD)/${1}/${1}.srec
+endef
+
+define unit_test_waves
+$(UNIT_TEST_BUILD)/${1}/${1}.vcd
+endef
+
+define unit_test_gtkwave
+$(UNIT_TEST_BUILD)/${1}/${1}.gtkwl
+endef
+
+define unit_test_log
+$(UNIT_TEST_BUILD)/${1}/${1}.log
+endef
+
+define add_unit_test
+$(call unit_test_elf,${1}) : ${2} $(UNIT_SRCS) ;
+	@mkdir -p $(dir $(call unit_test_elf,${1}))
+	$(CC) -Wall $(UNIT_CFLAGS) -o $(call unit_test_elf,${1}) $(UNIT_SRCS) ${2}
+
+$(call unit_test_objdump,${1}) : $(call unit_test_elf,${1}) ;
+	$(OBJDUMP) -D $(call unit_test_elf,${1}) > $(call unit_test_objdump,${1})
+
+$(call unit_test_srec,${1}) : $(call unit_test_elf,${1}) ;
+	$(OBJCOPY) -O srec --srec-forceS3 --srec-len=4 $(call unit_test_elf,${1})  $(call unit_test_srec,${1})
+        
+$(call unit_test_gtkwave,${1}) : $(call unit_test_objdump,${1})
+	grep "10.*:" $(call unit_test_objdump,${1}) \
+	    | grep -v ">:" | cut -c 14- | sed 's/\t//' \
+	    | sort | uniq | sed 's/ +/ /' | sed 's/\t/ /' \
+	    | sed 's/\(^....    \)    /0000\1/' \
+	    > $(call unit_test_gtkwave,${1})
+
+run-unit-${1} : $(call unit_test_srec,${1}) $(VL_OUT) ;
+	$(VL_OUT) +IMEM=$(call unit_test_srec,${1}) \
+	          +WAVES=$(call unit_test_waves,${1}) \
+	          +TIMEOUT=$(UNIT_TIMEOUT) \
+	          +PASS_ADDR=$(UNIT_PASS) +FAIL_ADDR=$(UNIT_FAIL) 
+
+$(call unit_test_waves,${1}) : run-unit-${1}
+$(call unit_test_log,${1}) : run-unit-${1}
+
+UNIT_TESTS += $(call unit_test_srec,${1}) \
+              $(call unit_test_objdump,${1}) \
+              $(call unit_test_elf,${1}) \
+              $(call unit_test_gtkwave,${1})
+
+build-unit-${1} : $(call unit_test_srec,${1}) \
+                  $(call unit_test_objdump,${1}) \
+                  $(call unit_test_elf,${1}) \
+                  $(call unit_test_gtkwave,${1})
+
+UNIT_TESTS_RUN += $(call unit_test_waves,${1}) \
+                  $(call unit_test_objdump,${1}) \
+                  $(call unit_test_log,${1}) \
+                  $(call unit_test_gtkwave,${1})
+
+UNIT_TESTS_CLEAN += $(call unit_test_waves,${1}) \
+                    $(call unit_test_objdump,${1}) \
+                    $(call unit_test_srec,${1}) \
+                    $(call unit_test_elf,${1}) \
+                    $(call unit_test_log,${1}) \
+                    $(call unit_test_gtkwave,${1})
+
+endef
+
+include $(REPO_HOME)/verif/unit/example/Makefile.in
+include $(REPO_HOME)/verif/unit/mtime-read/Makefile.in
+include $(REPO_HOME)/verif/unit/mtime-write/Makefile.in
+include $(REPO_HOME)/verif/unit/counters/Makefile.in
+include $(REPO_HOME)/verif/unit/interrupts/Makefile.in
+include $(REPO_HOME)/verif/unit/timer/Makefile.in
+
+.PHONY: unit-tests-build
+unit-tests-build: $(UNIT_TESTS)
+
+.PHONY: unit-tests-run
+unit-tests-run: $(UNIT_TESTS_RUN)
+
+.PHONY: unit-tests-clean
+unit-tests-clean:
+	rm -f $(UNIT_TESTS_CLEAN)
+	rm -rf $(dir $(UNIT_TESTS_CLEAN))
+

@@ -42,16 +42,11 @@ output wire [         XL:0] trs_pc         // Instruction trace PC
 `include "core_common.svh"
 
 // Inital address of the program counter post reset.
-parameter   PC_RESET_ADDRESS      = 64'h80000000;
+parameter   PC_RESET_ADDRESS      = 64'h10000000;
 
 // Base address of the memory mapped IO region.
 parameter   MMIO_BASE_ADDR  = 64'h0000_0000_0000_1000;
 parameter   MMIO_BASE_MASK  = 64'h0000_0000_0000_1FFF;
-
-// TODO implement trace interface proper.
-assign trs_valid = 1'b0;
-assign trs_instr = 32'b0;
-assign trs_pc    = 64'b0;
 
 //
 // Control flow change busses
@@ -191,7 +186,9 @@ wire                 mmio_error  ; // MMIO error
 //
 //  Pipeline Fetch Stage
 //
-core_pipe_fetch i_core_pipe_fetch (
+core_pipe_fetch #(
+.PC_RESET_ADDRESS(PC_RESET_ADDRESS)
+) i_core_pipe_fetch (
 .g_clk        (g_clk        ), // Global clock
 .g_resetn     (g_resetn     ), // Global active low sync reset.
 .cf_valid     (cf_valid     ), // Control flow change?
@@ -316,6 +313,9 @@ core_pipe_exec i_core_pipe_exec(
 .s2_cf_ack      (s2_cf_ack      ), // EX Control flow acknwoledged
 .s2_cf_target   (s2_cf_target   ), // EX Control flow destination
 .s2_cf_cause    (s2_cf_cause    ), // EX Control flow change cause
+.trs_valid      (trs_valid      ), // Instruction trace valid
+.trs_instr      (trs_instr      ), // Instruction trace data
+.trs_pc         (trs_pc         ), // Instruction trace PC
 .dmem_req       (int_dmem_req   ), // Memory request
 .dmem_addr      (int_dmem_addr  ), // Memory request address
 .dmem_wen       (int_dmem_wen   ), // Memory request write enable
