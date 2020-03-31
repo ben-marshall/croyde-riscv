@@ -9,6 +9,8 @@ This is a very simple 3-stage 64-bit micro-controller, implementing the
 `rv64ic` instruction set, with support for the `M` Multiply/Divide
 extension in the works.
 
+![Pipeline Diagram](docs/pipeline-diagram.png)
+
 ## Getting Started
 
 - Required Dependencies:
