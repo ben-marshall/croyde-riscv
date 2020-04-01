@@ -424,7 +424,7 @@ core_pipe_exec_lsu i_core_pipe_exec_lsu (
 // Trace
 // ------------------------------------------------------------
 
-assign trs_valid = e_new_instr  ;
+assign trs_valid = e_new_instr  || e_cf_change;
 assign trs_pc    = s2_pc        ;
 assign trs_instr = s2_instr     ;
 

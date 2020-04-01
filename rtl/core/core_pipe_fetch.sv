@@ -78,7 +78,7 @@ reg                 imem_req_r ;
 assign              imem_req   = imem_req_r;
 
 // Next instruction memory fetch request enable.
-wire                n_imem_req  = buf_ready;
+wire                n_imem_req  = buf_ready || (imem_req && !imem_gnt);
 
 // Next instruction fetch address
 wire [MEM_ADDR_R:0] n_imem_addr = imem_addr + 8;
@@ -187,6 +187,18 @@ assign      s1_i32bit       = buf_depth >= 4 && buf_data_out[1:0] == 2'b11;
 assign      s1_instr        = buf_data_out[31:0];
 assign      s1_ferr         = buf_error_out[1:0];
 
+reg         first_req_post_cf; // First request after a CF change.
+wire      n_first_req_post_cf =
+    first_req_post_cf ? !e_imem_req :
+                         e_cf_change;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        first_req_post_cf <= 1'b0;
+    end else begin
+        first_req_post_cf <= n_first_req_post_cf;
+    end
+end
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
@@ -195,11 +207,11 @@ always @(posedge g_clk) begin
         buf_fill_6 <= 1'b0;
         buf_fill_8 <= 1'b0;
     end else if(e_cf_change) begin
-        buf_fill_2 <= cf_target[3:0] == 4'd6;
-        buf_fill_4 <= cf_target[3:0] == 4'd4;
-        buf_fill_6 <= cf_target[3:0] == 4'd2;
-        buf_fill_8 <= cf_target[3:0] == 4'd0;
-    end else if(ignore_rsp) begin
+        buf_fill_2 <= cf_target[2:0] == 3'd6;
+        buf_fill_4 <= cf_target[2:0] == 3'd4;
+        buf_fill_6 <= cf_target[2:0] == 3'd2;
+        buf_fill_8 <= cf_target[2:0] == 3'd0;
+    end else if(ignore_rsp || first_req_post_cf) begin
         // Do nothing
     end else if(e_imem_req) begin
         buf_fill_2 <= 1'b0;
