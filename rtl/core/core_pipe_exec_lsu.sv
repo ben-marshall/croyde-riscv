@@ -39,6 +39,16 @@ input  wire [ MEM_DATA_R:0] dmem_rdata    // Memory response read data
 // Common parameters and width definitions.
 `include "core_common.svh"
 
+reg     rsp_recv;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        rsp_recv <= 1'b0;
+    end else begin
+        rsp_recv <= req_sent;
+    end
+end
+
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         ready <= 1'b0;
@@ -91,9 +101,9 @@ assign      rdata          =
 //
 // Simple bus assignments.
 
-assign  trap_bus     = dmem_err && ready;
+assign  trap_bus     = dmem_err && rsp_recv ;
 
-assign  trap_addr    = addr_err && ready;
+assign  trap_addr    = addr_err && ready    ;
 
 assign  dmem_wen     = store;
 
