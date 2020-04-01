@@ -26,17 +26,17 @@ int test_main() {
 
 
     if(a_cycle >= b_cycle) {
-        // Second reading of cycle should be larger
+        __putstr("Second reading of cycle should be larger\n");
         return 1;
     }
 
     if(a_time >= b_time) {
-        // Second reading of time should be larger
+        __putstr("Second reading of time should be larger.\n");
         return 2;
     }
 
     if(a_instret >= b_instret) {
-        // Second reading of instret should be larger.
+        __putstr("Second reading of instret should be larger.\n");
         return 3;
     }
 
@@ -54,17 +54,17 @@ int test_main() {
 
 
     if(a_cycle != b_cycle) {
-        // Cycle disabled, should be identical.
+        __putstr("Cycle disabled, should be identical.\n");
         return 4;
     }
 
     if(a_time >= b_time) {
-        // Second reading of time should be larger
+        __putstr("Second reading of time should be larger.\n");
         return 5;
     }
 
     if(a_instret >= b_instret) {
-        // Second reading of instret should be larger.
+        __putstr("Second reading of instret should be larger.\n");
         return 6;
     }
     
@@ -80,17 +80,17 @@ int test_main() {
     b_instret    = __rdinstret();
 
     if(a_cycle >= b_cycle) {
-        // Cycle enabled, first reading should be smaller.
+        __putstr("Cycle enabled, first reading should be smaller.\n");
         return 7;
     }
 
     if(a_time != b_time) {
-        // time register disabled. Should stay the same.
+        __putstr("time register disabled. Should stay the same.\n");
         return 8;
     }
 
     if(a_instret >= b_instret) {
-        // Second reading of instret should be larger.
+        __putstr("Second reading of instret should be larger.\n");
         return 9;
     }
     
@@ -106,17 +106,17 @@ int test_main() {
     b_instret    = __rdinstret();
 
     if(a_cycle >= b_cycle) {
-        // Cycle enabled, first reading should be smaller.
+        __putstr("Cycle enabled, first reading should be smaller.\n");
         return 10;
     }
 
     if(a_time >= b_time) {
-        // time register enabled . first reading should be smaller.
+        __putstr("time register enabled . first reading should be smaller.\n");
         return 11;
     }
 
     if(a_instret != b_instret) {
-        // instrret disabled, should not change.
+        __putstr("instrret disabled, should not change.\n");
         return 12;
     }
     
