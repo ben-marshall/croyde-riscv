@@ -11,8 +11,6 @@ VL_VERIF_MANIFEST   = $(REPO_HOME)/flow/verilator/manifest-verif.txt
 
 VL_CORE_RTL_SRC     = $(shell cat $(VL_CORE_MANIFEST) | envsubst)
 
-$(info $(VL_CORE_RTL_SRC))
-
 VL_TOP      = core_top
 
 VL_CSRC_DIR=$(REPO_HOME)/verif/verilator

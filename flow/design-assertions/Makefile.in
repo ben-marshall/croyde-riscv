@@ -1,90 +1,42 @@
 
-DESIGN_ASSERTION_BMC_DEPTH  = 20
+DESIGN_ASSERTIONS  =
 
-DESIGN_ASSERTION_TOP        = core_top
+ASSERT_SBY_SRC = $(shell find $(REPO_HOME)/flow/design-assertions -name *.sby)
 
-DESIGN_ASSERTIONS           =
-
-DESIGN_MACROS               =
-
-DA_DIR = $(REPO_WORK)/design-assertions
-
-define map_da_dir
-$(DA_DIR)/${1}
-endef
-
-define map_da_tcl
-$(call map_da_dir,${1})/${1}.tcl
-endef
-
-define map_da_smt2
-$(call map_da_dir,${1})/${1}.smt2
-endef
-
-define map_da_vcd
-$(call map_da_dir,${1})/${1}.vcd
-endef
-
-define map_da_bmc_log
-$(call map_da_dir,${1})/${1}_bmc.log
-endef
-
-define map_da_cov_log
-$(call map_da_dir,${1})/${1}_cov.log
-endef
-
-define map_da_log
-$(call map_da_dir,${1})/${1}.log
-endef
 
 #
-# Create a new set of targets for a single set of designer assertions.
+# 1. Input SBY config file.
+define map_sby
+$(patsubst $(REPO_HOME)/flow/%,$(REPO_WORK)/%,${1})
+endef
+
+
 #
-define target_da
-
-$(call map_da_tcl,${1}) :
-	@mkdir -p $(dir $(call map_da_tcl,${1}))
-	echo "yosys -import" >  $${@}
-	echo "read_verilog -formal -D${1} \\" >> $${@}
-	echo "    -I$(REPO_HOME)/rtl/core \\" >> $${@}
-	echo "    $(REPO_HOME)/rtl/core/*.v" >> $${@}
-	echo "prep" >> $${@}
-	echo "write_smt2 -wires \\" >> $${@}
-	echo "    $(call map_da_smt2,${1})" >> $${@}
-
-$(call map_da_smt2,${1}) : $(CORE_RTL_SRCS) $(call map_da_tcl,${1})
-	yosys -QTq \
-	    -l $(call map_da_log,${1}) \
-	    -c $(call map_da_tcl,${1})
-
-$(call map_da_bmc_log,${1}) : $(call map_da_smt2,${1})
-	yosys-smtbmc \
-	    -s boolector \
-	    -t $(DESIGN_ASSERTION_BMC_DEPTH) \
-	    -m $(DESIGN_ASSERTION_TOP) \
-	    --dump-vcd $(call map_da_vcd,${1}) \
-	    $(call map_da_smt2,${1}) \
-	| tee $(call map_da_bmc_log,${1})
-
-$(call map_da_cov_log,${1}) : $(call map_da_smt2,${1})
-	yosys-smtbmc \
-	    -s boolector \
-	    -t $(DESIGN_ASSERTION_BMC_DEPTH) \
-	    -m $(DESIGN_ASSERTION_TOP) \
-	    -c \
-	    $(call map_da_smt2,${1}) \
-	| tee $(call map_da_cov_log,${1})
+# 1. Input SBY config file
+define map_da_target
+da_prove_$(notdir $(basename ${1}))
+endef
 
 
-bmc-da-${1} : $(call map_da_smt2,${1}) \
-              $(call map_da_bmc_log,${1}) \
-              $(call map_da_cov_log,${1}) \
+#
+# 1. Input SBY config file
+define add_assert_target
 
-DESIGN_ASSERTIONS += bmc-da-${1}
+$(call map_sby,${1}) : ${1}
+	@mkdir -p $(dir $(call map_sby,${1}))
+	cp $${<} $${@}
+	sed -i "s+REPO_HOME+$(REPO_HOME)+g" $${@}
+	sed -i "s+REPO_WORK+$(REPO_WORK)+g" $${@}
+
+$(call map_da_target,${1}) : $(call map_sby,${1})
+	sby -f $${<}
+
+DESIGN_ASSERTIONS += $(call map_da_target,${1})
 
 endef
 
-$(foreach DMA, $(DESIGN_MACROS),$(eval $(call target_da,$(DMA))) )
+
+$(foreach ASS,$(ASSERT_SBY_SRC),$(eval $(call add_assert_target,$(ASS))))
 
 design-assertions: $(DESIGN_ASSERTIONS)
 
