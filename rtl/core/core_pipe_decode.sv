@@ -34,6 +34,7 @@ output reg  [         XL:0] s2_rs2_d    ,
 
 output wire                 s2_valid    , // Decode instr ready for execute
 input  wire                 s2_ready    , // Execute ready for new instr.
+output reg                  s2_full     , // Instruction present in regs?
 output reg  [         XL:0] s2_pc       , // Execute stage PC
 output wire [         XL:0] s2_npc      , // Decode stage PC
 output reg  [         XL:0] s2_opr_a    , // EX stage operand a
@@ -569,6 +570,7 @@ always @(posedge g_clk) begin
         s2_cfu_op   <= 0            ;
         s2_op_w     <= 0            ;
         s2_instr    <= 0            ;
+        s2_full     <= 1'b0         ;
     end else if(s2_valid && s2_ready) begin
         s2_pc       <= n_s2_pc      ;
         s2_opr_a    <= n_s2_opr_a   ;
@@ -582,6 +584,7 @@ always @(posedge g_clk) begin
         s2_cfu_op   <= n_cfu_op     ;
         s2_op_w     <= n_s2_op_w    ;
         s2_instr    <= n_s2_instr   ;
+        s2_full     <= 1'b1         ;
     end
 end
 

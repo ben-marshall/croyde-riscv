@@ -19,6 +19,7 @@ input  wire [         XL:0] s2_rs2_d    ,
 
 input  wire                 s2_valid    , // Decode instr ready for execute
 output wire                 s2_ready    , // Execute ready for new instr.
+input  wire                 s2_full     , // Instruction present in regs?
 input  wire [         XL:0] s2_pc       , // Execute stage PC
 input  wire [         XL:0] s2_npc      , // Decode stage PC
 input  wire [         XL:0] s2_opr_a    , // EX stage operand a
@@ -87,6 +88,9 @@ input  wire [ MEM_DATA_R:0] dmem_rdata    // Memory response read data
 
 // New instruction will arrive on the next cycle.
 wire    e_new_instr = s2_valid && s2_ready;
+
+// Old instruction retired.
+wire    e_iret      = e_new_instr && s2_full;
 
 // Control flow change occured this cycle.
 wire    e_cf_change = s2_cf_valid && s2_cf_ack;
@@ -273,7 +277,7 @@ assign  s2_cf_cause     = 0     ;   // TODO
 
 assign  exec_mret       = cfu_op_mret && e_new_instr;
 
-assign  instr_ret       = e_new_instr && !cf_excep  ;
+assign  instr_ret       = (e_iret || e_cf_change) && !cf_excep  ;
 
 assign  trap_cpu        = cf_excep                  ;
 
@@ -424,7 +428,7 @@ core_pipe_exec_lsu i_core_pipe_exec_lsu (
 // Trace
 // ------------------------------------------------------------
 
-assign trs_valid = e_new_instr  || e_cf_change;
+assign trs_valid = e_iret       || e_cf_change;
 assign trs_pc    = s2_pc        ;
 assign trs_instr = s2_instr     ;
 
@@ -444,7 +448,7 @@ core_rvfi core_rvfi_i (
 .g_clk           (g_clk            ),
 .g_resetn        (g_resetn         ),
 `RVFI_CONN                          ,
-.n_valid         (e_new_instr      ),
+.n_valid         (trs_valid        ),
 .n_insn          (s2_instr         ),
 .n_intr          (1'b0             ),
 .n_trap          (cf_excep         ),

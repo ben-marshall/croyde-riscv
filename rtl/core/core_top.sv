@@ -91,6 +91,7 @@ wire [         XL:0] s1_rs2_data ; // RS2 Read Data (Forwarded)
 
 wire                 s2_valid    ; // Decode instr ready for execute
 wire                 s2_ready    ; // Execute ready for new instr.
+wire                 s2_full     ; // Instruction present in regs?
 wire [         XL:0] s2_pc       ; // Execute stage PC
 wire [         XL:0] s2_npc      ; // Decode stage PC
 wire [         XL:0] s2_opr_a    ; // EX stage operand a
@@ -243,6 +244,7 @@ core_pipe_decode i_core_pipe_decode(
 `endif
 .s2_valid     (s2_valid     ), // Decode instr ready for execute
 .s2_ready     (s2_ready     ), // Execute ready for new instr.
+.s2_full      (s2_full      ), // Instruction present in regs?
 .s2_pc        (s2_pc        ), // Execute stage PC
 .s2_npc       (s2_npc       ), // Decode stage PC
 .s2_opr_a     (s2_opr_a     ), // EX stage operand a
@@ -276,6 +278,7 @@ core_pipe_exec i_core_pipe_exec(
 `endif
 .s2_valid       (s2_valid       ), // Decode instr ready for execute
 .s2_ready       (s2_ready       ), // Execute ready for new instr.
+.s2_full        (s2_full        ), // Instruction present in regs?
 .s2_pc          (s2_pc          ), // Execute stage PC
 .s2_npc         (s2_npc         ), // Decode stage PC
 .s2_opr_a       (s2_opr_a       ), // EX stage operand a
