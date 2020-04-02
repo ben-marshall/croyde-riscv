@@ -330,7 +330,8 @@ wire [XL:0] csr_gpr_wdata   = csr_rdata;
 // ------------------------------------------------------------
 
 assign  s2_ready    = op_done_csr && op_done_cfu &&
-                      op_done_alu && op_done_lsu ;
+                      op_done_alu && op_done_lsu &&
+                      !s2_cf_valid;
 
 //
 // GPR Writeback
