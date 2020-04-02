@@ -52,6 +52,7 @@ parameter   MMIO_BASE_MASK  = 64'h0000_0000_0000_1FFF;
 // Control flow change busses
 // ------------------------------------------------------------
 
+// See also: DESIGNER_ASSERTION_CONTROL_FLOW_BUS
 wire                 cf_valid    ; // Control flow change?
 wire                 cf_ack      ; // Control flow change acknwoledged
 wire [         XL:0] cf_target   ; // Control flow change destination
@@ -452,5 +453,34 @@ core_mmio_mux #(
 .mmio_rdata      (mmio_rdata      ), // MMIO read data
 .mmio_error      (mmio_error      )  // MMIO error
 );
+
+
+//
+// Designer Assertions
+// ------------------------------------------------------------
+
+`ifdef DESIGNER_ASSERTION_CONTROL_FLOW_BUS
+
+always @(posedge g_clk) if(g_resetn && $past(g_resetn)) begin
+    
+    cover(cf_valid);
+
+    cover(cf_ack);
+
+    cover(cf_valid && !cf_ack);
+
+    cover(cf_valid &&  cf_ack);
+
+    if($past(cf_valid) && !$past(cf_ack)) begin
+        
+        assert($stable(cf_target));
+        
+        assert($stable(cf_cause ));
+
+    end
+
+end
+
+`endif
 
 endmodule
