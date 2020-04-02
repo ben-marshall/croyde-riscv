@@ -50,6 +50,12 @@ extension in the works.
   make riscv-formal-run RV_FORMAL_NJOBS=$(nproc)
   ```
 
+- Run designer assertions on the internals of the core:
+
+  ```
+  make  design-assertions
+  ```
+
 ## Documentation 
 
 - See the [Documentation](docs/doc-home.md) in `docs/`.

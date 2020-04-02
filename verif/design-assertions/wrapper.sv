@@ -1,4 +1,5 @@
 
+`include "defines.svh"
 `include "rvfi_macros.vh"
 
 //
@@ -75,6 +76,40 @@ design_assertions_fairness #(
 .trs_instr    (trs_instr    ), // Instruction trace data
 .trs_pc       (trs_pc       )  // Instruction trace PC
 );
+
+//
+// Assertions
+// ------------------------------------------------------------
+
+`ifdef DESIGNER_ASSERTION_INSTRUCTION_MEMORY_INTERFACE
+assert_memory_if i_assert_memory_if(
+.g_clk        (clock        ), // Global clock
+.g_resetn     (g_resetn     ), // Global active low sync reset.
+.mem_req      (imem_req     ), // Memory request
+.mem_addr     (imem_addr    ), // Memory request address
+.mem_wen      (imem_wen     ), // Memory request write enable
+.mem_strb     (imem_strb    ), // Memory request write strobe
+.mem_wdata    (imem_wdata   ), // Memory write data.
+.mem_gnt      (imem_gnt     ), // Memory response valid
+.mem_err      (imem_err     ), // Memory response error
+.mem_rdata    (imem_rdata   )  // Memory response read data
+);
+`endif
+
+`ifdef DESIGNER_ASSERTION_DATA_MEMORY_INTERFACE
+assert_memory_if i_assert_memory_if(
+.g_clk        (clock        ), // Global clock
+.g_resetn     (g_resetn     ), // Global active low sync reset.
+.mem_req      (dmem_req     ), // Memory request
+.mem_addr     (dmem_addr    ), // Memory request address
+.mem_wen      (dmem_wen     ), // Memory request write enable
+.mem_strb     (dmem_strb    ), // Memory request write strobe
+.mem_wdata    (dmem_wdata   ), // Memory write data.
+.mem_gnt      (dmem_gnt     ), // Memory response valid
+.mem_err      (dmem_err     ), // Memory response error
+.mem_rdata    (dmem_rdata   )  // Memory response read data
+);
+`endif
 
 
 //

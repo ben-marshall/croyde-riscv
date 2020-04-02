@@ -1,9 +1,11 @@
 [tasks]
-task_cover  cover
-task_prove  prove
+task_cover_imem  cover imem
+task_prove_imem  prove imem
+task_cover_dmem  cover dmem
+task_prove_dmem  prove dmem
 
 [options]
-depth   10
+depth   15
 
 prove: mode bmc
 cover: mode cover
@@ -16,6 +18,7 @@ echo on
 verilog_defaults -add -IREPO_HOME/rtl/core/
 read_verilog -formal REPO_HOME/verif/design-assertions/wrapper.sv
 read_verilog -formal REPO_HOME/verif/design-assertions/fairness.sv
+read_verilog -formal REPO_HOME/verif/design-assertions/assert_memory_if.sv
 read_verilog -formal REPO_HOME/rtl/core/*.sv
 prep -flatten -nordff -top design_assertions_wrapper 
 chformal -early
@@ -24,5 +27,6 @@ chformal -early
 REPO_HOME/extern/riscv-formal/checks/rvfi_macros.vh
 
 [file defines.svh]
-`define DESIGNER_ASSERTION_MEMORY_INTERFACE
+imem: `define DESIGNER_ASSERTION_INSTRUCTION_MEMORY_INTERFACE 1
+dmem: `define DESIGNER_ASSERTION_DATA_MEMORY_INTERFACE        1
 

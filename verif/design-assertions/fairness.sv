@@ -47,18 +47,4 @@ parameter   MMIO_BASE_MASK  = 64'h0000_0000_0000_1FFF;
 // Assume that we start in reset.
 initial assume(g_resetn == 1'b0);
 
-//
-// Assume that we do not get memory bus errors
-always @(posedge g_clk) begin
-
-    if($past(imem_req) && $past(imem_gnt)) begin
-        assume(!imem_err);
-    end
-    
-    if($past(dmem_req) && $past(dmem_gnt)) begin
-        assume(!dmem_err);
-    end
-
-end
-
 endmodule
