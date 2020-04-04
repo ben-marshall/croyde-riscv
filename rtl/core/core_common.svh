@@ -20,7 +20,7 @@ localparam  MEM_ADDR_R  = MEM_ADDR_W - 1; // Memory address bus width
 localparam  MEM_STRB_R  = MEM_STRB_W - 1; // Memory strobe bits width
 localparam  MEM_DATA_R  = MEM_DATA_W - 1; // Memory data bits width
 
-localparam  CF_CAUSE_W  =  5;               // Control flow change cause width
+localparam  CF_CAUSE_W  =  7;               // Control flow change cause width
 localparam  CF_CAUSE_R  =  CF_CAUSE_W - 1;
 
 localparam  FD_IBUF_W   = 32             ;  // Fetch -> decode buffer width
@@ -37,21 +37,22 @@ localparam  REG_SP      = 5'd2          ;
 
 //
 // CSR Trap codes
+// See PRA 3.1.20 (mcause) for cause code values
 
-localparam TRAP_NONE    = 6'b111111;
-localparam TRAP_IALIGN  = 6'b0 ;
-localparam TRAP_IACCESS = 6'b1 ;
-localparam TRAP_IOPCODE = 6'd2 ;
-localparam TRAP_BREAKPT = 6'd3 ;
-localparam TRAP_LDALIGN = 6'd4 ;
-localparam TRAP_LDACCESS= 6'd5 ;
-localparam TRAP_STALIGN = 6'd6 ;
-localparam TRAP_STACCESS= 6'd7 ;
-localparam TRAP_ECALLM  = 6'd11;
+localparam TRAP_NONE    = 7'b111111;
+localparam TRAP_IALIGN  = 7'b0 ;
+localparam TRAP_IACCESS = 7'b1 ;
+localparam TRAP_IOPCODE = 7'd2 ;
+localparam TRAP_BREAKPT = 7'd3 ;
+localparam TRAP_LDALIGN = 7'd4 ;
+localparam TRAP_LDACCESS= 7'd5 ;
+localparam TRAP_STALIGN = 7'd6 ;
+localparam TRAP_STACCESS= 7'd7 ;
+localparam TRAP_ECALLM  = 7'd11;
 
-localparam TRAP_INT_MSI = 6'd3 ;
-localparam TRAP_INT_MTI = 6'd7 ;
-localparam TRAP_INT_MEI = 6'd11;
+localparam TRAP_INT_MSI = 7'd3 ;
+localparam TRAP_INT_MTI = 7'd7 ;
+localparam TRAP_INT_MEI = 7'd11;
 
 
 //

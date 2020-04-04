@@ -10,6 +10,9 @@ module design_assertions_fairness (
 
 input  wire                 g_clk        , // Global clock
 input  wire                 g_resetn     , // Global active low sync reset.
+
+input  wire                 int_sw       , // software interrupt
+input  wire                 int_ext      , // hardware interrupt
               
 input  wire                 imem_req     , // Memory request
 input  wire [ MEM_ADDR_R:0] imem_addr    , // Memory request address

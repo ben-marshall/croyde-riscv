@@ -45,6 +45,9 @@ parameter   MMIO_BASE_MASK  = 64'h0000_0000_0000_1FFF;
 (*keep*)      wire [         31:0] trs_instr    ; // Instruction trace data
 (*keep*)      wire [         XL:0] trs_pc       ; // Instruction trace PC
 
+(*keep*) rand reg                  int_sw       ; // software interrupt
+(*keep*) rand reg                  int_ext      ; // hardware interrupt
+
 
 //
 // Fairness and assumptions
@@ -56,6 +59,8 @@ design_assertions_fairness #(
 ) i_design_assertions_fairness (
 .g_clk        (clock        ), // Global clock
 .g_resetn     (g_resetn     ), // Global active low sync reset.
+.int_sw       (int_sw       ), // Software interrupt
+.int_ext      (int_ext      ), // External interrupt
 .imem_req     (imem_req     ), // Memory request
 .imem_addr    (imem_addr    ), // Memory request address
 .imem_wen     (imem_wen     ), // Memory request write enable
@@ -123,6 +128,8 @@ core_top #(
 ) i_dut (
 .g_clk        (clock        ), // Global clock
 .g_resetn     (g_resetn     ), // Global active low sync reset.
+.int_sw       (int_sw       ), // Software interrupt
+.int_ext      (int_ext      ), // External interrupt
 .imem_req     (imem_req     ), // Memory request
 .imem_addr    (imem_addr    ), // Memory request address
 .imem_wen     (imem_wen     ), // Memory request write enable

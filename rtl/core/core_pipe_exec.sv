@@ -48,14 +48,14 @@ input  wire [         XL:0] csr_rdata   , // CSR read data
 input  wire                 csr_error   , // CSR access error.
 
 input  wire [         XL:0] csr_mepc    , // Current MEPC  value
-input  wire [         XL:0] csr_mtvec   , // Current MTVEC value
+input  wire [         XL:0] mtvec_base  , // Current MTVEC base address value
 
 output wire                 exec_mret   , // MRET instruction executed
 output wire                 instr_ret   , // Instruction retired.
 
 output wire                 trap_cpu    , // A trap occured due to CPU
 output wire                 trap_int    , // A trap occured due to interrupt
-output wire [          5:0] trap_cause  , // A trap occured due to interrupt
+output wire [ CF_CAUSE_R:0] trap_cause  , // A trap occured due to interrupt
 output wire [         XL:0] trap_mtval  , // Value associated with the trap.
 output wire [         XL:0] trap_pc     , // PC value associated with the trap.
 
@@ -75,7 +75,12 @@ output wire [ MEM_STRB_R:0] dmem_strb   , // Memory request write strobe
 output wire [ MEM_DATA_R:0] dmem_wdata  , // Memory write data.
 input  wire                 dmem_gnt    , // Memory response valid
 input  wire                 dmem_err    , // Memory response error
-input  wire [ MEM_DATA_R:0] dmem_rdata    // Memory response read data
+input  wire [ MEM_DATA_R:0] dmem_rdata  , // Memory response read data
+
+input  wire                 int_pending , // To exec stage
+input  wire [          6:0] int_cause   , // Cause code for the interrupt.
+input  wire [         XL:0] int_tvec    , // Interrupt trap vector
+output wire                 int_ack       // Interrupt taken acknowledge
 
 );
 
@@ -214,7 +219,7 @@ wire    cfu_not_taken       = cfu_conditional && !cfu_cond_taken;
 wire    cfu_goto_mepc       = cfu_op_mret                                ;
 
 // Jump directly to the MTVEC CSR register
-wire    cfu_goto_mtvec      = cfu_op_ecall  || cfu_op_ebreak || cf_excep ;
+wire    cfu_goto_mtvec      = cfu_op_ecall  || cfu_op_ebreak;
 
 // Has the CFU finished executing it's given instruction.
 wire    op_done_cfu         = 
@@ -241,10 +246,15 @@ wire excep_ecall            = cfu_op_ecall          ;
 
 wire excep_ebreak           = cfu_op_ebreak         ;
 
+wire [6:0] excep_cause      = 7'b0                  ;
 
 wire cf_excep   = excep_csr_error || excep_cfu_bad_target   ||
                   excep_ecall     || excep_ebreak           ||
                   lsu_trap_bus    || lsu_trap_addr          ;
+
+wire cf_interupt= int_pending     ;
+
+assign int_ack  = trap_int  && e_cf_change;
 
 //
 // Control flow bus
@@ -264,33 +274,39 @@ always @(posedge g_clk) begin
 end
 
 assign  s2_cf_valid         =
-    (cf_excep || cfu_cond_taken || cfu_op_always_done) && !cf_done;
+    (cf_excep || cfu_cond_taken || cfu_op_always_done || cf_interupt) &&
+    !cf_done;
 
+// PRA 3.1.14: 
+//    "Synchronous exceptions are of lower priority than all interrupts"
 assign  s2_cf_target        = 
+    cf_interupt         ?   int_tvec        :
+    cf_excep            ?   mtvec_base      :
     cfu_goto_mepc       ?   csr_mepc        :
-    cfu_goto_mtvec      ?   csr_mtvec       :
     cfu_conditional     ?   cfu_bcmp_taret  :
     cfu_op_always_done  ?   cfu_jump_target :
-                            csr_mtvec       ;
+                            mtvec_base      ;
 
-assign  s2_cf_cause     = 0     ;   // TODO
+assign  s2_cf_cause     = cf_interupt ? int_cause : excep_cause;
 
 assign  exec_mret       = cfu_op_mret && e_new_instr;
 
 assign  instr_ret       = (e_iret || e_cf_change) && !cf_excep  ;
 
-assign  trap_cpu        = cf_excep                  ;
-
-assign  trap_int        = 1'b0                      ; // TODO
+// PRA 3.1.14: 
+//    "Synchronous exceptions are of lower priority than all interrupts"
+assign  trap_cpu        = cf_excep && !cf_interupt  ;
+assign  trap_int        = cf_interupt               ;
 
 assign  trap_mtval      = 64'b0                     ; // TODO
 
 assign  trap_pc         = s2_pc                     ;
 
 wire    s2_trap         = 1'b0; // TODO Trap raising from decode.
-wire    [5:0] s2_trap_cause = 0;
+wire    [6:0] s2_trap_cause = 0;
 
 assign  trap_cause      =
+    cf_interupt                 ?   int_cause       :
     s2_trap                     ?   s2_trap_cause   :
     lsu_trap_addr && lsu_load   ?   TRAP_LDALIGN    :
     lsu_trap_bus  && lsu_load   ?   TRAP_LDACCESS   :

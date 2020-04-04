@@ -50,7 +50,7 @@ timer_interrupt_handler:
     csrw mtvec, t1
 
     csrr t3, mcause     // Check mcause == 7, with MSB bit set.
-    li   t4, 0x80000007
+    li   t4, 0x8000000000000007
     bne  t3, t4, test_fail
 
     li t3, 0x00001008   // Set mtime cmp to something enormous.
@@ -106,7 +106,7 @@ mtvec_trap_handler_unaligned:
 .endfunc
 
 
-.balign 64
+.balign 128
 .func mtvec_trap_handler_aligned
 .global mtvec_trap_handler_aligned
 mtvec_trap_handler_aligned:
@@ -125,6 +125,10 @@ mtvec_trap_handler_aligned:
     la t0, interrupt_seen
     li t1, 1
     sw t1, 0(t0)
+
+    csrr t0, mepc       // Increment mepc by 4.
+    addi t0, t0, 4
+    csrw mepc, t0
     
     li t3, 0x00001008   // Set mtime cmp to something enormous.
     li t4, -1

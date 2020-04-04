@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Wed Apr  1 08:54:49 2020
+[*] Sat Apr  4 11:24:22 2020
 [*]
-[dumpfile] "/home/work/uc64/work/unit/example/example.vcd"
-[dumpfile_mtime] "Wed Apr  1 08:52:08 2020"
-[dumpfile_size] 4362607
-[savefile] "/home/work/uc64/flow/gtkwave/verilator.gtkw"
-[timestart] 1555
+[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/unit/interrupts/interrupts.vcd"
+[dumpfile_mtime] "Sat Apr  4 11:15:47 2020"
+[dumpfile_size] 9147721
+[savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/verilator.gtkw"
+[timestart] 47083
 [size] 1920 1025
 [pos] -1 -1
-*-5.535489 1606 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-6.239466 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.core_top.
 [treeopen] TOP.core_top.i_core_pipe_exec.
@@ -22,7 +22,7 @@
 TOP.core_top.i_core_pipe_fetch.g_clk
 TOP.core_top.i_core_pipe_fetch.g_resetn
 @c02022
-^1 /home/work/uc64/work/unit/example/example.gtkwl
+^3 /home/ben/projects/riscv/cores/uc64/work/unit/interrupts/interrupts.gtkwl
 TOP.core_top.trs_instr[31:0]
 @28
 (0)TOP.core_top.trs_instr[31:0]
@@ -59,11 +59,13 @@ TOP.core_top.trs_instr[31:0]
 (31)TOP.core_top.trs_instr[31:0]
 @1401200
 -group_end
-@23
+@22
 TOP.core_top.trs_pc[63:0]
 @28
 TOP.core_top.trs_valid
+@29
 TOP.core_top.trap_cpu
+@28
 TOP.core_top.trap_int
 @c00022
 TOP.core_top.cf_target[63:0]
@@ -179,7 +181,7 @@ TOP.core_top.dmem_wdata[63:0]
 TOP.core_top.dmem_wen
 @1401200
 -Memory Bus - Data
-@800200
+@c00200
 -Buffer
 @28
 TOP.core_top.i_core_pipe_fetch.buf_ready
@@ -221,7 +223,6 @@ TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.fill_8
 TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.flush
 @1401200
 -Buffer
-@1000200
 -Buffer
 @c00200
 -Control Flow
@@ -229,7 +230,6 @@ TOP.core_top.i_core_pipe_fetch.i_core_pipe_fetch_buffer.flush
 TOP.core_top.i_core_pipe_fetch.cf_valid
 TOP.core_top.i_core_pipe_fetch.cf_ack
 @22
-TOP.core_top.i_core_pipe_fetch.cf_cause[4:0]
 TOP.core_top.i_core_pipe_fetch.cf_target[63:0]
 TOP.core_top.i_core_pipe_fetch.n_s1_pc[63:0]
 TOP.core_top.i_core_pipe_fetch.s1_npc[63:0]
@@ -247,20 +247,21 @@ TOP.core_top.i_core_pipe_fetch.e_eat_2
 TOP.core_top.i_core_pipe_fetch.e_eat_4
 @1401200
 -Events
-@800200
+@c00200
 -Fetch -> Decode
 @28
 TOP.core_top.i_core_pipe_fetch.s1_ferr[1:0]
 @22
 TOP.core_top.i_core_pipe_fetch.s1_instr[31:0]
 @2022
-^1 /home/work/uc64/work/unit/example/example.gtkwl
+^1 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
 TOP.core_top.i_core_pipe_fetch.s1_instr[31:0]
 @22
 TOP.core_top.i_core_pipe_fetch.s1_pc[63:0]
 TOP.core_top.i_core_pipe_fetch.n_s1_pc[63:0]
-@1000200
+@1401200
 -Fetch -> Decode
+@1000200
 -Pipeline - Fetch
 @c00200
 -GPRs
@@ -547,7 +548,6 @@ TOP.core_top.i_core_pipe_exec.csr_wr_set
 TOP.core_top.i_core_pipe_exec.csr_error
 @22
 TOP.core_top.i_core_pipe_exec.csr_mepc[63:0]
-TOP.core_top.i_core_pipe_exec.csr_mtvec[63:0]
 @28
 TOP.core_top.i_core_pipe_exec.exec_mret
 @1000200
@@ -609,7 +609,6 @@ TOP.core_top.i_core_pipe_exec.cfu_goto_mtvec
 TOP.core_top.i_core_pipe_exec.s2_cf_valid
 TOP.core_top.i_core_pipe_exec.s2_cf_ack
 @22
-TOP.core_top.i_core_pipe_exec.s2_cf_cause[4:0]
 TOP.core_top.i_core_pipe_exec.s2_cf_target[63:0]
 @1401200
 -Execute - Control Flow
@@ -709,7 +708,9 @@ TOP.core_top.i_core_pipe_exec.s2_rd_addr[4:0]
 TOP.core_top.i_core_pipe_exec.s2_rd_wdata[63:0]
 @1401200
 -GPR Writeback
-@c00200
+@1000200
+-Pipeline - Execte
+@800200
 -CSR Bus
 @28
 TOP.core_top.i_core_pipe_exec.csr_gpr_wen
@@ -724,7 +725,7 @@ TOP.core_top.i_core_pipe_exec.csr_read_en
 TOP.core_top.i_core_pipe_exec.csr_wr
 TOP.core_top.i_core_pipe_exec.csr_wr_clr
 TOP.core_top.i_core_pipe_exec.csr_wr_set
-@1401200
+@1000200
 -CSR Bus
 @c00200
 -CSRs
@@ -779,9 +780,41 @@ TOP.core_top.i_core_csrs.reg_mtval[63:0]
 TOP.core_top.i_core_csrs.reg_mtvec[63:0]
 @1401200
 -CSRs
+@800200
+-Interrupts
+@28
+TOP.core_top.i_core_interrupts.g_clk
+TOP.core_top.i_core_interrupts.g_resetn
+TOP.core_top.i_core_interrupts.int_pending
+TOP.core_top.i_core_interrupts.int_ack
+@22
+TOP.core_top.i_core_interrupts.int_cause[6:0]
+TOP.core_top.i_core_interrupts.int_tvec[63:0]
+@28
+TOP.core_top.i_core_interrupts.int_ext
+TOP.core_top.i_core_interrupts.int_pend_ext
+TOP.core_top.i_core_interrupts.int_pend_sw
+TOP.core_top.i_core_interrupts.int_pend_ti
+TOP.core_top.i_core_interrupts.int_sw
+TOP.core_top.i_core_interrupts.int_ti
+TOP.core_top.i_core_interrupts.mie_meie
+TOP.core_top.i_core_interrupts.mie_msie
+TOP.core_top.i_core_interrupts.mie_mtie
+TOP.core_top.i_core_interrupts.mip_meip
+TOP.core_top.i_core_interrupts.mip_msip
+TOP.core_top.i_core_interrupts.mip_mtip
+TOP.core_top.i_core_interrupts.mode_direct
+TOP.core_top.i_core_interrupts.mode_vector
+TOP.core_top.i_core_interrupts.mstatus_mie
+@22
+TOP.core_top.i_core_interrupts.mtvec_base[63:0]
+@28
+TOP.core_top.i_core_interrupts.mtvec_mode[1:0]
+@22
+TOP.core_top.i_core_interrupts.mtvec_offset[63:0]
 @1000200
--Pipeline - Execte
-@c00200
+-Interrupts
+@800200
 -Counters
 @28
 TOP.core_top.i_core_counters.addr_mtime_lo
@@ -825,7 +858,7 @@ TOP.core_top.i_core_counters.n_timer_interrupt
 TOP.core_top.i_core_counters.timer_interrupt
 TOP.core_top.i_core_counters.wr_mtime_lo
 TOP.core_top.i_core_counters.wr_mtimecmp_lo
-@1401200
+@1000200
 -Counters
 [pattern_trace] 1
 [pattern_trace] 0

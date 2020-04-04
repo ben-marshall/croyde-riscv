@@ -6,8 +6,11 @@
 //
 module core_top (
 
-input  wire                 g_clk        , // Global clock
-input  wire                 g_resetn     , // Global active low sync reset.
+input  wire                 g_clk        , // global clock
+input  wire                 g_resetn     , // global active low sync reset.
+
+input  wire                 int_sw       , // software interrupt
+input  wire                 int_ext      , // hardware interrupt
               
 output wire                 imem_req     , // Memory request
 output wire [ MEM_ADDR_R:0] imem_addr    , // Memory request address
@@ -72,6 +75,11 @@ assign cf_target    = s2_cf_target;
 
 wire   s1_flush     = cf_valid && cf_ack;
 
+wire                 int_pending ; // To exec stage from core_interrupts
+wire [ CF_CAUSE_R:0] int_cause   ; // Cause code for the interrupt.
+wire [         XL:0] int_tvec    ; // Interrupt trap vector
+wire                 int_ack     ; // Interrupt taken acknowledge
+
 //
 // Inter-stage wiring
 // ------------------------------------------------------------
@@ -129,7 +137,8 @@ wire [         XL:0] csr_rdata   ; // CSR read data
 wire                 csr_error   ; // CSR access error
                
 wire [         XL:0] csr_mepc    ; // Current EPC.
-wire [         XL:0] csr_mtvec   ; // Current MTVEC.
+wire [         XL:0] mtvec_base  ; // Current MTVEC base address.
+wire [          1:0] mtvec_mode  ; // Current MTVEC direct/vector mode
                
 wire                 exec_mret   ; // MRET instruction executed.
                
@@ -138,12 +147,12 @@ wire                 mie_meie    ; // External interrupt enable.
 wire                 mie_mtie    ; // Timer interrupt enable.
 wire                 mie_msie    ; // Software interrupt enable.
                
-wire                 mip_meip    =0; // External interrupt pending
-wire                 mip_mtip    =0; // Timer interrupt pending
-wire                 mip_msip    =0; // Software interrupt pending
+wire                 mip_meip    ; // External interrupt pending
+wire                 mip_mtip    ; // Timer interrupt pending
+wire                 mip_msip    ; // Software interrupt pending
 
 wire                 instr_ret   ; // Instruction retired;
-wire                 timer_interrupt; // A timer interrupt has fired.
+wire                 int_ti      ; // A timer interrupt has fired.
                
 wire [         63:0] ctr_time    ; // The time counter value.
 wire [         63:0] ctr_cycle   ; // The cycle counter value.
@@ -155,7 +164,7 @@ wire                 inhibit_ir  ; // Stop instret incrementing.
                
 wire                 trap_cpu    ; // A trap occured due to CPU
 wire                 trap_int    ; // A trap occured due to interrupt
-wire [          5:0] trap_cause  ; // A trap occured due to interrupt
+wire [ CF_CAUSE_R:0] trap_cause  ; // A trap occured due to interrupt
 wire [         XL:0] trap_mtval  ; // Value associated with the trap.
 wire [         XL:0] trap_pc     ; // PC value associated with the trap.
 
@@ -304,7 +313,7 @@ core_pipe_exec i_core_pipe_exec(
 .csr_wdata      (csr_wdata      ), // Data to be written to a CSR
 .csr_rdata      (csr_rdata      ), // CSR read data
 .csr_mepc       (csr_mepc       ), // Current MEPC  value
-.csr_mtvec      (csr_mtvec      ), // Current MTVEC value
+.mtvec_base     (mtvec_base     ), // Current MTVEC value
 .csr_error      (csr_error      ), // CSR access error.
 .exec_mret      (exec_mret      ), // MRET instruction executed
 .instr_ret      (instr_ret      ), // Instruction retired.
@@ -327,7 +336,11 @@ core_pipe_exec i_core_pipe_exec(
 .dmem_wdata     (int_dmem_wdata ), // Memory write data.
 .dmem_gnt       (int_dmem_gnt   ), // Memory response valid
 .dmem_err       (int_dmem_err   ), // Memory response error
-.dmem_rdata     (int_dmem_rdata )  // Memory response read data
+.dmem_rdata     (int_dmem_rdata ), // Memory response read data
+.int_pending    (int_pending    ), // To exec stage
+.int_cause      (int_cause      ), // Cause code for the interrupt.
+.int_tvec       (int_tvec       ), // Interrupt trap vector
+.int_ack        (int_ack        )  // Interrupt taken acknowledge
 );
 
 //
@@ -365,7 +378,8 @@ core_csrs i_core_csrs (
 .csr_rdata        (csr_rdata        ), // CSR read data
 .csr_error        (csr_error        ), // CSR access error.
 .csr_mepc         (csr_mepc         ), // Current EPC.
-.csr_mtvec        (csr_mtvec        ), // Current MTVEC.
+.mtvec_base       (mtvec_base       ), // Current MTVEC base address.
+.mtvec_mode       (mtvec_mode       ), // Current MTVEC vector mode.
 .exec_mret        (exec_mret        ), // MRET instruction executed.
 .mstatus_mie      (mstatus_mie      ), // Global interrupt enable.
 .mie_meie         (mie_meie         ), // External interrupt enable.
@@ -389,6 +403,33 @@ core_csrs i_core_csrs (
 
 
 //
+// module: core_interrupts
+//
+//  Handles interrupt prioritisation and raising.
+//
+core_interrupts i_core_interrupts (
+.g_clk        (g_clk            ), // global clock
+.g_resetn     (g_resetn         ), // global active low sync reset.
+.int_sw       (int_sw           ), // Software interrupt
+.int_ext      (int_ext          ), // External interrupt
+.int_ti       (int_ti           ), // Timer interrupt
+.mtvec_base   (mtvec_base       ), // Current MTVEC base address.
+.mtvec_mode   (mtvec_mode       ), // Current MTVEC vector mode.
+.mstatus_mie  (mstatus_mie      ), // Global interrupt enable.
+.mie_meie     (mie_meie         ), // External interrupt enable.
+.mie_mtie     (mie_mtie         ), // Timer interrupt enable.
+.mie_msie     (mie_msie         ), // Software interrupt enable.
+.mip_meip     (mip_meip         ), // External interrupt pending
+.mip_mtip     (mip_mtip         ), // Timer interrupt pending
+.mip_msip     (mip_msip         ), // Software interrupt pending
+.int_pending  (int_pending      ), // To exec stage
+.int_cause    (int_cause        ), // Cause code for the interrupt.
+.int_tvec     (int_tvec         ), // Interrupt trap vector
+.int_ack      (int_ack          )  // Interrupt taken acknowledge
+);
+
+
+//
 // module: core_counters
 //
 //  Responsible for all performance counters and timers.
@@ -400,7 +441,7 @@ core_counters #(
 .g_clk           (g_clk           ), // global clock
 .g_resetn        (g_resetn        ), // synchronous reset
 .instr_ret       (instr_ret       ), // Instruction retired.
-.timer_interrupt (timer_interrupt ), // Raise a timer interrupt
+.timer_interrupt (int_ti          ), // Raise a timer interrupt
 .ctr_time        (ctr_time        ), // The time counter value.
 .ctr_cycle       (ctr_cycle       ), // The cycle counter value.
 .ctr_instret     (ctr_instret     ), // The instret counter value.

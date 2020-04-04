@@ -32,17 +32,15 @@
 
 - [ ] LSU address calculation in decode.
 
-- [ ] Interrupts
+- [x] Interrupts
 
-  - [ ] Timer
+  - [x] Timer
 
-  - [ ] External
+  - [x] External
 
-  - [ ] SW
+  - [x] SW
 
-  - [ ] NMI
-
-  - [ ] Vectoring
+  - [x] Vectoring
 
 - [ ] MPU
 

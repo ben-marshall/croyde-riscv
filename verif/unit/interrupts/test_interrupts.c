@@ -189,6 +189,7 @@ int test_mtvec_fields() {
     mtvec_test_code = 0;
     mtvec(&mtvec_trap_handler_unaligned, 2);
     if(mtvec_test_code != 1){return 3;} // Expect to have trapped.
+    mtvec_test_code = 0;
 
     //
     // Set to invalid interrupt mode, handler = mtvec_trap_handler.

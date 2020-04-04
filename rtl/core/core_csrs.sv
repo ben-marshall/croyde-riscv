@@ -19,7 +19,8 @@ output wire [XL:0] csr_rdata        , // CSR read data
 output wire        csr_error        , // Bad CSR access
 
 output wire [XL:0] csr_mepc         , // Current EPC.
-output wire [XL:0] csr_mtvec        , // Current MTVEC.
+output wire [XL:0] mtvec_base       , // Current MTVEC base address.
+output wire [ 1:0] mtvec_mode       , // Current MTVEC vector mode.
 
 input  wire        exec_mret        , // MRET instruction executed.
 
@@ -42,7 +43,7 @@ output wire        inhibit_ir       , // Stop instret incrementing.
 
 input  wire        trap_cpu         , // A trap occured due to CPU
 input  wire        trap_int         , // A trap occured due to interrupt
-input  wire [ 5:0] trap_cause       , // A trap occured due to interrupt
+input  wire [CF_CAUSE_R:0] trap_cause, // A trap occured due to interrupt
 input  wire [XL:0] trap_mtval       , // Value associated with the trap.
 input  wire [XL:0] trap_pc            // PC value associated with the trap.
 
@@ -55,43 +56,37 @@ input  wire [XL:0] trap_pc            // PC value associated with the trap.
 // CSR addresses and constant values.
 // -------------------------------------------------------------------------
 
-parameter  CSR_MTVEC_RESET_VALUE= 64'hC0000000;
-parameter  CSR_MVENDORID        = 64'b0;
-parameter  CSR_MARCHID          = 64'b0;
-parameter  CSR_MIMPID           = 64'b0;
-parameter  CSR_MHARTID          = 64'b0;
+localparam ADDR_CYCLE       = 12'hC00;
+localparam ADDR_TIME        = 12'hC01;
+localparam ADDR_INSTRET     = 12'hC02;
+localparam ADDR_CYCLEH      = 12'hC80;
+localparam ADDR_TIMEH       = 12'hC81;
+localparam ADDR_INSTRETH    = 12'hC82;
 
-localparam CSR_ADDR_CYCLE       = 12'hC00;
-localparam CSR_ADDR_TIME        = 12'hC01;
-localparam CSR_ADDR_INSTRET     = 12'hC02;
-localparam CSR_ADDR_CYCLEH      = 12'hC80;
-localparam CSR_ADDR_TIMEH       = 12'hC81;
-localparam CSR_ADDR_INSTRETH    = 12'hC82;
+localparam ADDR_MCYCLE      = 12'hB00;
+localparam ADDR_MINSTRET    = 12'hB02;
+localparam ADDR_MCYCLEH     = 12'hB80;
+localparam ADDR_MINSTRETH   = 12'hB82;
 
-localparam CSR_ADDR_MCYCLE      = 12'hB00;
-localparam CSR_ADDR_MINSTRET    = 12'hB02;
-localparam CSR_ADDR_MCYCLEH     = 12'hB80;
-localparam CSR_ADDR_MINSTRETH   = 12'hB82;
+localparam ADDR_MCOUNTIN    = 12'h320;
 
-localparam CSR_ADDR_MCOUNTIN    = 12'h320;
+localparam ADDR_MSTATUS     = 12'h300;
+localparam ADDR_MISA        = 12'h301;
+localparam ADDR_MEDELEG     = 12'h302;
+localparam ADDR_MIDELEG     = 12'h303;
+localparam ADDR_MIE         = 12'h304;
+localparam ADDR_MTVEC       = 12'h305;
 
-localparam CSR_ADDR_MSTATUS     = 12'h300;
-localparam CSR_ADDR_MISA        = 12'h301;
-localparam CSR_ADDR_MEDELEG     = 12'h302;
-localparam CSR_ADDR_MIDELEG     = 12'h303;
-localparam CSR_ADDR_MIE         = 12'h304;
-localparam CSR_ADDR_MTVEC       = 12'h305;
+localparam ADDR_MSCRATCH    = 12'h340;
+localparam ADDR_MEPC        = 12'h341;
+localparam ADDR_MCAUSE      = 12'h342;
+localparam ADDR_MTVAL       = 12'h343;
+localparam ADDR_MIP         = 12'h344;
 
-localparam CSR_ADDR_MSCRATCH    = 12'h340;
-localparam CSR_ADDR_MEPC        = 12'h341;
-localparam CSR_ADDR_MCAUSE      = 12'h342;
-localparam CSR_ADDR_MTVAL       = 12'h343;
-localparam CSR_ADDR_MIP         = 12'h344;
-
-localparam CSR_ADDR_MVENDORID   = 12'hF11;
-localparam CSR_ADDR_MARCHID     = 12'hF12;
-localparam CSR_ADDR_MIMPID      = 12'hF13;
-localparam CSR_ADDR_MHARTID     = 12'hF14;
+localparam ADDR_MVENDORID   = 12'hF11;
+localparam ADDR_MARCHID     = 12'hF12;
+localparam ADDR_MIMPID      = 12'hF13;
+localparam ADDR_MHARTID     = 12'hF14;
 
 
 //
@@ -110,10 +105,15 @@ wire [XL  :0] reg_misa = {
 // CSR: constants
 // -------------------------------------------------------------------------
 
-wire [XL:0] reg_mvendorid       = CSR_MVENDORID;
-wire [XL:0] reg_marchid         = CSR_MARCHID;
-wire [XL:0] reg_mimpid          = CSR_MIMPID;
-wire [XL:0] reg_mhartid         = CSR_MHARTID;
+parameter   MVENDORID           = 64'b0;
+parameter   MARCHID             = 64'b0;
+parameter   MIMPID              = 64'b0;
+parameter   MHARTID             = 64'b0;
+
+wire [XL:0] reg_mvendorid       = MVENDORID;
+wire [XL:0] reg_marchid         = MARCHID;
+wire [XL:0] reg_mimpid          = MIMPID;
+wire [XL:0] reg_mhartid         = MHARTID;
 
 wire [XL:0] reg_medeleg         = 64'b0;
 wire [XL:0] reg_mideleg         = 64'b0;
@@ -125,7 +125,7 @@ wire [XL:0] reg_mideleg         = 64'b0;
 
 wire [XL:0] reg_mip = {52'b0,mip_meip,3'b0,mip_mtip,3'b0,mip_msip,3'b0};
 
-wire wen_mie = csr_en && csr_wr  && csr_addr == CSR_ADDR_MIE;
+wire wen_mie = csr_en && csr_wr  && csr_addr == ADDR_MIE;
 
 wire [XL:0] reg_mie = {52'b0,mie_meie,3'b0,mie_mtie,3'b0,mie_msie,3'b0};
 
@@ -200,7 +200,7 @@ wire [XL:0] reg_mstatus         = {
     reg_mstatus_uie    
 };
 
-wire        wen_mstatus     = csr_wr && csr_addr == CSR_ADDR_MSTATUS;
+wire        wen_mstatus     = csr_wr && csr_addr == ADDR_MSTATUS;
 wire        wen_mstatus_mie = wen_mstatus || trap_cpu || trap_int || exec_mret;
 wire        wen_mstatus_mpie= wen_mstatus || trap_cpu || trap_int || exec_mret;
 
@@ -259,30 +259,62 @@ end
 
 //
 // CSR: MTVEC
+//
+//  See PRA setion 3.2.12 (mtvec)
+//
 // -------------------------------------------------------------------------
 
+// Reset value of mtvec.base
+parameter  MTVEC_BASE_RESET     = 64'h0000_0000_C000_0000;
+
+// Reset value of mtvec.mode
+parameter  MTVEC_MODE_RESET     = 2'b00;
+
+// Alignment required when writing mtvec.base with mtvec.mode = vectored.
+parameter  MTVEC_VECT_BASE_MASK = 64'hFFFF_FFFF_FFFF_FF80;
+
 reg  [XL-2:0] reg_mtvec_base  ;
-reg  [ 1:0] reg_mtvec_mode  = 2'b00; // Only direct exceptions supported.
+reg  [   1:0] reg_mtvec_mode  ;
+
 
 wire [XL:0] reg_mtvec       = {
     reg_mtvec_base,
     reg_mtvec_mode
 };
 
-assign      csr_mtvec    = {reg_mtvec_base, 2'b00};
+assign        mtvec_base    = {reg_mtvec_base, 2'b00}   ;
+assign        mtvec_mode    =  reg_mtvec_mode           ;
 
-wire        wen_mtvec    = csr_wr && csr_addr == CSR_ADDR_MTVEC;
+wire          wen_mtvec     = csr_wr && csr_addr == ADDR_MTVEC;
 
-wire [XL-2:0] n_mtvec_base = {32'b0,
-    csr_wr_set ? csr_mtvec[31:2] |  csr_wdata[31:2] :
-    csr_wr_clr ? csr_mtvec[31:2] & ~csr_wdata[31:2] :
-                 csr_wdata[31:2]                    };
+
+wire [XL-2:0] n_mtvec_base  = {
+    csr_wr_set ? reg_mtvec_base[XL-2:0] |  csr_wdata[XL:2] :
+    csr_wr_clr ? reg_mtvec_base[XL-2:0] & ~csr_wdata[XL:2] :
+                 csr_wdata     [XL  :2]                    };
+
+
+wire [   1:0] n_mtvec_mode  = {
+    csr_wr_set ? reg_mtvec_mode[ 1:0] |  csr_wdata[ 1:0] :
+    csr_wr_clr ? reg_mtvec_mode[ 1:0] & ~csr_wdata[ 1:0] :
+                 csr_wdata     [ 1:0]                    };
+
+wire bad_mtvec_mode = n_mtvec_mode[1];
+wire bad_mtvec_align= n_mtvec_mode[0] && 
+                      |({n_mtvec_base,2'b00} & ~MTVEC_VECT_BASE_MASK);
+
+wire          bad_mtvec_val = bad_mtvec_mode || bad_mtvec_align;
+
+wire          csr_error_mtvec = bad_mtvec_val && wen_mtvec;
+
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
-        reg_mtvec_base <= CSR_MTVEC_RESET_VALUE[XL:2];
-    end else if(wen_mtvec) begin
+        reg_mtvec_base <= MTVEC_BASE_RESET[XL:2];
+        reg_mtvec_mode <= MTVEC_MODE_RESET      ;
+    end else if(wen_mtvec && !bad_mtvec_val) begin
         reg_mtvec_base <= n_mtvec_base;
+        reg_mtvec_mode <= n_mtvec_mode;
     end
 end
 
@@ -298,7 +330,7 @@ wire[XL:0] n_reg_mscratch =
     csr_wr_clr ? reg_mscratch & ~csr_wdata :
                  csr_wdata                 ;
 
-wire       wen_mscratch = csr_wr && csr_addr == CSR_ADDR_MSCRATCH;
+wire       wen_mscratch = csr_wr && csr_addr == ADDR_MSCRATCH;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
@@ -320,7 +352,7 @@ wire [XL:0] n_reg_mtval =
     csr_wr_clr ? reg_mtval & ~csr_wdata:
                  csr_wdata             ;
 
-wire wen_mtval = csr_wr && csr_addr == CSR_ADDR_MTVAL;
+wire wen_mtval = csr_wr && csr_addr == ADDR_MTVAL;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
@@ -345,7 +377,7 @@ wire [XL:0] reg_mepc = {
 
 assign      csr_mepc = {reg_mepc_mepc, 1'b0};
 
-wire        wen_mepc = csr_wr  && csr_addr == CSR_ADDR_MEPC ||
+wire        wen_mepc = csr_wr  && csr_addr == ADDR_MEPC ||
                        trap_cpu                             ||
                        trap_int                             ;
 
@@ -376,27 +408,27 @@ wire [XL:0] reg_mcause = {
     reg_mcause_cause
 };
 
-wire        wen_mcause = csr_wr  && csr_addr == CSR_ADDR_MCAUSE ||
+wire        wen_mcause = csr_wr  && csr_addr == ADDR_MCAUSE ||
                          trap_cpu                               ||
                          trap_int                               ;
 
 wire [XL-1:0] n_mcause_cause =
-    trap_int || trap_cpu ? {32'b0,25'b0, trap_cause   }            :
+    trap_int || trap_cpu ? {32'b0,24'b0, trap_cause   }            :
     csr_wr_set           ? reg_mcause_cause |  csr_wdata[XL-1:0]   :
     csr_wr_clr           ? reg_mcause_cause & ~csr_wdata[XL-1:0]   :
                            csr_wdata[XL-1:0]                       ;
 
 wire        wen_valid_mcause = 
-    csr_wdata == {32'b0,26'b0,TRAP_IALIGN  } ||
-    csr_wdata == {32'b0,26'b0,TRAP_IACCESS } ||
-    csr_wdata == {32'b0,26'b0,TRAP_IOPCODE } ||
-    csr_wdata == {32'b0,26'b0,TRAP_BREAKPT } ||
-    csr_wdata == {32'b0,26'b0,TRAP_LDALIGN } ||
-    csr_wdata == {32'b0,26'b0,TRAP_LDACCESS} ||
-    csr_wdata == {32'b0,26'b0,TRAP_STALIGN } ||
-    csr_wdata == {32'b0,26'b0,TRAP_STACCESS} ||
-    csr_wdata == {32'b0,26'b0,TRAP_ECALLM  } ||
-    csr_addr  != CSR_ADDR_MCAUSE             ;
+    csr_wdata == {32'b0,25'b0,TRAP_IALIGN  } ||
+    csr_wdata == {32'b0,25'b0,TRAP_IACCESS } ||
+    csr_wdata == {32'b0,25'b0,TRAP_IOPCODE } ||
+    csr_wdata == {32'b0,25'b0,TRAP_BREAKPT } ||
+    csr_wdata == {32'b0,25'b0,TRAP_LDALIGN } ||
+    csr_wdata == {32'b0,25'b0,TRAP_LDACCESS} ||
+    csr_wdata == {32'b0,25'b0,TRAP_STALIGN } ||
+    csr_wdata == {32'b0,25'b0,TRAP_STACCESS} ||
+    csr_wdata == {32'b0,25'b0,TRAP_ECALLM  } ||
+    csr_addr  != ADDR_MCAUSE             ;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
@@ -417,12 +449,11 @@ reg mcountin_ir;
 reg mcountin_tm;
 reg mcountin_cy;
 
-// TODO: Turn into ports.
 assign inhibit_ir = mcountin_ir;
 assign inhibit_tm = mcountin_tm;
 assign inhibit_cy = mcountin_cy;
 
-wire wen_mcountin = csr_wr && csr_addr == CSR_ADDR_MCOUNTIN;
+wire wen_mcountin = csr_wr && csr_addr == ADDR_MCOUNTIN;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
@@ -447,32 +478,32 @@ wire [XL:0] reg_mcountin = {
 // CSR read responses.
 // -------------------------------------------------------------------------
 
-wire   read_mstatus   = csr_en && csr_addr == CSR_ADDR_MSTATUS  ;
-wire   read_misa      = csr_en && csr_addr == CSR_ADDR_MISA     ;
-wire   read_medeleg   = csr_en && csr_addr == CSR_ADDR_MEDELEG  ;
-wire   read_mideleg   = csr_en && csr_addr == CSR_ADDR_MIDELEG  ;
-wire   read_mie       = csr_en && csr_addr == CSR_ADDR_MIE      ;
-wire   read_mtvec     = csr_en && csr_addr == CSR_ADDR_MTVEC    ;
-wire   read_mscratch  = csr_en && csr_addr == CSR_ADDR_MSCRATCH ;
-wire   read_mepc      = csr_en && csr_addr == CSR_ADDR_MEPC     ;
-wire   read_mcause    = csr_en && csr_addr == CSR_ADDR_MCAUSE   ;
-wire   read_mtval     = csr_en && csr_addr == CSR_ADDR_MTVAL    ;
-wire   read_mip       = csr_en && csr_addr == CSR_ADDR_MIP      ;
-wire   read_mvendorid = csr_en && csr_addr == CSR_ADDR_MVENDORID;
-wire   read_marchid   = csr_en && csr_addr == CSR_ADDR_MARCHID  ;
-wire   read_mimpid    = csr_en && csr_addr == CSR_ADDR_MIMPID   ;
-wire   read_mhartid   = csr_en && csr_addr == CSR_ADDR_MHARTID  ;
-wire   read_cycle     = csr_en && csr_addr == CSR_ADDR_CYCLE    ;
-wire   read_time      = csr_en && csr_addr == CSR_ADDR_TIME     ;
-wire   read_instret   = csr_en && csr_addr == CSR_ADDR_INSTRET  ;
-wire   read_cycleh    = csr_en && csr_addr == CSR_ADDR_CYCLEH   ;
-wire   read_timeh     = csr_en && csr_addr == CSR_ADDR_TIMEH    ;
-wire   read_instreth  = csr_en && csr_addr == CSR_ADDR_INSTRETH ;
-wire   read_mcycle    = csr_en && csr_addr == CSR_ADDR_MCYCLE   ;
-wire   read_minstret  = csr_en && csr_addr == CSR_ADDR_MINSTRET ;
-wire   read_mcycleh   = csr_en && csr_addr == CSR_ADDR_MCYCLEH  ;
-wire   read_minstreth = csr_en && csr_addr == CSR_ADDR_MINSTRETH;
-wire   read_mcountin  = csr_en && csr_addr == CSR_ADDR_MCOUNTIN ;
+wire   read_mstatus   = csr_en && csr_addr == ADDR_MSTATUS  ;
+wire   read_misa      = csr_en && csr_addr == ADDR_MISA     ;
+wire   read_medeleg   = csr_en && csr_addr == ADDR_MEDELEG  ;
+wire   read_mideleg   = csr_en && csr_addr == ADDR_MIDELEG  ;
+wire   read_mie       = csr_en && csr_addr == ADDR_MIE      ;
+wire   read_mtvec     = csr_en && csr_addr == ADDR_MTVEC    ;
+wire   read_mscratch  = csr_en && csr_addr == ADDR_MSCRATCH ;
+wire   read_mepc      = csr_en && csr_addr == ADDR_MEPC     ;
+wire   read_mcause    = csr_en && csr_addr == ADDR_MCAUSE   ;
+wire   read_mtval     = csr_en && csr_addr == ADDR_MTVAL    ;
+wire   read_mip       = csr_en && csr_addr == ADDR_MIP      ;
+wire   read_mvendorid = csr_en && csr_addr == ADDR_MVENDORID;
+wire   read_marchid   = csr_en && csr_addr == ADDR_MARCHID  ;
+wire   read_mimpid    = csr_en && csr_addr == ADDR_MIMPID   ;
+wire   read_mhartid   = csr_en && csr_addr == ADDR_MHARTID  ;
+wire   read_cycle     = csr_en && csr_addr == ADDR_CYCLE    ;
+wire   read_time      = csr_en && csr_addr == ADDR_TIME     ;
+wire   read_instret   = csr_en && csr_addr == ADDR_INSTRET  ;
+wire   read_cycleh    = csr_en && csr_addr == ADDR_CYCLEH   ;
+wire   read_timeh     = csr_en && csr_addr == ADDR_TIMEH    ;
+wire   read_instreth  = csr_en && csr_addr == ADDR_INSTRETH ;
+wire   read_mcycle    = csr_en && csr_addr == ADDR_MCYCLE   ;
+wire   read_minstret  = csr_en && csr_addr == ADDR_MINSTRET ;
+wire   read_mcycleh   = csr_en && csr_addr == ADDR_MCYCLEH  ;
+wire   read_minstreth = csr_en && csr_addr == ADDR_MINSTRETH;
+wire   read_mcountin  = csr_en && csr_addr == ADDR_MCOUNTIN ;
 
 wire   valid_addr     = 
     read_mstatus   ||
@@ -503,7 +534,9 @@ wire   valid_addr     =
     read_mcountin   ;
 
 wire invalid_addr = !valid_addr;
-assign csr_error = invalid_addr && csr_wr;
+
+assign csr_error = invalid_addr && csr_wr   ||
+                   csr_error_mtvec          ;
 
 assign csr_rdata =
     {64{read_mstatus  }} & reg_mstatus          |
