@@ -43,7 +43,7 @@ assign cmp_eq               = opr_a == opr_b;
 // Add / Sub
 // ------------------------------------------------------------
 
-wire [XL:0] addsub_rhs      = opr_b               ;
+wire [XL:0] addsub_rhs      = op_sub ? ~opr_b : opr_b               ;
 
 wire [XL:0] addsub_output   = opr_a + addsub_rhs + {{XL{1'b0}},op_sub};
 assign      add_out         = addsub_output                         ;
