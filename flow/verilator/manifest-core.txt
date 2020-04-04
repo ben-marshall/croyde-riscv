@@ -7,4 +7,5 @@ $REPO_HOME/rtl/core/core_pipe_exec_lsu.sv
 $REPO_HOME/rtl/core/core_pipe_exec.sv
 $REPO_HOME/rtl/core/core_csrs.sv
 $REPO_HOME/rtl/core/core_regfile.sv
+$REPO_HOME/rtl/core/core_interrupts.sv
 $REPO_HOME/rtl/core/core_top.sv

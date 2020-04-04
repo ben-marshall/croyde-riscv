@@ -13,6 +13,7 @@ read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec_lsu.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_csrs.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_regfile.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_interrupts.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_top.sv
 
 # Synthesise processes ready for SCC check.
