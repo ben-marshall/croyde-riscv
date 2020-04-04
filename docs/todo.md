@@ -5,7 +5,7 @@
 
 ## RTL
 
-- [ ] Fix fetch so that it only ever asks for addresses on a 64-bit boundary
+- [x] Fix fetch so that it only ever asks for addresses on a 64-bit boundary
       and loads that data into the buffer as appropriate.
 
 - [ ] ALU

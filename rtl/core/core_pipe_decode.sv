@@ -35,6 +35,7 @@ output reg  [         XL:0] s2_rs2_d    ,
 output wire                 s2_valid    , // Decode instr ready for execute
 input  wire                 s2_ready    , // Execute ready for new instr.
 output reg                  s2_full     , // Instruction present in regs?
+output reg                  s2_trap     , // Trap has occured.
 output reg  [         XL:0] s2_pc       , // Execute stage PC
 output wire [         XL:0] s2_npc      , // Decode stage PC
 output reg  [         XL:0] s2_opr_a    , // EX stage operand a
@@ -61,8 +62,6 @@ output reg  [         31:0] s2_instr      // Encoded instruction for trace.
 // Pipeline stage progression.
 // ------------------------------------------------------------
 
-//
-// TODO: Stalls to delay eating of 16/32 bit instructions.
 assign s1_eat_2     = s1_i16bit && s2_ready;
 assign s1_eat_4     = s1_i32bit && s2_ready;
 
@@ -542,6 +541,17 @@ wire [XL:0] decode_cf_offset =
     {64{dec_c_j              }} & {{32{imm_c_j[31]}}, imm_c_j} ;
 
 //
+// Trapping
+// ------------------------------------------------------------
+
+wire        n_s2_trap = dec_invalid_opcode                     || 
+                        s1_ferr[0] && (s1_i16bit || s1_i32bit) ||
+                        s1_ferr[1] &&               s1_i32bit  ;
+
+wire [4:0]  n_s2_cause= dec_invalid_opcode ? TRAP_IOPCODE[4:0] :
+                                             TRAP_IACCESS[4:0] ;
+
+//
 // Decode -> Execute stage registers
 // ------------------------------------------------------------
 
@@ -571,12 +581,13 @@ always @(posedge g_clk) begin
         s2_op_w     <= 0            ;
         s2_instr    <= 0            ;
         s2_full     <= 1'b0         ;
+        s2_trap     <= 1'b0         ;
     end else if(s2_valid && s2_ready) begin
         s2_pc       <= n_s2_pc      ;
         s2_opr_a    <= n_s2_opr_a   ;
         s2_opr_b    <= n_s2_opr_b   ;
         s2_opr_c    <= n_s2_opr_c   ;
-        s2_rd       <= n_s2_rd      ;
+        s2_rd       <= n_s2_trap ? n_s2_cause : n_s2_rd;
         s2_alu_op   <= n_alu_op     ;
         s2_lsu_op   <= n_lsu_op     ;
         s2_mdu_op   <= n_mdu_op     ;
@@ -585,6 +596,7 @@ always @(posedge g_clk) begin
         s2_op_w     <= n_s2_op_w    ;
         s2_instr    <= n_s2_instr   ;
         s2_full     <= 1'b1         ;
+        s2_trap     <= n_s2_trap    ;
     end
 end
 

@@ -20,6 +20,7 @@ input  wire [         XL:0] s2_rs2_d    ,
 input  wire                 s2_valid    , // Decode instr ready for execute
 output wire                 s2_ready    , // Execute ready for new instr.
 input  wire                 s2_full     , // Instruction present in regs?
+input  wire                 s2_trap     , // Trap has occured.
 input  wire [         XL:0] s2_pc       , // Execute stage PC
 input  wire [         XL:0] s2_npc      , // Decode stage PC
 input  wire [         XL:0] s2_opr_a    , // EX stage operand a
@@ -302,8 +303,7 @@ assign  trap_mtval      = 64'b0                     ; // TODO
 
 assign  trap_pc         = s2_pc                     ;
 
-wire    s2_trap         = 1'b0; // TODO Trap raising from decode.
-wire    [6:0] s2_trap_cause = 0;
+wire    [6:0] s2_trap_cause = {2'b00,s2_rd};
 
 assign  trap_cause      =
     cf_interupt                 ?   int_cause       :
@@ -368,7 +368,7 @@ end
 
 assign s2_rd_addr   = s2_rd;
 
-assign s2_rd_wen    = !rd_done && (s2_valid || cfu_gpr_wen) && (
+assign s2_rd_wen    = !s2_trap && !rd_done && (s2_valid || cfu_gpr_wen) && (
     cfu_gpr_wen || csr_gpr_wen || alu_gpr_wen || lsu_gpr_wen
 );
 

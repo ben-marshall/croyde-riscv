@@ -124,3 +124,32 @@ wire [ 4:0] dec_bimm12lo           = s1_instr[11: 7];
 wire [ 4:0] dec_zimm               = s1_instr[19:15];
 wire [ 5:0] dec_shamt              = s1_instr[25:20];
 wire [ 4:0] dec_shamtw             = s1_instr[24:20];
+
+wire dec_invalid_opcode = !(
+dec_beq        || dec_bne        || dec_blt        || dec_bge        ||
+dec_bltu       || dec_bgeu       || dec_jalr       || dec_jal        ||
+dec_lui        || dec_auipc      || dec_addi       || dec_slli       ||
+dec_slti       || dec_sltiu      || dec_xori       || dec_srli       ||
+dec_srai       || dec_ori        || dec_andi       || dec_add        ||
+dec_sub        || dec_sll        || dec_slt        || dec_sltu       ||
+dec_xor        || dec_srl        || dec_sra        || dec_or         ||
+dec_and        || dec_addiw      || dec_slliw      || dec_srliw      ||
+dec_sraiw      || dec_addw       || dec_subw       || dec_sllw       ||
+dec_srlw       || dec_sraw       || dec_lb         || dec_lh         || dec_lw
+|| dec_ld         || dec_lbu        || dec_lhu        || dec_lwu        ||
+dec_sb         || dec_sh         || dec_sw         || dec_sd         ||
+dec_fence      || dec_fence_i    || dec_mul        || dec_mulh       ||
+dec_mulhsu     || dec_mulhu      || dec_div        || dec_divu       ||
+dec_rem        || dec_remu       || dec_mulw       || dec_divw       ||
+dec_divuw      || dec_remw       || dec_remuw      || dec_ecall      ||
+dec_ebreak     || dec_mret       || dec_wfi        || dec_csrrw      ||
+dec_csrrs      || dec_csrrc      || dec_csrrwi     || dec_csrrsi     ||
+dec_csrrci     || dec_c_addi4spn || dec_c_addi16sp || dec_c_lw       ||
+dec_c_ld       || dec_c_sw       || dec_c_sd       || dec_c_addi     ||
+dec_c_addiw    || dec_c_jalr     || dec_c_li       || dec_c_lui      ||
+dec_c_srli     || dec_c_srai     || dec_c_andi     || dec_c_sub      ||
+dec_c_xor      || dec_c_or       || dec_c_and      || dec_c_subw     ||
+dec_c_addw     || dec_c_j        || dec_c_jr       || dec_c_beqz     ||
+dec_c_bnez     || dec_c_slli     || dec_c_lwsp     || dec_c_ldsp     ||
+dec_c_mv       || dec_c_add      || dec_c_swsp     || dec_c_sdsp
+);
