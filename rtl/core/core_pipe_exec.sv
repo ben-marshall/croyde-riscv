@@ -254,7 +254,7 @@ wire cf_excep   = excep_csr_error || excep_cfu_bad_target   ||
 
 wire cf_interupt= int_pending     ;
 
-assign int_ack  = trap_int  && e_cf_change;
+assign int_ack  = int_pending && e_cf_change;
 
 //
 // Control flow bus
@@ -289,14 +289,14 @@ assign  s2_cf_target        =
 
 assign  s2_cf_cause     = cf_interupt ? int_cause : excep_cause;
 
-assign  exec_mret       = cfu_op_mret && e_new_instr;
+assign  exec_mret       = cfu_op_mret && e_cf_change;
 
 assign  instr_ret       = (e_iret || e_cf_change) && !cf_excep  ;
 
 // PRA 3.1.14: 
 //    "Synchronous exceptions are of lower priority than all interrupts"
 assign  trap_cpu        = cf_excep && !cf_interupt  ;
-assign  trap_int        = cf_interupt               ;
+assign  trap_int        = int_ack                   ;
 
 assign  trap_mtval      = 64'b0                     ; // TODO
 
