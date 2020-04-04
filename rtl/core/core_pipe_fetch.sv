@@ -177,7 +177,7 @@ wire        buf_drain_2     = s1_i16bit && s1_eat_2;
 wire        buf_drain_4     = s1_i32bit && s1_eat_4;
 
 // Is the buffer ready to accept more data?
-wire        buf_ready       = n_buf_depth  <= 4;
+wire        buf_ready       = n_buf_depth  <= 8 && !e_imem_req;
 
 // Is there currently a 16 or 32 bit instruction in the buffer?
 assign      s1_i16bit       = buf_depth >= 2 && buf_data_out[1:0] != 2'b11;

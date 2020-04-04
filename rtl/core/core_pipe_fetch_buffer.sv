@@ -130,5 +130,20 @@ always @(posedge g_clk) begin
     end
 end
 
+//
+// Designer Assertions
+// ------------------------------------------------------------
+
+`ifdef DESIGNER_ASSERTION_CORE_FETCH_BUFFER
+
+always @(posedge g_clk) if(g_resetn) begin
+
+    // Fetch buffer can store a maximum of 16 bytes.
+    assert(depth <= 16);
+
+end
+
+`endif
+
 endmodule
 
