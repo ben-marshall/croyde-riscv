@@ -9,6 +9,9 @@ module rvfi_fairness (
 
 input  wire                 g_clk        , // Global clock
 input  wire                 g_resetn     , // Global active low sync reset.
+
+input  wire                 int_sw       , // software interrupt
+input  wire                 int_ext      , // hardware interrupt
               
 input  wire                 imem_req     , // Memory request
 input  wire [ MEM_ADDR_R:0] imem_addr    , // Memory request address
@@ -49,7 +52,18 @@ parameter   MMIO_BASE_MASK  = 64'h0000_0000_0000_1FFF;
 initial assume(g_resetn == 1'b0);
 
 //
-// Assume that we do not get memory bus errors
+// Assume no interrupts for now - TODO
+always @(posedge g_clk) begin
+
+    assume(!int_sw);
+    
+    assume(!int_ext);
+
+end
+
+
+//
+// Assume that we do not get memory bus errors  TODO
 always @(posedge g_clk) begin
 
     if($past(imem_req) && $past(imem_gnt)) begin
