@@ -92,25 +92,41 @@ wire [XL:0] bitwise_result  = {XLEN{op_xor}} & xor_output |
 
 //
 // Shifts
-//  TODO
 // ------------------------------------------------------------
 
-wire [ 5:0] shift_amt   = opr_b[5:0];
+wire [XL:0] shift_in_r  = {word ? 32'b0 : opr_a[XL:32], opr_a[31:0]};
+wire [XL:0] shift_in_l  ;
 
-wire [31:0] shift_rw    = opr_a[31:0] >> shift_amt[4:0];
-wire [31:0] shift_lw    = opr_a[31:0] << shift_amt[4:0];
-wire [XL:0] shift_r     = opr_a       >> shift_amt;
-wire [XL:0] shift_l     = opr_a       << shift_amt;
-wire [XL:0] shift_ra    = $signed(opr_a) >>> shift_amt;
-wire [31:0] shift_raw   = $signed(opr_a[31:0]) >>> shift_amt[4:0];
+wire [XL:0] shift_in    = op_sll ? shift_in_l : shift_in_r;
 
-wire [XL:0] shift_result =
-    {64{op_sll  &&  word}} & {{32{shift_lw [31]}}, shift_lw }  |
-    {64{op_srl  &&  word}} & {{32{shift_rw [31]}}, shift_rw }  |
-    {64{op_sra  &&  word}} & {{32{shift_raw[31]}}, shift_raw}  |
-    {64{op_sll  && !word}} & shift_l                           |
-    {64{op_srl  && !word}} & shift_r                           |
-    {64{op_sra  && !word}} & shift_ra                          ;
+wire [ 5:0] shift_amnt  = {!word && opr_b[5] , opr_b[4:0]};
+
+wire [XL:0] shift_out_r = shift_in    >> shift_amnt     ;
+wire [XL:0] shift_out_l ;
+
+wire        shift_abit  = word ? opr_a[31] : opr_a[XL];
+wire [XL:0] shift_amask = shift_abit ? ~({64{1'b1}} >> shift_amnt) : 64'b0;
+
+genvar i;
+generate for(i = 0; i < XLEN; i = i + 1) begin
+    assign shift_in_l [i] = shift_in_r [XL-i];
+    assign shift_out_l[i] = shift_out_r[XL-i];
+end endgenerate
+
+wire [XL:0] shift_sraw  = {
+    {32{shift_in_r [31 ]  || shift_amask[XL   ]}},
+        shift_out_r[31:0] |  shift_amask[XL:32]
+};
+
+wire [XL:0] shift_sra   = shift_out_r | shift_amask;
+
+wire [XL:0] shift_result=
+    {64{op_sll  &&  word}} & {{32{shift_out_l[31]}}, shift_out_l[31:0]} |
+    {64{op_srl  &&  word}} & {{32{shift_out_r[31]}}, shift_out_r[31:0]} |
+    {64{op_sra  &&  word}} &                         shift_sraw         |
+    {64{op_sll  && !word}} &                         shift_out_l        |
+    {64{op_srl  && !word}} &                         shift_out_r        |
+    {64{op_sra  && !word}} &                         shift_sra          ;
 
 
 //

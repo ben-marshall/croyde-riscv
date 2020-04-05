@@ -12,7 +12,7 @@
 
   - [ ] SLTU[.w] optimisation / reuse adder circuit
 
-  - [ ] Shifts / optimise
+  - [x] Shifts / optimise
 
 - [ ] M Extension
 
