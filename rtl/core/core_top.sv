@@ -87,8 +87,6 @@ wire                 int_ack     ; // Interrupt taken acknowledge
 wire                 s1_i16bit   ; // 16 bit instruction?
 wire                 s1_i32bit   ; // 32 bit instruction?
 wire [  FD_IBUF_R:0] s1_instr    ; // Instruction to be decoded
-wire [         XL:0] s1_pc       ; // Program Counter
-wire [         XL:0] s1_npc      ; // Next Program Counter
 wire [   FD_ERR_R:0] s1_ferr     ; // Fetch bus error?
 wire                 s1_eat_2    ; // Decode eats 2 bytes
 wire                 s1_eat_4    ; // Decode eats 4 bytes
@@ -218,8 +216,6 @@ core_pipe_fetch #(
 .s1_i16bit    (s1_i16bit    ), // 16 bit instruction?
 .s1_i32bit    (s1_i32bit    ), // 32 bit instruction?
 .s1_instr     (s1_instr     ), // Instruction to be decoded
-.s1_pc        (s1_pc        ), // Program Counter
-.s1_npc       (s1_npc       ), // Next Program Counter
 .s1_ferr      (s1_ferr      ), // Fetch bus error?
 .s1_eat_2     (s1_eat_2     ), // Decode eats 2 bytes
 .s1_eat_4     (s1_eat_4     )  // Decode eats 4 bytes
@@ -231,18 +227,22 @@ core_pipe_fetch #(
 //
 //  Pipeline decode / operand gather stage.
 //
-core_pipe_decode i_core_pipe_decode(
+core_pipe_decode #(
+.PC_RESET_ADDRESS(PC_RESET_ADDRESS)
+) i_core_pipe_decode(
 .g_clk        (g_clk        ), // Global clock
 .g_resetn     (g_resetn     ), // Global active low sync reset.
 .s1_i16bit    (s1_i16bit    ), // 16 bit instruction?
 .s1_i32bit    (s1_i32bit    ), // 32 bit instruction?
 .s1_instr     (s1_instr     ), // Instruction to be decoded
-.s1_pc        (s1_pc        ), // Program Counter
-.s1_npc       (s1_npc       ), // Next Program Counter
 .s1_ferr      (s1_ferr      ), // Fetch bus error?
 .s1_eat_2     (s1_eat_2     ), // Decode eats 2 bytes
 .s1_eat_4     (s1_eat_4     ), // Decode eats 4 bytes
 .s1_flush     (s1_flush     ), // Flush stage
+.cf_valid     (cf_valid     ), // Control flow change?
+.cf_ack       (cf_ack       ), // Control flow change acknwoledged
+.cf_target    (cf_target    ), // Control flow change destination
+.cf_cause     (cf_cause     ), // Control flow change cause
 .s1_rs1_addr  (s1_rs1_addr  ), // RS1 Address
 .s1_rs1_data  (s1_rs1_data  ), // RS1 Read Data (Forwarded)
 .s1_rs2_addr  (s1_rs2_addr  ), // RS2 Address

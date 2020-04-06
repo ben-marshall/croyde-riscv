@@ -26,8 +26,6 @@ input  wire [ MEM_DATA_R:0] imem_rdata  , // Memory response read data
 output wire                 s1_i16bit   , // 16 bit instruction?
 output wire                 s1_i32bit   , // 32 bit instruction?
 output wire [  FD_IBUF_R:0] s1_instr    , // Instruction to be decoded
-output reg  [         XL:0] s1_pc       , // Program Counter
-output wire [         XL:0] s1_npc      , // Next Program Counter
 output wire [   FD_ERR_R:0] s1_ferr     , // Fetch bus error?
 input  wire                 s1_eat_2    , // Decode eats 2 bytes
 input  wire                 s1_eat_4      // Decode eats 4 bytes
@@ -96,24 +94,6 @@ always @(posedge g_clk) begin
         end else if(e_imem_req) begin
             imem_addr <= n_imem_addr;
         end
-    end
-end
-
-//
-// Program Counter Tracking
-// ------------------------------------------------------------
-
-wire [XL:0] n_s1_pc = s1_pc + {61'b0, s1_i32bit, s1_i16bit, 1'b0};
-
-assign      s1_npc  = n_s1_pc;
-
-always @(posedge g_clk) begin
-    if(!g_resetn) begin
-        s1_pc <= PC_RESET_ADDRESS;
-    end else if(e_cf_change) begin
-        s1_pc <= cf_target;
-    end else if(e_eat_2 || e_eat_4) begin
-        s1_pc <= n_s1_pc;
     end
 end
 

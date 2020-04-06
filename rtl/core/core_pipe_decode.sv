@@ -12,13 +12,16 @@ input  wire                 g_resetn    , // Global active low sync reset.
 input  wire                 s1_i16bit   , // 16 bit instruction?
 input  wire                 s1_i32bit   , // 32 bit instruction?
 input  wire [  FD_IBUF_R:0] s1_instr    , // Instruction to be decoded
-input  wire [         XL:0] s1_pc       , // Program Counter
-input  wire [         XL:0] s1_npc      , // Next Program Counter
 input  wire [   FD_ERR_R:0] s1_ferr     , // Fetch bus error?
 output wire                 s1_eat_2    , // Decode eats 2 bytes
 output wire                 s1_eat_4    , // Decode eats 4 bytes
 
 input  wire                 s1_flush    , // Stage 1 flush
+
+input  wire                 cf_valid    , // Control flow change?
+input  wire                 cf_ack      , // Control flow change acknwoledged
+input  wire [         XL:0] cf_target   , // Control flow change destination
+input  wire [ CF_CAUSE_R:0] cf_cause    , // Control flow change cause
 
 output wire [ REG_ADDR_R:0] s1_rs1_addr , // RS1 Address
 input  wire [         XL:0] s1_rs1_data , // RS1 Read Data (Forwarded)
@@ -64,6 +67,29 @@ output reg  [         31:0] s2_instr      // Encoded instruction for trace.
 
 assign s1_eat_2     = s1_i16bit && s2_ready;
 assign s1_eat_4     = s1_i32bit && s2_ready;
+
+//
+// Program Counter Tracking
+// ------------------------------------------------------------
+
+// Inital address of the program counter post reset.
+parameter   PC_RESET_ADDRESS      = 64'h10000000;
+
+wire        e_cf_change = cf_valid && cf_ack;
+
+reg  [XL:0]   s1_pc ;
+
+wire [XL:0]   s1_npc= s1_pc + {61'b0, s1_i32bit, s1_i16bit, 1'b0};
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        s1_pc <= PC_RESET_ADDRESS;
+    end else if(e_cf_change) begin
+        s1_pc <= cf_target;
+    end else if(s1_eat_2 || s1_eat_4) begin
+        s1_pc <= s1_npc;
+    end
+end
 
 //
 // Next pipeline stage value selection
