@@ -32,18 +32,13 @@
 
     Bits | Name      | Description
     -----|-----------|-----------------------------------------------------
-     PCW | `s1_pc`   | Program Counter valid in the decode stage.
      32  | `s1_instr`| 32-bit instruction word ready for decoding.
      1   | `s1_ferr` | Fetch error associated with these `s1_instr` bits?
+     1   | `s1_i16bit`| Eat a 16 bit instruction from the buffer.
+     1   | `s1_i32bit`| Eat a 32 bit instruction from the buffer.
 
-- It uses the following control signals to communicate readiness with the
-  decode stage:
-
-    Bits | Name      | Driver | Description
-    -----|-----------|--------|---------------------------------------------
-     1   | `s1_valid`| fetch  | Is the data presented to decode valid?
-     1   | `s2_eat_2`| decode | Decode eats 2 bytes from decode buffer.
-     1   | `s2_eat_4`| decode | Decode eats 4 bytes from decode buffer.
+  Note that `s1_i[16/32]bit` are driven by the decode stage, other signals
+  are driven by the fetch stage.
     
 - The control flow change bus is driven from *either* decode *or*
   execute, and communicates all interrupts, exceptions, branches and jumps to
@@ -56,36 +51,32 @@
      64  | `cf_target`  | in  | Target address of the control flow change.
      4   | `cf_cause`   | in  | Cause of the control flow change.
 
-## Decode / Operand Gather
+## Decode / Execute
 
-- Turns the 32-bits of `s1_instr` into a wider pipeline encoding ready for
-  execution.
+- Decodes instructions and selects inputs to functional units.
 
-- Responsible for gathering register and program counter operands into the
-  right pipeline registers.
+- Computes data memory & branch target addresses using the ALU.
 
-- Can cause control flow changes for non-conditional branches and jumps.
+- Non-trap control flow changes take place here.
 
-- The pipeline register data fields presented to execute are:
+- The pipeline register data fields presented to writeback are:
 
     Bits | Name         | Description
     -----|--------------|---------------------------------------------
-     64  | `s3_opr_a`   | ALU / Branch operand A
-     64  | `s3_opr_b`   | B
-     64  | `s3_opr_c`   | C
-     64  | `s3_pc`      | Program counter for the instruction.
-      4  | `s3_fu`      | Which functional unit will process the instruction?
-      7  | `s3_op`      | Which operation to perform?
-      5  | `s3_rd`      | Destination writeback register.
+       1 | s2_valid     | Execute has instruction ready for writeback
+       1 | s2_ready     | Writeback ready for new instruction
+       2 | s2_full      | Instruction in writeback stage
+       5 | s2_rd        | Destination GPR
+    XLEN | s2_wdata     | Write data for CSRs / GPRs
+    XLEN | s2_pc        | Program counter for instruction
+       3 | s2_csr_op    | Control & Status Register operation
+       4 | s2_cfu_op    | Control flow change operations: mret/ebreak etc
+       5 | s2_lsu_op    | Load/store unit operation
+       2 | s2_wb_op     | Writeback data sourcing
+       1 | s2_trap      | Raise trap.
 
-## Execute
+## Writeback
 
-- Computes ALU results,
-  accesses CSRs,
-  accesses memory,
-  triggers conditional control flow changes
-  and
-  raises exceptions / interrupts.
+- This stage writes back data to the register file, accesses CSRs,
+  finalises control flow changes and finishes memory accesses.
 
-- Only this stage can write back to the register file.
- 

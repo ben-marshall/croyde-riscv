@@ -6,117 +6,121 @@ operand assignments inside the pipeline.*
 
 ---
 
-Mnemonic  | `opr_a` | `opr_b` | `opr_c` | ALU Op | CFU OP |
-----------|---------|---------|---------|--------|--------|------------------
-beq       | rs1     | rs2     | imm     | SUB    | BEQ    |
-bne       | rs1     | rs2     | imm     | SUB    | BNE    |
-c.beqz    | rs1     | rs2     | imm     | SUB    | BEQ    |
-c.bnez    | rs1     | rs2     | imm     | SUB    | BNE    |
-blt       | rs1     | rs2     | imm     | SUB    | BLT    |
-bge       | rs1     | rs2     | imm     | SUB    | BGE    |
-bltu      | rs1     | rs2     | imm     | SUB    | BLTU   |
-bgeu      | rs1     | rs2     | imm     | SUB    | BGEU   |
-jalr      | rs1     | imm     | npc     | ADD    | JAL    |
-jal       | PC      | imm     | npc     | ADD    | JAL    |
-c.j       | PC      | imm     |         | ADD    | J      |
-c.jr      | rs1     | 0       |         | ADD    | J      |
-c.jalr    | rs1     | imm     | npc     | ADD    | JALR   |
-ecall     |         |         |         | NOP    | ECALL  |
-ebreak    |         |         |         | NOP    | EBREAK |
-mret      | rs1     |         |         | NOP    | MRET   |
-wfi       |         |         |         | NOP    | NOP    |
-fence.i   | npc     |         | npc     | NOP    | NOP    |
+Mnemonic  | ALU LHS | ALU RHS | ALU Op | CFU OP | WB Op | s2 wdata | s2 trap
+----------|---------|---------|--------|--------|-------|----------|--------
+beq       | rs1     | rs2     | SUB    | BEQ    |       |          |
+bne       | rs1     | rs2     | SUB    | BNE    |       |          |
+c.beqz    | rs1     | rs2     | SUB    | BEQ    |       |          |
+c.bnez    | rs1     | rs2     | SUB    | BNE    |       |          |
+blt       | rs1     | rs2     | SUB    | BLT    |       |          |
+bge       | rs1     | rs2     | SUB    | BGE    |       |          |
+bltu      | rs1     | rs2     | SUB    | BLTU   |       |          |
+bgeu      | rs1     | rs2     | SUB    | BGEU   |       |          |
+jalr      |         |         |        | JAL    | wdata | npn      |
+jal       |         |         |        | JAL    | wdata | npc      |
+c.jalr    |         |         |        | JALR   | wdata | npc      |
+c.j       |         |         |        | J      |       |          |
+c.jr      |         |         |        | J      |       |          |
+ecall     |         |         |        | ECALL  |       |          | 1
+ebreak    |         |         |        | EBREAK |       |          | 1
+mret      |         |         |        | MRET   |       |          |
+wfi       |         |         |        | NOP    |       |          |
 
-Mnemonic  | `opr_a` | `opr_b` | `opr_c` | ALU Op |
-----------|---------|---------|---------|--------|---------------------------
-lui       | 0       | imm     |         | OR     |
-auipc     | PC      | imm     |         | ADD    |
-addi      | rs1     | imm     |         | ADD    |
-c.addi4spn| rs1     | imm     |         | ADD    |
-c.addi    | rs1     | imm     |         | ADD    |
-slli      | rs1     | imm     |         | SLL    |
-c.mv      | 0       | rs1     |         | OR     |
-c.add     | rs1     | rs2     |         | ADD    |
-c.slli    | rs1     | imm     |         | SLL    |
-slti      | rs1     | imm     |         | SLT    |
-sltiu     | rs1     | imm     |         | SLTU   |
-xori      | rs1     | imm     |         | XOR    |
-srli      | rs1     | imm     |         | SLR    |
-srai      | rs1     | imm     |         | SRA    |
-ori       | rs1     | imm     |         | OR     |
-andi      | rs1     | imm     |         | AND    |
-add       | rs1     | rs2     |         | ADD    |
-sub       | rs1     | rs2     |         | SUB    |
-sll       | rs1     | rs2     |         | SLL    |
-slt       | rs1     | rs2     |         | SLT    |
-sltu      | rs1     | rs2     |         | SLTU   |
-xor       | rs1     | rs2     |         | XOR    |
-srl       | rs1     | rs2     |         | SLR    |
-sra       | rs1     | rs2     |         | SRA    |
-or        | rs1     | rs2     |         | OR     |
-and       | rs1     | rs2     |         | AND    |
-addiw     | rs1     | imm     |         | ADD    |
-slliw     | rs1     | imm     |         | SLL    |
-srliw     | rs1     | imm     |         | SLR    |
-sraiw     | rs1     | imm     |         | SRA    |
-addw      | rs1     | rs2     |         | ADD    |
-subw      | rs1     | rs2     |         | SUB    |
-sllw      | rs1     | rs2     |         | SLL    |
-srlw      | rs1     | rs2     |         | SLR    |
-sraw      | rs1     | rs2     |         | SRA    |
-c.li      |   0     | imm     |         | OR     |
-c.lui     |   0     | imm     |         | OR     |
-c.srli    | rs1     | imm     |         | SLR    |
-c.srai    | rs1     | imm     |         | SRA    |
-c.andi    | rs1     | imm     |         | AND    |
-c.sub     | rs1     | rs2     |         | SUB    |
-c.xor     | rs1     | rs2     |         | XOR    |
-c.or      | rs1     | rs2     |         | OR     |
-c.and     | rs1     | rs2     |         | AND    |
-c.subw    | rs1     | rs2     |         | SUB    |
-c.addw    | rs1     | rs2     |         | ADD    |
-fence     |         |         |         | NOP    |
+Mnemonic  | ALU LHS | ALU RHS | ALU Op | WB Op | s2 wdata | 
+----------|---------|---------|--------|-------|----------|-------
+c.mv      | rs1     | 0       | OR     | wdata | alu out  | 
+c.li      |   0     | imm     | OR     | wdata | alu out  | 
+c.lui     |   0     | imm     | OR     | wdata | alu out  | 
+lui       | 0       | imm     | OR     | wdata | alu out  | 
+auipc     | PC      | imm     | ADD    | wdata | alu out  | 
+addi      | rs1     | imm     | ADD    | wdata | alu out  | 
+c.addi4spn| rs1     | imm     | ADD    | wdata | alu out  | 
+c.addi    | rs1     | imm     | ADD    | wdata | alu out  | 
+c.addiw   | rs1     | imm     | ADD    | wdata | alu out  | 
+slli      | rs1     | imm     | SLL    | wdata | alu out  | 
+c.slli    | rs1     | imm     | SLL    | wdata | alu out  | 
+slti      | rs1     | imm     | SLT    | wdata | alu out  | 
+sltiu     | rs1     | imm     | SLTU   | wdata | alu out  | 
+xori      | rs1     | imm     | XOR    | wdata | alu out  | 
+srli      | rs1     | imm     | SLR    | wdata | alu out  | 
+srai      | rs1     | imm     | SRA    | wdata | alu out  | 
+ori       | rs1     | imm     | OR     | wdata | alu out  | 
+andi      | rs1     | imm     | AND    | wdata | alu out  | 
+addiw     | rs1     | imm     | ADD    | wdata | alu out  | 
+slliw     | rs1     | imm     | SLL    | wdata | alu out  | 
+srliw     | rs1     | imm     | SLR    | wdata | alu out  | 
+sraiw     | rs1     | imm     | SRA    | wdata | alu out  | 
+c.srli    | rs1     | imm     | SLR    | wdata | alu out  | 
+c.srai    | rs1     | imm     | SRA    | wdata | alu out  | 
+c.andi    | rs1     | imm     | AND    | wdata | alu out  | 
+c.add     | rs1     | rs2     | ADD    | wdata | alu out  | 
+add       | rs1     | rs2     | ADD    | wdata | alu out  | 
+sub       | rs1     | rs2     | SUB    | wdata | alu out  | 
+sll       | rs1     | rs2     | SLL    | wdata | alu out  | 
+slt       | rs1     | rs2     | SLT    | wdata | alu out  | 
+sltu      | rs1     | rs2     | SLTU   | wdata | alu out  | 
+xor       | rs1     | rs2     | XOR    | wdata | alu out  | 
+srl       | rs1     | rs2     | SLR    | wdata | alu out  | 
+sra       | rs1     | rs2     | SRA    | wdata | alu out  | 
+or        | rs1     | rs2     | OR     | wdata | alu out  | 
+and       | rs1     | rs2     | AND    | wdata | alu out  | 
+addw      | rs1     | rs2     | ADD    | wdata | alu out  | 
+subw      | rs1     | rs2     | SUB    | wdata | alu out  | 
+sllw      | rs1     | rs2     | SLL    | wdata | alu out  | 
+srlw      | rs1     | rs2     | SLR    | wdata | alu out  | 
+sraw      | rs1     | rs2     | SRA    | wdata | alu out  | 
+c.sub     | rs1     | rs2     | SUB    | wdata | alu out  | 
+c.xor     | rs1     | rs2     | XOR    | wdata | alu out  | 
+c.or      | rs1     | rs2     | OR     | wdata | alu out  | 
+c.and     | rs1     | rs2     | AND    | wdata | alu out  | 
+c.subw    | rs1     | rs2     | SUB    | wdata | alu out  | 
+c.addw    | rs1     | rs2     | ADD    | wdata | alu out  | 
+fence     |         |         | NOP    | wdata | alu out  | 
 
-Mnemonic  | `opr_a` | `opr_b` | `opr_c` | ALU Op |
-----------|---------|---------|---------|--------|--------------------------
-lb        | rs1     | imm     |         | ADD    |
-lh        | rs1     | imm     |         | ADD    |
-lw        | rs1     | imm     |         | ADD    |
-c.lw      | rs1     | imm     |         | ADD    |
-ld        | rs1     | imm     |         | ADD    |
-lbu       | rs1     | imm     |         | ADD    |
-lhu       | rs1     | imm     |         | ADD    |
-lwu       | rs1     | imm     |         | ADD    |
-sb        | rs1     | imm     | rs2     | ADD    |
-sh        | rs1     | imm     | rs2     | ADD    |
-sw        | rs1     | imm     | rs2     | ADD    |
-c.sw      | rs1     | imm     | rs2     | ADD    |
-sd        | rs1     | imm     | rs2     | ADD    |
-c.lwsp    | rs1     | imm     | rs2     | ADD    |
-c.swsp    | rs1     | imm     | rs2     | ADD    |
+Mnemonic  | ALU LHS | ALU RHS | ALU Op | lsu op | wb op |
+----------|---------|---------|--------|--------|-------|----------
+lb        | rs1     | imm     | ADD    | l b    | lsu   |
+lh        | rs1     | imm     | ADD    | l h    | lsu   |
+lw        | rs1     | imm     | ADD    | l w    | lsu   |
+c.lw      | rs1     | imm     | ADD    | l w    | lsu   |
+ld        | rs1     | imm     | ADD    | l d    | lsu   |
+c.ld      | rs1     | imm     | ADD    | l d    | lsu   |
+lbu       | rs1     | imm     | ADD    | l b u  | lsu   |
+lhu       | rs1     | imm     | ADD    | l h u  | lsu   |
+lwu       | rs1     | imm     | ADD    | l w u  | lsu   |
+c.lwsp    | rs1     | imm     | ADD    | l w    | lsu   |
+c.ldsp    | rs1     | imm     | ADD    | l d    | lsu   |
+sb        | rs1     | imm     | ADD    | s b    | lsu   |
+sh        | rs1     | imm     | ADD    | s h    | lsu   |
+sw        | rs1     | imm     | ADD    | s w    | lsu   |
+c.sw      | rs1     | imm     | ADD    | s w    | lsu   |
+sd        | rs1     | imm     | ADD    | s d    | lsu   |
+c.sd      | rs1     | imm     | ADD    | s d    | lsu   |
+c.swsp    | rs1     | imm     | ADD    | s w    | lsu   |
+c.sdsp    | rs1     | imm     | ADD    | s d    | lsu   |
 
-Mnemonic  | `opr_a` | `opr_b` | `opr_c` | MDU Op |
-----------|---------|---------|---------|--------|--------------------------
-mul       | rs1     | rs2     |         | MUL    |
-mulh      | rs1     | rs2     |         | MULH   |
-mulhsu    | rs1     | rs2     |         | MULHSU |
-mulhu     | rs1     | rs2     |         | MULHU  |
-div       | rs1     | rs2     |         | DIV    |
-divu      | rs1     | rs2     |         | DIVU   |
-rem       | rs1     | rs2     |         | REM    |
-remu      | rs1     | rs2     |         | REMU   |
-mulw      | rs1     | rs2     |         | MUL    |
-divw      | rs1     | rs2     |         | DIV    |
-divuw     | rs1     | rs2     |         | DIVU   |
-remw      | rs1     | rs2     |         | REM    |
-remuw     | rs1     | rs2     |         | REMU   |
+Mnemonic  | MDU LHS | MDU LHS | MDU Op | wb op   | wdata |
+----------|---------|---------|--------|---------|-------|-----------
+mul       | rs1     | rs2     | MUL    | mdu out | mdu   |
+mulh      | rs1     | rs2     | MULH   | mdu out | mdu   |
+mulhsu    | rs1     | rs2     | MULHSU | mdu out | mdu   |
+mulhu     | rs1     | rs2     | MULHU  | mdu out | mdu   |
+div       | rs1     | rs2     | DIV    | mdu out | mdu   |
+divu      | rs1     | rs2     | DIVU   | mdu out | mdu   |
+rem       | rs1     | rs2     | REM    | mdu out | mdu   |
+remu      | rs1     | rs2     | REMU   | mdu out | mdu   |
+mulw      | rs1     | rs2     | MUL    | mdu out | mdu   |
+divw      | rs1     | rs2     | DIV    | mdu out | mdu   |
+divuw     | rs1     | rs2     | DIVU   | mdu out | mdu   |
+remw      | rs1     | rs2     | REM    | mdu out | mdu   |
+remuw     | rs1     | rs2     | REMU   | mdu out | mdu   |
 
-Mnemonic  | `opr_a` | `opr_b` | `opr_c` | CSR OP |
-----------|---------|---------|---------|--------|---------------------------
-csrrw     | rs1     | rs2     | csr     |
-csrrs     | rs1     | rs2     | csr     |
-csrrc     | rs1     | rs2     | csr     |
-csrrwi    | rs1     | imm     | csr     |
-csrrsi    | rs1     | imm     | csr     |
-csrrci    | rs1     | imm     | csr     |
+Mnemonic  | ALU LHS | ALU RHS | ALU OP  | CSR OP | wb op |
+----------|---------|---------|---------|--------|-------|-----------
+csrrw     | rs1     | 0       | OR      | rw     | csr   |
+csrrs     | rs1     | 0       | OR      | rs     | csr   |
+csrrc     | rs1     | 0       | OR      | rc     | csr   |
+csrrwi    | rs1     | 0       | OR      | rw     | csr   |
+csrrsi    | rs1     | 0       | OR      | rs     | csr   |
+csrrci    | rs1     | 0       | OR      | rc     | csr   |
 
