@@ -42,15 +42,15 @@ c.slli    | rs1     | imm     | SLL    | wdata | alu out  |
 slti      | rs1     | imm     | SLT    | wdata | alu out  | 
 sltiu     | rs1     | imm     | SLTU   | wdata | alu out  | 
 xori      | rs1     | imm     | XOR    | wdata | alu out  | 
-srli      | rs1     | imm     | SLR    | wdata | alu out  | 
+srli      | rs1     | imm     | SRL    | wdata | alu out  | 
 srai      | rs1     | imm     | SRA    | wdata | alu out  | 
 ori       | rs1     | imm     | OR     | wdata | alu out  | 
 andi      | rs1     | imm     | AND    | wdata | alu out  | 
 addiw     | rs1     | imm     | ADD    | wdata | alu out  | 
 slliw     | rs1     | imm     | SLL    | wdata | alu out  | 
-srliw     | rs1     | imm     | SLR    | wdata | alu out  | 
+srliw     | rs1     | imm     | SRL    | wdata | alu out  | 
 sraiw     | rs1     | imm     | SRA    | wdata | alu out  | 
-c.srli    | rs1     | imm     | SLR    | wdata | alu out  | 
+c.srli    | rs1     | imm     | SRL    | wdata | alu out  | 
 c.srai    | rs1     | imm     | SRA    | wdata | alu out  | 
 c.andi    | rs1     | imm     | AND    | wdata | alu out  | 
 c.add     | rs1     | rs2     | ADD    | wdata | alu out  | 
@@ -60,14 +60,14 @@ sll       | rs1     | rs2     | SLL    | wdata | alu out  |
 slt       | rs1     | rs2     | SLT    | wdata | alu out  | 
 sltu      | rs1     | rs2     | SLTU   | wdata | alu out  | 
 xor       | rs1     | rs2     | XOR    | wdata | alu out  | 
-srl       | rs1     | rs2     | SLR    | wdata | alu out  | 
+srl       | rs1     | rs2     | SRL    | wdata | alu out  | 
 sra       | rs1     | rs2     | SRA    | wdata | alu out  | 
 or        | rs1     | rs2     | OR     | wdata | alu out  | 
 and       | rs1     | rs2     | AND    | wdata | alu out  | 
 addw      | rs1     | rs2     | ADD    | wdata | alu out  | 
 subw      | rs1     | rs2     | SUB    | wdata | alu out  | 
 sllw      | rs1     | rs2     | SLL    | wdata | alu out  | 
-srlw      | rs1     | rs2     | SLR    | wdata | alu out  | 
+srlw      | rs1     | rs2     | SRL    | wdata | alu out  | 
 sraw      | rs1     | rs2     | SRA    | wdata | alu out  | 
 c.sub     | rs1     | rs2     | SUB    | wdata | alu out  | 
 c.xor     | rs1     | rs2     | XOR    | wdata | alu out  | 
@@ -115,12 +115,12 @@ divuw     | rs1     | rs2     | DIVU   | mdu out | mdu   |
 remw      | rs1     | rs2     | REM    | mdu out | mdu   |
 remuw     | rs1     | rs2     | REMU   | mdu out | mdu   |
 
-Mnemonic  | ALU LHS | ALU RHS | ALU OP  | CSR OP | wb op |
-----------|---------|---------|---------|--------|-------|-----------
-csrrw     | rs1     | 0       | OR      | rw     | csr   |
-csrrs     | rs1     | 0       | OR      | rs     | csr   |
-csrrc     | rs1     | 0       | OR      | rc     | csr   |
-csrrwi    | rs1     | 0       | OR      | rw     | csr   |
-csrrsi    | rs1     | 0       | OR      | rs     | csr   |
-csrrci    | rs1     | 0       | OR      | rc     | csr   |
+Mnemonic  | CSR OP | wb op | wdata
+----------|--------|-------|-----------
+csrrw     | rw     | csr   | rs1
+csrrs     | rs     | csr   | rs1
+csrrc     | rc     | csr   | rs1
+csrrwi    | rw     | csr   | rs1
+csrrsi    | rs     | csr   | rs1
+csrrci    | rc     | csr   | rs1
 

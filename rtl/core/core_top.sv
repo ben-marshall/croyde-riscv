@@ -61,20 +61,6 @@ wire                 cf_ack      ; // Control flow change acknwoledged
 wire [         XL:0] cf_target   ; // Control flow change destination
 wire [ CF_CAUSE_R:0] cf_cause    ; // Control flow change cause
 
-wire                 s2_cf_valid ; // EX Control flow change?
-wire                 s2_cf_ack   ; // EX Control flow change acknwoledged
-wire [         XL:0] s2_cf_target; // EX Control flow change destination
-wire [ CF_CAUSE_R:0] s2_cf_cause ; // EX Control flow change cause
-
-assign cf_valid     = s2_cf_valid;
-
-assign s2_cf_ack    = cf_ack;
-
-assign cf_cause     = s2_cf_cause ;
-assign cf_target    = s2_cf_target;
-
-wire   s1_flush     = cf_valid && cf_ack;
-
 wire                 int_pending ; // To exec stage from core_interrupts
 wire [ CF_CAUSE_R:0] int_cause   ; // Cause code for the interrupt.
 wire [         XL:0] int_tvec    ; // Interrupt trap vector
@@ -95,24 +81,6 @@ wire [ REG_ADDR_R:0] s1_rs1_addr ; // RS1 Address
 wire [         XL:0] s1_rs1_data ; // RS1 Read Data (Forwarded)
 wire [ REG_ADDR_R:0] s1_rs2_addr ; // RS2 Address
 wire [         XL:0] s1_rs2_data ; // RS2 Read Data (Forwarded)
-
-wire                 s2_valid    ; // Decode instr ready for execute
-wire                 s2_ready    ; // Execute ready for new instr.
-wire                 s2_full     ; // Instruction present in regs?
-wire                 s2_trap     ; // Raise trap, cause in s2_rd
-wire [         XL:0] s2_pc       ; // Execute stage PC
-wire [         XL:0] s2_npc      ; // Decode stage PC
-wire [         XL:0] s2_opr_a    ; // EX stage operand a
-wire [         XL:0] s2_opr_b    ; //    "       "     b
-wire [         XL:0] s2_opr_c    ; //    "       "     c
-wire [ REG_ADDR_R:0] s2_rd       ; // EX stage destination reg address.
-wire [   ALU_OP_R:0] s2_alu_op   ; // ALU operation
-wire [   LSU_OP_R:0] s2_lsu_op   ; // LSU operation
-wire [   MDU_OP_R:0] s2_mdu_op   ; // Mul/Div Operation
-wire [   CSR_OP_R:0] s2_csr_op   ; // CSR operation
-wire [   CFU_OP_R:0] s2_cfu_op   ; // Control flow unit operation
-wire                 s2_op_w     ; // Is the operation on a word?
-wire [         31:0] s2_instr    ; // Encoded instruction for trace.
 
 `ifdef RVFI
 wire [ REG_ADDR_R:0] s2_rs1_a    ;
@@ -273,78 +241,6 @@ core_pipe_decode #(
 );
 
 
-//
-// Instance: core_pipe_exec
-//
-//  Top level for the execute stage of the pipeline.
-//
-core_pipe_exec i_core_pipe_exec(
-.g_clk          (g_clk          ), // Global clock
-.g_resetn       (g_resetn       ), // Global active low sync reset.
-`ifdef RVFI
-`RVFI_CONN                       ,
-.s2_rs1_a       (s2_rs1_a       ),
-.s2_rs1_d       (s2_rs1_d       ),
-.s2_rs2_a       (s2_rs2_a       ),
-.s2_rs2_d       (s2_rs2_d       ),
-`endif
-.s2_valid       (s2_valid       ), // Decode instr ready for execute
-.s2_ready       (s2_ready       ), // Execute ready for new instr.
-.s2_full        (s2_full        ), // Instruction present in regs?
-.s2_trap        (s2_trap        ), // Raise trap. Cause in RD
-.s2_pc          (s2_pc          ), // Execute stage PC
-.s2_npc         (s2_npc         ), // Decode stage PC
-.s2_opr_a       (s2_opr_a       ), // EX stage operand a
-.s2_opr_b       (s2_opr_b       ), //    "       "     b
-.s2_opr_c       (s2_opr_c       ), //    "       "     c
-.s2_rd          (s2_rd          ), // EX stage destination reg address.
-.s2_alu_op      (s2_alu_op      ), // ALU operation
-.s2_lsu_op      (s2_lsu_op      ), // LSU operation
-.s2_mdu_op      (s2_mdu_op      ), // Mul/Div Operation
-.s2_csr_op      (s2_csr_op      ), // CSR operation
-.s2_cfu_op      (s2_cfu_op      ), // Control flow unit operation
-.s2_op_w        (s2_op_w        ), // Is the operation on a word?
-.s2_instr       (s2_instr       ), // Encoded instruction for trace.
-.s2_rd_wen      (s2_rd_wen      ), // GPR write enable
-.s2_rd_addr     (s2_rd_addr     ), // GPR write address
-.s2_rd_wdata    (s2_rd_wdata    ), // GPR write data
-.csr_en         (csr_en         ), // CSR Access Enable
-.csr_wr         (csr_wr         ), // CSR Write Enable
-.csr_wr_set     (csr_wr_set     ), // CSR Write - Set
-.csr_wr_clr     (csr_wr_clr     ), // CSR Write - Clear
-.csr_addr       (csr_addr       ), // Address of the CSR to access.
-.csr_wdata      (csr_wdata      ), // Data to be written to a CSR
-.csr_rdata      (csr_rdata      ), // CSR read data
-.csr_mepc       (csr_mepc       ), // Current MEPC  value
-.mtvec_base     (mtvec_base     ), // Current MTVEC value
-.csr_error      (csr_error      ), // CSR access error.
-.exec_mret      (exec_mret      ), // MRET instruction executed
-.instr_ret      (instr_ret      ), // Instruction retired.
-.trap_cpu       (trap_cpu       ), // A trap occured due to CPU
-.trap_int       (trap_int       ), // A trap occured due to interrupt
-.trap_cause     (trap_cause     ), // A trap occured due to interrupt
-.trap_mtval     (trap_mtval     ), // Value associated with the trap.
-.trap_pc        (trap_pc        ), // PC value associated with the trap.
-.s2_cf_valid    (s2_cf_valid    ), // EX Control flow change?
-.s2_cf_ack      (s2_cf_ack      ), // EX Control flow acknwoledged
-.s2_cf_target   (s2_cf_target   ), // EX Control flow destination
-.s2_cf_cause    (s2_cf_cause    ), // EX Control flow change cause
-.trs_valid      (trs_valid      ), // Instruction trace valid
-.trs_instr      (trs_instr      ), // Instruction trace data
-.trs_pc         (trs_pc         ), // Instruction trace PC
-.dmem_req       (int_dmem_req   ), // Memory request
-.dmem_addr      (int_dmem_addr  ), // Memory request address
-.dmem_wen       (int_dmem_wen   ), // Memory request write enable
-.dmem_strb      (int_dmem_strb  ), // Memory request write strobe
-.dmem_wdata     (int_dmem_wdata ), // Memory write data.
-.dmem_gnt       (int_dmem_gnt   ), // Memory response valid
-.dmem_err       (int_dmem_err   ), // Memory response error
-.dmem_rdata     (int_dmem_rdata ), // Memory response read data
-.int_pending    (int_pending    ), // To exec stage
-.int_cause      (int_cause      ), // Cause code for the interrupt.
-.int_tvec       (int_tvec       ), // Interrupt trap vector
-.int_ack        (int_ack        )  // Interrupt taken acknowledge
-);
 
 //
 // instance: core_regfile

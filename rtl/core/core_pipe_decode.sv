@@ -6,52 +6,95 @@
 //
 module core_pipe_decode (
 
-input  wire                 g_clk       , // Global clock
-input  wire                 g_resetn    , // Global active low sync reset.
+input  wire                 g_clk           , // Global clock
+input  wire                 g_resetn        , // Global active low sync reset.
 
-input  wire                 s1_i16bit   , // 16 bit instruction?
-input  wire                 s1_i32bit   , // 32 bit instruction?
-input  wire [  FD_IBUF_R:0] s1_instr    , // Instruction to be decoded
-input  wire [   FD_ERR_R:0] s1_ferr     , // Fetch bus error?
-output wire                 s1_eat_2    , // Decode eats 2 bytes
-output wire                 s1_eat_4    , // Decode eats 4 bytes
+input  wire                 s1_i16bit       , // 16 bit instruction?
+input  wire                 s1_i32bit       , // 32 bit instruction?
+input  wire [  FD_IBUF_R:0] s1_instr        , // Instruction to be decoded
+input  wire [   FD_ERR_R:0] s1_ferr         , // Fetch bus error?
+output wire                 s1_eat_2        , // Decode eats 2 bytes
+output wire                 s1_eat_4        , // Decode eats 4 bytes
 
-input  wire                 s1_flush    , // Stage 1 flush
+input  wire                 s1_flush        , // Stage 1 flush
 
-input  wire                 cf_valid    , // Control flow change?
-input  wire                 cf_ack      , // Control flow change acknwoledged
-input  wire [         XL:0] cf_target   , // Control flow change destination
-input  wire [ CF_CAUSE_R:0] cf_cause    , // Control flow change cause
+output wire                 cf_valid        , // Control flow change?
+output wire                 cf_ack          , // Control flow acknwoledged
+output wire [         XL:0] cf_target       , // Control flow destination
 
-output wire [ REG_ADDR_R:0] s1_rs1_addr , // RS1 Address
-input  wire [         XL:0] s1_rs1_data , // RS1 Read Data (Forwarded)
-output wire [ REG_ADDR_R:0] s1_rs2_addr , // RS2 Address
-input  wire [         XL:0] s1_rs2_data , // RS2 Read Data (Forwarded)
+output wire [ REG_ADDR_R:0] s1_rs1_addr     , // RS1 Address
+input  wire [         XL:0] s1_rs1_data     , // RS1 Read Data (Forwarded)
+output wire [ REG_ADDR_R:0] s1_rs2_addr     , // RS2 Address
+input  wire [         XL:0] s1_rs2_data     , // RS2 Read Data (Forwarded)
 
-`ifdef RVFI
-output reg  [ REG_ADDR_R:0] s2_rs1_a    ,
-output reg  [         XL:0] s2_rs1_d    ,
-output reg  [ REG_ADDR_R:0] s2_rs2_a    ,
-output reg  [         XL:0] s2_rs2_d    ,
-`endif
+output wire [         XL:0] s2_rs1_data     , // RS1 value.
+output wire [         XL:0] s2_rs2_data     , // RS2 value.
+output wire [ REG_ADDR_R:0] s2_rd           , // Destination reg address.
+output wire [         XL:0] s2_imm          , // Immediate value
+output wire [         XL:0] s2_pc           , // Current program counter.
+output wire [         XL:0] s2_npc          , // Next    program counter.
+output wire [         31:0] s2_instr        , // Current instruction word.
+output wire                 s2_trap         , // Raise a trap
 
-output wire                 s2_valid    , // Decode instr ready for execute
-input  wire                 s2_ready    , // Execute ready for new instr.
-output reg                  s2_full     , // Instruction present in regs?
-output reg                  s2_trap     , // Trap has occured.
-output reg  [         XL:0] s2_pc       , // Execute stage PC
-output wire [         XL:0] s2_npc      , // Decode stage PC
-output reg  [         XL:0] s2_opr_a    , // EX stage operand a
-output reg  [         XL:0] s2_opr_b    , //    "       "     b
-output reg  [         XL:0] s2_opr_c    , //    "       "     c
-output reg  [ REG_ADDR_R:0] s2_rd       , // EX stage destination reg address.
-output reg  [   ALU_OP_R:0] s2_alu_op   , // ALU operation
-output reg  [   LSU_OP_R:0] s2_lsu_op   , // LSU operation
-output reg  [   MDU_OP_R:0] s2_mdu_op   , // Mul/Div Operation
-output reg  [   CSR_OP_R:0] s2_csr_op   , // CSR operation
-output reg  [   CFU_OP_R:0] s2_cfu_op   , // Control flow unit operation
-output reg                  s2_op_w     , // Is the operation on a word?
-output reg  [         31:0] s2_instr      // Encoded instruction for trace.
+output wire                 s2_alu_lhs      , // ALU left  operand
+output wire                 s2_alu_rhs      , // ALU right operand
+output wire                 s2_alu_add      , // ALU Operation to perform.
+output wire                 s2_alu_and      , // 
+output wire                 s2_alu_or       , // 
+output wire                 s2_alu_sll      , // 
+output wire                 s2_alu_srl      , // 
+output wire                 s2_alu_slt      , // 
+output wire                 s2_alu_sltu     , // 
+output wire                 s2_alu_sra      , // 
+output wire                 s2_alu_sub      , // 
+output wire                 s2_alu_xor      , // 
+output wire                 s2_alu_word     , // Word result only.
+
+output wire                 s2_cfu_beq      , // Control flow operation.
+output wire                 s2_cfu_bge      , //
+output wire                 s2_cfu_bgeu     , //
+output wire                 s2_cfu_blt      , //
+output wire                 s2_cfu_bltu     , //
+output wire                 s2_cfu_bne      , //
+output wire                 s2_cfu_ebrk     , //
+output wire                 s2_cfu_ecall    , //
+output wire                 s2_cfu_j        , //
+output wire                 s2_cfu_jal      , //
+output wire                 s2_cfu_jalr     , //
+output wire                 s2_cfu_mret     , //
+
+output wire                 s2_lsu_load     , // LSU Load
+output wire                 s2_lsu_store    , // "   Store
+output wire                 s2_lsu_byte     , // Byte width
+output wire                 s2_lsu_half     , // Halfword width
+output wire                 s2_lsu_word     , // Word width
+output wire                 s2_lsu_dbl      , // Doubleword widt
+output wire                 s2_lsu_sext     , // Sign extend loaded value.
+
+output wire                 s2_mdu_mul      , // MDU Operation
+output wire                 s2_mdu_mulh     , //
+output wire                 s2_mdu_mulhsu   , //
+output wire                 s2_mdu_mulhu    , //
+output wire                 s2_mdu_div      , //
+output wire                 s2_mdu_divu     , //
+output wire                 s2_mdu_rem      , //
+output wire                 s2_mdu_remu     , //
+output wire                 s2_mdu_mul      , //
+output wire                 s2_mdu_div      , //
+output wire                 s2_mdu_divu     , //
+output wire                 s2_mdu_rem      , //
+output wire                 s2_mdu_remu     , //
+
+output wire                 s2_csr_set      , // CSR Operation
+output wire                 s2_csr_clr      , //
+output wire                 s2_csr_rd       , //
+output wire                 s2_csr_wr       , //
+
+output wire                 s2_wb_alu       , // Writeback ALU result
+output wire                 s2_wb_csr       , // Writeback CSR result
+output wire                 s2_wb_mdu       , // Writeback MDU result
+output wire                 s2_wb_lsu       , // Writeback LSU Loaded data
+output wire                 s2_wb_npc         // Writeback next PC value
 
 );
 
@@ -77,31 +120,21 @@ parameter   PC_RESET_ADDRESS      = 64'h10000000;
 
 wire        e_cf_change = cf_valid && cf_ack;
 
-reg  [XL:0]   s1_pc ;
-
-wire [XL:0]   s1_npc= s1_pc + {61'b0, s1_i32bit, s1_i16bit, 1'b0};
+assign      s2_npc      = s1_pc + {61'b0, s1_i32bit, s1_i16bit, 1'b0};
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
-        s1_pc <= PC_RESET_ADDRESS;
+        s2_pc <= PC_RESET_ADDRESS;
     end else if(e_cf_change) begin
-        s1_pc <= cf_target;
+        s2_pc <= cf_target;
     end else if(s1_eat_2 || s1_eat_4) begin
-        s1_pc <= s1_npc;
+        s2_pc <= s2_npc;
     end
 end
 
 //
-// Next pipeline stage value selection
+// Immediate Decoding
 // ------------------------------------------------------------
-
-wire [         XL:0] n_s2_opr_a     ;
-wire [         XL:0] n_s2_opr_b     ;
-wire [         XL:0] n_s2_opr_c     ;
-wire [ REG_ADDR_R:0] n_s2_rd        ;
-
-wire [         XL:0] opr_b_imm      ;
-wire [         XL:0] opr_c_imm      ;
 
 wire [         31:0] imm32_i        ;
 wire [         11:0] imm_csr_addr   ;
@@ -123,99 +156,69 @@ wire [         31:0] imm_c_sdsp     ;
 wire [         31:0] imm_c_j        ;
 wire [         31:0] imm_c_bz       ;
 
-//
-// Operand A
+wire  cf_offset_cbeq_imm    = dec_c_beqz || dec_c_bnez;
 
-wire sel_opr_a_rs1 = 
-    dec_beq       || dec_bne       || dec_c_beqz    || dec_c_bnez    ||
-    dec_blt       || dec_bge       || dec_bltu      || dec_bgeu      ||
-    dec_jalr      || dec_c_addiw   || dec_addi      || dec_c_addi4spn||
-    dec_c_addi    || dec_slli      || dec_c_jr      || dec_c_add     ||
-    dec_c_slli    || dec_slti      || dec_sltiu     || dec_xori      ||
-    dec_srli      || dec_srai      || dec_ori       || dec_andi      ||
-    dec_add       || dec_sub       || dec_sll       || dec_slt       ||
-    dec_sltu      || dec_xor       || dec_srl       || dec_sra       ||
-    dec_or        || dec_and       || dec_addiw     || dec_slliw     ||
-    dec_srliw     || dec_sraiw     || dec_addw      || dec_subw      ||
-    dec_sllw      || dec_srlw      || dec_sraw      || dec_c_srli    ||
-    dec_c_srai    || dec_c_andi    || dec_c_sub     || dec_c_xor     ||
-    dec_c_or      || dec_c_and     || dec_c_subw    || dec_c_addw    ||
-    dec_lb        || dec_lh        || dec_lw        || dec_c_lw      ||
-    dec_ld        || dec_lbu       || dec_lhu       || dec_lwu       ||
-    dec_sb        || dec_sh        || dec_sw        || dec_c_sw      ||
-    dec_sd        || dec_c_lwsp    || dec_c_swsp    || dec_mul       ||
-    dec_mulh      || dec_mulhsu    || dec_mulhu     || dec_div       ||
-    dec_divu      || dec_rem       || dec_remu      || dec_mulw      ||
-    dec_divw      || dec_divuw     || dec_remw      || dec_remuw     ||
-    dec_csrrw     || dec_csrrs     || dec_csrrc     || dec_csrrwi    ||
-    dec_csrrsi    || dec_csrrci    || dec_c_addi16sp|| dec_c_sd      ||
-    dec_c_sdsp    || dec_c_ldsp    || dec_c_ld      || dec_c_jalr    ;
+wire  cfu_op_conditonal     =
+    dec_beq     || c_beqz   || dec_bge  || dec_bgeu   || dec_blt    ||
+    dec_bltu    || dec_bne  || c_bnez   ;
 
-wire sel_opr_a_pc   =
-    dec_jal       ||                  dec_c_j       || dec_auipc     ;
+wire [         XL:0] cf_offset =
+    |n_csr_op            ? {52'b0             , imm_csr_addr} :
+    cf_offset_cbeq_imm   ? {{32{imm_c_bz[31]}}, imm_c_bz    } :
+    cfu_op_conditonal    ? {{32{imm32_b[31]}} , imm32_b     } :
+    dec_lui              ? {{32{imm32_u[31]}} , imm32_u     } :
+                           0                                    ;
 
-//
-// Operand B
+wire    [XL:0]  sext_imm32_u = {{32{imm32_u[31]}}, imm32_u};
+wire    [XL:0]  sext_imm32_i = {{32{imm32_i[31]}}, imm32_i};
+wire    [XL:0]  sext_imm32_s = {{32{imm32_s[31]}}, imm32_s};
+wire    [XL:0]  sext_imm32_j = {{32{imm32_j[31]}}, imm32_j};
 
-wire sel_opr_b_rs2  =
-    dec_beq       || dec_bne       || dec_c_beqz    || dec_c_bnez    ||
-    dec_blt       || dec_bge       || dec_bltu      || dec_bgeu      ||
-    dec_c_add     || dec_add       || dec_sub       || dec_sll       ||
-    dec_slt       || dec_sltu      || dec_xor       || dec_srl       ||
-    dec_sra       || dec_or        || dec_and       || dec_addw      ||
-    dec_subw      || dec_sllw      || dec_srlw      || dec_sraw      ||
-    dec_c_sub     || dec_c_xor     || dec_c_or      || dec_c_and     ||
-    dec_c_subw    || dec_c_addw    || dec_mul       || dec_mulh      ||
-    dec_mulhsu    || dec_mulhu     || dec_div       || dec_divu      ||
-    dec_rem       || dec_remu      || dec_mulw      || dec_divw      ||
-    dec_divuw     || dec_remw      || dec_remuw     || dec_csrrw     ||
-    dec_csrrs     || dec_csrrc     || dec_c_mv      ;
+wire    major_op_load        = s1_instr[6:0] == 7'b0000011;
+wire    major_op_store       = s1_instr[6:0] == 7'b0100011;
+wire    major_op_imm         = s1_instr[6:0] == 7'b0010011;
 
-wire sel_opr_b_imm  =
-    dec_jalr      || dec_jal       ||                  dec_c_j       ||
-    dec_lui       || dec_auipc     || dec_addi      || dec_c_addi4spn||
-    dec_c_addi    || dec_slli      || dec_c_slli    || dec_slti      ||
-    dec_sltiu     || dec_xori      || dec_srli      || dec_srai      ||
-    dec_ori       || dec_andi      || dec_addiw     || dec_slliw     ||
-    dec_srliw     || dec_sraiw     || dec_c_li      || dec_c_lui     ||
-    dec_c_srli    || dec_c_srai    || dec_c_andi    || dec_lb        ||
-    dec_lh        || dec_lw        || dec_c_lw      || dec_ld        ||
-    dec_lbu       || dec_lhu       || dec_lwu       || dec_sb        ||
-    dec_sh        || dec_sw        || dec_c_sw      || dec_sd        ||
-    dec_c_lwsp    || dec_c_swsp    || dec_csrrwi    || dec_csrrsi    ||
-    dec_csrrci    || dec_c_addiw   || dec_c_addi16sp|| dec_c_sd      ||
-    dec_c_sdsp    || dec_c_ldsp    || dec_c_ld      ;
+wire    use_imm_sext_imm32_u = dec_lui      || dec_auipc        ;
 
-//
-// Operand C
+wire    use_imm_sext_imm32_i = dec_jalr     || major_op_load    ||
+                               major_op_imm || dec_addiw        ;
 
-wire sel_opr_c_imm  =
-    dec_beq       || dec_bne       || dec_c_beqz    || dec_c_bnez    ||
-    dec_blt       || dec_bge       || dec_bltu      || dec_bgeu      ||
-    dec_csrrw     || dec_csrrs     || dec_csrrc     || dec_csrrwi    ||
-    dec_csrrsi    || dec_csrrci    || dec_auipc     ;
+wire    use_imm_shamt        = dec_slli     || dec_srli         ||
+                               dec_slliw    || dec_srliw        ||
+                               dec_srai     || dec_sraiw        ||
+                               dec_c_slli   || dec_c_srli       ||
+                               dec_c_srai   ;
 
-wire sel_opr_c_npc  =
-    dec_jalr      || dec_jal       ||                  dec_c_jalr    ||
-    dec_fence_i   ;
+wire    use_imm_c_addi      = dec_c_addi    || dec_c_addiw      ||
+                              dec_c_li      || dec_c_andi       ;
 
-wire sel_opr_c_rs2  =
-    dec_sb        || dec_sh        || dec_sw        || dec_c_sw      ||
-    dec_sd        || dec_c_swsp    || dec_c_sd      || dec_c_sdsp    ;
+wire    use_imm_c_lsw       = dec_c_lw      || dec_c_sw         ;
 
+wire    use_imm_c_lsd       = dec_c_ld      || dec_c_sd         ;
 
-assign n_s2_opr_a   =
-    {64{sel_opr_a_rs1}} & s1_rs1_data |
-    {64{sel_opr_a_pc }} & s1_pc       ;
+wire    use_imm_c_j         = dec_c_j                           ;
 
-assign n_s2_opr_b   =
-    {64{sel_opr_b_rs2}} & s1_rs2_data |
-    {64{sel_opr_b_imm}} & opr_b_imm   ;
+wire    [ 5:0] imm_c_shamt  = {s1_instr[12],s1_instr[6:2]};
+wire    [XL:0] imm_shamt    = {58'b0, s1_i16bit ? imm_c_shamt : {1'b0,dec_shamtw}};
 
-assign n_s2_opr_c   =
-    {64{sel_opr_c_rs2}} & s1_rs2_data |
-    {64{sel_opr_c_imm}} & opr_c_imm   |
-    {64{sel_opr_c_npc}} & s1_npc      ;
+assign s2_imm =
+    use_imm_sext_imm32_u    ? sext_imm32_u  :
+    use_imm_sext_imm32_i    ? sext_imm32_i  :
+    major_op_store          ? sext_imm32_s  :
+    use_imm_shamt           ? imm_shamt     :
+    dec_c_lui               ? {{32{imm_c_lui[31]}}, imm_c_lui      } :
+    dec_c_addi4spn          ? {{32{imm_addi4spn[31]}}, imm_addi4spn} :
+    dec_c_addi16sp          ? {{32{imm_addi16sp[31]}}, imm_addi16sp} :
+    use_imm_c_addi          ? {{32{imm_c_addi[31]}}, imm_c_addi} :
+    use_imm_c_j             ? {{32{imm_c_j   [31]}}, imm_c_j   } :
+    dec_c_lwsp              ? {32'b0, imm_c_lwsp} :
+    dec_c_swsp              ? {32'b0, imm_c_swsp} :
+    use_imm_c_lsw           ? {32'b0, imm_c_lsw } :
+    dec_c_ldsp              ? {32'b0, imm_c_ldsp} :
+    dec_c_sdsp              ? {32'b0, imm_c_sdsp} :
+    use_imm_c_lsd           ? {32'b0, imm_c_lsd } :
+    dec_jal                 ? sext_imm32_j  :
+                              0             ;
 
 //
 // Register Address Decoding
@@ -298,79 +301,8 @@ assign s1_rs1_addr  = s1_i16bit ? dec_rs1_16 : dec_rs1 ;
 assign s1_rs2_addr  = s1_i16bit ? dec_rs2_16 : dec_rs2 ;
 assign n_s2_rd      = s1_i16bit ? dec_rd_16  : dec_rd  ;
 
-
-//
-// Is this decoded instruction explicitly operating on a word, rather than
-// the full XLEN=64 bit register?
-wire   n_s2_op_w    =
-    dec_addiw     || dec_slliw     || dec_srliw     || dec_sraiw     ||
-    dec_addw      || dec_subw      || dec_sllw      || dec_srlw      ||
-    dec_sraw      || dec_c_subw    || dec_mulw      || dec_divw      ||
-    dec_divuw     || dec_remw      || dec_remuw     || dec_c_addw    ||
-    dec_c_addiw   ;
-
-//
-// Operand immediate selection
-
-wire   opr_c_cbeq_imm   = dec_c_beqz || dec_c_bnez;
-
-assign opr_c_imm = 
-    |n_csr_op            ? {52'b0             , imm_csr_addr} : 
-    opr_c_cbeq_imm       ? {{32{imm_c_bz[31]}}, imm_c_bz    } :
-    n_cfu_op_conditional ? {{32{imm32_b[31]}} , imm32_b     } :
-    dec_lui              ? {{32{imm32_u[31]}} , imm32_u     } :
-                           0                                    ;
-
-wire    [XL:0]  sext_imm32_u = {{32{imm32_u[31]}}, imm32_u};
-wire    [XL:0]  sext_imm32_i = {{32{imm32_i[31]}}, imm32_i};
-wire    [XL:0]  sext_imm32_s = {{32{imm32_s[31]}}, imm32_s};
-wire    [XL:0]  sext_imm32_j = {{32{imm32_j[31]}}, imm32_j};
-
-wire    major_op_load        = s1_instr[6:0] == 7'b0000011;
-wire    major_op_store       = s1_instr[6:0] == 7'b0100011;
-wire    major_op_imm         = s1_instr[6:0] == 7'b0010011;
-
-wire    use_imm_sext_imm32_u = dec_lui      || dec_auipc        ;
-
-wire    use_imm_sext_imm32_i = dec_jalr     || major_op_load    ||
-                               major_op_imm || dec_addiw        ;
-
-wire    use_imm_shamt        = dec_slli     || dec_srli         ||
-                               dec_slliw    || dec_srliw        ||
-                               dec_srai     || dec_sraiw        ||
-                               dec_c_slli   || dec_c_srli       ||
-                               dec_c_srai   ;
-
-wire    use_imm_c_addi      = dec_c_addi    || dec_c_addiw      ||
-                              dec_c_li      || dec_c_andi       ;
-
-wire    use_imm_c_lsw       = dec_c_lw      || dec_c_sw         ;
-
-wire    use_imm_c_lsd       = dec_c_ld      || dec_c_sd         ;
-
-wire    use_imm_c_j         = dec_c_j                           ;
-
-wire    [ 5:0] imm_c_shamt  = {s1_instr[12],s1_instr[6:2]};
-wire    [XL:0] imm_shamt    = {58'b0, s1_i16bit ? imm_c_shamt : {1'b0,dec_shamtw}};
-
-assign opr_b_imm = 
-    use_imm_sext_imm32_u    ? sext_imm32_u  :
-    use_imm_sext_imm32_i    ? sext_imm32_i  :
-    major_op_store          ? sext_imm32_s  :
-    use_imm_shamt           ? imm_shamt     :
-    dec_c_lui               ? {{32{imm_c_lui[31]}}, imm_c_lui      } :
-    dec_c_addi4spn          ? {{32{imm_addi4spn[31]}}, imm_addi4spn} :
-    dec_c_addi16sp          ? {{32{imm_addi16sp[31]}}, imm_addi16sp} :
-    use_imm_c_addi          ? {{32{imm_c_addi[31]}}, imm_c_addi} :
-    use_imm_c_j             ? {{32{imm_c_j   [31]}}, imm_c_j   } :
-    dec_c_lwsp              ? {32'b0, imm_c_lwsp} :
-    dec_c_swsp              ? {32'b0, imm_c_swsp} :
-    use_imm_c_lsw           ? {32'b0, imm_c_lsw } :
-    dec_c_ldsp              ? {32'b0, imm_c_ldsp} :
-    dec_c_sdsp              ? {32'b0, imm_c_sdsp} :
-    use_imm_c_lsd           ? {32'b0, imm_c_lsd } :
-    dec_jal                 ? sext_imm32_j  :
-                              0             ;
+assign s2_rs1_data  = s1_rs1_data   ;
+assign s2_rs2_data  = s1_rs2_data   ;
 
 
 //
@@ -378,253 +310,126 @@ assign opr_b_imm =
 // ------------------------------------------------------------
 
 //
-// ALU Op code select
+// ALU
 
-wire [ALU_OP_R:0] n_alu_op = 
-    {ALU_OP_W{dec_beq       }} & ALU_OP_SUB     |
-    {ALU_OP_W{dec_bne       }} & ALU_OP_SUB     |
-    {ALU_OP_W{dec_c_beqz    }} & ALU_OP_SUB     |
-    {ALU_OP_W{dec_c_bnez    }} & ALU_OP_SUB     |
-    {ALU_OP_W{dec_blt       }} & ALU_OP_SUB     |
-    {ALU_OP_W{dec_bge       }} & ALU_OP_SUB     |
-    {ALU_OP_W{dec_bltu      }} & ALU_OP_SUB     |
-    {ALU_OP_W{dec_bgeu      }} & ALU_OP_SUB     |
-    {ALU_OP_W{dec_jalr      }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_jal       }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_c_j       }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_c_jr      }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_ecall     }} & ALU_OP_NOP     |
-    {ALU_OP_W{dec_ebreak    }} & ALU_OP_NOP     |
-    {ALU_OP_W{dec_mret      }} & ALU_OP_NOP     |
-    {ALU_OP_W{dec_wfi       }} & ALU_OP_NOP     |
-    {ALU_OP_W{dec_fence_i   }} & ALU_OP_NOP     |
-    {ALU_OP_W{dec_lui       }} & ALU_OP_OR      |
-    {ALU_OP_W{dec_auipc     }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_addi      }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_c_addi4spn}} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_c_addi16sp}} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_c_addi    }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_c_addiw   }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_slli      }} & ALU_OP_SLL     |
-    {ALU_OP_W{dec_c_mv      }} & ALU_OP_OR      |
-    {ALU_OP_W{dec_c_add     }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_c_slli    }} & ALU_OP_SLL     |
-    {ALU_OP_W{dec_slti      }} & ALU_OP_SLT     |
-    {ALU_OP_W{dec_sltiu     }} & ALU_OP_SLTU    |
-    {ALU_OP_W{dec_xori      }} & ALU_OP_XOR     |
-    {ALU_OP_W{dec_srli      }} & ALU_OP_SRL     |
-    {ALU_OP_W{dec_srai      }} & ALU_OP_SRA     |
-    {ALU_OP_W{dec_ori       }} & ALU_OP_OR      |
-    {ALU_OP_W{dec_andi      }} & ALU_OP_AND     |
-    {ALU_OP_W{dec_add       }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_sub       }} & ALU_OP_SUB     |
-    {ALU_OP_W{dec_sll       }} & ALU_OP_SLL     |
-    {ALU_OP_W{dec_slt       }} & ALU_OP_SLT     |
-    {ALU_OP_W{dec_sltu      }} & ALU_OP_SLTU    |
-    {ALU_OP_W{dec_xor       }} & ALU_OP_XOR     |
-    {ALU_OP_W{dec_srl       }} & ALU_OP_SRL     |
-    {ALU_OP_W{dec_sra       }} & ALU_OP_SRA     |
-    {ALU_OP_W{dec_or        }} & ALU_OP_OR      |
-    {ALU_OP_W{dec_and       }} & ALU_OP_AND     |
-    {ALU_OP_W{dec_addiw     }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_slliw     }} & ALU_OP_SLL     |
-    {ALU_OP_W{dec_srliw     }} & ALU_OP_SRL     |
-    {ALU_OP_W{dec_sraiw     }} & ALU_OP_SRA     |
-    {ALU_OP_W{dec_addw      }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_subw      }} & ALU_OP_SUB     |
-    {ALU_OP_W{dec_sllw      }} & ALU_OP_SLL     |
-    {ALU_OP_W{dec_srlw      }} & ALU_OP_SRL     |
-    {ALU_OP_W{dec_sraw      }} & ALU_OP_SRA     |
-    {ALU_OP_W{dec_c_li      }} & ALU_OP_OR      |
-    {ALU_OP_W{dec_c_lui     }} & ALU_OP_OR      |
-    {ALU_OP_W{dec_c_srli    }} & ALU_OP_SRL     |
-    {ALU_OP_W{dec_c_srai    }} & ALU_OP_SRA     |
-    {ALU_OP_W{dec_c_andi    }} & ALU_OP_AND     |
-    {ALU_OP_W{dec_c_sub     }} & ALU_OP_SUB     |
-    {ALU_OP_W{dec_c_xor     }} & ALU_OP_XOR     |
-    {ALU_OP_W{dec_c_or      }} & ALU_OP_OR      |
-    {ALU_OP_W{dec_c_and     }} & ALU_OP_AND     |
-    {ALU_OP_W{dec_c_subw    }} & ALU_OP_SUB     |
-    {ALU_OP_W{dec_c_addw    }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_fence     }} & ALU_OP_NOP     |
-    {ALU_OP_W{dec_lb        }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_lh        }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_lw        }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_c_lw      }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_ld        }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_c_ld      }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_lbu       }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_lhu       }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_lwu       }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_sb        }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_sh        }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_sw        }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_c_sw      }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_sd        }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_c_sd      }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_c_lwsp    }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_c_swsp    }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_c_ldsp    }} & ALU_OP_ADD     |
-    {ALU_OP_W{dec_c_sdsp    }} & ALU_OP_ADD     ;
+wire    alu_rhs_imm = dec_addi          || dec_addiw        ||
+                      dec_slli          || dec_slliw        ||
+                      dec_srli          || dec_srliw        ||
+                      dec_srai          || dec_sraiw        ||
+                      dec_andi          || dec_ori          ||
+                      dec_xori          || dec_lui          ||
+                      dec_auipc         ;
+
+assign  s2_alu_lhs  = s2_rs1_data   ;
+
+assign  s2_alu_rhs  = alu_rhs_imm   ? s2_imm : s2_rs2_data    ;
+
+assign  s2_alu_add  = dec_add           || dec_addi          ||
+                      dec_addiw         || dec_addw          ||
+                      dec_auipc         || dec_c_add         ||
+                      dec_c_addi        || dec_c_addi4spn    ||
+                      dec_c_addiw       || dec_c_addw        ;
+
+assign  s2_alu_and  = dec_and           || dec_andi          ||
+                      dec_c_and         || dec_c_andi        ;
+
+assign  s2_alu_or   = dec_c_li          || dec_c_lui         ||
+                      dec_c_mv          || dec_c_or          ||
+                      dec_lui           || dec_or            ||
+                      dec_ori           ;
+
+assign  s2_alu_sll  = dec_c_slli        || dec_sll           ||
+                      dec_slli          || dec_slliw         ||
+                      dec_sllw          || dec_slt           ||
+                      dec_slti          ;
+
+assign  s2_alu_sltu = dec_sltiu         || dec_sltu          ;
+
+assign  s2_alu_sra  = dec_c_srai        || dec_sra           ||
+                      dec_srai          || dec_sraiw         ||
+                      dec_sraw          ;
+
+assign  s2_alu_srl  = dec_c_srli        || dec_srl           ||
+                      dec_srli          || dec_srliw         ||
+                      dec_srlw          ;
+
+assign  s2_alu_sub  = dec_beq           || dec_c_beqz        ||
+                      dec_bge           || dec_c_bnez        ||
+                      dec_bgeu          || dec_c_sub         ||
+                      dec_blt           || dec_c_subw        ||
+                      dec_bltu          || dec_sub           ||
+                      dec_bne           || dec_subw          ;
+
+assign  s2_alu_xor  = dec_c_xor         || dec_xor           ||
+                      dec_xori          ;
+
+assign  s2_alu_word = dec_addiw         || dec_addw         ||
+                      dec_slliw         || dec_sllw         ||
+                      dec_srliw         || dec_srlw         ||
+                      dec_sraiw         || dec_sraw         ||
+                      dec_sub           || dec_subw         ;
 
 //
-// MUL / DIV Opcode select
+// CFU
 
-wire [MDU_OP_R:0] n_mdu_op = 
-    {MDU_OP_W{dec_mul       }} & MDU_OP_MUL     |
-    {MDU_OP_W{dec_mulh      }} & MDU_OP_MULH    |
-    {MDU_OP_W{dec_mulhsu    }} & MDU_OP_MULHSU  |
-    {MDU_OP_W{dec_mulhu     }} & MDU_OP_MULHU   |
-    {MDU_OP_W{dec_div       }} & MDU_OP_DIV     |
-    {MDU_OP_W{dec_divu      }} & MDU_OP_DIVU    |
-    {MDU_OP_W{dec_rem       }} & MDU_OP_REM     |
-    {MDU_OP_W{dec_remu      }} & MDU_OP_REMU    |
-    {MDU_OP_W{dec_mulw      }} & MDU_OP_MUL     |
-    {MDU_OP_W{dec_divw      }} & MDU_OP_DIV     |
-    {MDU_OP_W{dec_divuw     }} & MDU_OP_DIVU    |
-    {MDU_OP_W{dec_remw      }} & MDU_OP_REM     |
-    {MDU_OP_W{dec_remuw     }} & MDU_OP_REMU    ;
+assign  s2_cfu_beq  = dec_beq    || c_beqz  ;
+assign  s2_cfu_bge  = dec_bge               ;
+assign  s2_cfu_bgeu = dec_bgeu              ;
+assign  s2_cfu_blt  = dec_blt               ;
+assign  s2_cfu_bltu = dec_bltu              ;
+assign  s2_cfu_bne  = dec_bne    || c_bnez  ;
+assign  s2_cfu_ebrk = dec_ebreak            ;
+assign  s2_cfu_ecall= dec_ecall             ;
+assign  s2_cfu_j    = dec_c_j    || c_jr    ;
+assign  s2_cfu_jal  = dec_jal               ;
+assign  s2_cfu_jalr = dec_jalr   || c_jalr  ;
+assign  s2_cfu_mret = dec_mret              ;
 
 //
-// Load/Store opcode select
+// LSU
 
-wire [LSU_OP_R:0] n_lsu_op =
-    {LSU_OP_W{dec_c_lw      }} & LSU_OP_LW      |
-    {LSU_OP_W{dec_c_lwsp    }} & LSU_OP_LW      |
-    {LSU_OP_W{dec_c_sw      }} & LSU_OP_SW      |
-    {LSU_OP_W{dec_c_swsp    }} & LSU_OP_SW      |
-    {LSU_OP_W{dec_c_ld      }} & LSU_OP_LD      |
-    {LSU_OP_W{dec_c_ldsp    }} & LSU_OP_LD      |
-    {LSU_OP_W{dec_c_sd      }} & LSU_OP_SD      |
-    {LSU_OP_W{dec_c_sdsp    }} & LSU_OP_SD      |
-    {LSU_OP_W{dec_lb        }} & LSU_OP_LB      |
-    {LSU_OP_W{dec_lbu       }} & LSU_OP_LBU     |
-    {LSU_OP_W{dec_lh        }} & LSU_OP_LH      |
-    {LSU_OP_W{dec_lhu       }} & LSU_OP_LHU     |
-    {LSU_OP_W{dec_lw        }} & LSU_OP_LW      |
-    {LSU_OP_W{dec_lwu       }} & LSU_OP_LWU     |
-    {LSU_OP_W{dec_ld        }} & LSU_OP_LD      |
-    {LSU_OP_W{dec_sb        }} & LSU_OP_SB      |
-    {LSU_OP_W{dec_sh        }} & LSU_OP_SH      |
-    {LSU_OP_W{dec_sw        }} & LSU_OP_SW      |
-    {LSU_OP_W{dec_sd        }} & LSU_OP_SD      ;
+assign  s2_lsu_load = dec_lb    || dec_lbu  || dec_lh   || dec_lhu      ||
+                      dec_lw    || dec_lwu  || dec_ld   || dec_c_lwsp   ||
+                      dec_c_lw  || dec_c_ldsp || dec_c_ld;
+
+assign  s2_lsu_store= dec_sb        || dec_sh   || dec_sw     || dec_sd   || 
+                      dec_c_swsp    || dec_c_sw || dec_c_sdsp || dec_c_sd ;
+
+assign  s2_lsu_byte = dec_lb    || dec_lbu  || dec_sb;
+
+assign  s2_lsu_half = dec_lh    || dec_lhu  || dec_sh;
+
+assign  s2_lsu_word = dec_lw    || dec_lwu  || dec_sw   || dec_c_lwsp   ||
+                      dec_c_swsp;
+
+assign  s2_lsu_dbl  = dec_ld    || dec_sd   || dec_c_ldsp || dec_c_sdsp ;
+
+assign  s2_lsu_sext = dec_lw    || dec_lh   || dec_lb   ;
 
 //
-// CSR Opcode select
+// MDU
 
-wire [CSR_OP_R:0] n_csr_op;
-
-wire    rd_zero     = dec_rd    == 5'b0;
-wire    rs1_zero    = dec_rs1   == 5'b0;
-
-assign  n_csr_op[CSR_OP_RD ] = !rd_zero && (
-    dec_csrrw  || dec_csrrc  || dec_csrrs  ||
-    dec_csrrwi || dec_csrrci || dec_csrrsi
-);
-
-assign  n_csr_op[CSR_OP_WR ] = (
-    dec_csrrw  || dec_csrrc  || dec_csrrs  ||
-    dec_csrrwi || (dec_csrrci || dec_csrrsi) && |imm_csr_mask
-);
-
-assign  n_csr_op[CSR_OP_SET] = dec_csrrs || dec_csrrsi;
-assign  n_csr_op[CSR_OP_CLR] = dec_csrrc || dec_csrrci;
+assign  s2_mdu_mul    = dec_mul   ;
+assign  s2_mdu_mulh   = dec_mulh  ;
+assign  s2_mdu_mulhsu = dec_mulhsu;
+assign  s2_mdu_mulhu  = dec_mulhu ;
+assign  s2_mdu_div    = dec_div   ;
+assign  s2_mdu_divu   = dec_divu  ;
+assign  s2_mdu_rem    = dec_rem   ;
+assign  s2_mdu_remu   = dec_remu  ;
+assign  s2_mdu_mul    = dec_mul   ;
+assign  s2_mdu_div    = dec_div   ;
+assign  s2_mdu_divu   = dec_divu  ;
+assign  s2_mdu_rem    = dec_rem   ;
+assign  s2_mdu_remu   = dec_remu  ;
 
 //
-//  CFU Opcode select
-    
-wire n_cfu_op_conditional = 
-    dec_beq    || dec_bne    || dec_blt    ||
-    dec_bge    || dec_bltu   || dec_bgeu   ;
+// CSRs
 
-wire [CFU_OP_R:0] n_cfu_op =
-    {CFU_OP_W{dec_beq       }} & CFU_OP_BEQ     |
-    {CFU_OP_W{dec_bne       }} & CFU_OP_BNE     |
-    {CFU_OP_W{dec_c_beqz    }} & CFU_OP_BEQ     |
-    {CFU_OP_W{dec_c_bnez    }} & CFU_OP_BNE     |
-    {CFU_OP_W{dec_blt       }} & CFU_OP_BLT     |
-    {CFU_OP_W{dec_bge       }} & CFU_OP_BGE     |
-    {CFU_OP_W{dec_bltu      }} & CFU_OP_BLTU    |
-    {CFU_OP_W{dec_bgeu      }} & CFU_OP_BGEU    |
-    {CFU_OP_W{dec_jalr      }} & CFU_OP_JALR    |
-    {CFU_OP_W{dec_jal       }} & CFU_OP_JAL     |
-    {CFU_OP_W{dec_c_jalr    }} & CFU_OP_JALR    |
-    {CFU_OP_W{dec_c_j       }} & CFU_OP_J       |
-    {CFU_OP_W{dec_c_jr      }} & CFU_OP_JALR    |
-    {CFU_OP_W{dec_ecall     }} & CFU_OP_ECALL   |
-    {CFU_OP_W{dec_ebreak    }} & CFU_OP_EBREAK  |
-    {CFU_OP_W{dec_mret      }} & CFU_OP_MRET    |
-    {CFU_OP_W{dec_wfi       }} & CFU_OP_NOP     |
-    {CFU_OP_W{dec_fence_i   }} & CFU_OP_NOP     ;
-
-//
-// Decode stage control flow change raising
-// ------------------------------------------------------------
-
-// Offset used when calculating jumps taken from the decode stage.
-wire [XL:0] decode_cf_offset = 
-    {64{dec_jalr || dec_jal  }} & {{32{imm32_j[31]}}, imm32_j} |
-    {64{dec_c_j              }} & {{32{imm_c_j[31]}}, imm_c_j} ;
-
-//
-// Trapping
-// ------------------------------------------------------------
-
-wire        n_s2_trap = dec_invalid_opcode                     || 
-                        s1_ferr[0] && (s1_i16bit || s1_i32bit) ||
-                        s1_ferr[1] &&               s1_i32bit  ;
-
-wire [4:0]  n_s2_cause= dec_invalid_opcode ? TRAP_IOPCODE[4:0] :
-                                             TRAP_IACCESS[4:0] ;
-
-//
-// Decode -> Execute stage registers
-// ------------------------------------------------------------
-
-assign      s2_valid    = ( s1_i16bit   || s1_i32bit  );
-
-assign      s2_npc      = n_s2_pc;
-
-wire [XL:0] n_s2_pc     = s1_pc;
-wire [31:0] n_s2_instr  = {
-    s1_i16bit ? 16'b0 : s1_instr[31:16], s1_instr[15:0]
-};
-
-wire        flush_pipe  = s1_flush;
-
-always @(posedge g_clk) begin
-    if(!g_resetn || flush_pipe) begin
-        s2_pc       <= 0            ;
-        s2_opr_a    <= 0            ;
-        s2_opr_b    <= 0            ;
-        s2_opr_c    <= 0            ;
-        s2_rd       <= 0            ;
-        s2_alu_op   <= 0            ;
-        s2_lsu_op   <= 0            ;
-        s2_mdu_op   <= 0            ;
-        s2_csr_op   <= 0            ;
-        s2_cfu_op   <= 0            ;
-        s2_op_w     <= 0            ;
-        s2_instr    <= 0            ;
-        s2_full     <= 1'b0         ;
-        s2_trap     <= 1'b0         ;
-    end else if(s2_valid && s2_ready) begin
-        s2_pc       <= n_s2_pc      ;
-        s2_opr_a    <= n_s2_opr_a   ;
-        s2_opr_b    <= n_s2_opr_b   ;
-        s2_opr_c    <= n_s2_opr_c   ;
-        s2_rd       <= n_s2_trap ? n_s2_cause : n_s2_rd;
-        s2_alu_op   <= n_alu_op     ;
-        s2_lsu_op   <= n_lsu_op     ;
-        s2_mdu_op   <= n_mdu_op     ;
-        s2_csr_op   <= n_csr_op     ;
-        s2_cfu_op   <= n_cfu_op     ;
-        s2_op_w     <= n_s2_op_w    ;
-        s2_instr    <= n_s2_instr   ;
-        s2_full     <= 1'b1         ;
-        s2_trap     <= n_s2_trap    ;
-    end
-end
+assign  s2_csr_set    = dec_csrrsi || dec_csrrs ;
+assign  s2_csr_clr    = dec_csrrsi || dec_csrrs ;
+assign  s2_csr_rd     = dec_csrrsi || dec_csrrs || dec_csrrw || dec_csrrwi;
+assign  s2_csr_wr     = dec_csrrsi || dec_csrrs || dec_csrrw || dec_csrrwi;
 
 
 //
@@ -653,27 +458,6 @@ core_pipe_decode_immediates i_core_pipe_decode_immediates (
 .imm_c_j      (imm_c_j      ),
 .imm_c_bz     (imm_c_bz     ) 
 );
-
-
-//
-// RVFI
-// ------------------------------------------------------------
-
-`ifdef RVFI
-always @(posedge g_clk) begin
-    if(!g_resetn || flush_pipe) begin
-        s2_rs1_a <= 0;
-        s2_rs1_d <= 0;
-        s2_rs2_a <= 0;
-        s2_rs2_d <= 0;
-    end else if(s2_valid && s2_ready) begin
-        s2_rs1_a <= s1_rs1_addr;
-        s2_rs1_d <= s1_rs1_data;
-        s2_rs2_a <= s1_rs2_addr;
-        s2_rs2_d <= s1_rs2_data;
-    end
-end
-`endif
 
 endmodule
 
