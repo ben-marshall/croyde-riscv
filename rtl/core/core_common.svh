@@ -54,41 +54,15 @@ localparam TRAP_INT_MSI = 7'd3 ;
 localparam TRAP_INT_MTI = 7'd7 ;
 localparam TRAP_INT_MEI = 7'd11;
 
-
 //
-// ALU Op codes
+// Writeback opcodes
+localparam WB_OP_W          = 2;
+localparam WB_OP_R          = WB_OP_W - 1;
 
-localparam ALU_OP_W         = 4;
-localparam ALU_OP_R         = ALU_OP_W - 1;
-
-localparam ALU_OP_NOP       = 4'h0;
-localparam ALU_OP_ADD       = 4'h1;
-localparam ALU_OP_SUB       = 4'h2;
-localparam ALU_OP_SLL       = 4'h3;
-localparam ALU_OP_SRL       = 4'h4;
-localparam ALU_OP_SRA       = 4'h5;
-localparam ALU_OP_AND       = 4'h6;
-localparam ALU_OP_OR        = 4'h7;
-localparam ALU_OP_NOT       = 4'h8;
-localparam ALU_OP_XOR       = 4'h9;
-localparam ALU_OP_SLT       = 4'hA;
-localparam ALU_OP_SLTU      = 4'hB;
-
-//
-// MUL / DIV Opcodes
-
-localparam MDU_OP_W         = 4;
-localparam MDU_OP_R         = MDU_OP_W - 1;
-
-localparam MDU_OP_NOP       = 4'h0;
-localparam MDU_OP_MUL       = 4'h1;
-localparam MDU_OP_MULH      = 4'h2;
-localparam MDU_OP_MULHSU    = 4'h3;
-localparam MDU_OP_MULHU     = 4'h4;
-localparam MDU_OP_DIV       = 4'h5;
-localparam MDU_OP_DIVU      = 4'h6;
-localparam MDU_OP_REM       = 4'h7;
-localparam MDU_OP_REMU      = 4'h8;
+localparam WB_OP_NONE       = 2'b00;
+localparam WB_OP_WDATA      = 2'b01;
+localparam WB_OP_LSU        = 2'b10;
+localparam WB_OP_CSR        = 2'b11;
 
 //
 // Load/Store opcodes
@@ -115,7 +89,7 @@ localparam LSU_OP_SD        = 5'b1_100_0;
 localparam CSR_OP_W         = 4;
 localparam CSR_OP_R         = CSR_OP_W - 1;
 
-localparam CSR_OP_NOP       = 4'b0000;
+localparam CSR_OP_NOP       = 4'b000;
 localparam CSR_OP_RD        = 0;
 localparam CSR_OP_WR        = 1;
 localparam CSR_OP_SET       = 2;
@@ -124,20 +98,12 @@ localparam CSR_OP_CLR       = 3;
 //
 //  CFU Opcodes
 
-localparam CFU_OP_W         = 4;
+localparam CFU_OP_W         = 3;
 localparam CFU_OP_R         = CFU_OP_W - 1;
 
-localparam CFU_OP_NOP       = 4'h0;
-localparam CFU_OP_J         = 4'h1;
-localparam CFU_OP_JAL       = 4'h2;
-localparam CFU_OP_JALR      = 4'h3;
-localparam CFU_OP_BEQ       = 4'h4;
-localparam CFU_OP_BNE       = 4'h5;
-localparam CFU_OP_BLT       = 4'h6;
-localparam CFU_OP_BLTU      = 4'h7;
-localparam CFU_OP_BGE       = 4'h8;
-localparam CFU_OP_BGEU      = 4'h9;
-localparam CFU_OP_MRET      = 4'hA;
-localparam CFU_OP_EBREAK    = 4'hB;
-localparam CFU_OP_ECALL     = 4'hC;
+localparam CFU_OP_NOP       = 3'b000;
+localparam CFU_OP_TAKEN     = 3'b001;
+localparam CFU_OP_IGNORE    = 3'b010;
+localparam CFU_OP_MRET      = 3'b101;
+localparam CFU_OP_TRAP      = 3'b111;
 

@@ -12,7 +12,6 @@ input  wire                 g_resetn    , // Global active low sync reset.
 input  wire                 cf_valid    , // Control flow change?
 output wire                 cf_ack      , // Control flow change acknwoledged
 input  wire [         XL:0] cf_target   , // Control flow change destination
-input  wire [ CF_CAUSE_R:0] cf_cause    , // Control flow change cause
 
 output wire                 imem_req    , // Memory request
 output reg  [ MEM_ADDR_R:0] imem_addr   , // Memory request address

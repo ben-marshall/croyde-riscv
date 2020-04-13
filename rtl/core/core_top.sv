@@ -59,12 +59,24 @@ parameter   MMIO_BASE_MASK  = 64'h0000_0000_0000_1FFF;
 wire                 cf_valid    ; // Control flow change?
 wire                 cf_ack      ; // Control flow change acknwoledged
 wire [         XL:0] cf_target   ; // Control flow change destination
-wire [ CF_CAUSE_R:0] cf_cause    ; // Control flow change cause
+
+wire                 s2_cf_valid ; // Control flow change?
+wire                 s2_cf_ack   = cf_ack;
+wire [         XL:0] s2_cf_target; // Control flow destination
+
+wire                 s3_cf_valid ; // Control flow change?
+wire                 s3_cf_ack   = cf_ack;
+wire [         XL:0] s3_cf_target; // Control flow destination
+
+assign  cf_valid    = s2_cf_valid || s3_cf_valid;
+assign  cf_target   = s3_cf_valid ? s3_cf_target : s2_cf_target;
 
 wire                 int_pending ; // To exec stage from core_interrupts
 wire [ CF_CAUSE_R:0] int_cause   ; // Cause code for the interrupt.
 wire [         XL:0] int_tvec    ; // Interrupt trap vector
 wire                 int_ack     ; // Interrupt taken acknowledge
+
+wire                 s2_flush    = cf_valid && cf_ack;
 
 //
 // Inter-stage wiring
@@ -82,16 +94,98 @@ wire [         XL:0] s1_rs1_data ; // RS1 Read Data (Forwarded)
 wire [ REG_ADDR_R:0] s1_rs2_addr ; // RS2 Address
 wire [         XL:0] s1_rs2_data ; // RS2 Read Data (Forwarded)
 
-`ifdef RVFI
-wire [ REG_ADDR_R:0] s2_rs1_a    ;
-wire [         XL:0] s2_rs1_d    ;
-wire [ REG_ADDR_R:0] s2_rs2_a    ;
-wire [         XL:0] s2_rs2_d    ;
-`endif
+wire                 s2_ready       ; // EX ready for new instruction
+wire                 s2_valid       ; // Decode -> EX instr valid.
 
-wire                 s2_rd_wen   ;
-wire [ REG_ADDR_R:0] s2_rd_addr  ;
-wire [         XL:0] s2_rd_wdata ;
+wire [ REG_ADDR_R:0] s2_rs1_addr    ; // RS1 address.
+wire [ REG_ADDR_R:0] s2_rs2_addr    ; // RS2 address.
+wire [ REG_ADDR_R:0] s2_rd          ; // Destination reg address.
+wire [         XL:0] s2_rs1_data    ; // RS1 value.
+wire [         XL:0] s2_rs2_data    ; // RS2 value.
+wire [         XL:0] s2_imm         ; // Immediate value
+wire [         XL:0] s2_pc          ; // Current program counter.
+wire [         XL:0] s2_npc         ; // Next    program counter.
+wire [         31:0] s2_instr       ; // Current instruction word.
+wire                 s2_trap        ; // Raise a trap
+
+wire [         XL:0] s2_alu_lhs     ; // ALU left  operand
+wire [         XL:0] s2_alu_rhs     ; // ALU right operand
+wire                 s2_alu_add     ; // ALU Operation to perform.
+wire                 s2_alu_and     ; // 
+wire                 s2_alu_or      ; // 
+wire                 s2_alu_sll     ; // 
+wire                 s2_alu_srl     ; // 
+wire                 s2_alu_slt     ; // 
+wire                 s2_alu_sltu    ; // 
+wire                 s2_alu_sra     ; // 
+wire                 s2_alu_sub     ; // 
+wire                 s2_alu_xor     ; // 
+wire                 s2_alu_word    ; // Word result only.
+
+wire                 s2_cfu_beq     ; // Control flow operation.
+wire                 s2_cfu_bge     ; //
+wire                 s2_cfu_bgeu    ; //
+wire                 s2_cfu_blt     ; //
+wire                 s2_cfu_bltu    ; //
+wire                 s2_cfu_bne     ; //
+wire                 s2_cfu_ebrk    ; //
+wire                 s2_cfu_ecall   ; //
+wire                 s2_cfu_j       ; //
+wire                 s2_cfu_jal     ; //
+wire                 s2_cfu_jalr    ; //
+wire                 s2_cfu_mret    ; //
+
+wire                 s2_lsu_load    ; // LSU Load
+wire                 s2_lsu_store   ; // "   Store
+wire                 s2_lsu_byte    ; // Byte width
+wire                 s2_lsu_half    ; // Halfword width
+wire                 s2_lsu_word    ; // Word width
+wire                 s2_lsu_dbl     ; // Doubleword widt
+wire                 s2_lsu_sext    ; // Sign extend loaded value.
+
+wire                 s2_mdu_mul     ; // MDU Operation
+wire                 s2_mdu_mulh    ; //
+wire                 s2_mdu_mulhsu  ; //
+wire                 s2_mdu_mulhu   ; //
+wire                 s2_mdu_div     ; //
+wire                 s2_mdu_divu    ; //
+wire                 s2_mdu_rem     ; //
+wire                 s2_mdu_remu    ; //
+wire                 s2_mdu_mulw    ; //
+wire                 s2_mdu_divw    ; //
+wire                 s2_mdu_divuw   ; //
+wire                 s2_mdu_remw    ; //
+wire                 s2_mdu_remuw   ; //
+
+wire                 s2_csr_set     ; // CSR Operation
+wire                 s2_csr_clr     ; //
+wire                 s2_csr_rd      ; //
+wire                 s2_csr_wr      ; //
+wire [         11:0] s2_csr_addr    ; // CSR access address
+
+wire                 s2_wb_alu      ; // Writeback ALU result
+wire                 s2_wb_csr      ; // Writeback CSR result
+wire                 s2_wb_mdu      ; // Writeback MDU result
+wire                 s2_wb_lsu      ; // Writeback LSU Loaded data
+wire                 s2_wb_npc      ; // Writeback next PC value
+
+wire                 s3_valid       ; // New instruction ready
+wire                 s3_ready       ; // WB ready for new instruciton.
+wire                 s3_full        ; // WB has an instr in it.
+wire [         XL:0] s3_pc          ; // Writeback stage PC
+wire [         31:0] s3_instr       ; // Writeback stage instr word
+wire [         XL:0] s3_wdata       ; // Writeback stage instr word
+wire [ REG_ADDR_R:0] s3_rd          ; // Writeback stage instr word
+wire [   LSU_OP_R:0] s3_lsu_op      ; // Writeback LSU op
+wire [   CSR_OP_R:0] s3_csr_op      ; // Writeback CSR op
+wire [         11:0] s3_csr_addr    ; // CSR access address
+wire [   CFU_OP_R:0] s3_cfu_op      ; // Writeback CFU op
+wire [    WB_OP_R:0] s3_wb_op       ; // Writeback Data source.
+wire                 s3_trap        ; // Raise a trap
+
+wire                 s3_rd_wen      ; // Destination register write enable
+wire [ REG_ADDR_R:0] s3_rd_addr     ; // Destination register write addr
+wire [         XL:0] s3_rd_wdata    ; // Destination register write data.
 
 
 wire                 csr_en      ; // CSR Access Enable
@@ -172,7 +266,6 @@ core_pipe_fetch #(
 .cf_valid     (cf_valid     ), // Control flow change?
 .cf_ack       (cf_ack       ), // Control flow change acknwoledged
 .cf_target    (cf_target    ), // Control flow change destination
-.cf_cause     (cf_cause     ), // Control flow change cause
 .imem_req     (imem_req     ), // Memory request
 .imem_addr    (imem_addr    ), // Memory request address
 .imem_wen     (imem_wen     ), // Memory request write enable
@@ -191,53 +284,244 @@ core_pipe_fetch #(
 
 
 //
-// Instance: core_pipe_decode
+// Module: core_pipe_decode
 //
 //  Pipeline decode / operand gather stage.
 //
-core_pipe_decode #(
-.PC_RESET_ADDRESS(PC_RESET_ADDRESS)
-) i_core_pipe_decode(
-.g_clk        (g_clk        ), // Global clock
-.g_resetn     (g_resetn     ), // Global active low sync reset.
-.s1_i16bit    (s1_i16bit    ), // 16 bit instruction?
-.s1_i32bit    (s1_i32bit    ), // 32 bit instruction?
-.s1_instr     (s1_instr     ), // Instruction to be decoded
-.s1_ferr      (s1_ferr      ), // Fetch bus error?
-.s1_eat_2     (s1_eat_2     ), // Decode eats 2 bytes
-.s1_eat_4     (s1_eat_4     ), // Decode eats 4 bytes
-.s1_flush     (s1_flush     ), // Flush stage
-.cf_valid     (cf_valid     ), // Control flow change?
-.cf_ack       (cf_ack       ), // Control flow change acknwoledged
-.cf_target    (cf_target    ), // Control flow change destination
-.cf_cause     (cf_cause     ), // Control flow change cause
-.s1_rs1_addr  (s1_rs1_addr  ), // RS1 Address
-.s1_rs1_data  (s1_rs1_data  ), // RS1 Read Data (Forwarded)
-.s1_rs2_addr  (s1_rs2_addr  ), // RS2 Address
-.s1_rs2_data  (s1_rs2_data  ), // RS2 Read Data (Forwarded)
-`ifdef RVFI
-.s2_rs1_a     (s2_rs1_a     ),
-.s2_rs1_d     (s2_rs1_d     ),
-.s2_rs2_a     (s2_rs2_a     ),
-.s2_rs2_d     (s2_rs2_d     ),
-`endif
-.s2_valid     (s2_valid     ), // Decode instr ready for execute
-.s2_ready     (s2_ready     ), // Execute ready for new instr.
-.s2_full      (s2_full      ), // Instruction present in regs?
-.s2_trap      (s2_trap      ), // Raise trap. Cause in RD
-.s2_pc        (s2_pc        ), // Execute stage PC
-.s2_npc       (s2_npc       ), // Decode stage PC
-.s2_opr_a     (s2_opr_a     ), // EX stage operand a
-.s2_opr_b     (s2_opr_b     ), //    "       "     b
-.s2_opr_c     (s2_opr_c     ), //    "       "     c
-.s2_rd        (s2_rd        ), // EX stage destination reg address.
-.s2_alu_op    (s2_alu_op    ), // ALU operation
-.s2_lsu_op    (s2_lsu_op    ), // LSU operation
-.s2_mdu_op    (s2_mdu_op    ), // Mul/Div Operation
-.s2_csr_op    (s2_csr_op    ), // CSR operation
-.s2_cfu_op    (s2_cfu_op    ), // Control flow unit operation
-.s2_op_w      (s2_op_w      ), // Is the operation on a word?
-.s2_instr     (s2_instr     )  // Encoded instruction for trace.
+core_pipe_decode i_core_pipe_decode (
+.g_clk           (g_clk           ), // Global clock
+.g_resetn        (g_resetn        ), // Global active low sync reset.
+.s1_i16bit       (s1_i16bit       ), // 16 bit instruction?
+.s1_i32bit       (s1_i32bit       ), // 32 bit instruction?
+.s1_instr        (s1_instr        ), // Instruction to be decoded
+.s1_ferr         (s1_ferr         ), // Fetch bus error?
+.s1_eat_2        (s1_eat_2        ), // Decode eats 2 bytes
+.s1_eat_4        (s1_eat_4        ), // Decode eats 4 bytes
+.s2_flush        (s2_flush        ), // Stage 1 flush
+.cf_valid        (cf_valid        ), // Control flow change?
+.cf_ack          (cf_ack          ), // Control flow acknwoledged
+.cf_target       (cf_target       ), // Control flow destination
+.s1_rs1_addr     (s1_rs1_addr     ), // RS1 Address
+.s1_rs1_data     (s1_rs1_data     ), // RS1 Read Data (Forwarded)
+.s1_rs2_addr     (s1_rs2_addr     ), // RS2 Address
+.s1_rs2_data     (s1_rs2_data     ), // RS2 Read Data (Forwarded)
+.s2_ready        (s2_ready        ), // EX ready for new instruction
+.s2_valid        (s2_valid        ), // Decode -> EX instr valid.
+.s2_rs1_addr     (s2_rs1_addr     ), // RS1 address.
+.s2_rs2_addr     (s2_rs2_addr     ), // RS2 address.
+.s2_rd           (s2_rd           ), // Destination reg address.
+.s2_rs1_data     (s2_rs1_data     ), // RS1 value.
+.s2_rs2_data     (s2_rs2_data     ), // RS2 value.
+.s2_imm          (s2_imm          ), // Immediate value
+.s2_pc           (s2_pc           ), // Current program counter.
+.s2_npc          (s2_npc          ), // Next    program counter.
+.s2_instr        (s2_instr        ), // Current instruction word.
+.s2_trap         (s2_trap         ), // Raise a trap
+.s2_alu_lhs      (s2_alu_lhs      ), // ALU left  operand
+.s2_alu_rhs      (s2_alu_rhs      ), // ALU right operand
+.s2_alu_add      (s2_alu_add      ), // ALU Operation to perform.
+.s2_alu_and      (s2_alu_and      ), // 
+.s2_alu_or       (s2_alu_or       ), // 
+.s2_alu_sll      (s2_alu_sll      ), // 
+.s2_alu_srl      (s2_alu_srl      ), // 
+.s2_alu_slt      (s2_alu_slt      ), // 
+.s2_alu_sltu     (s2_alu_sltu     ), // 
+.s2_alu_sra      (s2_alu_sra      ), // 
+.s2_alu_sub      (s2_alu_sub      ), // 
+.s2_alu_xor      (s2_alu_xor      ), // 
+.s2_alu_word     (s2_alu_word     ), // Word result only.
+.s2_cfu_beq      (s2_cfu_beq      ), // Control flow operation.
+.s2_cfu_bge      (s2_cfu_bge      ), //
+.s2_cfu_bgeu     (s2_cfu_bgeu     ), //
+.s2_cfu_blt      (s2_cfu_blt      ), //
+.s2_cfu_bltu     (s2_cfu_bltu     ), //
+.s2_cfu_bne      (s2_cfu_bne      ), //
+.s2_cfu_ebrk     (s2_cfu_ebrk     ), //
+.s2_cfu_ecall    (s2_cfu_ecall    ), //
+.s2_cfu_j        (s2_cfu_j        ), //
+.s2_cfu_jal      (s2_cfu_jal      ), //
+.s2_cfu_jalr     (s2_cfu_jalr     ), //
+.s2_cfu_mret     (s2_cfu_mret     ), //
+.s2_lsu_load     (s2_lsu_load     ), // LSU Load
+.s2_lsu_store    (s2_lsu_store    ), // "   Store
+.s2_lsu_byte     (s2_lsu_byte     ), // Byte width
+.s2_lsu_half     (s2_lsu_half     ), // Halfword width
+.s2_lsu_word     (s2_lsu_word     ), // Word width
+.s2_lsu_dbl      (s2_lsu_dbl      ), // Doubleword widt
+.s2_lsu_sext     (s2_lsu_sext     ), // Sign extend loaded value.
+.s2_mdu_mul      (s2_mdu_mul      ), // MDU Operation
+.s2_mdu_mulh     (s2_mdu_mulh     ), //
+.s2_mdu_mulhsu   (s2_mdu_mulhsu   ), //
+.s2_mdu_mulhu    (s2_mdu_mulhu    ), //
+.s2_mdu_div      (s2_mdu_div      ), //
+.s2_mdu_divu     (s2_mdu_divu     ), //
+.s2_mdu_rem      (s2_mdu_rem      ), //
+.s2_mdu_remu     (s2_mdu_remu     ), //
+.s2_mdu_mulw     (s2_mdu_mulw     ), //
+.s2_mdu_divw     (s2_mdu_divw     ), //
+.s2_mdu_divuw    (s2_mdu_divuw    ), //
+.s2_mdu_remw     (s2_mdu_remw     ), //
+.s2_mdu_remuw    (s2_mdu_remuw    ), //
+.s2_csr_set      (s2_csr_set      ), // CSR Operation
+.s2_csr_clr      (s2_csr_clr      ), //
+.s2_csr_rd       (s2_csr_rd       ), //
+.s2_csr_wr       (s2_csr_wr       ), //
+.s2_csr_addr     (s2_csr_addr     ), // CSR Access address
+.s2_wb_alu       (s2_wb_alu       ), // Writeback ALU result
+.s2_wb_csr       (s2_wb_csr       ), // Writeback CSR result
+.s2_wb_mdu       (s2_wb_mdu       ), // Writeback MDU result
+.s2_wb_lsu       (s2_wb_lsu       ), // Writeback LSU Loaded data
+.s2_wb_npc       (s2_wb_npc       )  // Writeback next PC value
+);
+
+
+//
+// Module: core_pipe_exec
+//
+//  Top level for the execute stage of the pipeline.
+//
+core_pipe_exec i_core_pipe_exec(
+.g_clk           (g_clk           ), // Global clock
+.g_resetn        (g_resetn        ), // Global active low sync reset.
+.s2_cf_valid     (s2_cf_valid     ), // Control flow change?
+.s2_cf_ack       (s2_cf_ack       ), // Control flow acknwoledged
+.s2_cf_target    (s2_cf_target    ), // Control flow destination
+.s2_ready        (s2_ready        ), // EX ready for new instruction
+.s2_valid        (s2_valid        ), // Decode -> EX instr valid.
+.s2_rs1_addr     (s2_rs1_addr     ), // RS1 address.
+.s2_rs2_addr     (s2_rs2_addr     ), // RS2 address.
+.s2_rd           (s2_rd           ), // Destination reg address.
+.s2_rs1_data     (s2_rs1_data     ), // RS1 value.
+.s2_rs2_data     (s2_rs2_data     ), // RS2 value.
+.s2_imm          (s2_imm          ), // Immediate value
+.s2_pc           (s2_pc           ), // Current program counter.
+.s2_npc          (s2_npc          ), // Next    program counter.
+.s2_instr        (s2_instr        ), // Current instruction word.
+.s2_trap         (s2_trap         ), // Raise a trap
+.s2_alu_lhs      (s2_alu_lhs      ), // ALU left  operand
+.s2_alu_rhs      (s2_alu_rhs      ), // ALU right operand
+.s2_alu_add      (s2_alu_add      ), // ALU Operation to perform.
+.s2_alu_and      (s2_alu_and      ), // 
+.s2_alu_or       (s2_alu_or       ), // 
+.s2_alu_sll      (s2_alu_sll      ), // 
+.s2_alu_srl      (s2_alu_srl      ), // 
+.s2_alu_slt      (s2_alu_slt      ), // 
+.s2_alu_sltu     (s2_alu_sltu     ), // 
+.s2_alu_sra      (s2_alu_sra      ), // 
+.s2_alu_sub      (s2_alu_sub      ), // 
+.s2_alu_xor      (s2_alu_xor      ), // 
+.s2_alu_word     (s2_alu_word     ), // Word result only.
+.s2_cfu_beq      (s2_cfu_beq      ), // Control flow operation.
+.s2_cfu_bge      (s2_cfu_bge      ), //
+.s2_cfu_bgeu     (s2_cfu_bgeu     ), //
+.s2_cfu_blt      (s2_cfu_blt      ), //
+.s2_cfu_bltu     (s2_cfu_bltu     ), //
+.s2_cfu_bne      (s2_cfu_bne      ), //
+.s2_cfu_ebrk     (s2_cfu_ebrk     ), //
+.s2_cfu_ecall    (s2_cfu_ecall    ), //
+.s2_cfu_j        (s2_cfu_j        ), //
+.s2_cfu_jal      (s2_cfu_jal      ), //
+.s2_cfu_jalr     (s2_cfu_jalr     ), //
+.s2_cfu_mret     (s2_cfu_mret     ), //
+.s2_lsu_load     (s2_lsu_load     ), // LSU Load
+.s2_lsu_store    (s2_lsu_store    ), // "   Store
+.s2_lsu_byte     (s2_lsu_byte     ), // Byte width
+.s2_lsu_half     (s2_lsu_half     ), // Halfword width
+.s2_lsu_word     (s2_lsu_word     ), // Word width
+.s2_lsu_dbl      (s2_lsu_dbl      ), // Doubleword widt
+.s2_lsu_sext     (s2_lsu_sext     ), // Sign extend loaded value.
+.s2_mdu_mul      (s2_mdu_mul      ), // MDU Operation
+.s2_mdu_mulh     (s2_mdu_mulh     ), //
+.s2_mdu_mulhsu   (s2_mdu_mulhsu   ), //
+.s2_mdu_mulhu    (s2_mdu_mulhu    ), //
+.s2_mdu_div      (s2_mdu_div      ), //
+.s2_mdu_divu     (s2_mdu_divu     ), //
+.s2_mdu_rem      (s2_mdu_rem      ), //
+.s2_mdu_remu     (s2_mdu_remu     ), //
+.s2_mdu_mulw     (s2_mdu_mulw     ), //
+.s2_mdu_divw     (s2_mdu_divw     ), //
+.s2_mdu_divuw    (s2_mdu_divuw    ), //
+.s2_mdu_remw     (s2_mdu_remw     ), //
+.s2_mdu_remuw    (s2_mdu_remuw    ), //
+.s2_csr_set      (s2_csr_set      ), // CSR Operation
+.s2_csr_clr      (s2_csr_clr      ), //
+.s2_csr_rd       (s2_csr_rd       ), //
+.s2_csr_wr       (s2_csr_wr       ), //
+.s2_csr_addr     (s2_csr_addr     ), // CSR Access address
+.s2_wb_alu       (s2_wb_alu       ), // Writeback ALU result
+.s2_wb_csr       (s2_wb_csr       ), // Writeback CSR result
+.s2_wb_mdu       (s2_wb_mdu       ), // Writeback MDU result
+.s2_wb_lsu       (s2_wb_lsu       ), // Writeback LSU Loaded data
+.s2_wb_npc       (s2_wb_npc       ), // Writeback next PC value
+.s3_valid        (s3_valid        ), // New instruction ready
+.s3_ready        (s3_ready        ), // WB ready for new instruciton.
+.s3_full         (s3_full         ), // WB has an instr in it.
+.s3_pc           (s3_pc           ), // Writeback stage PC
+.s3_instr        (s3_instr        ), // Writeback stage instr word
+.s3_wdata        (s3_wdata        ), // Writeback stage instr word
+.s3_rd           (s3_rd           ), // Writeback stage instr word
+.s3_lsu_op       (s3_lsu_op       ), // Writeback LSU op
+.s3_csr_op       (s3_csr_op       ), // Writeback CSR op
+.s3_csr_addr     (s3_csr_addr     ), // CSR Access address
+.s3_cfu_op       (s3_cfu_op       ), // Writeback CFU op
+.s3_wb_op        (s3_wb_op        ), // Writeback Data source.
+.s3_trap         (s3_trap         ), // Raise a trap
+.dmem_req        (dmem_req        ), // Memory request
+.dmem_addr       (dmem_addr       ), // Memory request address
+.dmem_wen        (dmem_wen        ), // Memory request write enable
+.dmem_strb       (dmem_strb       ), // Memory request write strobe
+.dmem_wdata      (dmem_wdata      ), // Memory write data.
+.dmem_gnt        (dmem_gnt        ), // Memory response valid
+.dmem_err        (dmem_err        ), // Memory response error
+.dmem_rdata      (dmem_rdata      )  // Memory response read data
+);
+
+
+
+//
+// module: core_pipe_wb
+//
+//  Writeback stage. Responsible for GPR writebacks, CSR accesses,
+//  Load data processing, trap raising.
+//
+core_pipe_wb i_core_pipe_wb (
+.g_clk           (g_clk           ), // Global clock
+.g_resetn        (g_resetn        ), // Global active low sync reset.
+.s3_cf_valid     (s3_cf_valid     ), // Control flow change?
+.s3_cf_ack       (s3_cf_ack       ), // Control flow acknwoledged
+.s3_cf_target    (s3_cf_target    ), // Control flow destination
+.s3_valid        (s3_valid        ), // New instruction ready
+.s3_ready        (s3_ready        ), // WB ready for new instruciton.
+.s3_full         (s3_full         ), // WB has an instr in it.
+.s3_pc           (s3_pc           ), // Writeback stage PC
+.s3_instr        (s3_instr        ), // Writeback stage instr word
+.s3_wdata        (s3_wdata        ), // Writeback stage instr word
+.s3_rd           (s3_rd           ), // Writeback stage instr word
+.s3_lsu_op       (s3_lsu_op       ), // Writeback LSU op
+.s3_csr_op       (s3_csr_op       ), // Writeback CSR op
+.s3_csr_addr     (s3_csr_addr     ), // CSR Access address
+.s3_cfu_op       (s3_cfu_op       ), // Writeback CFU op
+.s3_wb_op        (s3_wb_op        ), // Writeback Data source.
+.s3_trap         (s3_trap         ), // Raise a trap
+.s3_rd_wen       (s3_rd_wen       ), // RD write enable
+.s3_rd_addr      (s3_rd_addr      ), // RD write addr
+.s3_rd_wdata     (s3_rd_wdata     ), // RD write data.
+.csr_en          (csr_en          ), // CSR Access Enable
+.csr_wr          (csr_wr          ), // CSR Write Enable
+.csr_wr_set      (csr_wr_set      ), // CSR Write - Set
+.csr_wr_clr      (csr_wr_clr      ), // CSR Write - Clear
+.csr_addr        (csr_addr        ), // Address of the CSR to access.
+.csr_wdata       (csr_wdata       ), // Data to be written to a CSR
+.csr_rdata       (csr_rdata       ), // CSR read data
+.csr_error       (csr_error       ), // CSR access error.
+.dmem_req        (dmem_req        ), // Memory request
+.dmem_addr       (dmem_addr       ), // Memory request address
+.dmem_wen        (dmem_wen        ), // Memory request write enable
+.dmem_strb       (dmem_strb       ), // Memory request write strobe
+.dmem_wdata      (dmem_wdata      ), // Memory write data.
+.dmem_gnt        (dmem_gnt        ), // Memory response valid
+.dmem_err        (dmem_err        ), // Memory response error
+.dmem_rdata      (dmem_rdata      )  // Memory response read data
 );
 
 
@@ -254,9 +538,9 @@ core_regfile i_core_regfile (
 .rs2_addr (s1_rs2_addr ),
 .rs1_data (s1_rs1_data ),
 .rs2_data (s1_rs2_data ),
-.rd_wen   (s2_rd_wen   ),
-.rd_addr  (s2_rd_addr  ),
-.rd_wdata (s2_rd_wdata ) 
+.rd_wen   (s3_rd_wen   ),
+.rd_addr  (s3_rd_addr  ),
+.rd_wdata (s3_rd_wdata ) 
 );
 
 
@@ -414,8 +698,6 @@ always @(posedge g_clk) if(g_resetn && $past(g_resetn)) begin
     if($past(cf_valid) && !$past(cf_ack)) begin
         
         assert($stable(cf_target));
-        
-        assert($stable(cf_cause ));
 
     end
 

@@ -16,28 +16,33 @@ input  wire [   FD_ERR_R:0] s1_ferr         , // Fetch bus error?
 output wire                 s1_eat_2        , // Decode eats 2 bytes
 output wire                 s1_eat_4        , // Decode eats 4 bytes
 
-input  wire                 s1_flush        , // Stage 1 flush
+input  wire                 s2_flush        , // Stage 2 flush
 
-output wire                 cf_valid        , // Control flow change?
-output wire                 cf_ack          , // Control flow acknwoledged
-output wire [         XL:0] cf_target       , // Control flow destination
+input  wire                 cf_valid        , // Control flow change?
+input  wire                 cf_ack          , // Control flow acknwoledged
+input  wire [         XL:0] cf_target       , // Control flow destination
 
 output wire [ REG_ADDR_R:0] s1_rs1_addr     , // RS1 Address
 input  wire [         XL:0] s1_rs1_data     , // RS1 Read Data (Forwarded)
 output wire [ REG_ADDR_R:0] s1_rs2_addr     , // RS2 Address
 input  wire [         XL:0] s1_rs2_data     , // RS2 Read Data (Forwarded)
 
+input  wire                 s2_ready        , // EX ready for new instruction
+output wire                 s2_valid        , // Decode -> EX instr valid.
+
+output wire [ REG_ADDR_R:0] s2_rs1_addr     , // RS1 address.
+output wire [ REG_ADDR_R:0] s2_rs2_addr     , // RS2 address.
+output wire [ REG_ADDR_R:0] s2_rd           , // Destination reg address.
 output wire [         XL:0] s2_rs1_data     , // RS1 value.
 output wire [         XL:0] s2_rs2_data     , // RS2 value.
-output wire [ REG_ADDR_R:0] s2_rd           , // Destination reg address.
 output wire [         XL:0] s2_imm          , // Immediate value
-output wire [         XL:0] s2_pc           , // Current program counter.
+output reg  [         XL:0] s2_pc           , // Current program counter.
 output wire [         XL:0] s2_npc          , // Next    program counter.
 output wire [         31:0] s2_instr        , // Current instruction word.
 output wire                 s2_trap         , // Raise a trap
 
-output wire                 s2_alu_lhs      , // ALU left  operand
-output wire                 s2_alu_rhs      , // ALU right operand
+output wire [         XL:0] s2_alu_lhs      , // ALU left  operand
+output wire [         XL:0] s2_alu_rhs      , // ALU right operand
 output wire                 s2_alu_add      , // ALU Operation to perform.
 output wire                 s2_alu_and      , // 
 output wire                 s2_alu_or       , // 
@@ -79,16 +84,17 @@ output wire                 s2_mdu_div      , //
 output wire                 s2_mdu_divu     , //
 output wire                 s2_mdu_rem      , //
 output wire                 s2_mdu_remu     , //
-output wire                 s2_mdu_mul      , //
-output wire                 s2_mdu_div      , //
-output wire                 s2_mdu_divu     , //
-output wire                 s2_mdu_rem      , //
-output wire                 s2_mdu_remu     , //
+output wire                 s2_mdu_mulw     , //
+output wire                 s2_mdu_divw     , //
+output wire                 s2_mdu_divuw    , //
+output wire                 s2_mdu_remw     , //
+output wire                 s2_mdu_remuw    , //
 
 output wire                 s2_csr_set      , // CSR Operation
 output wire                 s2_csr_clr      , //
 output wire                 s2_csr_rd       , //
 output wire                 s2_csr_wr       , //
+output wire [         11:0] s2_csr_addr     , // CSR Access address.
 
 output wire                 s2_wb_alu       , // Writeback ALU result
 output wire                 s2_wb_csr       , // Writeback CSR result
@@ -111,6 +117,9 @@ output wire                 s2_wb_npc         // Writeback next PC value
 assign s1_eat_2     = s1_i16bit && s2_ready;
 assign s1_eat_4     = s1_i32bit && s2_ready;
 
+assign s2_valid     = s1_i16bit || s1_i32bit;
+assign s2_instr     = {s1_i32bit ? s1_instr[31:16] : 16'b0, s1_instr[15:0]};
+
 //
 // Program Counter Tracking
 // ------------------------------------------------------------
@@ -120,7 +129,7 @@ parameter   PC_RESET_ADDRESS      = 64'h10000000;
 
 wire        e_cf_change = cf_valid && cf_ack;
 
-assign      s2_npc      = s1_pc + {61'b0, s1_i32bit, s1_i16bit, 1'b0};
+assign      s2_npc      = s2_pc + {61'b0, s1_i32bit, s1_i16bit, 1'b0};
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
@@ -159,15 +168,13 @@ wire [         31:0] imm_c_bz       ;
 wire  cf_offset_cbeq_imm    = dec_c_beqz || dec_c_bnez;
 
 wire  cfu_op_conditonal     =
-    dec_beq     || c_beqz   || dec_bge  || dec_bgeu   || dec_blt    ||
-    dec_bltu    || dec_bne  || c_bnez   ;
+    dec_beq     || dec_c_beqz   || dec_bge      || dec_bgeu   || dec_blt  ||
+    dec_bltu    || dec_bne      || dec_c_bnez   ;
 
 wire [         XL:0] cf_offset =
-    |n_csr_op            ? {52'b0             , imm_csr_addr} :
     cf_offset_cbeq_imm   ? {{32{imm_c_bz[31]}}, imm_c_bz    } :
     cfu_op_conditonal    ? {{32{imm32_b[31]}} , imm32_b     } :
-    dec_lui              ? {{32{imm32_u[31]}} , imm32_u     } :
-                           0                                    ;
+                           0                                  ;
 
 wire    [XL:0]  sext_imm32_u = {{32{imm32_u[31]}}, imm32_u};
 wire    [XL:0]  sext_imm32_i = {{32{imm32_i[31]}}, imm32_i};
@@ -219,6 +226,8 @@ assign s2_imm =
     use_imm_c_lsd           ? {32'b0, imm_c_lsd } :
     dec_jal                 ? sext_imm32_j  :
                               0             ;
+
+assign s2_csr_addr          = s1_instr[31:20];
 
 //
 // Register Address Decoding
@@ -297,10 +306,10 @@ wire [4:0] dec_rd_16 =
     {5{dec_c_subw    }} & {2'b01, s1_instr[9:7]} |
     {5{dec_c_xor     }} & {2'b01, s1_instr[9:7]} ;
 
-assign s1_rs1_addr  = s1_i16bit ? dec_rs1_16 : dec_rs1 ;
-assign s1_rs2_addr  = s1_i16bit ? dec_rs2_16 : dec_rs2 ;
-assign n_s2_rd      = s1_i16bit ? dec_rd_16  : dec_rd  ;
+assign s1_rs1_addr  = s1_i16bit     ? dec_rs1_16 : dec_rs1 ;
+assign s1_rs2_addr  = s1_i16bit     ? dec_rs2_16 : dec_rs2 ;
 
+assign s2_rd        = s1_i16bit     ? dec_rd_16  : dec_rd  ;
 assign s2_rs1_data  = s1_rs1_data   ;
 assign s2_rs2_data  = s1_rs2_data   ;
 
@@ -372,18 +381,18 @@ assign  s2_alu_word = dec_addiw         || dec_addw         ||
 //
 // CFU
 
-assign  s2_cfu_beq  = dec_beq    || c_beqz  ;
-assign  s2_cfu_bge  = dec_bge               ;
-assign  s2_cfu_bgeu = dec_bgeu              ;
-assign  s2_cfu_blt  = dec_blt               ;
-assign  s2_cfu_bltu = dec_bltu              ;
-assign  s2_cfu_bne  = dec_bne    || c_bnez  ;
-assign  s2_cfu_ebrk = dec_ebreak            ;
-assign  s2_cfu_ecall= dec_ecall             ;
-assign  s2_cfu_j    = dec_c_j    || c_jr    ;
-assign  s2_cfu_jal  = dec_jal               ;
-assign  s2_cfu_jalr = dec_jalr   || c_jalr  ;
-assign  s2_cfu_mret = dec_mret              ;
+assign  s2_cfu_beq  = dec_beq    || dec_c_beqz  ;
+assign  s2_cfu_bge  = dec_bge                   ;
+assign  s2_cfu_bgeu = dec_bgeu                  ;
+assign  s2_cfu_blt  = dec_blt                   ;
+assign  s2_cfu_bltu = dec_bltu                  ;
+assign  s2_cfu_bne  = dec_bne    || dec_c_bnez  ;
+assign  s2_cfu_ebrk = dec_ebreak                ;
+assign  s2_cfu_ecall= dec_ecall                 ;
+assign  s2_cfu_j    = dec_c_j    || dec_c_jr    ;
+assign  s2_cfu_jal  = dec_jal                   ;
+assign  s2_cfu_jalr = dec_jalr   || dec_c_jalr  ;
+assign  s2_cfu_mret = dec_mret                  ;
 
 //
 // LSU
@@ -417,11 +426,11 @@ assign  s2_mdu_div    = dec_div   ;
 assign  s2_mdu_divu   = dec_divu  ;
 assign  s2_mdu_rem    = dec_rem   ;
 assign  s2_mdu_remu   = dec_remu  ;
-assign  s2_mdu_mul    = dec_mul   ;
-assign  s2_mdu_div    = dec_div   ;
-assign  s2_mdu_divu   = dec_divu  ;
-assign  s2_mdu_rem    = dec_rem   ;
-assign  s2_mdu_remu   = dec_remu  ;
+assign  s2_mdu_mulw   = dec_mulw  ;
+assign  s2_mdu_divw   = dec_divw  ;
+assign  s2_mdu_divw   = dec_divuw ;
+assign  s2_mdu_remw   = dec_remw  ;
+assign  s2_mdu_remuw  = dec_remuw ;
 
 //
 // CSRs
@@ -430,6 +439,25 @@ assign  s2_csr_set    = dec_csrrsi || dec_csrrs ;
 assign  s2_csr_clr    = dec_csrrsi || dec_csrrs ;
 assign  s2_csr_rd     = dec_csrrsi || dec_csrrs || dec_csrrw || dec_csrrwi;
 assign  s2_csr_wr     = dec_csrrsi || dec_csrrs || dec_csrrw || dec_csrrwi;
+
+//
+// Writeback data selection
+assign  s2_wb_alu     = !s2_wb_npc && (
+    s2_alu_add      || s2_alu_and      || s2_alu_or       || s2_alu_sll ||
+    s2_alu_srl      || s2_alu_slt      || s2_alu_sltu     || s2_alu_sra ||
+    s2_alu_sub      || s2_alu_xor      || s2_alu_word     );
+
+assign  s2_wb_csr     = s2_csr_rd   ;
+
+assign  s2_wb_mdu     = 
+    s2_mdu_mul      || s2_mdu_mulh     || s2_mdu_mulhsu   || s2_mdu_mulhu ||
+    s2_mdu_div      || s2_mdu_divu     || s2_mdu_rem      || s2_mdu_remu  ||
+    s2_mdu_mulw     || s2_mdu_divw     || s2_mdu_divuw    || s2_mdu_remw  ||
+    s2_mdu_remuw    ;
+
+assign  s2_wb_lsu     = s2_lsu_load ;
+
+assign  s2_wb_npc     = s2_cfu_jal  || s2_cfu_jalr;
 
 
 //

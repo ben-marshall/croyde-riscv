@@ -21,9 +21,7 @@ input   wire                d_byte      , //
 input   wire                sext        , // Sign extend read data
 
 output  reg                 ready       , // Read data ready
-output  wire                trap_bus    , // Bus error
 output  wire                trap_addr   , // Address alignment error
-output  wire [        XL:0] rdata       , // Read data
 
 output wire                 dmem_req    , // Memory request
 output wire [ MEM_ADDR_R:0] dmem_addr   , // Memory request address
@@ -77,6 +75,8 @@ wire [ 5:0] data_shift     = {addr[2:0], 3'b000};
 //
 // Read data positioning.
 
+wire [XL:0] rdata;
+
 wire [XL:0] rdata_shifted  = dmem_rdata >> data_shift;
 
 wire [XL:0] mask_ls_byte   = {56'h0,  8'hFF};
@@ -100,8 +100,6 @@ assign      rdata          =
 
 //
 // Simple bus assignments.
-
-assign  trap_bus     = dmem_err && rsp_recv ;
 
 assign  trap_addr    = addr_err && ready    ;
 

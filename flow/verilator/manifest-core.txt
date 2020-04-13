@@ -3,8 +3,10 @@ $REPO_HOME/rtl/core/core_pipe_fetch.sv
 $REPO_HOME/rtl/core/core_pipe_decode_immediates.sv
 $REPO_HOME/rtl/core/core_pipe_decode.sv
 $REPO_HOME/rtl/core/core_pipe_exec_alu.sv
+$REPO_HOME/rtl/core/core_pipe_exec_cfu.sv
 $REPO_HOME/rtl/core/core_pipe_exec_lsu.sv
 $REPO_HOME/rtl/core/core_pipe_exec.sv
+$REPO_HOME/rtl/core/core_pipe_wb.sv
 $REPO_HOME/rtl/core/core_csrs.sv
 $REPO_HOME/rtl/core/core_regfile.sv
 $REPO_HOME/rtl/core/core_interrupts.sv
