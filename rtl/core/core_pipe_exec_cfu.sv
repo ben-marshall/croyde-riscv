@@ -114,7 +114,7 @@ assign  rd_wdata            = npc                           ;
 reg       cf_change_done;
 wire    n_cf_change_done = (cf_valid && cf_ack) || cf_change_done;
 
-assign  finished    = n_cf_change_done || trap_raise;
+assign  finished    = n_cf_change_done || trap_raise || branch_ignore;
 
 assign  cf_target   = target_addr;
 

@@ -1,28 +1,28 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Mon Apr 13 18:36:04 2020
+[*] Tue Apr 14 18:14:24 2020
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/uc64/work/unit/example/example.vcd"
-[dumpfile_mtime] "Mon Apr 13 18:35:54 2020"
-[dumpfile_size] 10040294
+[dumpfile_mtime] "Tue Apr 14 18:11:39 2020"
+[dumpfile_size] 39856008
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/verilator.gtkw"
-[timestart] 1
+[timestart] 741
 [size] 1920 1025
 [pos] -1 -1
-*-8.199757 226 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-6.268547 846 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.core_top.
 [treeopen] TOP.core_top.i_core_pipe_exec.
 [treeopen] TOP.core_top.i_core_pipe_fetch.
 [sst_width] 305
-[signals_width] 394
+[signals_width] 462
 [sst_expanded] 1
 [sst_vpaned_height] 187
 @28
 TOP.core_top.i_core_pipe_fetch.g_clk
 TOP.core_top.i_core_pipe_fetch.g_resetn
-@c02022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/interrupts/interrupts.gtkwl
+@c02023
+^2 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
 TOP.core_top.trs_instr[31:0]
 @28
 (0)TOP.core_top.trs_instr[31:0]
@@ -57,14 +57,17 @@ TOP.core_top.trs_instr[31:0]
 (29)TOP.core_top.trs_instr[31:0]
 (30)TOP.core_top.trs_instr[31:0]
 (31)TOP.core_top.trs_instr[31:0]
-@1401200
+@1401201
 -group_end
 @22
 TOP.core_top.trs_pc[63:0]
-@28
+@29
 TOP.core_top.trs_valid
+@28
 TOP.core_top.trap_cpu
 TOP.core_top.trap_int
+@29
+TOP.core_top.i_core_pipe_fetch.e_cf_change
 @c00022
 TOP.core_top.cf_target[63:0]
 @28
@@ -134,8 +137,13 @@ TOP.core_top.cf_target[63:0]
 (63)TOP.core_top.cf_target[63:0]
 @1401200
 -group_end
+@2024
+^3 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
+TOP.core_top.i_core_pipe_wb.s3_rd_addr[4:0]
+@22
+TOP.core_top.i_core_pipe_wb.s3_rd_wdata[63:0]
 @28
-TOP.core_top.i_core_pipe_fetch.e_cf_change
+TOP.core_top.i_core_pipe_wb.s3_rd_wen
 @c00200
 -Pipeline - Fetch
 @800200
@@ -431,7 +439,7 @@ TOP.core_top.i_core_pipe_decode.s1_rs2_addr[4:0]
 TOP.core_top.i_core_pipe_decode.s1_rs2_data[63:0]
 @1401200
 -Interface - Fetch
-@800200
+@c00200
 -Interface Execute
 @28
 TOP.core_top.i_core_pipe_decode.s2_valid
@@ -530,7 +538,7 @@ TOP.core_top.i_core_pipe_decode.s2_mdu_remuw
 TOP.core_top.i_core_pipe_decode.s2_mdu_remw
 @1401200
 -MDU
-@c00200
+@800200
 -Writeback
 @28
 TOP.core_top.i_core_pipe_decode.s2_wb_alu
@@ -538,13 +546,12 @@ TOP.core_top.i_core_pipe_decode.s2_wb_csr
 TOP.core_top.i_core_pipe_decode.s2_wb_lsu
 TOP.core_top.i_core_pipe_decode.s2_wb_mdu
 TOP.core_top.i_core_pipe_decode.s2_wb_npc
-@1401200
--Writeback
 @1000200
--Interface Execute
+-Writeback
 @1401200
+-Interface Execute
 -Pipeline - Decode
-@c00201
+@c00200
 -Pipeline  - Execute
 @28
 TOP.core_top.i_core_pipe_exec.g_clk
@@ -561,6 +568,7 @@ TOP.core_top.i_core_pipe_exec.s2_imm[63:0]
 ^2 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
 TOP.core_top.i_core_pipe_exec.s2_instr[31:0]
 @22
+TOP.core_top.i_core_pipe_exec.s2_instr[31:0]
 TOP.core_top.i_core_pipe_exec.s2_npc[63:0]
 TOP.core_top.i_core_pipe_exec.s2_pc[63:0]
 TOP.core_top.i_core_pipe_exec.s2_rd[4:0]
@@ -628,6 +636,10 @@ TOP.core_top.i_core_pipe_exec.cfu_rd_wdata[63:0]
 TOP.core_top.i_core_pipe_exec.cfu_rd_wen
 @22
 TOP.core_top.i_core_pipe_exec.cfu_trap_cause[6:0]
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_cfu.offset[63:0]
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_cfu.pc[63:0]
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_cfu.target_addr[63:0]
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_cfu.target_lhs[63:0]
 @28
 TOP.core_top.i_core_pipe_exec.cfu_trap_raise
 TOP.core_top.i_core_pipe_exec.s2_cfu_beq
@@ -667,33 +679,28 @@ TOP.core_top.i_core_pipe_exec.lsu_ready
 TOP.core_top.i_core_pipe_exec.lsu_trap_addr
 TOP.core_top.i_core_pipe_exec.s2_lsu_byte
 TOP.core_top.i_core_pipe_exec.lsu_valid
-@22
-TOP.core_top.i_core_pipe_exec.lsu_new_op[4:0]
-@28
 TOP.core_top.i_core_pipe_exec.s2_lsu_dbl
 TOP.core_top.i_core_pipe_exec.s2_lsu_half
 TOP.core_top.i_core_pipe_exec.s2_lsu_load
 TOP.core_top.i_core_pipe_exec.s2_lsu_sext
 TOP.core_top.i_core_pipe_exec.s2_lsu_store
 TOP.core_top.i_core_pipe_exec.s2_lsu_word
-@c00200
+@800200
 -DMEM
-@22
-TOP.core_top.i_core_pipe_exec.dmem_addr[63:0]
-@28
-TOP.core_top.i_core_pipe_exec.dmem_err
-TOP.core_top.i_core_pipe_exec.dmem_gnt
-@22
-TOP.core_top.i_core_pipe_exec.dmem_rdata[63:0]
 @28
 TOP.core_top.i_core_pipe_exec.dmem_req
+TOP.core_top.i_core_pipe_exec.dmem_gnt
+TOP.core_top.i_core_pipe_exec.dmem_err
 @22
+TOP.core_top.i_core_pipe_exec.dmem_addr[63:0]
+TOP.core_top.i_core_pipe_exec.dmem_rdata[63:0]
 TOP.core_top.i_core_pipe_exec.dmem_strb[7:0]
 TOP.core_top.i_core_pipe_exec.dmem_wdata[63:0]
 @28
 TOP.core_top.i_core_pipe_exec.dmem_wen
-@1401200
+@1000200
 -DMEM
+@1401200
 -LSU
 @c00200
 -MDU
@@ -738,7 +745,6 @@ TOP.core_top.i_core_pipe_exec.n_s3_csr_op[3:0]
 TOP.core_top.i_core_pipe_exec.n_s3_full
 @22
 TOP.core_top.i_core_pipe_exec.n_s3_instr[31:0]
-TOP.core_top.i_core_pipe_exec.n_s3_lsu_op[4:0]
 TOP.core_top.i_core_pipe_exec.n_s3_pc[63:0]
 TOP.core_top.i_core_pipe_exec.n_s3_rd[4:0]
 @28
@@ -748,8 +754,166 @@ TOP.core_top.i_core_pipe_exec.n_s3_wb_op[1:0]
 TOP.core_top.i_core_pipe_exec.n_s3_wdata[63:0]
 @1401200
 -Next Stage
-@1401201
 -Pipeline  - Execute
+@c00200
+-Pipeline - Writeback
+@28
+TOP.core_top.i_core_pipe_wb.g_clk
+TOP.core_top.i_core_pipe_wb.g_resetn
+TOP.core_top.i_core_pipe_wb.e_cf_change
+TOP.core_top.i_core_pipe_wb.e_instr_ret
+TOP.core_top.i_core_pipe_wb.e_new_instr
+TOP.core_top.i_core_pipe_wb.cfu_wait
+TOP.core_top.i_core_pipe_wb.s3_valid
+TOP.core_top.i_core_pipe_wb.s3_ready
+TOP.core_top.i_core_pipe_wb.s3_trap
+TOP.core_top.i_core_pipe_wb.s3_cfu_op[2:0]
+@22
+TOP.core_top.i_core_pipe_wb.s3_csr_addr[11:0]
+TOP.core_top.i_core_pipe_wb.s3_csr_op[3:0]
+@28
+TOP.core_top.i_core_pipe_wb.s3_full
+@2022
+^2 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
+TOP.core_top.i_core_pipe_wb.s3_instr[31:0]
+@22
+TOP.core_top.i_core_pipe_wb.s3_pc[63:0]
+TOP.core_top.i_core_pipe_wb.s3_wdata[63:0]
+@28
+TOP.core_top.i_core_pipe_wb.wb_none
+TOP.core_top.i_core_pipe_wb.wb_csr
+TOP.core_top.i_core_pipe_wb.wb_lsu
+TOP.core_top.i_core_pipe_wb.wb_wdata
+@800200
+-GPR Write
+@28
+TOP.core_top.i_core_pipe_wb.rd_wen_enable
+@2024
+^3 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
+TOP.core_top.i_core_pipe_wb.s3_rd[4:0]
+@22
+TOP.core_top.i_core_pipe_wb.s3_rd_addr[4:0]
+TOP.core_top.i_core_pipe_wb.s3_rd_wdata[63:0]
+@28
+TOP.core_top.i_core_pipe_wb.s3_rd_wen
+@1000200
+-GPR Write
+@800200
+-Control Flow
+@28
+TOP.core_top.i_core_pipe_wb.s3_cf_ack
+@22
+TOP.core_top.i_core_pipe_wb.s3_cf_target[63:0]
+@28
+TOP.core_top.i_core_pipe_wb.s3_cf_valid
+@1000200
+-Control Flow
+@800200
+-DMEM
+@28
+TOP.core_top.i_core_pipe_wb.dmem_req
+TOP.core_top.i_core_pipe_wb.dmem_gnt
+TOP.core_top.i_core_pipe_wb.dmem_err
+@22
+TOP.core_top.i_core_pipe_wb.dmem_rdata[63:0]
+@c00022
+TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+@28
+(0)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(1)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(2)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(3)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(4)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(5)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(6)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(7)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(8)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(9)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(10)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(11)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(12)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(13)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(14)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(15)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(16)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(17)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(18)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(19)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(20)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(21)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(22)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(23)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(24)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(25)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(26)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(27)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(28)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(29)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(30)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(31)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(32)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(33)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(34)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(35)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(36)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(37)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(38)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(39)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(40)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(41)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(42)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(43)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(44)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(45)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(46)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(47)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(48)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(49)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(50)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(51)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(52)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(53)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(54)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(55)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(56)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(57)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(58)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(59)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(60)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(61)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(62)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+(63)TOP.core_top.i_core_pipe_wb.dmem_addr[63:0]
+@1401200
+-group_end
+@22
+TOP.core_top.i_core_pipe_wb.dmem_strb[7:0]
+TOP.core_top.i_core_pipe_wb.dmem_wdata[63:0]
+@28
+TOP.core_top.i_core_pipe_wb.dmem_wen
+@1000200
+-DMEM
+@c00200
+-CSR
+@22
+TOP.core_top.i_core_pipe_wb.csr_addr[11:0]
+@28
+TOP.core_top.i_core_pipe_wb.csr_en
+TOP.core_top.i_core_pipe_wb.csr_error
+TOP.core_top.i_core_pipe_wb.csr_op_clr
+TOP.core_top.i_core_pipe_wb.csr_op_done
+TOP.core_top.i_core_pipe_wb.csr_op_rd
+TOP.core_top.i_core_pipe_wb.csr_op_set
+TOP.core_top.i_core_pipe_wb.csr_op_wr
+@22
+TOP.core_top.i_core_pipe_wb.csr_rdata[63:0]
+TOP.core_top.i_core_pipe_wb.csr_wdata[63:0]
+@28
+TOP.core_top.i_core_pipe_wb.csr_wr
+TOP.core_top.i_core_pipe_wb.csr_wr_clr
+TOP.core_top.i_core_pipe_wb.csr_wr_set
+@1401200
+-CSR
+-Pipeline - Writeback
 @c00200
 -GPRs
 @22

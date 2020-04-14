@@ -171,11 +171,6 @@ wire  cfu_op_conditonal     =
     dec_beq     || dec_c_beqz   || dec_bge      || dec_bgeu   || dec_blt  ||
     dec_bltu    || dec_bne      || dec_c_bnez   ;
 
-wire [         XL:0] cf_offset =
-    cf_offset_cbeq_imm   ? {{32{imm_c_bz[31]}}, imm_c_bz    } :
-    cfu_op_conditonal    ? {{32{imm32_b[31]}} , imm32_b     } :
-                           0                                  ;
-
 wire    [XL:0]  sext_imm32_u = {{32{imm32_u[31]}}, imm32_u};
 wire    [XL:0]  sext_imm32_i = {{32{imm32_i[31]}}, imm32_i};
 wire    [XL:0]  sext_imm32_s = {{32{imm32_s[31]}}, imm32_s};
@@ -209,6 +204,8 @@ wire    [ 5:0] imm_c_shamt  = {s1_instr[12],s1_instr[6:2]};
 wire    [XL:0] imm_shamt    = {58'b0, s1_i16bit ? imm_c_shamt : {1'b0,dec_shamtw}};
 
 assign s2_imm =
+    cf_offset_cbeq_imm      ? {{32{imm_c_bz[31]}}, imm_c_bz    } :
+    cfu_op_conditonal       ? {{32{imm32_b[31]}} , imm32_b     } :
     use_imm_sext_imm32_u    ? sext_imm32_u  :
     use_imm_sext_imm32_i    ? sext_imm32_i  :
     major_op_store          ? sext_imm32_s  :
@@ -327,11 +324,16 @@ wire    alu_rhs_imm = dec_addi          || dec_addiw        ||
                       dec_srai          || dec_sraiw        ||
                       dec_andi          || dec_ori          ||
                       dec_xori          || dec_lui          ||
-                      dec_auipc         ;
+                      dec_auipc         || dec_c_addi       ||
+                      dec_c_addi4spn    || dec_c_addiw      ||
+                      dec_c_addi16sp    || dec_c_andi       ||
+                      dec_c_slli        || dec_c_srli       ||
+                      dec_c_srai        || dec_c_li         ||
+                      dec_c_lui         ;
 
-assign  s2_alu_lhs  = s2_rs1_data   ;
+assign  s2_alu_lhs  = dec_auipc     ? s2_pc  : s2_rs1_data  ;
 
-assign  s2_alu_rhs  = alu_rhs_imm   ? s2_imm : s2_rs2_data    ;
+assign  s2_alu_rhs  = alu_rhs_imm   ? s2_imm : s2_rs2_data  ;
 
 assign  s2_alu_add  = dec_add           || dec_addi          ||
                       dec_addiw         || dec_addw          ||
@@ -389,9 +391,9 @@ assign  s2_cfu_bltu = dec_bltu                  ;
 assign  s2_cfu_bne  = dec_bne    || dec_c_bnez  ;
 assign  s2_cfu_ebrk = dec_ebreak                ;
 assign  s2_cfu_ecall= dec_ecall                 ;
-assign  s2_cfu_j    = dec_c_j    || dec_c_jr    ;
+assign  s2_cfu_j    = dec_c_j                   ;
 assign  s2_cfu_jal  = dec_jal                   ;
-assign  s2_cfu_jalr = dec_jalr   || dec_c_jalr  ;
+assign  s2_cfu_jalr = dec_jalr   || dec_c_jalr  || dec_c_jr;
 assign  s2_cfu_mret = dec_mret                  ;
 
 //
@@ -442,7 +444,8 @@ assign  s2_csr_wr     = dec_csrrsi || dec_csrrs || dec_csrrw || dec_csrrwi;
 
 //
 // Writeback data selection
-assign  s2_wb_alu     = !s2_wb_npc && (
+
+assign  s2_wb_alu     = !s2_wb_npc && !cfu_op_conditonal && (
     s2_alu_add      || s2_alu_and      || s2_alu_or       || s2_alu_sll ||
     s2_alu_srl      || s2_alu_slt      || s2_alu_sltu     || s2_alu_sra ||
     s2_alu_sub      || s2_alu_xor      || s2_alu_word     );

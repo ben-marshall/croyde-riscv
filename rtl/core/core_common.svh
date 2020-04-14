@@ -67,21 +67,17 @@ localparam WB_OP_CSR        = 2'b11;
 //
 // Load/Store opcodes
 
-localparam LSU_OP_W         = 5;
+localparam LSU_OP_W         = 7;
 localparam LSU_OP_R         = LSU_OP_W - 1;
 
-localparam LSU_OP_NOP       = 5'b0_000_0;
-localparam LSU_OP_LB        = 5'b0_001_1;
-localparam LSU_OP_LBU       = 5'b0_001_0;
-localparam LSU_OP_LH        = 5'b0_010_1;
-localparam LSU_OP_LHU       = 5'b0_010_0;
-localparam LSU_OP_LW        = 5'b0_011_1;
-localparam LSU_OP_LWU       = 5'b0_011_0;
-localparam LSU_OP_LD        = 5'b0_100_1;
-localparam LSU_OP_SB        = 5'b1_001_0;
-localparam LSU_OP_SH        = 5'b1_010_0;
-localparam LSU_OP_SW        = 5'b1_011_0;
-localparam LSU_OP_SD        = 5'b1_100_0;
+localparam LSU_OP_LOAD      = 0;
+localparam LSU_OP_STORE     = 1;
+localparam LSU_OP_BYTE      = 2;
+localparam LSU_OP_HALF      = 3;
+localparam LSU_OP_WORD      = 4;
+localparam LSU_OP_DOUBLE    = 5;
+localparam LSU_OP_SEXT      = 6;
+
 
 //
 // CSR Opcodes

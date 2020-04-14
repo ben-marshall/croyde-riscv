@@ -9,6 +9,7 @@ module core_pipe_exec_lsu (
 input   wire                g_clk       , // Global clock enable.
 input   wire                g_resetn    , // Global synchronous reset
 
+input   wire                new_instr   , // New instruction arriving
 input   wire                valid       , // Inputs are valid
 input   wire [        XL:0] addr        , // Address of the access.
 input   wire [        XL:0] wdata       , // Data being written (if any)
@@ -20,7 +21,7 @@ input   wire                d_half      , //
 input   wire                d_byte      , //
 input   wire                sext        , // Sign extend read data
 
-output  reg                 ready       , // Read data ready
+output  wire                ready       , // Request processed
 output  wire                trap_addr   , // Address alignment error
 
 output wire                 dmem_req    , // Memory request
@@ -37,25 +38,22 @@ input  wire [ MEM_DATA_R:0] dmem_rdata    // Memory response read data
 // Common parameters and width definitions.
 `include "core_common.svh"
 
-reg     rsp_recv;
+reg     finished    ;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
-        rsp_recv <= 1'b0;
-    end else begin
-        rsp_recv <= req_sent;
+        finished <= 1'b0;
+    end else if(new_instr) begin
+        finished <= 1'b0;
+    end else if(req_sent) begin
+        finished <= 1'b1;
     end
 end
 
-always @(posedge g_clk) begin
-    if(!g_resetn) begin
-        ready <= 1'b0;
-    end else begin
-        ready <= (req_sent || addr_err) && !ready;
-    end
-end
+wire    req_sent    = dmem_req && dmem_gnt;
 
-wire req_sent = dmem_req && dmem_gnt;
+assign  ready       = req_sent || valid && trap_addr;
+
 
 //
 // Transaction validity
@@ -72,40 +70,15 @@ wire    txn_okay = !addr_err        ;
 
 wire [ 5:0] data_shift     = {addr[2:0], 3'b000};
 
-//
-// Read data positioning.
-
-wire [XL:0] rdata;
-
-wire [XL:0] rdata_shifted  = dmem_rdata >> data_shift;
-
-wire [XL:0] mask_ls_byte   = {56'h0,  8'hFF};
-wire [XL:0] mask_ls_half   = {48'h0, 16'hFFFF};
-wire [XL:0] mask_ls_word   = {32'h0, 32'hFFFFFFFF};
-
-wire [XL:0] sext_byte      = {{56{sext && rdata_shifted[ 7]}},  8'b0};
-wire [XL:0] sext_half      = {{48{sext && rdata_shifted[15]}}, 16'b0};
-wire [XL:0] sext_word      = {{32{sext && rdata_shifted[31]}}, 32'b0};
-
-wire [XL:0] rdata_byte     = (rdata_shifted & mask_ls_byte) | sext_byte;
-wire [XL:0] rdata_half     = (rdata_shifted & mask_ls_half) | sext_half;
-wire [XL:0] rdata_word     = (rdata_shifted & mask_ls_word) | sext_word;
-
-assign      rdata          =
-    d_byte      ? rdata_byte    :
-    d_half      ? rdata_half    :
-    d_word      ? rdata_word    :
-                  dmem_rdata ;
-
 
 //
 // Simple bus assignments.
 
-assign  trap_addr    = addr_err && ready    ;
+assign  trap_addr    = addr_err && valid    ;
 
 assign  dmem_wen     = store;
 
-assign  dmem_req     = valid && txn_okay && !ready;
+assign  dmem_req     = valid && txn_okay && !finished;
 
 assign  dmem_addr    = {addr[XL:3], 3'b000};
 

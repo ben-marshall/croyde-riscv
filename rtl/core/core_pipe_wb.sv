@@ -48,7 +48,11 @@ input  wire [ MEM_STRB_R:0] dmem_strb       , // Memory request write strobe
 input  wire [ MEM_DATA_R:0] dmem_wdata      , // Memory write data.
 input  wire                 dmem_gnt        , // Memory response valid
 input  wire                 dmem_err        , // Memory response error
-input  wire [ MEM_DATA_R:0] dmem_rdata        // Memory response read data
+input  wire [ MEM_DATA_R:0] dmem_rdata      , // Memory response read data
+
+output wire                 trs_valid       , // Instruction trace valid
+output wire [         31:0] trs_instr       , // Instruction trace data
+output wire [         XL:0] trs_pc            // Instruction trace PC
 
 );
 
@@ -91,11 +95,11 @@ wire    wb_wdata   = s3_wb_op == WB_OP_WDATA   ;
 wire    wb_lsu     = s3_wb_op == WB_OP_LSU     ;
 wire    wb_csr     = s3_wb_op == WB_OP_CSR     ;
 
-assign  s3_rd_wen  = rd_wen_enable && (wb_wdata || wb_lsu || wb_csr);
+assign  s3_rd_wen  = rd_wen_enable && (wb_wdata || lsu_wen || wb_csr);
 
 assign  s3_rd_wdata=
     {XLEN{wb_wdata  }}  & s3_wdata  |
-    {XLEN{wb_lsu    }}  & lsu_wdata |
+    {XLEN{wb_lsu    }}  & lsu_rdata |
     {XLEN{wb_csr    }}  & csr_rdata ;
 
 assign  s3_rd_addr = s3_rd          ;
@@ -136,7 +140,42 @@ assign  csr_wdata   = s3_wdata      ;
 // LSU Control
 // ------------------------------------------------------------
 
-wire [XL:0] lsu_wdata = 0;
+wire [ 5:0] data_shift     = {s3_wdata[2:0], 3'b000};
+
+wire        lsu_wen        = lsu_load               ;
+
+//
+// Read data positioning.
+
+wire [XL:0] lsu_rdata;
+
+wire        lsu_load       = s3_lsu_op[LSU_OP_LOAD  ];
+wire        lsu_store      = s3_lsu_op[LSU_OP_STORE ];
+wire        lsu_byte       = s3_lsu_op[LSU_OP_BYTE  ];
+wire        lsu_half       = s3_lsu_op[LSU_OP_HALF  ];
+wire        lsu_word       = s3_lsu_op[LSU_OP_WORD  ];
+wire        lsu_double     = s3_lsu_op[LSU_OP_DOUBLE];
+wire        lsu_sext       = s3_lsu_op[LSU_OP_SEXT  ];
+
+wire [XL:0] rdata_shifted  = dmem_rdata >> data_shift;
+
+wire [XL:0] mask_ls_byte   = {56'h0,  8'hFF};
+wire [XL:0] mask_ls_half   = {48'h0, 16'hFFFF};
+wire [XL:0] mask_ls_word   = {32'h0, 32'hFFFFFFFF};
+
+wire [XL:0] sext_byte      = {{56{lsu_sext && rdata_shifted[ 7]}},  8'b0};
+wire [XL:0] sext_half      = {{48{lsu_sext && rdata_shifted[15]}}, 16'b0};
+wire [XL:0] sext_word      = {{32{lsu_sext && rdata_shifted[31]}}, 32'b0};
+
+wire [XL:0] rdata_byte     = (rdata_shifted & mask_ls_byte) | sext_byte;
+wire [XL:0] rdata_half     = (rdata_shifted & mask_ls_half) | sext_half;
+wire [XL:0] rdata_word     = (rdata_shifted & mask_ls_word) | sext_word;
+
+assign      lsu_rdata      =
+    lsu_byte    ? rdata_byte    :
+    lsu_half    ? rdata_half    :
+    lsu_word    ? rdata_word    :
+                  dmem_rdata ;
 
 //
 // Control flow changes
@@ -145,10 +184,12 @@ wire [XL:0] lsu_wdata = 0;
 wire        cfu_wait  = 1'b0;
 
 //
-// Submodule instances.
+// Trace
 // ------------------------------------------------------------
 
-
+assign trs_valid = e_instr_ret  ;
+assign trs_pc    = s3_pc        ;
+assign trs_instr = s3_instr     ;
 
 
 endmodule

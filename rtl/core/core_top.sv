@@ -521,7 +521,10 @@ core_pipe_wb i_core_pipe_wb (
 .dmem_wdata      (dmem_wdata      ), // Memory write data.
 .dmem_gnt        (dmem_gnt        ), // Memory response valid
 .dmem_err        (dmem_err        ), // Memory response error
-.dmem_rdata      (dmem_rdata      )  // Memory response read data
+.dmem_rdata      (dmem_rdata      ), // Memory response read data
+.trs_valid       (trs_valid       ), // Instruction trace valid
+.trs_instr       (trs_instr       ), // Instruction trace data
+.trs_pc          (trs_pc          )  // Instruction trace PC
 );
 
 

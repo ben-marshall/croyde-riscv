@@ -167,7 +167,17 @@ wire        lsu_valid       = s2_valid && (s2_lsu_load || s2_lsu_store);
 wire        lsu_ready       ;
 wire        lsu_trap_addr   ;
 
+wire        lsu_new_instr   = e_new_instr;
+
 wire [LSU_OP_R:0] lsu_new_op;
+assign  lsu_new_op[LSU_OP_LOAD  ] = s2_lsu_load ;
+assign  lsu_new_op[LSU_OP_STORE ] = s2_lsu_store;
+assign  lsu_new_op[LSU_OP_BYTE  ] = s2_lsu_byte ;
+assign  lsu_new_op[LSU_OP_HALF  ] = s2_lsu_half ;
+assign  lsu_new_op[LSU_OP_WORD  ] = s2_lsu_word ;
+assign  lsu_new_op[LSU_OP_DOUBLE] = s2_lsu_dbl  ;
+assign  lsu_new_op[LSU_OP_SEXT  ] = s2_lsu_sext ;
+
 
 //
 // CSR interfacing
@@ -220,6 +230,7 @@ wire [    WB_OP_R:0] n_s3_wb_op  =
     {WB_OP_W{s2_wb_csr}} & WB_OP_CSR    ;
 
 wire [         XL:0] n_s3_wdata  = 
+    {XLEN{s2_wb_lsu}}   &   alu_add_out |
     {XLEN{s2_wb_alu}}   &   alu_result  |
     {XLEN{s2_wb_mdu}}   &   mdu_result  |
     {XLEN{s2_wb_npc}}   &   s2_npc      ;
@@ -235,6 +246,7 @@ always @(posedge g_clk) begin
         s3_pc       <= n_s3_pc          ;
         s3_csr_addr <= n_s3_csr_addr    ;
         s3_instr    <= n_s3_instr       ;
+        s3_wdata    <= n_s3_wdata       ;
         s3_rd       <= n_s3_rd          ;
         s3_lsu_op   <= n_s3_lsu_op      ;
         s3_csr_op   <= n_s3_csr_op      ;
@@ -279,6 +291,7 @@ core_pipe_exec_alu i_core_pipe_exec_alu (
 core_pipe_exec_lsu i_core_pipe_exec_lsu (
 .g_clk      (g_clk          ), // Global clock enable.
 .g_resetn   (g_resetn       ), // Global synchronous reset
+.new_instr  (lsu_new_instr  ), // New instruciton next cycle
 .valid      (lsu_valid      ), // Inputs are valid
 .addr       (alu_add_out    ), // Address of the access.
 .wdata      (s2_rs2_data    ), // Data being written (if any)
