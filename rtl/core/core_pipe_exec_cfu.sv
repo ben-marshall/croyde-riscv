@@ -15,6 +15,8 @@ input  wire                 cmp_eq      ,
 input  wire                 cmp_lt      ,
 input  wire                 cmp_ltu     ,
 
+input  wire                 valid       , // Inputs are valid.
+
 input  wire [        XL:0]  pc          , // Current program counter
 input  wire [        XL:0]  npc         , // Next natural program counter
 input  wire [        XL:0]  rs1         , // Source register 1
@@ -118,7 +120,7 @@ assign  finished    = n_cf_change_done || trap_raise || branch_ignore;
 
 assign  cf_target   = target_addr;
 
-assign  cf_valid    = branch_taken && !cf_change_done;
+assign  cf_valid    = branch_taken && !cf_change_done && valid;
 
 always @(posedge g_clk) begin
     if(!g_resetn || new_instr) begin

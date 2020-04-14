@@ -325,6 +325,7 @@ core_pipe_exec_cfu i_core_pipe_exec_cfu (
 .cmp_eq     (alu_cmp_eq     ),
 .cmp_lt     (alu_cmp_lt     ),
 .cmp_ltu    (alu_cmp_ltu    ),
+.valid      (s2_valid       ),
 .pc         (s2_pc          ), // Current program counter
 .npc        (s2_npc         ), // Next natural program counter
 .rs1        (s2_alu_lhs     ), // Source register 1
