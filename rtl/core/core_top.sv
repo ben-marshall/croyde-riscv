@@ -183,6 +183,13 @@ wire [   CFU_OP_R:0] s3_cfu_op      ; // Writeback CFU op
 wire [    WB_OP_R:0] s3_wb_op       ; // Writeback Data source.
 wire                 s3_trap        ; // Raise a trap
 
+`ifdef RVFI
+wire [ REG_ADDR_R:0] s3_rs1_addr    ;
+wire [ REG_ADDR_R:0] s3_rs2_addr    ;
+wire [         XL:0] s3_rs1_rdata   ;
+wire [         XL:0] s3_rs2_rdata   ;
+`endif
+
 wire                 s3_rd_wen      ; // Destination register write enable
 wire [ REG_ADDR_R:0] s3_rd_addr     ; // Destination register write addr
 wire [         XL:0] s3_rd_wdata    ; // Destination register write data.
@@ -466,14 +473,20 @@ core_pipe_exec i_core_pipe_exec(
 .s3_cfu_op       (s3_cfu_op       ), // Writeback CFU op
 .s3_wb_op        (s3_wb_op        ), // Writeback Data source.
 .s3_trap         (s3_trap         ), // Raise a trap
-.dmem_req        (dmem_req        ), // Memory request
-.dmem_addr       (dmem_addr       ), // Memory request address
-.dmem_wen        (dmem_wen        ), // Memory request write enable
-.dmem_strb       (dmem_strb       ), // Memory request write strobe
-.dmem_wdata      (dmem_wdata      ), // Memory write data.
-.dmem_gnt        (dmem_gnt        ), // Memory response valid
-.dmem_err        (dmem_err        ), // Memory response error
-.dmem_rdata      (dmem_rdata      )  // Memory response read data
+`ifdef RVFI
+.s3_rs1_addr     (s3_rs1_addr     ),
+.s3_rs2_addr     (s3_rs2_addr     ),
+.s3_rs1_rdata    (s3_rs1_rdata    ),
+.s3_rs2_rdata    (s3_rs2_rdata    ),
+`endif
+.dmem_req        (int_dmem_req    ), // Memory request
+.dmem_addr       (int_dmem_addr   ), // Memory request address
+.dmem_wen        (int_dmem_wen    ), // Memory request write enable
+.dmem_strb       (int_dmem_strb   ), // Memory request write strobe
+.dmem_wdata      (int_dmem_wdata  ), // Memory write data.
+.dmem_gnt        (int_dmem_gnt    ), // Memory response valid
+.dmem_err        (int_dmem_err    ), // Memory response error
+.dmem_rdata      (int_dmem_rdata  )  // Memory response read data
 );
 
 
@@ -494,6 +507,7 @@ core_pipe_wb i_core_pipe_wb (
 .s3_ready        (s3_ready        ), // WB ready for new instruciton.
 .s3_full         (s3_full         ), // WB has an instr in it.
 .s3_pc           (s3_pc           ), // Writeback stage PC
+.s3_n_pc         (s2_pc           ), // Writeback stage Next PC
 .s3_instr        (s3_instr        ), // Writeback stage instr word
 .s3_wdata        (s3_wdata        ), // Writeback stage instr word
 .s3_rd           (s3_rd           ), // Writeback stage instr word
@@ -514,14 +528,28 @@ core_pipe_wb i_core_pipe_wb (
 .csr_wdata       (csr_wdata       ), // Data to be written to a CSR
 .csr_rdata       (csr_rdata       ), // CSR read data
 .csr_error       (csr_error       ), // CSR access error.
-.dmem_req        (dmem_req        ), // Memory request
-.dmem_addr       (dmem_addr       ), // Memory request address
-.dmem_wen        (dmem_wen        ), // Memory request write enable
-.dmem_strb       (dmem_strb       ), // Memory request write strobe
-.dmem_wdata      (dmem_wdata      ), // Memory write data.
-.dmem_gnt        (dmem_gnt        ), // Memory response valid
-.dmem_err        (dmem_err        ), // Memory response error
-.dmem_rdata      (dmem_rdata      ), // Memory response read data
+.trap_cpu        (trap_cpu        ), // A trap occured due to CPU
+.trap_int        (trap_int        ), // A trap occured due to interrupt
+.trap_cause      (trap_cause      ), // A trap occured due to interrupt
+.trap_mtval      (trap_mtval      ), // Value associated with the trap.
+.trap_pc         (trap_pc         ), // PC value associated with the trap.
+.exec_mret       (exec_mret       ), // MRET instruction executed.
+.instr_ret       (instr_ret       ), // INstruction retired
+.dmem_req        (int_dmem_req    ), // Memory request
+.dmem_addr       (int_dmem_addr   ), // Memory request address
+.dmem_wen        (int_dmem_wen    ), // Memory request write enable
+.dmem_strb       (int_dmem_strb   ), // Memory request write strobe
+.dmem_wdata      (int_dmem_wdata  ), // Memory write data.
+.dmem_gnt        (int_dmem_gnt    ), // Memory response valid
+.dmem_err        (int_dmem_err    ), // Memory response error
+.dmem_rdata      (int_dmem_rdata  ), // Memory response read data
+`ifdef RVFI
+.s3_rs1_addr     (s3_rs1_addr     ),
+.s3_rs2_addr     (s3_rs2_addr     ),
+.s3_rs1_rdata    (s3_rs1_rdata    ),
+.s3_rs2_rdata    (s3_rs2_rdata    ),
+`RVFI_CONN                         ,
+`endif
 .trs_valid       (trs_valid       ), // Instruction trace valid
 .trs_instr       (trs_instr       ), // Instruction trace data
 .trs_pc          (trs_pc          )  // Instruction trace PC

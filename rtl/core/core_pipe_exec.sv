@@ -102,6 +102,13 @@ output reg  [   CFU_OP_R:0] s3_cfu_op       , // Writeback CFU op
 output reg  [    WB_OP_R:0] s3_wb_op        , // Writeback Data source.
 output reg                  s3_trap         , // Raise a trap
 
+`ifdef RVFI
+output reg  [ REG_ADDR_R:0] s3_rs1_addr     ,
+output reg  [ REG_ADDR_R:0] s3_rs2_addr     ,
+output reg  [         XL:0] s3_rs1_rdata    ,
+output reg  [         XL:0] s3_rs2_rdata    ,
+`endif
+
 output wire                 dmem_req        , // Memory request
 output wire [ MEM_ADDR_R:0] dmem_addr       , // Memory request address
 output wire                 dmem_wen        , // Memory request write enable
@@ -253,6 +260,12 @@ always @(posedge g_clk) begin
         s3_cfu_op   <= n_s3_cfu_op      ;
         s3_wb_op    <= n_s3_wb_op       ;
         s3_trap     <= n_s3_trap        ;
+        `ifdef RVFI
+        s3_rs1_addr <= s2_rs1_addr      ;
+        s3_rs2_addr <= s2_rs2_addr      ;
+        s3_rs1_rdata<= s2_rs1_data      ;
+        s3_rs2_rdata<= s2_rs2_data      ;
+        `endif
     end
 end
 

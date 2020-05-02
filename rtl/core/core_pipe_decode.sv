@@ -306,6 +306,9 @@ wire [4:0] dec_rd_16 =
 assign s1_rs1_addr  = s1_i16bit     ? dec_rs1_16 : dec_rs1 ;
 assign s1_rs2_addr  = s1_i16bit     ? dec_rs2_16 : dec_rs2 ;
 
+assign s2_rs1_addr  = s1_rs1_addr;
+assign s2_rs2_addr  = s1_rs2_addr;
+
 assign s2_rd        = s1_i16bit     ? dec_rd_16  : dec_rd  ;
 assign s2_rs1_data  = s1_rs1_data   ;
 assign s2_rs2_data  = s1_rs2_data   ;
@@ -351,8 +354,9 @@ assign  s2_alu_or   = dec_c_li          || dec_c_lui         ||
 
 assign  s2_alu_sll  = dec_c_slli        || dec_sll           ||
                       dec_slli          || dec_slliw         ||
-                      dec_sllw          || dec_slt           ||
-                      dec_slti          ;
+                      dec_sllw          ;
+                      
+assign  s2_alu_slt  = dec_slt           || dec_slti          ;
 
 assign  s2_alu_sltu = dec_sltiu         || dec_sltu          ;
 
@@ -430,7 +434,7 @@ assign  s2_mdu_rem    = dec_rem   ;
 assign  s2_mdu_remu   = dec_remu  ;
 assign  s2_mdu_mulw   = dec_mulw  ;
 assign  s2_mdu_divw   = dec_divw  ;
-assign  s2_mdu_divw   = dec_divuw ;
+assign  s2_mdu_divuw  = dec_divuw ;
 assign  s2_mdu_remw   = dec_remw  ;
 assign  s2_mdu_remuw  = dec_remuw ;
 

@@ -18,6 +18,7 @@ input  wire                 s3_valid        , // New instruction ready
 output wire                 s3_ready        , // WB ready for new instruciton.
 input  wire                 s3_full         , // WB has an instr in it.
 input  wire [         XL:0] s3_pc           , // Writeback stage PC
+input  wire [         XL:0] s3_n_pc         , // Writeback stage next PC
 input  wire [         31:0] s3_instr        , // Writeback stage instr word
 input  wire [         XL:0] s3_wdata        , // Writeback stage instr word
 input  wire [ REG_ADDR_R:0] s3_rd           , // Writeback stage instr word
@@ -41,6 +42,15 @@ output wire [         XL:0] csr_wdata       , // Data to be written to a CSR
 input  wire [         XL:0] csr_rdata       , // CSR read data
 input  wire                 csr_error       , // CSR access error
 
+output wire                 trap_cpu        , // trap occured due to CPU
+output wire                 trap_int        , // trap occured due to interrupt
+output wire [ CF_CAUSE_R:0] trap_cause      , // 
+output wire [         XL:0] trap_mtval      , // Value associated with trap.
+output wire [         XL:0] trap_pc         , // PC associated with the trap.
+
+output wire                 exec_mret       , // MRET instruction executed.
+output wire                 instr_ret       ,
+
 input  wire                 dmem_req        , // Memory request
 input  wire [ MEM_ADDR_R:0] dmem_addr       , // Memory request address
 input  wire                 dmem_wen        , // Memory request write enable
@@ -49,6 +59,14 @@ input  wire [ MEM_DATA_R:0] dmem_wdata      , // Memory write data.
 input  wire                 dmem_gnt        , // Memory response valid
 input  wire                 dmem_err        , // Memory response error
 input  wire [ MEM_DATA_R:0] dmem_rdata      , // Memory response read data
+
+`ifdef RVFI
+input  wire [ REG_ADDR_R:0] s3_rs1_addr     ,
+input  wire [ REG_ADDR_R:0] s3_rs2_addr     ,
+input  wire [         XL:0] s3_rs1_rdata    ,
+input  wire [         XL:0] s3_rs2_rdata    ,
+`RVFI_OUTPUTS                               ,
+`endif
 
 output wire                 trs_valid       , // Instruction trace valid
 output wire [         31:0] trs_instr       , // Instruction trace data
@@ -68,6 +86,8 @@ output wire [         XL:0] trs_pc            // Instruction trace PC
 wire   e_new_instr  =  s3_valid && s3_ready;
 
 wire   e_instr_ret  =  e_new_instr && s3_full;
+
+assign instr_ret    =  e_instr_ret;
 
 wire   e_cf_change  = s3_cf_valid && s3_cf_ack;
 
@@ -183,6 +203,21 @@ assign      lsu_rdata      =
 
 wire        cfu_wait  = 1'b0;
 
+assign      s3_cf_target = 0;
+assign      s3_cf_valid  = 0;
+
+assign      exec_mret    = 1'b0;
+
+//
+// Traps
+// ------------------------------------------------------------
+
+assign trap_cpu       = 0 ; // trap occured due to CPU
+assign trap_int       = 0 ; // trap occured due to interrupt
+assign trap_cause     = 0 ; // 
+assign trap_mtval     = 0 ; // Value associated with trap.
+assign trap_pc        = 0 ; // PC associated with the trap.
+
 //
 // Trace
 // ------------------------------------------------------------
@@ -191,6 +226,56 @@ assign trs_valid = e_instr_ret  ;
 assign trs_pc    = s3_pc        ;
 assign trs_instr = s3_instr     ;
 
+
+//
+// RVFI Interface
+// ------------------------------------------------------------
+
+`ifdef RVFI
+
+wire [ILEN   - 1 : 0] n_rvfi_intr         =  'b0;
+wire                  n_rvfi_trap         = trap_cpu;
+
+wire                  n_rvfi_mem_req_valid = dmem_req && dmem_gnt;
+reg                   n_rvfi_mem_rsp_valid ;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) n_rvfi_mem_rsp_valid <= 1'b0;
+    else          n_rvfi_mem_rsp_valid <= n_rvfi_mem_req_valid;
+end
+
+wire [XLEN/8 - 1 : 0] n_rvfi_mem_rmask    = 'b0;
+wire [XLEN/8 - 1 : 0] n_rvfi_mem_wmask    = 'b0;
+
+core_rvfi i_core_rvfi (
+.g_clk              (g_clk                  ),
+.g_resetn           (g_resetn               ),
+`RVFI_CONN                                   ,
+.n_valid            (e_instr_ret            ),
+.n_insn             (s3_instr               ),
+.n_intr             (rvfi_intr              ),
+.n_trap             (n_rvfi_trap            ),
+.n_rs1_addr         (s3_rs1_addr            ),
+.n_rs2_addr         (s3_rs2_addr            ),
+.n_rs1_rdata        (s3_rs1_rdata           ),
+.n_rs2_rdata        (s3_rs2_rdata           ),
+.n_rd_valid         (s3_rd_wen              ),
+.n_rd_addr          (s3_rd_addr             ),
+.n_rd_wdata         (s3_rd_wdata            ),
+.n_cf_change        (e_cf_change            ),
+.n_cf_target        (s3_cf_target           ),
+.n_pc_rdata         (s3_pc                  ),
+.n_pc_wdata         (s3_n_pc                ),
+.n_mem_req_valid    (n_rvfi_mem_req_valid   ),
+.n_mem_rsp_valid    (n_rvfi_mem_rsp_valid   ),
+.n_mem_addr         (dmem_addr              ),
+.n_mem_rmask        (n_rvfi_mem_rmask       ),
+.n_mem_wmask        (n_rvfi_mem_wmask       ),
+.n_mem_rdata        (lsu_rdata              ),
+.n_mem_wdata        (dmem_wdata             )
+);
+
+`endif
 
 endmodule
 
