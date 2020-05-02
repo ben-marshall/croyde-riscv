@@ -178,6 +178,7 @@ wire    [XL:0]  sext_imm32_j = {{32{imm32_j[31]}}, imm32_j};
 
 wire    major_op_load        = s1_instr[6:0] == 7'b0000011;
 wire    major_op_store       = s1_instr[6:0] == 7'b0100011;
+wire    major_op_branch      = s1_instr[6:0] == 7'b1100011;
 wire    major_op_imm         = s1_instr[6:0] == 7'b0010011;
 
 wire    use_imm_sext_imm32_u = dec_lui      || dec_auipc        ;
@@ -309,7 +310,12 @@ assign s1_rs2_addr  = s1_i16bit     ? dec_rs2_16 : dec_rs2 ;
 assign s2_rs1_addr  = s1_rs1_addr;
 assign s2_rs2_addr  = s1_rs2_addr;
 
-assign s2_rd        = s1_i16bit     ? dec_rd_16  : dec_rd  ;
+wire   zero_rd      = major_op_store || major_op_branch;
+
+assign s2_rd        = s1_i16bit     ? dec_rd_16         :
+                      zero_rd       ? {REG_ADDR_W{1'b0}}:
+                                      dec_rd            ;
+
 assign s2_rs1_data  = s1_rs1_data   ;
 assign s2_rs2_data  = s1_rs2_data   ;
 
