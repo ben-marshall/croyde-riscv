@@ -332,7 +332,8 @@ wire    alu_rhs_imm = dec_addi          || dec_addiw        ||
                       dec_c_addi16sp    || dec_c_andi       ||
                       dec_c_slli        || dec_c_srli       ||
                       dec_c_srai        || dec_c_li         ||
-                      dec_c_lui         ;
+                      dec_c_lui         || dec_slti         ||
+                      dec_sltiu         ;
 
 assign  s2_alu_lhs  = dec_auipc     ? s2_pc  : s2_rs1_data  ;
 
@@ -342,7 +343,8 @@ assign  s2_alu_add  = dec_add           || dec_addi          ||
                       dec_addiw         || dec_addw          ||
                       dec_auipc         || dec_c_add         ||
                       dec_c_addi        || dec_c_addi4spn    ||
-                      dec_c_addiw       || dec_c_addw        ;
+                      dec_c_addiw       || dec_c_addw        ||
+                      dec_c_addi16sp    ;
 
 assign  s2_alu_and  = dec_and           || dec_andi          ||
                       dec_c_and         || dec_c_andi        ;
@@ -356,7 +358,7 @@ assign  s2_alu_sll  = dec_c_slli        || dec_sll           ||
                       dec_slli          || dec_slliw         ||
                       dec_sllw          ;
                       
-assign  s2_alu_slt  = dec_slt           || dec_slti          ;
+assign  s2_alu_slt  = dec_slti          || dec_slt           ;
 
 assign  s2_alu_sltu = dec_sltiu         || dec_sltu          ;
 
@@ -382,7 +384,8 @@ assign  s2_alu_word = dec_addiw         || dec_addw         ||
                       dec_slliw         || dec_sllw         ||
                       dec_srliw         || dec_srlw         ||
                       dec_sraiw         || dec_sraw         ||
-                      dec_sub           || dec_subw         ;
+                      dec_subw          || dec_c_subw       ||
+                      dec_c_addiw       || dec_c_addw       ;
 
 //
 // CFU
