@@ -341,7 +341,9 @@ wire    alu_rhs_imm = dec_addi          || dec_addiw        ||
                       dec_c_lui         || dec_slti         ||
                       dec_sltiu         ;
 
-assign  s2_alu_lhs  = dec_auipc     ? s2_pc  : s2_rs1_data  ;
+assign  s2_alu_lhs  = dec_auipc     ? s2_pc         :
+                      dec_lui       ? {XLEN{1'b0}}  :
+                                      s2_rs1_data   ;
 
 assign  s2_alu_rhs  = alu_rhs_imm   ? s2_imm : s2_rs2_data  ;
 
