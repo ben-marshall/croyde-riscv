@@ -212,11 +212,15 @@ assign      exec_mret    = 1'b0;
 // Traps
 // ------------------------------------------------------------
 
-assign trap_cpu       = 0 ; // trap occured due to CPU
+// trap occured due to CPU
+assign trap_cpu       = s3_trap;
+
 assign trap_int       = 0 ; // trap occured due to interrupt
-assign trap_cause     = 0 ; // 
-assign trap_mtval     = 0 ; // Value associated with trap.
-assign trap_pc        = 0 ; // PC associated with the trap.
+
+assign trap_cause     = s3_trap ? s3_rd_addr : 'b0 ;
+
+assign trap_mtval     = 0 ;
+assign trap_pc        = s3_pc ;
 
 //
 // Trace
@@ -244,8 +248,8 @@ always @(posedge g_clk) begin
     else          n_rvfi_mem_rsp_valid <= n_rvfi_mem_req_valid;
 end
 
-wire [XLEN/8 - 1 : 0] n_rvfi_mem_rmask    = 'b0;
-wire [XLEN/8 - 1 : 0] n_rvfi_mem_wmask    = 'b0;
+wire [XLEN/8 - 1 : 0] n_rvfi_mem_rmask    = dmem_wen ? 8'b0 : dmem_strb;
+wire [XLEN/8 - 1 : 0] n_rvfi_mem_wmask    = dmem_wen ? dmem_strb : 8'b0;
 
 core_rvfi i_core_rvfi (
 .g_clk              (g_clk                  ),

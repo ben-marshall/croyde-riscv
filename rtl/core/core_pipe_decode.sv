@@ -339,7 +339,8 @@ wire    alu_rhs_imm = dec_addi          || dec_addiw        ||
                       dec_c_slli        || dec_c_srli       ||
                       dec_c_srai        || dec_c_li         ||
                       dec_c_lui         || dec_slti         ||
-                      dec_sltiu         ;
+                      dec_sltiu         || major_op_load    ||
+                      major_op_store    ;
 
 assign  s2_alu_lhs  = dec_auipc     ? s2_pc         :
                       dec_lui       ? {XLEN{1'b0}}  :
@@ -426,9 +427,10 @@ assign  s2_lsu_byte = dec_lb    || dec_lbu  || dec_sb;
 assign  s2_lsu_half = dec_lh    || dec_lhu  || dec_sh;
 
 assign  s2_lsu_word = dec_lw    || dec_lwu  || dec_sw   || dec_c_lwsp   ||
-                      dec_c_swsp;
+                      dec_c_swsp|| dec_c_lw || dec_c_sw ;
 
-assign  s2_lsu_dbl  = dec_ld    || dec_sd   || dec_c_ldsp || dec_c_sdsp ;
+assign  s2_lsu_dbl  = dec_ld    || dec_sd   || dec_c_ldsp || dec_c_sdsp ||
+                      dec_c_ld  || dec_c_sd ;
 
 assign  s2_lsu_sext = dec_lw    || dec_lh   || dec_lb   ;
 
@@ -477,6 +479,12 @@ assign  s2_wb_lsu     = s2_lsu_load ;
 
 assign  s2_wb_npc     = s2_cfu_jal  || s2_cfu_jalr;
 
+//
+// Traps
+// ------------------------------------------------------------
+
+
+assign  s2_trap = dec_invalid_opcode;
 
 //
 // Submodule instances

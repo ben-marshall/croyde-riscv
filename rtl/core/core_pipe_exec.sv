@@ -227,7 +227,7 @@ wire [ REG_ADDR_R:0] n_s3_rd     = s2_rd        ;
 wire [   LSU_OP_R:0] n_s3_lsu_op = lsu_new_op   ;
 wire [   CSR_OP_R:0] n_s3_csr_op = csr_new_op   ;
 wire [   CFU_OP_R:0] n_s3_cfu_op = cfu_new_op   ;
-wire                 n_s3_trap   = s2_trap      ;
+wire                 n_s3_trap   = s2_trap      || lsu_trap_addr;
 
 wire [    WB_OP_R:0] n_s3_wb_op  =
     {WB_OP_W{s2_wb_alu}} & WB_OP_WDATA  |
