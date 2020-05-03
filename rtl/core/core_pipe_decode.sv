@@ -340,7 +340,11 @@ wire    alu_rhs_imm = dec_addi          || dec_addiw        ||
                       dec_c_srai        || dec_c_li         ||
                       dec_c_lui         || dec_slti         ||
                       dec_sltiu         || major_op_load    ||
-                      major_op_store    ;
+                      major_op_store    || dec_c_lw         ||
+                      dec_c_lwsp        || dec_c_ld         ||
+                      dec_c_ldsp        || dec_c_sw         ||
+                      dec_c_swsp        || dec_c_sd         ||
+                      dec_c_sdsp        ;
 
 assign  s2_alu_lhs  = dec_auipc     ? s2_pc         :
                       dec_lui       ? {XLEN{1'b0}}  :
@@ -432,7 +436,8 @@ assign  s2_lsu_word = dec_lw    || dec_lwu  || dec_sw   || dec_c_lwsp   ||
 assign  s2_lsu_dbl  = dec_ld    || dec_sd   || dec_c_ldsp || dec_c_sdsp ||
                       dec_c_ld  || dec_c_sd ;
 
-assign  s2_lsu_sext = dec_lw    || dec_lh   || dec_lb   ;
+assign  s2_lsu_sext = dec_lw    || dec_lh   || dec_lb   || dec_c_lw     ||
+                      dec_c_lwsp;
 
 //
 // MDU
