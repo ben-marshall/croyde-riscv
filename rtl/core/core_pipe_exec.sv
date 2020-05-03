@@ -246,7 +246,8 @@ wire [         XL:0] n_s3_wdata  =
     {XLEN{s2_wb_lsu}}   &   alu_add_out |
     {XLEN{s2_wb_alu}}   &   alu_result  |
     {XLEN{s2_wb_mdu}}   &   mdu_result  |
-    {XLEN{s2_wb_npc}}   &   s2_npc      ;
+    {XLEN{s2_wb_npc}}   &   s2_npc      |
+    {XLEN{s2_wb_csr}}   &   s2_rs1_data ;
 
 wire [         11:0] n_s3_csr_addr = s2_csr_addr;
 
