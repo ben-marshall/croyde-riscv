@@ -56,7 +56,7 @@ __rdinstret:
 .func __rdmcountinhibit
 .global __rdmcountinhibit
 __rdmcountinhibit:
-    .word 0x32002573         // csrr a0,mcountinhibit
+    csrr a0,mucounteren
                              // Toolchain doesnt recognise mcountinhibit
     ret
 .endfunc
@@ -64,7 +64,7 @@ __rdmcountinhibit:
 .func __wrmcountinhibit
 .global __wrmcountinhibit
 __wrmcountinhibit:
-    .word 0x32051573        // csrrw a0,mcountinhibit, a0
+    csrrw a0,mucounteren, a0
                             // Toolchain doesnt recognise mcountinhibit
     ret
 .endfunc
