@@ -188,6 +188,10 @@ wire [ REG_ADDR_R:0] s3_rs1_addr    ;
 wire [ REG_ADDR_R:0] s3_rs2_addr    ;
 wire [         XL:0] s3_rs1_rdata   ;
 wire [         XL:0] s3_rs2_rdata   ;
+wire [ MEM_ADDR_R:0] s3_dmem_valid  ;
+wire [ MEM_ADDR_R:0] s3_dmem_addr   ;
+wire [ MEM_STRB_R:0] s3_dmem_strb   ;
+wire [ MEM_ADDR_R:0] s3_dmem_wdata  ;
 `endif
 
 wire                 s3_rd_wen      ; // Destination register write enable
@@ -478,6 +482,10 @@ core_pipe_exec i_core_pipe_exec(
 .s3_rs2_addr     (s3_rs2_addr     ),
 .s3_rs1_rdata    (s3_rs1_rdata    ),
 .s3_rs2_rdata    (s3_rs2_rdata    ),
+.s3_dmem_valid   (s3_dmem_valid   ),
+.s3_dmem_addr    (s3_dmem_addr    ),
+.s3_dmem_strb    (s3_dmem_strb    ),
+.s3_dmem_wdata   (s3_dmem_wdata   ),
 `endif
 .dmem_req        (int_dmem_req    ), // Memory request
 .dmem_addr       (int_dmem_addr   ), // Memory request address
@@ -548,6 +556,10 @@ core_pipe_wb i_core_pipe_wb (
 .s3_rs2_addr     (s3_rs2_addr     ),
 .s3_rs1_rdata    (s3_rs1_rdata    ),
 .s3_rs2_rdata    (s3_rs2_rdata    ),
+.s3_dmem_valid   (s3_dmem_valid   ),
+.s3_dmem_addr    (s3_dmem_addr    ),
+.s3_dmem_strb    (s3_dmem_strb    ),
+.s3_dmem_wdata   (s3_dmem_wdata   ),
 `RVFI_CONN                         ,
 `endif
 .trs_valid       (trs_valid       ), // Instruction trace valid

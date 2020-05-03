@@ -107,6 +107,10 @@ output reg  [ REG_ADDR_R:0] s3_rs1_addr     ,
 output reg  [ REG_ADDR_R:0] s3_rs2_addr     ,
 output reg  [         XL:0] s3_rs1_rdata    ,
 output reg  [         XL:0] s3_rs2_rdata    ,
+output reg  [ MEM_ADDR_R:0] s3_dmem_valid   ,
+output reg  [ MEM_ADDR_R:0] s3_dmem_addr    ,
+output reg  [ MEM_STRB_R:0] s3_dmem_strb    ,
+output reg  [ MEM_ADDR_R:0] s3_dmem_wdata   ,
 `endif
 
 output wire                 dmem_req        , // Memory request
@@ -268,6 +272,28 @@ always @(posedge g_clk) begin
         `endif
     end
 end
+
+//
+// RVFI
+// ------------------------------------------------------------
+
+`ifdef RVFI
+
+//
+// Catch memory transaction requests.
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+
+    end else if(dmem_req && dmem_gnt) begin
+        s3_dmem_valid <= 1'b1       ;
+        s3_dmem_addr  <= dmem_addr  ;
+        s3_dmem_strb  <= dmem_strb  ;
+        s3_dmem_wdata <= dmem_wdata ;
+    end
+
+end
+
+`endif
 
 
 //

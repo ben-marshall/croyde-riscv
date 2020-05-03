@@ -61,6 +61,8 @@ reg rvfi_mem_wmask;
 reg rvfi_mem_rdata;
 reg rvfi_mem_wdata;
 
+assign rvfi_halt = 1'b0;
+
 reg         rvfi_order      ;
 initial     rvfi_order      = 0;
 wire [XL:0] n_rvfi_order    = rvfi_order + 1;
@@ -129,7 +131,11 @@ end
 
 always @(posedge g_clk) begin
     if(n_rd_valid || (n_valid && !hold_rd_data)) begin
-        rvfi_rd_addr     <= n_rd_addr       ;
+        if(n_rd_valid) begin
+            rvfi_rd_addr     <= n_rd_addr       ;
+        end else begin
+            rvfi_rd_addr     <= 5'b0            ;
+        end
         if(|n_rd_addr) begin
             rvfi_rd_wdata    <= n_rd_wdata  ;
         end else begin

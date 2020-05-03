@@ -65,6 +65,10 @@ input  wire [ REG_ADDR_R:0] s3_rs1_addr     ,
 input  wire [ REG_ADDR_R:0] s3_rs2_addr     ,
 input  wire [         XL:0] s3_rs1_rdata    ,
 input  wire [         XL:0] s3_rs2_rdata    ,
+input  wire [ MEM_ADDR_R:0] s3_dmem_valid   ,
+input  wire [ MEM_ADDR_R:0] s3_dmem_addr    ,
+input  wire [ MEM_STRB_R:0] s3_dmem_strb    ,
+input  wire [ MEM_ADDR_R:0] s3_dmem_wdata   ,
 `RVFI_OUTPUTS                               ,
 `endif
 
@@ -237,19 +241,20 @@ assign trs_instr = s3_instr     ;
 
 `ifdef RVFI
 
-wire [ILEN   - 1 : 0] n_rvfi_intr         =  'b0;
-wire                  n_rvfi_trap         = trap_cpu;
+wire [ILEN   - 1 : 0] n_rvfi_intr           =  'b0;
+wire                  n_rvfi_trap           = trap_cpu;
 
-wire                  n_rvfi_mem_req_valid = dmem_req && dmem_gnt;
-reg                   n_rvfi_mem_rsp_valid ;
+wire                  n_rvfi_mem_req_valid  = lsu_load || lsu_store;
+wire                  rvfi_mem_req          = dmem_req && dmem_gnt;
+reg                   n_rvfi_mem_rsp_valid  ;
 
 always @(posedge g_clk) begin
-    if(!g_resetn) n_rvfi_mem_rsp_valid <= 1'b0;
-    else          n_rvfi_mem_rsp_valid <= n_rvfi_mem_req_valid;
+    if(!g_resetn) n_rvfi_mem_rsp_valid     <= 1'b0;
+    else          n_rvfi_mem_rsp_valid     <= rvfi_mem_req;
 end
 
-wire [XLEN/8 - 1 : 0] n_rvfi_mem_rmask    = dmem_wen ? 8'b0 : dmem_strb;
-wire [XLEN/8 - 1 : 0] n_rvfi_mem_wmask    = dmem_wen ? dmem_strb : 8'b0;
+wire [XLEN/8 - 1 : 0] n_rvfi_mem_rmask    = lsu_store ? 8'b0 : s3_dmem_strb;
+wire [XLEN/8 - 1 : 0] n_rvfi_mem_wmask    = lsu_store ? s3_dmem_strb : 8'b0;
 
 core_rvfi i_core_rvfi (
 .g_clk              (g_clk                  ),
@@ -272,11 +277,11 @@ core_rvfi i_core_rvfi (
 .n_pc_wdata         (s3_n_pc                ),
 .n_mem_req_valid    (n_rvfi_mem_req_valid   ),
 .n_mem_rsp_valid    (n_rvfi_mem_rsp_valid   ),
-.n_mem_addr         (dmem_addr              ),
+.n_mem_addr         (s3_dmem_addr           ),
 .n_mem_rmask        (n_rvfi_mem_rmask       ),
 .n_mem_wmask        (n_rvfi_mem_wmask       ),
-.n_mem_rdata        (lsu_rdata              ),
-.n_mem_wdata        (dmem_wdata             )
+.n_mem_rdata        (dmem_rdata             ),
+.n_mem_wdata        (s3_dmem_wdata          )
 );
 
 `endif
