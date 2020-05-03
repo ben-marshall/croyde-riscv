@@ -1,7 +1,7 @@
 
 .data
 
-#define MMIO_BASE   0x00001000
+#define MMIO_BASE   0x00010000
 #define MTIME       (MMIO_BASE + 0)
 #define MTIMECMP    (MMIO_BASE + 8)
 
