@@ -30,17 +30,19 @@
     - [ ] insn remuw
     - [ ] insn remw
 
-- [ ] LSU address calculation in decode.
+- [x] LSU address calculation in decode.
 
-- [x] Interrupts
+- [ ] Trap on bad jump/branch target address.
 
-  - [x] Timer
+- [ ] Interrupts
 
-  - [x] External
+  - [ ] Timer
 
-  - [x] SW
+  - [ ] External
 
-  - [x] Vectoring
+  - [ ] SW
+
+  - [ ] Vectoring
 
   - [ ] MIP.MSIP writing
 

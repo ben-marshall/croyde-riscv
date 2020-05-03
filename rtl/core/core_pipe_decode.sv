@@ -244,9 +244,9 @@ wire rs1_16_5bit =  dec_c_add      || dec_c_addi     || dec_c_addiw    ||
 
 // Source register 1, given a 16-bit instruction
 wire [4:0] dec_rs1_16 = 
-       rs1_16_5bit      ? {s1_instr[11:7]      } :
-       rs1_16_sp        ? {REG_SP              } :
-     /*rs1_16_prime */    {2'b01, s1_instr[9:7]} ;
+    {5{rs1_16_5bit   }} & {s1_instr[11:7]      } |
+    {5{rs1_16_sp     }} & {REG_SP              } |
+    {5{rs1_16_prime  }} & {2'b01, s1_instr[9:7]} ;
     
 // Source register 2, given a 16-bit instruction
 wire [4:0] dec_rs2_16 = 
