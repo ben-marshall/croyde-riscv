@@ -9,8 +9,10 @@ read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_fetch.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_decode_immediates.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_decode.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec_alu.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec_cfu.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec_lsu.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_wb.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_csrs.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_regfile.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_interrupts.sv

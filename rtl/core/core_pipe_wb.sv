@@ -221,7 +221,7 @@ assign trap_cpu       = s3_trap;
 
 assign trap_int       = 0 ; // trap occured due to interrupt
 
-assign trap_cause     = s3_trap ? s3_rd_addr : 'b0 ;
+assign trap_cause     = s3_trap ? {2'b00, s3_rd_addr} : 'b0 ;
 
 assign trap_mtval     = 0 ;
 assign trap_pc        = s3_pc ;
