@@ -178,6 +178,8 @@ wire        lsu_valid       = s2_valid && (s2_lsu_load || s2_lsu_store);
 wire        lsu_ready       ;
 wire        lsu_trap_addr   ;
 
+wire [MEM_ADDR_R:0] lsu_addr = alu_add_out[MEM_ADDR_R:0];
+
 wire        lsu_new_instr   = e_new_instr;
 
 wire [LSU_OP_R:0] lsu_new_op;
@@ -332,7 +334,7 @@ core_pipe_exec_lsu i_core_pipe_exec_lsu (
 .g_resetn   (g_resetn       ), // Global synchronous reset
 .new_instr  (lsu_new_instr  ), // New instruciton next cycle
 .valid      (lsu_valid      ), // Inputs are valid
-.addr       (alu_add_out    ), // Address of the access.
+.addr       (lsu_addr       ), // Address of the access.
 .wdata      (s2_rs2_data    ), // Data being written (if any)
 .load       (s2_lsu_load    ), //
 .store      (s2_lsu_store   ), //

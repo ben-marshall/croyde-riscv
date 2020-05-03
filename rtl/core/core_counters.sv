@@ -7,35 +7,35 @@
 //
 module core_counters (
 
-input              g_clk            , // global clock
-input              g_resetn         , // synchronous reset
+input                      g_clk            , // global clock
+input                      g_resetn         , // synchronous reset
 
-input              instr_ret        , // Instruction retired.
-output reg         timer_interrupt  , // Raise a timer interrupt
+input                      instr_ret        , // Instruction retired.
+output reg                 timer_interrupt  , // Raise a timer interrupt
 
-output wire [63:0] ctr_time         , // The time counter value.
-output reg  [63:0] ctr_cycle        , // The cycle counter value.
-output reg  [63:0] ctr_instret      , // The instret counter value.
+output wire [        63:0] ctr_time         , // The time counter value.
+output reg  [        63:0] ctr_cycle        , // The cycle counter value.
+output reg  [        63:0] ctr_instret      , // The instret counter value.
 
-input  wire        inhibit_cy       , // Stop cycle counter incrementing.
-input  wire        inhibit_tm       , // Stop time counter incrementing.
-input  wire        inhibit_ir       , // Stop instret incrementing.
+input  wire                inhibit_cy       , // Stop cycle counter incrementing.
+input  wire                inhibit_tm       , // Stop time counter incrementing.
+input  wire                inhibit_ir       , // Stop instret incrementing.
 
-input  wire        mmio_req         , // MMIO enable
-input  wire        mmio_wen         , // MMIO write enable
-input  wire [63:0] mmio_addr        , // MMIO address
-input  wire [63:0] mmio_wdata       , // MMIO write data
-output wire        mmio_gnt         , // Request grant.
-output reg  [63:0] mmio_rdata       , // MMIO read data
-output reg         mmio_error         // MMIO error
+input  wire                mmio_req         , // MMIO enable
+input  wire                mmio_wen         , // MMIO write enable
+input  wire [MEM_ADDR_R:0] mmio_addr        , // MMIO address
+input  wire [MEM_DATA_R:0] mmio_wdata       , // MMIO write data
+output wire                mmio_gnt         , // Request grant.
+output reg  [MEM_DATA_R:0] mmio_rdata       , // MMIO read data
+output reg                 mmio_error         // MMIO error
 
 );
 
 `include "core_common.svh"
 
 // Base address of the memory mapped IO region.
-parameter   MMIO_BASE_ADDR        = 64'h0000_0000_0000_1000;
-parameter   MMIO_BASE_MASK        = 64'h0000_0000_0000_1FFF;
+parameter   MMIO_BASE_ADDR        = 'h0000_0000_0001_0000;
+parameter   MMIO_BASE_MASK        = 'h0000_0000_0001_FFFF;
 
 // Base address of the MTIME memory mapped register.
 localparam  MMIO_MTIME_ADDR       = MMIO_BASE_ADDR;

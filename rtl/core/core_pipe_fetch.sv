@@ -36,7 +36,7 @@ input  wire                 s1_eat_4      // Decode eats 4 bytes
 `include "core_common.svh"
 
 // Inital address of the program counter post reset.
-parameter   PC_RESET_ADDRESS      = 64'h10000000;
+parameter   PC_RESET_ADDRESS      = 'h10000000;
 
 //
 // Constant assignments.
@@ -89,7 +89,7 @@ always @(posedge g_clk) begin
         imem_req_r  <= n_imem_req;
         imem_recv   <= imem_req && imem_gnt;
         if(e_cf_change) begin
-            imem_addr <= cf_target & ~64'h7;
+            imem_addr <= {cf_target[MEM_ADDR_R:3], 3'b000};
         end else if(e_imem_req) begin
             imem_addr <= n_imem_addr;
         end

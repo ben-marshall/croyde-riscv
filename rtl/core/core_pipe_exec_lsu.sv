@@ -11,7 +11,7 @@ input   wire                g_resetn    , // Global synchronous reset
 
 input   wire                new_instr   , // New instruction arriving
 input   wire                valid       , // Inputs are valid
-input   wire [        XL:0] addr        , // Address of the access.
+input   wire [MEM_ADDR_R:0] addr        , // Address of the access.
 input   wire [        XL:0] wdata       , // Data being written (if any)
 input   wire                load        , //
 input   wire                store       , //
@@ -80,7 +80,7 @@ assign  dmem_wen     = store;
 
 assign  dmem_req     = valid && txn_okay && !finished;
 
-assign  dmem_addr    = {addr[XL:3], 3'b000};
+assign  dmem_addr    = {addr[MEM_ADDR_R:3], 3'b000};
 
 assign  dmem_wdata   = wdata    << data_shift           ;
 

@@ -30,10 +30,10 @@ input  wire [ MEM_DATA_R:0] ext_dmem_rdata, // Memory response read data
 
 output wire                 mmio_req         , // MMIO enable
 output wire                 mmio_wen         , // MMIO write enable
-output wire [         63:0] mmio_addr        , // MMIO address
-output wire [         63:0] mmio_wdata       , // MMIO write data
+output wire [ MEM_ADDR_R:0] mmio_addr        , // MMIO address
+output wire [ MEM_DATA_R:0] mmio_wdata       , // MMIO write data
 input  wire                 mmio_gnt         , // Request grant.
-input  wire [         63:0] mmio_rdata       , // MMIO read data
+input  wire [ MEM_DATA_R:0] mmio_rdata       , // MMIO read data
 input  wire                 mmio_error         // MMIO error
 
 );
@@ -41,8 +41,8 @@ input  wire                 mmio_error         // MMIO error
 `include "core_common.svh"
 
 // Base address of the memory mapped IO region.
-parameter   MMIO_BASE_ADDR  = 64'h0000_0000_0000_1000;
-parameter   MMIO_BASE_MASK  = 64'h0000_0000_0000_1FFF;
+parameter   MMIO_BASE_ADDR  = 'h0000_0000_0001_0000;
+parameter   MMIO_BASE_MASK  = 'h0000_0000_0001_FFFF;
 parameter   MMIO_TOP        = MMIO_BASE_ADDR | MMIO_BASE_MASK;
 
 `ifdef RVFI
@@ -74,8 +74,8 @@ assign mmio_wdata     = int_dmem_wdata;
 //
 // Did we hit the MMIO region or not?
 
-wire [63:0] a_mask    = int_dmem_addr &  MMIO_BASE_MASK;
-wire [63:0] a_base    = int_dmem_addr |  MMIO_BASE_ADDR;
+wire [MEM_ADDR_R:0] a_mask    = int_dmem_addr &  MMIO_BASE_MASK;
+wire [MEM_ADDR_R:0] a_base    = int_dmem_addr |  MMIO_BASE_ADDR;
 
 wire        mmio_hit  = a_mask == a_base;
 

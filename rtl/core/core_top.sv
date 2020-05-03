@@ -45,11 +45,11 @@ output wire [         XL:0] trs_pc         // Instruction trace PC
 `include "core_common.svh"
 
 // Inital address of the program counter post reset.
-parameter   PC_RESET_ADDRESS      = 64'h10000000;
+parameter   PC_RESET_ADDRESS= 'h10000000;
 
 // Base address of the memory mapped IO region.
-parameter   MMIO_BASE_ADDR  = 64'h0000_0000_0000_1000;
-parameter   MMIO_BASE_MASK  = 64'h0000_0000_0000_1FFF;
+parameter   MMIO_BASE_ADDR  = 'h0000_0000_0001_0000;
+parameter   MMIO_BASE_MASK  = 'h0000_0000_0001_FFFF;
 
 //
 // Control flow change busses
@@ -253,10 +253,10 @@ wire [ MEM_DATA_R:0] int_dmem_rdata; // Memory response read data
 
 wire                 mmio_req    ; // MMIO enable
 wire                 mmio_wen    ; // MMIO write enable
-wire [         XL:0] mmio_addr   ; // MMIO address
-wire [         XL:0] mmio_wdata  ; // MMIO write data
+wire [ MEM_ADDR_R:0] mmio_addr   ; // MMIO address
+wire [ MEM_DATA_R:0] mmio_wdata  ; // MMIO write data
 wire                 mmio_gnt    ; // MMIO grant
-wire [         XL:0] mmio_rdata  ; // MMIO read data
+wire [ MEM_DATA_R:0] mmio_rdata  ; // MMIO read data
 wire                 mmio_error  ; // MMIO error
 
 //
