@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sun May  3 10:12:13 2020
+[*] Sun May  3 10:42:52 2020
 [*]
-[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/riscv-formal/reg_ch0/engine_0/trace.vcd"
-[dumpfile_mtime] "Sun May  3 10:05:18 2020"
-[dumpfile_size] 944454
+[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/riscv-formal/insn_c_addi_ch0/engine_0/trace.vcd"
+[dumpfile_mtime] "Sun May  3 10:19:17 2020"
+[dumpfile_size] 450321
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/riscv-formal.gtkw"
-[timestart] 190
+[timestart] 1
 [size] 1920 1025
 [pos] -1 -1
-*-3.727772 210 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-4.337610 64 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] rvfi_testbench.
 [treeopen] rvfi_testbench.checker_inst.
 [treeopen] rvfi_testbench.wrapper.
@@ -20,7 +20,7 @@
 [sst_width] 305
 [signals_width] 462
 [sst_expanded] 1
-[sst_vpaned_height] 371
+[sst_vpaned_height] 187
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_fetch.g_clk
 rvfi_testbench.wrapper.i_dut.i_core_pipe_fetch.g_resetn
@@ -149,35 +149,68 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.s3_rd_wen
 -Instruction Checker
 @28
 rvfi_testbench.checker_inst.check
-@c00200
--Check - Memory
-@1401200
--Check - Memory
-@800200
--Check - RD
-@1000200
--Check - RD
-@c00200
--Check - RS
-@1401200
--Check - RS
-@800200
--Check - Register Order
 @22
-rvfi_testbench.checker_inst.rvfi_insn[31:0]
+rvfi_testbench.checker_inst.insn[31:0]
 @28
-rvfi_testbench.checker_inst.check
+rvfi_testbench.checker_inst.insn_pma_x
+rvfi_testbench.checker_inst.intr
 @22
-rvfi_testbench.checker_inst.insn_order[63:0]
+rvfi_testbench.checker_inst.pc_rdata[63:0]
+rvfi_testbench.checker_inst.pc_wdata[63:0]
+rvfi_testbench.checker_inst.insn_spec.spec_pc_wdata[63:0]
+@c00200
+-Check - Memory
+@28
+rvfi_testbench.checker_inst.mem_access_fault
+@22
+rvfi_testbench.checker_inst.mem_addr[63:0]
+rvfi_testbench.checker_inst.mem_rdata[63:0]
+rvfi_testbench.checker_inst.mem_rmask[7:0]
+rvfi_testbench.checker_inst.mem_wdata[63:0]
+rvfi_testbench.checker_inst.mem_wmask[7:0]
+rvfi_testbench.checker_inst.spec_mem_addr[63:0]
+rvfi_testbench.checker_inst.spec_mem_rmask[7:0]
+rvfi_testbench.checker_inst.spec_mem_wdata[63:0]
+rvfi_testbench.checker_inst.spec_mem_wmask[7:0]
+@1401200
+-Check - Memory
+@800200
+-Check - RD
 @2024
 ^2 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
-rvfi_testbench.checker_inst.register_index[4:0]
+rvfi_testbench.checker_inst.rd_addr[4:0]
+^2 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
+rvfi_testbench.checker_inst.spec_rd_addr[4:0]
 @22
-rvfi_testbench.checker_inst.register_shadow[63:0]
-@28
-rvfi_testbench.checker_inst.register_written
+rvfi_testbench.checker_inst.rd_wdata[63:0]
+rvfi_testbench.checker_inst.spec_rd_wdata[63:0]
 @1000200
--Check - Register Order
+-Check - RD
+@800200
+-Check - RS
+@2024
+^2 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
+rvfi_testbench.checker_inst.rs1_addr[4:0]
+@22
+rvfi_testbench.checker_inst.rs1_rdata[63:0]
+@2024
+^2 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
+rvfi_testbench.checker_inst.rs2_addr[4:0]
+@22
+rvfi_testbench.checker_inst.rs2_rdata[63:0]
+@2024
+^2 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
+rvfi_testbench.checker_inst.spec_rs1_addr[4:0]
+^2 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
+rvfi_testbench.checker_inst.spec_rs2_addr[4:0]
+@1000200
+-Check - RS
+@28
+rvfi_testbench.checker_inst.trap
+rvfi_testbench.checker_inst.spec_trap
+rvfi_testbench.checker_inst.valid
+rvfi_testbench.checker_inst.spec_valid
+@1000200
 -Instruction Checker
 @c00200
 -Pipeline - Fetch
@@ -458,7 +491,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s1_rs2_addr[4:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s1_rs2_data[63:0]
 @1401200
 -Interface - Fetch
-@800200
+@c00200
 -Interface Execute
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s2_valid
@@ -471,17 +504,10 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s2_instr[31:0]
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s2_npc[63:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s2_pc[63:0]
-@2024
-^2 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
 rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s2_rd[4:0]
-^2 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
 rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s2_rs1_addr[4:0]
-@22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s2_rs1_data[63:0]
-@2024
-^2 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
 rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s2_rs2_addr[4:0]
-@22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s2_rs2_data[63:0]
 @c00200
 -ALU
@@ -571,7 +597,9 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s2_wb_mdu
 rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s2_wb_npc
 @1000200
 -Writeback
+@1401200
 -Interface Execute
+@1000200
 -Pipeline - Decode
 @c00200
 -Pipeline  - Execute
@@ -582,6 +610,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.g_resetn
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.csr_new_op[3:0]
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.e_new_instr
+rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_trap
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_imm[63:0]
 @2022
@@ -688,7 +717,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_csr_set
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_csr_wr
 @1401200
 -CSR
-@800200
+@c00200
 -LSU
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.lsu_valid
@@ -715,6 +744,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.dmem_wdata[63:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.dmem_wen
 @1000200
 -DMEM
+@1401200
 -LSU
 @c00200
 -MDU
@@ -746,7 +776,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_wb_mdu
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_wb_npc
 @1401200
 -Writeback
-@c00200
+@800200
 -Next Stage
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.n_s3_csr_op[3:0]
@@ -760,10 +790,13 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.n_s3_rd[4:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.n_s3_wb_op[1:0]
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.n_s3_wdata[63:0]
-@1401200
+@28
+rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.n_s3_trap
+@1000200
 -Next Stage
+@1401200
 -Pipeline  - Execute
-@800200
+@c00200
 -Pipeline - Writeback
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.g_clk
@@ -774,6 +807,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.e_new_instr
 rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.cfu_wait
 rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.s3_valid
 rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.s3_ready
+rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.s3_trap
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.s3_csr_addr[11:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.s3_csr_op[3:0]
@@ -795,14 +829,15 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.wb_wdata
 rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.rd_wen_enable
 @2024
 ^2 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
-rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.s3_rd_addr[4:0]
+rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.s3_rd[4:0]
 @22
+rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.s3_rd_addr[4:0]
 rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.s3_rd_wdata[63:0]
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.s3_rd_wen
 @1000200
 -GPR Write
-@c00200
+@800200
 -Control Flow
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.s3_cf_ack
@@ -810,7 +845,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.s3_cf_ack
 rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.s3_cf_target[63:0]
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.s3_cf_valid
-@1401200
+@1000200
 -Control Flow
 @800200
 -DMEM
@@ -914,7 +949,6 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.csr_wr_clr
 rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.csr_wr_set
 @1401200
 -CSR
-@1000200
 -Pipeline - Writeback
 @c00200
 -GPRs
