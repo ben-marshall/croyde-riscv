@@ -203,6 +203,8 @@ assign  csr_new_op[CSR_OP_WR    ] = s2_csr_wr   ;
 assign  csr_new_op[CSR_OP_SET   ] = s2_csr_set  ;
 assign  csr_new_op[CSR_OP_CLR   ] = s2_csr_clr  ;
 
+wire    wdata_csr = |csr_new_op;
+
 //
 // MDU interfacing
 // ------------------------------------------------------------
@@ -247,7 +249,7 @@ wire [         XL:0] n_s3_wdata  =
     {XLEN{s2_wb_alu}}   &   alu_result  |
     {XLEN{s2_wb_mdu}}   &   mdu_result  |
     {XLEN{s2_wb_npc}}   &   s2_npc      |
-    {XLEN{s2_wb_csr}}   &   s2_rs1_data ;
+    {XLEN{wdata_csr}}   &   s2_rs1_data ;
 
 wire [         11:0] n_s3_csr_addr = s2_csr_addr;
 

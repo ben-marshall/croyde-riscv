@@ -447,7 +447,7 @@ assign  s2_mdu_remuw  = dec_remuw ;
 // CSRs
 
 assign  s2_csr_set    = dec_csrrsi || dec_csrrs ;
-assign  s2_csr_clr    = dec_csrrsi || dec_csrrs ;
+assign  s2_csr_clr    = dec_csrrci || dec_csrrc ;
 assign  s2_csr_rd     = dec_csrrsi || dec_csrrs || dec_csrrw || dec_csrrwi;
 assign  s2_csr_wr     = dec_csrrsi || dec_csrrs || dec_csrrw || dec_csrrwi;
 
