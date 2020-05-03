@@ -231,35 +231,22 @@ assign s2_csr_addr          = s1_instr[31:20];
 // Register Address Decoding
 // -------------------------------------------------------------------------
 
+wire rs1_16_prime = (s1_instr[15] && s1_instr[1:0] == 2'b01)  || 
+                    dec_c_beqz || dec_c_bnez ||
+                    dec_c_sw   || dec_c_sd   || dec_c_lw   || dec_c_ld   ;
+
+wire rs1_16_sp    = dec_c_swsp     || dec_c_sdsp     || dec_c_addi16sp ||
+                    dec_c_addi4spn || dec_c_lwsp     || dec_c_ldsp     ;
+
+wire rs1_16_5bit =  dec_c_add      || dec_c_addi     || dec_c_addiw    ||
+                    dec_c_jalr     || dec_c_jr       || dec_c_slli     ;
+
+
 // Source register 1, given a 16-bit instruction
 wire [4:0] dec_rs1_16 = 
-    {5{dec_c_add     }} & {s1_instr[11:7]      } |
-    {5{dec_c_addi    }} & {s1_instr[11:7]      } |
-    {5{dec_c_addiw   }} & {s1_instr[11:7]      } |
-    {5{dec_c_jalr    }} & {s1_instr[11:7]      } |
-    {5{dec_c_jr      }} & {s1_instr[11:7]      } |
-    {5{dec_c_slli    }} & {s1_instr[11:7]      } |
-    {5{dec_c_swsp    }} & {REG_SP            } |
-    {5{dec_c_sdsp    }} & {REG_SP            } |
-    {5{dec_c_addi16sp}} & {REG_SP            } |
-    {5{dec_c_addi4spn}} & {REG_SP            } |
-    {5{dec_c_lwsp    }} & {REG_SP            } |
-    {5{dec_c_ldsp    }} & {REG_SP            } |
-    {5{dec_c_and     }} & {2'b01, s1_instr[9:7]} |
-    {5{dec_c_andi    }} & {2'b01, s1_instr[9:7]} |
-    {5{dec_c_beqz    }} & {2'b01, s1_instr[9:7]} |
-    {5{dec_c_bnez    }} & {2'b01, s1_instr[9:7]} |
-    {5{dec_c_lw      }} & {2'b01, s1_instr[9:7]} |
-    {5{dec_c_ld      }} & {2'b01, s1_instr[9:7]} |
-    {5{dec_c_or      }} & {2'b01, s1_instr[9:7]} |
-    {5{dec_c_srai    }} & {2'b01, s1_instr[9:7]} |
-    {5{dec_c_srli    }} & {2'b01, s1_instr[9:7]} |
-    {5{dec_c_sub     }} & {2'b01, s1_instr[9:7]} |
-    {5{dec_c_addw    }} & {2'b01, s1_instr[9:7]} |
-    {5{dec_c_subw    }} & {2'b01, s1_instr[9:7]} |
-    {5{dec_c_sw      }} & {2'b01, s1_instr[9:7]} |
-    {5{dec_c_sd      }} & {2'b01, s1_instr[9:7]} |
-    {5{dec_c_xor     }} & {2'b01, s1_instr[9:7]} ;
+       rs1_16_5bit      ? {s1_instr[11:7]      } :
+       rs1_16_sp        ? {REG_SP              } :
+     /*rs1_16_prime */    {2'b01, s1_instr[9:7]} ;
     
 // Source register 2, given a 16-bit instruction
 wire [4:0] dec_rs2_16 = 
@@ -282,8 +269,6 @@ wire [4:0] dec_rs2_16 =
 wire [4:0] dec_rd_16 = 
     {5{dec_c_addi16sp}} & {REG_SP} |
     {5{dec_c_addi4spn}} & {2'b01, s1_instr[4:2]} |
-    {5{dec_c_and     }} & {2'b01, s1_instr[9:7]} |
-    {5{dec_c_andi    }} & {2'b01, s1_instr[9:7]} |
     {5{dec_c_jalr    }} & {REG_RA} |
     {5{dec_c_add     }} & {s1_instr[11:7]} |
     {5{dec_c_addi    }} & {s1_instr[11:7]} |
@@ -296,6 +281,8 @@ wire [4:0] dec_rd_16 =
     {5{dec_c_slli    }} & {s1_instr[11:7]} |
     {5{dec_c_lw      }} & {2'b01, s1_instr[4:2]} |
     {5{dec_c_ld      }} & {2'b01, s1_instr[4:2]} |
+    {5{dec_c_and     }} & {2'b01, s1_instr[9:7]} |
+    {5{dec_c_andi    }} & {2'b01, s1_instr[9:7]} |
     {5{dec_c_or      }} & {2'b01, s1_instr[9:7]} |
     {5{dec_c_srai    }} & {2'b01, s1_instr[9:7]} |
     {5{dec_c_srli    }} & {2'b01, s1_instr[9:7]} |

@@ -48,10 +48,10 @@ parameter   MMIO_MTIMECMP_RESET   = -1;
 
 // ---------------------- Memory mapped registers -----------------------
 
-wire    addr_mtime_lo    = mmio_req &&
+wire    addr_mtime_lo    =
     (mmio_addr& MMIO_BASE_MASK)==(MMIO_MTIME_ADDR    & MMIO_BASE_MASK);
 
-wire    addr_mtimecmp_lo = mmio_req &&
+wire    addr_mtimecmp_lo =
     (mmio_addr& MMIO_BASE_MASK)==(MMIO_MTIMECMP_ADDR & MMIO_BASE_MASK);
 
 reg  [63:0] mapped_mtime;
@@ -61,7 +61,7 @@ wire [63:0] n_mapped_mtime = mapped_mtime + 1;
 
 wire n_timer_interrupt = mapped_mtime >= mapped_mtimecmp;
 
-wire wr_mtime_lo = addr_mtime_lo && mmio_wen;
+wire wr_mtime_lo = addr_mtime_lo && mmio_wen && mmio_req;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
@@ -81,7 +81,7 @@ always @(posedge g_clk) begin
     end
 end
 
-wire wr_mtimecmp_lo = addr_mtimecmp_lo && mmio_wen;
+wire wr_mtimecmp_lo = addr_mtimecmp_lo && mmio_wen && mmio_req;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
@@ -115,7 +115,9 @@ always @(posedge g_clk) begin
         mmio_rdata <= 64'b0;
     end else if(mmio_req) begin
         mmio_error <= n_mmio_error;
-        mmio_rdata <= n_mmio_rdata;
+        if(!mmio_wen) begin
+            mmio_rdata <= n_mmio_rdata;
+        end
     end
 end
 
@@ -135,12 +137,20 @@ assign ctr_time = mapped_mtime;
 
 wire [63:0] n_ctr_instret = ctr_instret + 1;
 
+// Register inserted to break up long timing path to instret register
+// load enable bit.
+reg     instr_ret_r;
+
+always @(posedge g_clk) begin
+    instr_ret_r <= instr_ret;
+end
+
 always @(posedge g_clk) begin
     if(!g_resetn) begin
 
         ctr_instret <= 0;
 
-    end else if(instr_ret && !inhibit_ir) begin
+    end else if(instr_ret_r && !inhibit_ir) begin
 
         ctr_instret <= n_ctr_instret;
 
