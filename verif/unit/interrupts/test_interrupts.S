@@ -53,7 +53,7 @@ timer_interrupt_handler:
     li   t4, 0x8000000000000007
     bne  t3, t4, test_fail
 
-    li t3, 0x00001008   // Set mtime cmp to something enormous.
+    li t3, 0x00010008   // Set mtime cmp to something enormous.
     li t4, -1
     sw t4, 0(t3)
     sw t4, 4(t3)

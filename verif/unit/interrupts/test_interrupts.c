@@ -260,6 +260,7 @@ int test_main() {
     fail = test_individual_interrupt_enable();
     if(fail){return fail;}
 
+
     //__putstr("Test Timer Interrupt...\n");
     fail = test_timer_interupt();
     if(fail){return fail;}
