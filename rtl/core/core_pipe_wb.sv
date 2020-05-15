@@ -152,10 +152,10 @@ always @(posedge g_clk) begin
     end
 end
 
-wire    csr_op_rd   = s3_csr_op[CSR_OP_RD ];
-wire    csr_op_wr   = s3_csr_op[CSR_OP_WR ];
-wire    csr_op_set  = s3_csr_op[CSR_OP_SET];
-wire    csr_op_clr  = s3_csr_op[CSR_OP_CLR];
+wire    csr_op_rd   = s3_full && s3_csr_op[CSR_OP_RD ];
+wire    csr_op_wr   = s3_full && s3_csr_op[CSR_OP_WR ];
+wire    csr_op_set  = s3_full && s3_csr_op[CSR_OP_SET];
+wire    csr_op_clr  = s3_full && s3_csr_op[CSR_OP_CLR];
 
 assign  csr_en      = !csr_op_done && (
         csr_op_rd || csr_op_wr || csr_op_set || csr_op_clr
@@ -229,12 +229,16 @@ wire   raise_int      = int_pending;
 assign int_ack        = raise_int && e_cf_change;
 
 // trap occured due to CPU
-assign trap_cpu       = s3_trap && !raise_int;
+assign trap_cpu       = !raise_int && (
+    s3_trap                 ||
+    csr_en  && csr_error
+);
 
 assign trap_int       = int_ack; // trap occured due to interrupt
 
 assign trap_cause     = raise_int ? int_cause           :
                         s3_trap   ? {2'b00, s3_rd_addr} :
+                        csr_error ? TRAP_IOPCODE        :
                                     'b0                 ;
 
 assign trap_mtval     = 0 ;
