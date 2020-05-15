@@ -19,8 +19,8 @@ int test_global_interrupt_enable() {
     uint64_t uie= mstatus & MSTATUS_UIE;
 
     // U/S mode not implemented. uie/sie should never be set.
-    if(sie) {return 1;}
-    if(uie) {return 2;}
+    if(sie) {test_fail();}
+    if(uie) {test_fail();}
 
     // Writes should be ignored to UIE / SIE
     __set_mstatus(MSTATUS_SIE | MSTATUS_UIE);
@@ -29,8 +29,8 @@ int test_global_interrupt_enable() {
     sie         = mstatus & MSTATUS_SIE;
     uie         = mstatus & MSTATUS_UIE;
 
-    if(sie) {return 3; }
-    if(uie) {return 4; }
+    if(sie) {test_fail(); }
+    if(uie) {test_fail(); }
     
     // Clear MIE bit. No interrupts enabled.
     __clr_mstatus(MSTATUS_MIE);
@@ -39,7 +39,7 @@ int test_global_interrupt_enable() {
     mie         = mstatus & MSTATUS_MIE;
 
     // MIE should be zero now.
-    if(mie) {return 5;}
+    if(mie) {test_fail();}
 
     // Set MIE bit.
     __set_mstatus(MSTATUS_MIE);
@@ -48,7 +48,7 @@ int test_global_interrupt_enable() {
     mie         = mstatus & MSTATUS_MIE;
 
     // MIE should be set now.
-    if(!mie){return 6;}
+    if(!mie){test_fail();}
 
     // Leave interrupts disabled.
     __clr_mstatus(MSTATUS_MIE);
@@ -67,33 +67,39 @@ int test_individual_interrupt_enable() {
     uint64_t mstatus = __rd_mstatus();
     uint64_t mie     = __rd_mie();
 
-    if(mstatus & MSTATUS_MIE){return 7;}
-    if(mstatus & MSTATUS_SIE){return 8;}
-    if(mstatus & MSTATUS_UIE){return 9;}
+    if(mstatus & MSTATUS_MIE){test_fail();}
+    if(mstatus & MSTATUS_SIE){test_fail();}
+    if(mstatus & MSTATUS_UIE){test_fail();}
     
-    if(mie     & MIE_MEIE){return 10;}
-    if(mie     & MIE_MTIE){return 11;}
-    if(mie     & MIE_MSIE){return 12;}
+    if(mie     & MIE_MEIE){test_fail();}
+    if(mie     & MIE_MTIE){test_fail();}
+    if(mie     & MIE_MSIE){test_fail();}
 
     // Check we can enable them one by one.
 
     // External interrupts
     __set_mie(MIE_MEIE);
     mie     = __rd_mie();
-    if(!(mie & MIE_MEIE)){return 13;}
+    if(!(mie & MIE_MEIE)){test_fail();}
     __clr_mie(MIE_MEIE);
+
+    __putchar('.');
 
     // Software interrupts
     __set_mie(MIE_MSIE);
     mie     = __rd_mie();
-    if(!(mie & MIE_MSIE)){return 14;}
+    if(!(mie & MIE_MSIE)){test_fail();}
     __clr_mie(MIE_MSIE);
+    
+    __putchar('.');
 
     // Timer interrupts
     __set_mie(MIE_MTIE);
     mie     = __rd_mie();
-    if(!(mie & MIE_MTIE)){return 15;}
+    if(!(mie & MIE_MTIE)){test_fail();}
     __clr_mie(MIE_MTIE);
+    __putchar('.');
+    __putchar('\n');
 
     return 0;
 
@@ -245,27 +251,26 @@ int test_main() {
 
     int fail;
 
-    __putstr("Test Global Interrupt Enable...\n");
+    //__putstr("Test Global Interrupt Enable...\n");
     fail = test_global_interrupt_enable();
     if(fail){return fail;}
 
 
-    __putstr("Test Individual Interrupt Enable...\n");
+    //__putstr("Test Individual Interrupt Enable...\n");
     fail = test_individual_interrupt_enable();
     if(fail){return fail;}
 
-
-    __putstr("Test Timer Interrupt...\n");
+    //__putstr("Test Timer Interrupt...\n");
     fail = test_timer_interupt();
     if(fail){return fail;}
 
 
-    __putstr("Test MTVEC Fields...\n");
+    //__putstr("Test MTVEC Fields...\n");
     fail = test_mtvec_fields();
     if(fail){return fail;}
 
 
-    __putstr("Test Vectored Timer Interrupt...\n");
+    //__putstr("Test Vectored Timer Interrupt...\n");
     fail = test_vectored_timer_interrupt();
     if(fail){return fail;}
 

@@ -50,28 +50,52 @@ volatile uint32_t __rdmcountinhibit();
 volatile uint32_t __wrmcountinhibit(uint32_t toset);
 
 //! Read the mstatus CSR
-volatile uint32_t __rd_mstatus();
+inline volatile uint64_t __rd_mstatus() {
+    uint64_t rd;
+    asm volatile("csrr %0, mstatus" : "=r"(rd));
+    return rd;
+}
 
 //! Write the mstatus CSR and return it's original value.
-volatile uint32_t __wr_mstatus(uint32_t n);
+inline volatile uint64_t __wr_mstatus(uint64_t n){
+    uint64_t rd;
+    asm volatile("csrrw %0, %1, mstatus" : "=r"(rd) : "r"(n));
+    return rd;
+}
 
 //! Set bits in the mstatus CSR
-volatile void __set_mstatus(uint32_t mask);
+inline volatile void __set_mstatus(uint64_t mask) {
+    asm volatile("csrs mstatus, %0" : : "r"(mask));
+}
 
 //! Clear bits in the mstatus CSR
-volatile void __clr_mstatus(uint32_t mask);
+inline volatile void __clr_mstatus(uint64_t mask) {
+    asm volatile("csrc mstatus, %0" : : "r"(mask));
+}
 
 //! Read the mie CSR
-volatile uint32_t __rd_mie();
+inline volatile uint64_t __rd_mie() {
+    uint64_t rd;
+    asm volatile("csrr %0, mie" : "=r"(rd));
+    return rd;
+}
 
 //! Write the mie CSR and return it's original value.
-volatile uint32_t __wr_mie(uint32_t n);
+inline volatile uint64_t __wr_mie(uint64_t n){
+    uint64_t rd;
+    asm volatile("csrrw %0, %1, mie" : "=r"(rd) : "r"(n));
+    return rd;
+}
 
 //! Set bits in the mie CSR
-volatile void __set_mie(uint32_t mask);
+inline volatile void __set_mie(uint64_t mask) {
+    asm volatile("csrs mie, %0" : : "r"(mask));
+}
 
 //! Clear bits in the mie CSR
-volatile void __clr_mie(uint32_t mask);
+inline volatile void __clr_mie(uint64_t mask) {
+    asm volatile("csrc mie, %0" : : "r"(mask));
+}
 
 //! Write a character to the uart.
 void __putchar(char c) ;
