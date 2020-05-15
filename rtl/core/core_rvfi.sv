@@ -136,7 +136,7 @@ always @(posedge g_clk) begin
         end else begin
             rvfi_rd_addr     <= 5'b0            ;
         end
-        if(|n_rd_addr) begin
+        if(n_rd_valid && |n_rd_addr) begin
             rvfi_rd_wdata    <= n_rd_wdata  ;
         end else begin
             rvfi_rd_wdata    <= 0           ;

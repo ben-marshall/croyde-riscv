@@ -127,7 +127,7 @@ wire    wb_lsu     = s3_wb_op == WB_OP_LSU     ;
 wire    wb_csr     = s3_wb_op == WB_OP_CSR     ;
 
 assign  s3_rd_wen  = rd_wen_enable && (wb_wdata || lsu_wen || wb_csr) &&
-                     !(trap_cpu);
+                     !(trap_cpu) && s3_full;
 
 assign  s3_rd_wdata=
     {XLEN{wb_wdata  }}  & s3_wdata  |
