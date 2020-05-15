@@ -13,6 +13,9 @@ output wire                 s2_cf_valid     , // Control flow change?
 input  wire                 s2_cf_ack       , // Control flow acknwoledged
 output wire [         XL:0] s2_cf_target    , // Control flow destination
 
+input  wire                 s2_flush        , // Flush pipestage contents
+input  wire [         XL:0] csr_mepc        , // return address for mret
+
 output wire                 s2_ready        , // EX ready for new instruction
 input  wire                 s2_valid        , // Decode -> EX instr valid.
 
@@ -228,7 +231,7 @@ assign              s3_valid     =
     (cfu_op_any ? cfu_finished : 1'b1)  &&
     (lsu_valid  ? lsu_ready    : 1'b1)  ;
 
-wire                 n_s3_full   = s3_valid && s3_ready;
+wire                 n_s3_full   = s3_valid && s3_ready && !s2_flush;
 wire [         XL:0] n_s3_pc     = s2_pc        ;
 wire [         31:0] n_s3_instr  = s2_instr     ;
 wire [ REG_ADDR_R:0] n_s3_rd     = s2_rd        ;
@@ -254,7 +257,7 @@ wire [         XL:0] n_s3_wdata  =
 wire [         11:0] n_s3_csr_addr = s2_csr_addr;
 
 always @(posedge g_clk) begin
-    if(!g_resetn) begin
+    if(!g_resetn || s2_flush) begin
         s3_full     <= 1'b0;
         s3_trap     <= 1'b0;
     end else if(s3_valid && s3_ready) begin
@@ -366,6 +369,7 @@ core_pipe_exec_cfu i_core_pipe_exec_cfu (
 .g_clk      (g_clk          ),
 .g_resetn   (g_resetn       ),
 .new_instr  (cfu_new_instr  ), // Being fed a new instruction.
+.csr_mepc   (csr_mepc       ),
 .cmp_eq     (alu_cmp_eq     ),
 .cmp_lt     (alu_cmp_lt     ),
 .cmp_ltu    (alu_cmp_ltu    ),

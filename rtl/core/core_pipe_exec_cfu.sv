@@ -11,6 +11,8 @@ input  wire                 g_resetn    ,
 
 input  wire                 new_instr   , // Being fed a new instruction.
 
+input  wire [         XL:0] csr_mepc    , // Current trap vector addr
+
 input  wire                 cmp_eq      ,
 input  wire                 cmp_lt      ,
 input  wire                 cmp_ltu     ,
@@ -118,7 +120,7 @@ wire    n_cf_change_done = (cf_valid && cf_ack) || cf_change_done;
 
 assign  finished    = n_cf_change_done || trap_raise || branch_ignore;
 
-assign  cf_target   = target_addr;
+assign  cf_target   = cfu_mret ? csr_mepc : target_addr;
 
 assign  cf_valid    = branch_taken && !cf_change_done && valid;
 

@@ -76,7 +76,7 @@ wire [ CF_CAUSE_R:0] int_cause   ; // Cause code for the interrupt.
 wire [         XL:0] int_tvec    ; // Interrupt trap vector
 wire                 int_ack     ; // Interrupt taken acknowledge
 
-wire                 s2_flush    = cf_valid && cf_ack;
+wire                 s2_flush    = s3_cf_valid && s3_cf_ack;
 
 //
 // Inter-stage wiring
@@ -397,6 +397,8 @@ core_pipe_exec i_core_pipe_exec(
 .s2_cf_valid     (s2_cf_valid     ), // Control flow change?
 .s2_cf_ack       (s2_cf_ack       ), // Control flow acknwoledged
 .s2_cf_target    (s2_cf_target    ), // Control flow destination
+.s2_flush        (s2_flush        ), // Flush stage contents.
+.csr_mepc        (csr_mepc        ), // MRET return address
 .s2_ready        (s2_ready        ), // EX ready for new instruction
 .s2_valid        (s2_valid        ), // Decode -> EX instr valid.
 .s2_rs1_addr     (s2_rs1_addr     ), // RS1 address.
@@ -511,6 +513,10 @@ core_pipe_wb i_core_pipe_wb (
 .s3_cf_valid     (s3_cf_valid     ), // Control flow change?
 .s3_cf_ack       (s3_cf_ack       ), // Control flow acknwoledged
 .s3_cf_target    (s3_cf_target    ), // Control flow destination
+.int_pending     (int_pending     ), // To exec stage
+.int_cause       (int_cause       ), // Cause code for the interrupt.
+.int_tvec        (int_tvec        ), // Interrupt trap vector
+.int_ack         (int_ack         ), // Interrupt taken acknowledge
 .s3_valid        (s3_valid        ), // New instruction ready
 .s3_ready        (s3_ready        ), // WB ready for new instruciton.
 .s3_full         (s3_full         ), // WB has an instr in it.
@@ -536,6 +542,7 @@ core_pipe_wb i_core_pipe_wb (
 .csr_wdata       (csr_wdata       ), // Data to be written to a CSR
 .csr_rdata       (csr_rdata       ), // CSR read data
 .csr_error       (csr_error       ), // CSR access error.
+.mtvec_base      (mtvec_base      ), // Current MTVEC base address.
 .trap_cpu        (trap_cpu        ), // A trap occured due to CPU
 .trap_int        (trap_int        ), // A trap occured due to interrupt
 .trap_cause      (trap_cause      ), // A trap occured due to interrupt

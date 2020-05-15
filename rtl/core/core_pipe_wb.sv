@@ -14,6 +14,11 @@ output wire                 s3_cf_valid     , // Control flow change?
 input  wire                 s3_cf_ack       , // Control flow acknwoledged
 output wire [         XL:0] s3_cf_target    , // Control flow destination
 
+input  wire                 int_pending     , // Interrupt pending
+input  wire [ CF_CAUSE_R:0] int_cause       , // Cause code for the interrupt.
+input  wire [         XL:0] int_tvec        , // Interrupt trap vector
+output wire                 int_ack         , // Interrupt taken acknowledge
+
 input  wire                 s3_valid        , // New instruction ready
 output wire                 s3_ready        , // WB ready for new instruciton.
 input  wire                 s3_full         , // WB has an instr in it.
@@ -41,6 +46,8 @@ output wire [         11:0] csr_addr        , // Address of the CSR to access.
 output wire [         XL:0] csr_wdata       , // Data to be written to a CSR
 input  wire [         XL:0] csr_rdata       , // CSR read data
 input  wire                 csr_error       , // CSR access error
+
+input  wire [         XL:0] mtvec_base      , // Current trap vector addr
 
 output wire                 trap_cpu        , // trap occured due to CPU
 output wire                 trap_int        , // trap occured due to interrupt
@@ -206,23 +213,29 @@ assign      lsu_rdata      =
 // Control flow changes
 // ------------------------------------------------------------
 
-wire        cfu_wait  = 1'b0;
+wire        cfu_wait     = s3_cf_valid && !s3_cf_ack;
 
-assign      s3_cf_target = 0;
-assign      s3_cf_valid  = 0;
+assign      s3_cf_target = raise_int ? int_tvec : mtvec_base;
+assign      s3_cf_valid  = trap_cpu || raise_int;
 
-assign      exec_mret    = 1'b0;
+assign      exec_mret    = s3_cfu_op == CFU_OP_MRET && e_instr_ret;
 
 //
-// Traps
+// Traps and interrupts.
 // ------------------------------------------------------------
 
+wire   raise_int      = int_pending;
+
+assign int_ack        = raise_int && e_cf_change;
+
 // trap occured due to CPU
-assign trap_cpu       = s3_trap;
+assign trap_cpu       = s3_trap && !raise_int;
 
-assign trap_int       = 0 ; // trap occured due to interrupt
+assign trap_int       = int_ack; // trap occured due to interrupt
 
-assign trap_cause     = s3_trap ? {2'b00, s3_rd_addr} : 'b0 ;
+assign trap_cause     = raise_int ? int_cause           :
+                        s3_trap   ? {2'b00, s3_rd_addr} :
+                                    'b0                 ;
 
 assign trap_mtval     = 0 ;
 assign trap_pc        = s3_pc ;
