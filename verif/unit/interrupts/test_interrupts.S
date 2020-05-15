@@ -90,7 +90,7 @@ mtvec_trap_handler_unaligned:
     li t1, 1
     sw t1, 0(t0)
     
-    li t3, 0x00001008   // Set mtime cmp to something enormous.
+    li t3, 0x00010008   // Set mtime cmp to something enormous.
     li t4, -1
     sw t4, 0(t3)
     sw t4, 4(t3)
@@ -130,7 +130,7 @@ mtvec_trap_handler_aligned:
     addi t0, t0, 4
     csrw mepc, t0
     
-    li t3, 0x00001008   // Set mtime cmp to something enormous.
+    li t3, 0x00010008   // Set mtime cmp to something enormous.
     li t4, -1
     sw t4, 0(t3)
     sw t4, 4(t3)
