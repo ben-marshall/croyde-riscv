@@ -5,14 +5,9 @@
 
 ## RTL
 
-- [x] Fix fetch so that it only ever asks for addresses on a 64-bit boundary
-      and loads that data into the buffer as appropriate.
-
 - [ ] ALU
 
   - [ ] SLTU[.w] optimisation / reuse adder circuit
-
-  - [x] Shifts / optimise
 
 - [ ] M Extension
 
@@ -30,19 +25,21 @@
     - [ ] insn remuw
     - [ ] insn remw
 
-- [x] LSU address calculation in decode.
+- [ ] Configurable physical address bit width
 
-- [ ] Trap on bad jump/branch target address.
+  - [ ] Top level parameter
 
-- [ ] Interrupts
+  - [ ] Trap on bad jump/branch target address.
 
-  - [ ] Timer
+- [X] Interrupts
+
+  - [X] Timer
 
   - [ ] External
 
   - [ ] SW
 
-  - [ ] Vectoring
+  - [X] Vectoring
 
   - [ ] MIP.MSIP writing
 
@@ -50,11 +47,17 @@
 
 - [ ] Trace
 
+  - [ ] Fix tracing of instructions which trapped.
+
 - [ ] Core Complex
 
   - [ ] Integrated Memories
 
   - [ ] Debug
+
+- [ ] Performance Optmisations
+
+  - [ ] `c.add`, `c.ld/w/h/b[u]` fusion.
 
 - [ ] Energy Optimisations
 
@@ -73,10 +76,8 @@
 
 ## Verif
 
-- [x] RTL signal tracking from fetch to execute and retirement.
-
-- [x] riscv-formal wrapper.
-
+- [ ] rvfi - `pc_fwd`
+- [ ] rvfi - `liveness`
 - [ ] csrw mcycle
 - [ ] csrw minstret
 - [ ] insn div
@@ -92,10 +93,4 @@
 - [ ] insn remu
 - [ ] insn remuw
 - [ ] insn remw
-
-- [x] Designer assertions flow.
-
-  - [x] Memory interface formal checkers.
-
-  - [x] Control flow bus formal checkers.
 
