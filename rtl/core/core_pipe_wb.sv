@@ -141,26 +141,32 @@ assign  s3_rd_addr = s3_rd          ;
 // CSR Control
 // ------------------------------------------------------------
 
-reg     csr_op_done   ;
+reg     csr_op_done ;
+reg     r_csr_error ;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         csr_op_done <= 1'b0;
+        r_csr_error <= 1'b0;
     end else if(e_new_instr) begin
         csr_op_done <= 1'b0;
+        r_csr_error <= 1'b0;
     end else if(csr_en) begin
         csr_op_done <= 1'b1;
+        r_csr_error <= csr_error;
     end
 end
+wire    csr_trap    = csr_en     &&   csr_error ||
+                      csr_op_done&& r_csr_error ;
 
 wire    csr_op_rd   = s3_full && s3_csr_op[CSR_OP_RD ];
 wire    csr_op_wr   = s3_full && s3_csr_op[CSR_OP_WR ];
 wire    csr_op_set  = s3_full && s3_csr_op[CSR_OP_SET];
 wire    csr_op_clr  = s3_full && s3_csr_op[CSR_OP_CLR];
 
-assign  csr_en      = !csr_op_done && (
-        csr_op_rd || csr_op_wr || csr_op_set || csr_op_clr
-    );
+wire    csr_op_any  = csr_op_rd || csr_op_wr || csr_op_set || csr_op_clr;
+
+assign  csr_en      = !csr_op_done && csr_op_any;
 
 assign  csr_wr      = csr_op_wr     ;
 assign  csr_wr_set  = csr_op_set    ;
@@ -242,8 +248,8 @@ assign int_ack        = raise_int && e_cf_change;
 
 // trap occured due to CPU
 assign trap_cpu       = !raise_int && (
-    s3_trap                 ||
-    csr_en  && csr_error
+    s3_trap    ||
+    csr_trap
 );
 
 assign trap_int       = int_ack; // trap occured due to interrupt
