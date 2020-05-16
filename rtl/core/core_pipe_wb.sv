@@ -128,7 +128,7 @@ wire    wb_lsu     = s3_wb_op == WB_OP_LSU     ;
 wire    wb_csr     = s3_wb_op == WB_OP_CSR     ;
 
 assign  s3_rd_wen  = rd_wen_enable && (wb_wdata || lsu_wen || wb_csr) &&
-                     !(trap_cpu) && !trapped;
+                     !(trap_cpu) && !trapped && s3_full;
 
 assign  s3_rd_wdata=
     {XLEN{wb_wdata  }}  & s3_wdata  |
@@ -220,10 +220,20 @@ assign      lsu_rdata      =
 // Control flow changes
 // ------------------------------------------------------------
 
+reg         cf_done      ; // Enforce 1 control flow change per instruction.
+
+always @(posedge g_clk) begin
+    if(!g_resetn || e_new_instr) begin
+        cf_done <= 1'b0;
+    end else begin
+        cf_done <= cf_done || (s3_cf_valid && s3_cf_ack);
+    end
+end
+
 wire        cfu_wait     = s3_cf_valid && !s3_cf_ack;
 
 assign      s3_cf_target = raise_int ? int_tvec : mtvec_base;
-assign      s3_cf_valid  = trap_cpu || raise_int;
+assign      s3_cf_valid  = !cf_done && (trap_cpu || raise_int);
 
 assign      exec_mret    = s3_cfu_op == CFU_OP_MRET && e_instr_ret;
 
