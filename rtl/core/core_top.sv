@@ -745,9 +745,17 @@ always @(posedge g_clk) if(g_resetn && $past(g_resetn)) begin
 
     cover(cf_valid &&  cf_ack);
 
-    if($past(cf_valid) && !$past(cf_ack)) begin
+    if($past(s2_cf_valid) && !$past(s2_cf_ack)) begin
         
-        assert($stable(cf_target));
+        assert($stable(s2_cf_target));
+        assert($stable(s2_cf_valid ));
+
+    end
+
+    if($past(s3_cf_valid) && !$past(s3_cf_ack)) begin
+
+        assert($stable(s3_cf_target));
+        assert($stable(s3_cf_valid ));
 
     end
 
