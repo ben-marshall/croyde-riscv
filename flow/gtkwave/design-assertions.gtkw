@@ -1,22 +1,22 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sat May 16 15:46:45 2020
+[*] Sat May 16 16:16:50 2020
 [*]
-[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/design-assertions/memory_interface_task_prove_dmem/engine_0/trace.vcd"
-[dumpfile_mtime] "Sat May 16 15:44:19 2020"
-[dumpfile_size] 232870
+[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/design-assertions/control_flow_bus_task_prove/engine_0/trace.vcd"
+[dumpfile_mtime] "Sat May 16 16:15:58 2020"
+[dumpfile_size] 230582
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/design-assertions.gtkw"
-[timestart] 1
+[timestart] 0
 [size] 1920 1025
 [pos] -1 -1
-*-3.692941 64 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-4.000000 50 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] design_assertions_wrapper.
 [treeopen] design_assertions_wrapper.i_dut.
 [treeopen] design_assertions_wrapper.i_dut.i_core_pipe_decode.
 [treeopen] design_assertions_wrapper.i_dut.i_core_pipe_exec.
 [treeopen] design_assertions_wrapper.i_dut.i_core_pipe_fetch.
 [sst_width] 305
-[signals_width] 462
+[signals_width] 419
 [sst_expanded] 1
 [sst_vpaned_height] 187
 @28
@@ -143,32 +143,33 @@ design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_rd_addr[4:0]
 design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_rd_wdata[63:0]
 @28
 design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_rd_wen
-@800201
+@800200
 -Pipeline - Fetch
+@c00200
 -Memory Bus - Instructions
-@29
+@28
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.n_imem_req
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.imem_req
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.imem_gnt
-@23
+@22
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.imem_addr[63:0]
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.imem_rdata[63:0]
-@29
+@28
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.imem_err
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.imem_recv
-@23
+@22
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.n_imem_addr[63:0]
-@25
+@24
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.n_reqs_outstanding[1:0]
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.reqs_outstanding[1:0]
-@29
+@28
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.ignore_rsp
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.rsps_ignore[1:0]
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.first_req_post_cf
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.n_first_req_post_cf
-@1000201
+@1401200
 -Memory Bus - Instructions
-@c00201
+@c00200
 -Memory Bus - Data
 @22
 design_assertions_wrapper.i_dut.dmem_addr[63:0]
@@ -184,9 +185,9 @@ design_assertions_wrapper.i_dut.dmem_strb[7:0]
 design_assertions_wrapper.i_dut.dmem_wdata[63:0]
 @28
 design_assertions_wrapper.i_dut.dmem_wen
-@1401201
+@1401200
 -Memory Bus - Data
-@c00201
+@c00200
 -Buffer
 @28
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.buf_ready
@@ -227,18 +228,27 @@ design_assertions_wrapper.i_dut.i_core_pipe_fetch.i_core_pipe_fetch_buffer.fill_
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.i_core_pipe_fetch_buffer.flush
 @1401200
 -Buffer
-@1401201
 -Buffer
-@c00201
+@800200
 -Control Flow
 @28
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.cf_valid
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.cf_ack
 @22
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.cf_target[63:0]
-@1401201
+@28
+design_assertions_wrapper.i_dut.s2_cf_valid
+design_assertions_wrapper.i_dut.s2_cf_ack
+@22
+design_assertions_wrapper.i_dut.s2_cf_target[63:0]
+@28
+design_assertions_wrapper.i_dut.s3_cf_valid
+design_assertions_wrapper.i_dut.s3_cf_ack
+@22
+design_assertions_wrapper.i_dut.s3_cf_target[63:0]
+@1000200
 -Control Flow
-@c00201
+@c00200
 -Events
 @28
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.e_cf_change
@@ -246,20 +256,20 @@ design_assertions_wrapper.i_dut.i_core_pipe_fetch.e_imem_req
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.e_imem_recv
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.e_eat_2
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.e_eat_4
-@1401201
+@1401200
 -Events
-@c00201
+@c00200
 -Fetch -> Decode
 @22
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.s1_instr[31:0]
 @2022
 ^1 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.s1_instr[31:0]
-@1401201
+@1401200
 -Fetch -> Decode
-@1000201
+@1000200
 -Pipeline - Fetch
-@800200
+@c00200
 -Pipeline - Decode
 @28
 design_assertions_wrapper.i_dut.i_core_pipe_decode.g_clk
@@ -530,7 +540,6 @@ design_assertions_wrapper.i_dut.i_core_pipe_decode.s2_wb_npc
 -Writeback
 @1401200
 -Interface Execute
-@1000200
 -Pipeline - Decode
 @c00200
 -Pipeline  - Execute
@@ -599,7 +608,7 @@ design_assertions_wrapper.i_dut.i_core_pipe_exec.s2_alu_word
 design_assertions_wrapper.i_dut.i_core_pipe_exec.s2_alu_xor
 @1401200
 -ALU
-@c00200
+@800200
 -CFU
 @28
 design_assertions_wrapper.i_dut.i_core_pipe_exec.s2_cf_valid
@@ -637,7 +646,7 @@ design_assertions_wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_cfu.branch_tak
 design_assertions_wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_cfu.new_instr
 design_assertions_wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_cfu.cf_change_done
 design_assertions_wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_cfu.n_cf_change_done
-@1401200
+@1000200
 -CFU
 @c00200
 -CSR
@@ -726,7 +735,7 @@ design_assertions_wrapper.i_dut.i_core_pipe_exec.n_s3_trap
 -Next Stage
 @1401200
 -Pipeline  - Execute
-@c00200
+@800200
 -Pipeline - Writeback
 @28
 design_assertions_wrapper.i_dut.i_core_pipe_wb.g_clk
@@ -782,11 +791,6 @@ design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_cf_valid
 @28
 design_assertions_wrapper.i_dut.i_core_pipe_wb.dmem_req
 design_assertions_wrapper.i_dut.i_core_pipe_wb.dmem_gnt
-@c00200
--design_assertions_wrapper.i_dut.i_core_pipe_wb.dmem_addr
-@1401200
--group_end
-@28
 design_assertions_wrapper.i_dut.i_core_pipe_wb.dmem_wen
 @22
 design_assertions_wrapper.i_dut.i_core_pipe_wb.dmem_strb[7:0]
@@ -813,6 +817,7 @@ design_assertions_wrapper.i_dut.i_core_pipe_wb.csr_wr_clr
 design_assertions_wrapper.i_dut.i_core_pipe_wb.csr_wr_set
 @1401200
 -CSR
+@1000200
 -Pipeline - Writeback
 @c00200
 -GPRs
