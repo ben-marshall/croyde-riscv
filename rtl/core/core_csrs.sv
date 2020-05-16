@@ -378,7 +378,7 @@ wire [XL:0] reg_mepc = {
 // Allow forwarding of mepc value for case when mret is in
 // ex stage causing a CF change, and CSR write in wb stage writing
 // to mepc.
-assign      csr_mepc = wen_mepc ? n_mepc : {reg_mepc_mepc, 1'b0};
+assign      csr_mepc = wen_mepc ? {n_mepc,1'b0} : {reg_mepc_mepc, 1'b0};
 
 wire        wen_mepc = csr_wr  && csr_addr == ADDR_MEPC ||
                        trap_cpu                             ||
