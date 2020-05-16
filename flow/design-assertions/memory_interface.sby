@@ -5,7 +5,7 @@ task_cover_dmem  cover dmem
 task_prove_dmem  prove dmem
 
 [options]
-depth   15
+depth   6
 
 prove: mode bmc
 cover: mode cover
