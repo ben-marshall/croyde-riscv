@@ -64,6 +64,8 @@ wire    branch_conditional  = cfu_beq   || cfu_bge  || cfu_bgeu ||
 wire    branch_always       = cfu_j     || cfu_jal  || cfu_jalr ||
                               cfu_mret  || cfu_ebrk || cfu_ecall;
 
+wire    branch_trap         = cfu_ebrk  || cfu_ecall;
+
 //
 // Compute branch target address
 // ------------------------------------------------------------
@@ -89,7 +91,7 @@ assign  trap_cause          = cfu_ecall ? TRAP_ECALLM   :
 // ------------------------------------------------------------
 
 wire    branch_taken        =
-    branch_always                   ||
+    branch_always && !branch_trap   ||
     cfu_beq  &&  cmp_eq             ||
     cfu_bge  && (cmp_eq || !cmp_lt )||
     cfu_bgeu && (cmp_eq || !cmp_ltu)||
