@@ -3,7 +3,7 @@ task_cover cover
 task_prove prove
 
 [options]
-depth   20
+depth   7
 
 prove: mode bmc
 cover: mode cover
