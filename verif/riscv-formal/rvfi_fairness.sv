@@ -88,13 +88,22 @@ localparam MAX_DELAY_DMEM = 5;
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         delay_imem <= 0;
-        delay_dmem <= 0;
-    end else begin
-        delay_imem <= delay_imem + (imem_req && !imem_gnt);
-        delay_dmem <= delay_dmem + (dmem_req && !dmem_gnt);
+    end else if(imem_req && imem_gnt) begin
+        delay_imem <= 'b0;
+    end else if(imem_req && !imem_gnt) begin
+        delay_imem <= delay_imem + 1;
     end
-
     assume(delay_imem < MAX_DELAY_IMEM);
+end
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        delay_dmem <= 0;
+    end else if(dmem_req && dmem_gnt) begin
+        delay_dmem <= 'b0;
+    end else if(dmem_req && !dmem_gnt) begin
+        delay_dmem <= delay_dmem + 1;
+    end
     assume(delay_dmem < MAX_DELAY_DMEM);
 end
 
