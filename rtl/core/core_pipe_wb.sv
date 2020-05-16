@@ -96,7 +96,8 @@ output wire [         XL:0] trs_pc            // Instruction trace PC
 // A new instruction will arrive on the next cycle.
 wire   e_new_instr  =  s3_valid && s3_ready;
 
-wire   e_instr_ret  =  e_new_instr && s3_full;
+wire   e_instr_ret  =  e_new_instr && s3_full ||
+                       s3_full && trapped && e_cf_change;
 
 assign instr_ret    =  e_instr_ret;
 
@@ -127,7 +128,7 @@ wire    wb_lsu     = s3_wb_op == WB_OP_LSU     ;
 wire    wb_csr     = s3_wb_op == WB_OP_CSR     ;
 
 assign  s3_rd_wen  = rd_wen_enable && (wb_wdata || lsu_wen || wb_csr) &&
-                     !(trap_cpu) && s3_full;
+                     !(trap_cpu) && !trapped;
 
 assign  s3_rd_wdata=
     {XLEN{wb_wdata  }}  & s3_wdata  |
@@ -148,7 +149,7 @@ always @(posedge g_clk) begin
     end else if(e_new_instr) begin
         csr_op_done <= 1'b0;
     end else if(csr_en) begin
-        csr_op_done <= 1'b0;
+        csr_op_done <= 1'b1;
     end
 end
 
@@ -223,6 +224,17 @@ assign      exec_mret    = s3_cfu_op == CFU_OP_MRET && e_instr_ret;
 //
 // Traps and interrupts.
 // ------------------------------------------------------------
+
+wire   trapped        = trap_cpu || r_trapped;
+reg    r_trapped      ;
+
+always @(posedge g_clk) begin
+    if(!g_resetn || e_instr_ret) begin
+        r_trapped <= 1'b0;
+    end else begin
+        r_trapped <= trapped;
+    end
+end
 
 wire   raise_int      = int_pending;
 
