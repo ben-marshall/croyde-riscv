@@ -1,0 +1,37 @@
+os      : linux
+language: c
+dist    : bionic
+env     :
+  global:
+  - TOOLS_DIR: ~/tools
+  - VERILATOR_ROOT: ~/tools/verilator
+  - YOSYS_ROOT: ~/tools/yosys
+before_install :
+- sudo apt-get --yes install flex bison libfl2 libfl-dev perl build-essential clang bison flex libreadline-dev gawk tcl-dev libffi-dev graphviz xdot pkg-config python3 libboost-system-dev libboost-python-dev libboost-filesystem-dev zlib1g-dev
+jobs:
+  include:
+  - name: "Unit Tests"
+    script:
+    - source ./bin/install-verilator.sh
+    - source ./bin/conf.sh
+    - make verilator-build-core
+  - name: "Designer Assertions"
+    script:
+    - source ./bin/install-yosys.sh
+    - source ./bin/conf.sh
+    - echo "Designer assertions flow not implemented"
+  - name: "riscv-formal"
+    script:
+    - source ./bin/install-yosys.sh
+    - source ./bin/conf.sh
+    - echo "riscv-formal flow not implemented"
+  - name: "Synthesis"
+    script:
+    - source ./bin/install-yosys.sh
+    - source ./bin/conf.sh
+    - make synthesise-cmos
+cache   :
+  directories:
+  - ~/tools/verilator
+  - ~/tools/yosys
+

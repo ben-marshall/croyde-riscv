@@ -25,7 +25,7 @@ procs
 synth -top core_top
 
 # Map to CMOS cells
-abc -g cmos
+abc -g cmos4
 
 # Simple optimisations
 opt fast
@@ -34,5 +34,5 @@ write_verilog   $::env(SYNTH_DIR)/synth-cmos.v
 flatten
 
 # Statistics: size and latency
-tee -o $::env(SYNTH_DIR)/synth-cmos.rpt stat -tech cmos
+tee -o $::env(SYNTH_DIR)/synth-cmos.rpt stat
 tee -a $::env(SYNTH_DIR)/synth-cmos.rpt ltp  -noff

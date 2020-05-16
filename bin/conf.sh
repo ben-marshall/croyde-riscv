@@ -10,6 +10,10 @@ if [[ -z "$VERILATOR_ROOT" ]]; then
     export VERILATOR_ROOT=/home/ben/tools/verilator
 fi
 
+if [[ -z "$YOSYS_ROOT" ]]; then
+    export YOSYS_ROOT=/home/ben/tools/yosys
+fi
+
 export PATH=$RISCV:$PATH
 
 echo "------------------------[CPU Project Setup]--------------------------"

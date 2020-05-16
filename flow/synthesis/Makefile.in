@@ -11,7 +11,7 @@ SYNTH_VERILOG_OUT   = $(SYNTH_DIR)/synth-cmos.v
 $(SYNTH_VERILOG_OUT) : export SYNTH_DIR = $(REPO_WORK)/synthesise
 $(SYNTH_VERILOG_OUT) : $(SYNTH_SCRIPT) $(CPU_RTL_SRCS)
 	@mkdir -p $(dir $(SYNTH_VERILOG_OUT))
-	yosys -QT \
+	$(YOSYS_ROOT)/yosys -QT \
         -l $(SYNTH_LOG_OUT) \
         $(SYNTH_SCRIPT)
 
