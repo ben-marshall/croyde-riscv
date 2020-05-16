@@ -14,7 +14,7 @@ endef
 #
 # 1. Input SBY config file
 define map_da_target
-da_prove_$(notdir $(basename ${1}))
+da-prove-$(notdir $(basename ${1}))
 endef
 
 
@@ -38,5 +38,5 @@ endef
 
 $(foreach ASS,$(ASSERT_SBY_SRC),$(eval $(call add_assert_target,$(ASS))))
 
-design-assertions: $(DESIGN_ASSERTIONS)
+da-prove-all: $(DESIGN_ASSERTIONS)
 
