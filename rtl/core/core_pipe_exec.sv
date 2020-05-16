@@ -177,7 +177,8 @@ wire                 cfu_finished    ; // CFU instruction finished.
 // LSU interfacing
 // ------------------------------------------------------------
 
-wire        lsu_valid       = s2_valid && (s2_lsu_load || s2_lsu_store);
+wire        lsu_valid       =  s2_valid && !s3_trap && !s2_flush &&
+                              (s2_lsu_load || s2_lsu_store);
 wire        lsu_ready       ;
 wire        lsu_trap_addr   ;
 

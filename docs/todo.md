@@ -76,7 +76,7 @@
 
 ## Verif
 
-- [ ] rvfi - `pc_fwd`
+- [x] rvfi - `pc_fwd`
 - [ ] rvfi - `liveness`
 - [ ] csrw mcycle
 - [ ] csrw minstret
