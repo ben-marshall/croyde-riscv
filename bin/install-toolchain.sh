@@ -44,7 +44,7 @@ if [ ! -e $RISCV/bin/riscv64-unknown-elf-gcc ]; then
 
     ls $TOOLS_DIR
 
-    export RISCV=$TOOLS_DIR/$ARCHIVE_FOLDER
+    export RISCV=$ARCHIVE_FOLDER
 
     echo "Toolchain installed to '$RISCV'"
 
