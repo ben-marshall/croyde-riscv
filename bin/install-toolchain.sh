@@ -12,11 +12,13 @@ fi
 
 TC_URL=https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14.tar.gz
 TC_FILE=$TOOLS_DIR/toolchain.tar.gz
+ARCHIVE_FOLDER=$TOOLS_DIR/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14
 
 echo "------------------- Installing Tools --------------------------"
 echo "TOOLS_DIR         '$TOOLS_DIR'"
 echo "RISCV             '$RISCV'"
 echo "Toolchain URL     '$TC_URL'"
+echo "Archive Folder    '$ARCHIVE_FOLDER'"
 
 set -e
 
@@ -40,7 +42,8 @@ if [ ! -e $RISCV/bin/riscv64-unknown-elf-gcc ]; then
 
     tar -xzf $TC_FILE -C $TOOLS_DIR
 
-    mv $RV_DIR-* $RV_DIR
+    echo "mv $ARCHIVE_FOLDER $RV_DIR"
+    mv $ARCHIVE_FOLDER $RV_DIR
 
     export RISCV=$RV_DIR
 
