@@ -42,12 +42,11 @@ if [ ! -e $RISCV/bin/riscv64-unknown-elf-gcc ]; then
 
     tar -xzf $TC_FILE -C $TOOLS_DIR
 
-    echo "mv $ARCHIVE_FOLDER $RV_DIR"
-    mv $ARCHIVE_FOLDER $RV_DIR
+    ls $TOOLS_DIR
 
-    export RISCV=$RV_DIR
+    export RISCV=$TOOLS_DIR/$ARCHIVE_FOLDER
 
-    echo "Toolchain installed to '$RV_DIR'"
+    echo "Toolchain installed to '$RISCV'"
 
 else
 

@@ -15,8 +15,6 @@ jobs:
     script:
     - source ./bin/install-verilator.sh
     - source ./bin/install-toolchain.sh
-    - ls -l $RISCV
-    - ls -l $RISCV/bin
     - source ./bin/conf.sh
     - make verilator-build-core
     - make unit-tests-build
