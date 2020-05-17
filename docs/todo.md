@@ -31,18 +31,6 @@
 
   - [ ] Trap on bad jump/branch target address.
 
-- [X] Interrupts
-
-  - [X] Timer
-
-  - [ ] External
-
-  - [ ] SW
-
-  - [X] Vectoring
-
-  - [ ] MIP.MSIP writing
-
 - [ ] MPU
 
 - [ ] Trace
@@ -76,8 +64,6 @@
 
 ## Verif
 
-- [x] rvfi - `pc_fwd`
-- [ ] rvfi - `liveness`
 - [ ] csrw mcycle
 - [ ] csrw minstret
 - [ ] insn div
