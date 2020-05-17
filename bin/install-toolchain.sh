@@ -6,13 +6,13 @@ fi
 
 RV_DIR=$TOOLS_DIR/riscv64-unknown-elf
 
-if [[ -z "$RISCV" ]]; then
-    export RISCV=$RV_DIR
-fi
-
 TC_URL=https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14.tar.gz
 TC_FILE=$TOOLS_DIR/toolchain.tar.gz
 ARCHIVE_FOLDER=$TOOLS_DIR/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14
+
+if [[ -z "$RISCV" ]]; then
+    export RISCV=$ARCHIVE_FOLDER
+fi
 
 echo "------------------- Installing Tools --------------------------"
 echo "TOOLS_DIR         '$TOOLS_DIR'"
