@@ -5,7 +5,7 @@ if [[ -z "$TOOLS_DIR" ]]; then
 fi
 
 if [[ -z "$VERILATOR_ROOT" ]]; then
-    export VERILATOR_ROOT=~/$TOOLS_DIR/verilator
+    export VERILATOR_ROOT=$TOOLS_DIR/verilator
 fi
 
 VERILATOR_BIN=$VERILATOR_ROOT/bin/verilator

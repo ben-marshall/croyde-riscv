@@ -75,7 +75,9 @@ reg                 imem_req_r ;
 assign              imem_req   = imem_req_r;
 
 // Next instruction memory fetch request enable.
-wire                n_imem_req  = buf_ready || (imem_req && !imem_gnt);
+wire                n_imem_req  =  buf_ready                ||
+                                  (imem_req && !imem_gnt)   ||
+                                   e_cf_change              ;
 
 // Next instruction fetch address
 wire [MEM_ADDR_R:0] n_imem_addr = imem_addr + 8;
@@ -119,7 +121,7 @@ always @(posedge g_clk) begin
 
         if(|rsps_ignore) begin
             
-            rsps_ignore <= rsps_ignore - 1;
+            rsps_ignore <= rsps_ignore - 1 + e_cf_change;
 
         end else if(e_cf_change) begin
             

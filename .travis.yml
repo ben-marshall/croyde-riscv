@@ -6,6 +6,7 @@ env     :
   - TOOLS_DIR: ~/tools
   - VERILATOR_ROOT: ~/tools/verilator
   - YOSYS_ROOT: ~/tools/yosys
+  - RISCV: ~/tools/riscv64-unknown-elf
 before_install :
 - sudo apt-get --yes install flex bison libfl2 libfl-dev perl build-essential clang bison flex libreadline-dev gawk tcl-dev libffi-dev graphviz xdot pkg-config python3 libboost-system-dev libboost-python-dev libboost-filesystem-dev zlib1g-dev
 jobs:
@@ -13,8 +14,11 @@ jobs:
   - name: "Unit Tests"
     script:
     - source ./bin/install-verilator.sh
+    - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
     - make verilator-build-core
+    - make unit-tests-build
+    - make unit-tests-run
   - name: "Designer Assertions"
     script:
     - source ./bin/install-yosys.sh
@@ -34,4 +38,5 @@ cache   :
   directories:
   - ~/tools/verilator
   - ~/tools/yosys
+  - ~/tools/riscv64-unknown-elf
 
