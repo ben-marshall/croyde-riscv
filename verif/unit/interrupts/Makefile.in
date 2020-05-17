@@ -1,7 +1,0 @@
-
-TEST_NAME = interrupts
-TEST_SRC  = $(UNIT_ROOT)/interrupts/test_interrupts.c \
-            $(UNIT_ROOT)/interrupts/test_interrupts.S
-
-$(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
-

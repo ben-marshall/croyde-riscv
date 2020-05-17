@@ -98,8 +98,10 @@ include $(REPO_HOME)/verif/unit/example/Makefile.in
 include $(REPO_HOME)/verif/unit/mtime-read/Makefile.in
 include $(REPO_HOME)/verif/unit/mtime-write/Makefile.in
 include $(REPO_HOME)/verif/unit/counters/Makefile.in
-include $(REPO_HOME)/verif/unit/interrupts/Makefile.in
 include $(REPO_HOME)/verif/unit/timer/Makefile.in
+include $(REPO_HOME)/verif/unit/interrupts-enablebits/Makefile.in
+include $(REPO_HOME)/verif/unit/interrupts-timer-direct/Makefile.in
+include $(REPO_HOME)/verif/unit/interrupts-timer-vectored/Makefile.in
 
 .PHONY: unit-tests-build
 unit-tests-build: $(UNIT_TESTS)
