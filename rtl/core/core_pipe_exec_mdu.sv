@@ -75,9 +75,8 @@ end
 // Multiplier
 // ------------------------------------------------------------
 
-parameter MUL_UNROLL = 1;
+parameter MUL_UNROLL = 4;
 localparam MUL_END   = (MUL_UNROLL & 'd1) ==0 ? 0 : 1;
-localparam U         = MUL_UNROLL;
 
 wire        mul_start = valid && any_mul && !mul_run && !mul_done;
 wire        mul_hi    = op_mulh || op_mulhu || op_mulhsu;
@@ -98,13 +97,15 @@ reg  [XLEN:0] mul_sum;
 
 integer i;
 always @(*) begin
+    
+    n_mul_state = mul_state;
 
-    for(i = 0;i < MUL_UNROLL; i = i + 1) begin
-        to_add      = s_rs2[0] ? s_rs1 : 64'b0;
-        mul_sum     = mul_state[MW:XLEN] + to_add;
-        n_mul_state = {mul_sum, mul_state[XL:U]};
+    for(i = 0; i < MUL_UNROLL; i = i + 1) begin
+        to_add      = s_rs2[i] ? s_rs1 : 64'b0;
+        mul_sum     = n_mul_state[MW:XLEN] + to_add;
+        n_mul_state = {mul_sum, n_mul_state[XL:1]};
         n_rs1_mul   = s_rs1;
-        n_rs2_mul   = s_rs2 >> 1;
+        n_rs2_mul   = s_rs2 >> MUL_UNROLL;
     end
 end
 

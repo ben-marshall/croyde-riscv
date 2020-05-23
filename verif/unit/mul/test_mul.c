@@ -16,6 +16,7 @@ int test_main() {
     CHECK(in_mul,  0,  1);
     CHECK(in_mul,  1,  1);
     CHECK(in_mul,  2,  1);
+    CHECK(in_mul,  1,  2);
     CHECK(in_mul,  0, -1);
     CHECK(in_mul, -1,  0);
     CHECK(in_mul, -1,  1);
