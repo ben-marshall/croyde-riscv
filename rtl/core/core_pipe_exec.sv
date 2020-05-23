@@ -174,7 +174,7 @@ wire [XL:0] s2_mdu_rhs  = s2_alu_rhs;
 wire        mdu_ready   ;
 wire [XL:0] mdu_result  ;
 
-wire        mdu_flush   = 1'b0;
+wire        mdu_flush   = e_new_instr;
 
 //
 // CFU interfacing

@@ -75,41 +75,60 @@ end
 // Multiplier
 // ------------------------------------------------------------
 
-parameter MUL_UNROLL = 4;
+parameter MUL_UNROLL = 1;
+localparam MUL_END   = (MUL_UNROLL & 'd1) ==0 ? 0 : 1;
+localparam U         = MUL_UNROLL;
 
-wire        mul_start = valid && any_mul && !mul_run;
+wire        mul_start = valid && any_mul && !mul_run && !mul_done;
+wire        mul_hi    = op_mulh || op_mulhu || op_mulhsu;
+
+assign      result_mul= 
+    mul_hi && op_word ? {{32{mul_state[31]}}, mul_state[31:0]}  :
+    mul_hi            ? mul_state[MW:64]                        :
+                        mul_state[XL: 0]                        ;
 
 reg  [MW:0]   mul_state;
 reg  [MW:0] n_mul_state;
 
 reg         mul_run ;
 reg         mul_done;
-reg  [ 5:0] mul_ctr ;
+reg  [ 6:0] mul_ctr ;
+reg  [XL:0] to_add  ;
+reg  [XLEN:0] mul_sum;
 
+integer i;
 always @(*) begin
-    // FIXME
-    n_mul_state = mul_state + 1;
-    n_rs1_mul   = s_rs1 >> 1;
-    n_rs2_mul   = s_rs2 << 1;
+
+    for(i = 0;i < MUL_UNROLL; i = i + 1) begin
+        to_add      = s_rs2[0] ? s_rs1 : 64'b0;
+        mul_sum     = mul_state[MW:XLEN] + to_add;
+        n_mul_state = {mul_sum, mul_state[XL:U]};
+        n_rs1_mul   = s_rs1;
+        n_rs2_mul   = s_rs2 >> 1;
+    end
 end
 
 always @(posedge g_clk) begin
     if (!g_resetn || flush) begin
         mul_run     <= 1'b0;
         mul_done    <= 1'b0;
-        mul_ctr     <= 6'd0;
+        mul_ctr     <= 'd0;
         mul_state   <= {MLEN{1'b0}};
     end else if (mul_start) begin
         mul_run     <= 1'b1;
         mul_done    <= 1'b0;
-        mul_ctr     <= op_word ? 6'd63 : 6'd31;
+        mul_state   <= 'b0;
+        mul_ctr     <= op_word ? 'd32 : 'd64;
     end else if(mul_run) begin
-        mul_state <= n_mul_state;
-        if(mul_ctr == 0) begin
+        if(mul_ctr == MUL_END) begin
             mul_done    <= 1'b1;
             mul_run     <= 1'b0;
+            if(MUL_UNROLL == 1) begin
+                mul_state   <= n_mul_state;
+            end
         end else begin
-            mul_ctr     <= mul_ctr - 1;
+            mul_ctr     <= mul_ctr - MUL_UNROLL;
+            mul_state   <= n_mul_state;
         end
     end
 end
