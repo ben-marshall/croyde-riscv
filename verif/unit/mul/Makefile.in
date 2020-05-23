@@ -1,0 +1,7 @@
+
+TEST_NAME = mul
+TEST_SRC  = $(UNIT_ROOT)/mul/test_mul.c
+
+$(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
+
+
