@@ -101,7 +101,7 @@ reg         mul_l_sign;
 reg         mul_r_sign;
 reg         sub_last  ;
 
-wire        lhs_signed = op_mulh;
+wire        lhs_signed = op_mulh || op_mulhsu;
 wire        rhs_signed = op_mulh;
 
 integer i;
