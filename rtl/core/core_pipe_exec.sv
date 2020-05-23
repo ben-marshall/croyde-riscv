@@ -164,6 +164,8 @@ wire        mdu_valid   =
     s2_mdu_mulw     || s2_mdu_divw     || s2_mdu_divuw    || s2_mdu_remw  ||
     s2_mdu_remuw    ;
 
+wire        mdu_mul     = s2_mdu_mulw || s2_mdu_mul;
+
 wire        mdu_word    =
     s2_mdu_mulw     || s2_mdu_divw     || s2_mdu_divuw    || s2_mdu_remw  ||
     s2_mdu_remuw    ;
@@ -358,7 +360,7 @@ core_pipe_exec_mdu i_core_pipe_exec_mdu(
 .flush      (mdu_flush      ) , // Flush and stop any execution.
 .valid      (mdu_valid      ) , // Inputs are valid.
 .op_word    (mdu_word       ) , // word-wise operation on 32-bit data.
-.op_mul     (s2_mdu_mul     ) , //
+.op_mul     (mdu_mul        ) , //
 .op_mulh    (s2_mdu_mulh    ) , //
 .op_mulhu   (s2_mdu_mulhu   ) , //
 .op_mulhsu  (s2_mdu_mulhsu  ) , //

@@ -82,7 +82,7 @@ wire        mul_start = valid && any_mul && !mul_run && !mul_done;
 wire        mul_hi    = op_mulh || op_mulhu || op_mulhsu;
 
 assign      result_mul= 
-    mul_hi && op_word ? {{32{mul_state[31]}}, mul_state[31:0]}  :
+              op_word ? {{32{mul_state[XL]}}, mul_state[XL:32]} :
     mul_hi            ? mul_state[MW:64]                        :
                         mul_state[XL: 0]                        ;
 
@@ -93,16 +93,36 @@ reg         mul_run ;
 reg         mul_done;
 reg  [ 6:0] mul_ctr ;
 reg  [XL:0] to_add  ;
+reg  [XLEN:0] mul_add_l;
+reg  [XLEN:0] mul_add_r;
 reg  [XLEN:0] mul_sum;
+
+reg         mul_l_sign;
+reg         mul_r_sign;
+reg         sub_last  ;
+
+wire        lhs_signed = op_mulh;
+wire        rhs_signed = op_mulh;
 
 integer i;
 always @(*) begin
     
     n_mul_state = mul_state;
+    sub_last    = 1'b0;
 
     for(i = 0; i < MUL_UNROLL; i = i + 1) begin
+        sub_last    = i == (MUL_UNROLL - 1) &&
+                      mul_ctr == MUL_UNROLL &&
+                      rhs_signed && s_rs2[MUL_UNROLL-1];
         to_add      = s_rs2[i] ? s_rs1 : 64'b0;
-        mul_sum     = n_mul_state[MW:XLEN] + to_add;
+        mul_l_sign  = lhs_signed ? n_mul_state[MW] : 1'b0;
+        mul_r_sign  = rhs_signed ? to_add[XL]      : 1'b0;
+        mul_add_l   = {mul_l_sign,n_mul_state[MW:XLEN]};
+        mul_add_r   = {mul_r_sign,to_add              };
+        if(sub_last) begin
+            mul_add_r = ~mul_add_r;
+        end
+        mul_sum     = mul_add_l + mul_add_r + {64'b0,sub_last};
         n_mul_state = {mul_sum, n_mul_state[XL:1]};
         n_rs1_mul   = s_rs1;
         n_rs2_mul   = s_rs2 >> MUL_UNROLL;
