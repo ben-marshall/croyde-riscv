@@ -15,11 +15,11 @@
     - [ ] insn divu
     - [ ] insn divuw
     - [ ] insn divw
-    - [ ] insn mul
-    - [ ] insn mulh
-    - [ ] insn mulhsu
-    - [ ] insn mulhu
-    - [ ] insn mulw
+    - [x] insn mul
+    - [x] insn mulh
+    - [x] insn mulhsu
+    - [x] insn mulhu
+    - [x] insn mulw
     - [ ] insn rem
     - [ ] insn remu
     - [ ] insn remuw
