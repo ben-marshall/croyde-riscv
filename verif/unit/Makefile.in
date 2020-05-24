@@ -96,6 +96,7 @@ endef
 
 include $(REPO_HOME)/verif/unit/example/Makefile.in
 include $(REPO_HOME)/verif/unit/mul/Makefile.in
+include $(REPO_HOME)/verif/unit/div/Makefile.in
 include $(REPO_HOME)/verif/unit/mtime-read/Makefile.in
 include $(REPO_HOME)/verif/unit/mtime-write/Makefile.in
 include $(REPO_HOME)/verif/unit/counters/Makefile.in
