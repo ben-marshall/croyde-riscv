@@ -46,7 +46,9 @@ wire        any_mul     = op_mul || op_mulh || op_mulhu || op_mulhsu;
 
 assign      rd          = any_mul ? result_mul  : result_div;
 
-assign      ready       = any_mul ? mul_done    : 1'b0      ;
+assign      ready       = any_mul ? mul_done    :
+                          any_div ? div_done    : 
+                                    1'b0        ;
 
 //
 // Argument storage
@@ -58,10 +60,16 @@ reg [XL:0] s_rs2;
 reg [XL:0] n_rs1_mul;
 reg [XL:0] n_rs2_mul;
 
+wire [XL:0] n_rs1_div;
+wire [XL:0] n_rs2_div;
+
 always @(posedge g_clk) begin
     if(!g_resetn || flush) begin
         s_rs1 <= {XLEN{1'b0}};
         s_rs2 <= {XLEN{1'b0}};
+    end else if(div_start || div_run) begin
+        s_rs1 <= n_rs1_div;
+        s_rs2 <= n_rs2_div;
     end else if(mul_start) begin
         s_rs1 <= rs1;
         s_rs2 <= rs2;
@@ -150,6 +158,91 @@ always @(posedge g_clk) begin
         end else begin
             mul_ctr     <= mul_ctr - MUL_UNROLL;
             mul_state   <= n_mul_state;
+        end
+    end
+end
+
+
+//
+// Divider
+// ------------------------------------------------------------
+
+// rs1 = dividend
+// rs2 = divisor
+
+reg     [MW:0]  divisor ;
+reg     [MW:0]n_divisor ;
+
+wire    [XL:0]  dividend    = s_rs1;
+reg     [XL:0]n_dividend    ;
+assign        n_rs1_div     = n_dividend;
+
+wire    [XL:0]  quotient     = s_rs2;
+reg     [XL:0]n_quotient    ;
+assign        n_rs2_div     = n_quotient;
+
+
+wire            div_start   = valid && any_div && !div_run && !div_done;
+wire            div_signed  = op_div || op_rem;
+wire            div_sign_lhs= div_signed && (op_word ? rs1[31] : rs1[XL]);
+wire            div_sign_rhs= div_signed && (op_word ? rs2[31] : rs2[XL]);
+
+wire            div_div     = op_div || op_divu;
+wire            div_rem     = op_rem || op_remu;
+
+wire            div_less    = divisor <= {{XLEN{1'b0}},dividend};
+
+wire    [XL:0]  qmask       = 64'b1 << (div_ctr-1);
+
+wire            div_rs2_nz  = op_word ? |rs2[31:0] : |rs2;
+
+wire            div_outsign = 
+    div_div ? div_sign_lhs != div_sign_rhs && div_rs2_nz    :
+              div_sign_lhs                                  ;
+
+reg         div_run ;
+reg         div_done;
+reg  [ 6:0] div_ctr ;
+
+wire    [XL:0] div_div_out = div_outsign ? -dividend : dividend;
+wire    [XL:0] div_qot_out = div_outsign ? -quotient : quotient;
+
+assign      result_div = div_div ? div_qot_out : div_div_out;
+
+always @(*) begin
+    if(div_start) begin
+        n_dividend  = div_sign_lhs ? -rs1 : rs1;
+        n_divisor   = (div_sign_rhs ? -{{XLEN{div_sign_rhs}}, rs2}:
+                                       {{XLEN{1'b0        }}, rs2}) << XL;
+        n_quotient  = 'b0;
+    end else if(div_run) begin
+
+        if(div_less) begin
+            n_dividend = dividend - divisor[XL:0];
+            n_quotient = quotient | qmask;
+        end
+
+        n_divisor = divisor >> 1;
+
+    end
+end
+
+always @(posedge g_clk) begin
+    if(!g_resetn || flush) begin
+        div_run     <= 1'b0;
+        div_done    <= 1'b0;
+        div_ctr     <= 'b0;
+    end else if(div_start) begin
+        div_run     <= 1'b1;
+        div_ctr     <= op_word ? 'd32 : 'd64;
+        divisor     <= n_divisor ;
+    end else if(div_run) begin
+        if(div_ctr == 0) begin
+            div_done<= 1'b1;
+            div_run <= 1'b0;
+        end else begin
+            divisor <= n_divisor ;
+            div_ctr <= div_ctr - 7'd1;
         end
     end
 end

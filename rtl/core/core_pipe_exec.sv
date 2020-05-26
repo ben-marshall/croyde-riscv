@@ -164,7 +164,11 @@ wire        mdu_valid   =
     s2_mdu_mulw     || s2_mdu_divw     || s2_mdu_divuw    || s2_mdu_remw  ||
     s2_mdu_remuw    ;
 
-wire        mdu_mul     = s2_mdu_mulw || s2_mdu_mul;
+wire        mdu_mul     = s2_mdu_mulw || s2_mdu_mul     ;
+wire        mdu_div     = s2_mdu_div  || s2_mdu_divw    ;
+wire        mdu_divu    = s2_mdu_divu || s2_mdu_divuw   ;
+wire        mdu_rem     = s2_mdu_rem  || s2_mdu_remw    ;
+wire        mdu_remu    = s2_mdu_remu || s2_mdu_remuw   ;
 
 wire        mdu_word    =
     s2_mdu_mulw     || s2_mdu_divw     || s2_mdu_divuw    || s2_mdu_remw  ||
@@ -364,10 +368,10 @@ core_pipe_exec_mdu i_core_pipe_exec_mdu(
 .op_mulh    (s2_mdu_mulh    ) , //
 .op_mulhu   (s2_mdu_mulhu   ) , //
 .op_mulhsu  (s2_mdu_mulhsu  ) , //
-.op_div     (s2_mdu_div     ) , //
-.op_divu    (s2_mdu_divu    ) , //
-.op_rem     (s2_mdu_rem     ) , //
-.op_remu    (s2_mdu_remu    ) , //
+.op_div     (mdu_div        ) , //
+.op_divu    (mdu_divu       ) , //
+.op_rem     (mdu_rem        ) , //
+.op_remu    (mdu_remu       ) , //
 .rs1        (s2_mdu_lhs     ) , // Source register 1
 .rs2        (s2_mdu_rhs     ) , // Source register 2
 .ready      (mdu_ready      ) , // Finished computing
