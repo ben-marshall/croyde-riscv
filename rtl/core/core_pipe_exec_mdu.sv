@@ -210,11 +210,16 @@ wire    [XL:0] div_qot_out = div_outsign ? -quotient : quotient;
 assign      result_div = div_div ? div_qot_out : div_div_out;
 
 always @(*) begin
+    n_dividend = dividend;
+    n_quotient = quotient;
+    n_divisor = divisor >> 1;
+
     if(div_start) begin
         n_dividend  = div_sign_lhs ? -rs1 : rs1;
         n_divisor   = (div_sign_rhs ? -{{XLEN{div_sign_rhs}}, rs2}:
                                        {{XLEN{1'b0        }}, rs2}) << XL;
         n_quotient  = 'b0;
+
     end else if(div_run) begin
 
         if(div_less) begin
@@ -222,10 +227,9 @@ always @(*) begin
             n_quotient = quotient | qmask;
         end
 
-        n_divisor = divisor >> 1;
-
     end
 end
+
 
 always @(posedge g_clk) begin
     if(!g_resetn || flush) begin
