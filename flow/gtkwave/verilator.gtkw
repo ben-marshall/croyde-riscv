@@ -1,28 +1,28 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sun May 24 10:34:46 2020
+[*] Tue May 26 20:30:11 2020
 [*]
-[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/unit/mul/mul.vcd"
-[dumpfile_mtime] "Sun May 24 10:31:16 2020"
-[dumpfile_size] 2303196
+[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/unit/div/div.vcd"
+[dumpfile_mtime] "Tue May 26 18:16:35 2020"
+[dumpfile_size] 2716844
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/verilator.gtkw"
-[timestart] 19090
+[timestart] 13140
 [size] 1920 1025
 [pos] -1 -1
-*-6.859876 19175 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-11.601840 16450 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.core_top.
 [treeopen] TOP.core_top.i_core_pipe_exec.
 [treeopen] TOP.core_top.i_core_pipe_fetch.
 [sst_width] 305
-[signals_width] 462
+[signals_width] 484
 [sst_expanded] 1
 [sst_vpaned_height] 187
 @28
 TOP.core_top.i_core_pipe_fetch.g_clk
 TOP.core_top.i_core_pipe_fetch.g_resetn
 @c02022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
+^1 /home/ben/projects/riscv/cores/uc64/work/unit/div/div.gtkwl
 TOP.core_top.trs_instr[31:0]
 @28
 (0)TOP.core_top.trs_instr[31:0]
@@ -250,7 +250,7 @@ TOP.core_top.i_core_pipe_fetch.s1_ferr[1:0]
 @22
 TOP.core_top.i_core_pipe_fetch.s1_instr[31:0]
 @2022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
+^3 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
 TOP.core_top.i_core_pipe_fetch.s1_instr[31:0]
 @1401200
 -Fetch -> Decode
@@ -441,7 +441,7 @@ TOP.core_top.i_core_pipe_decode.s2_flush
 @22
 TOP.core_top.i_core_pipe_decode.s2_imm[63:0]
 @2022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
+^3 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
 TOP.core_top.i_core_pipe_decode.s2_instr[31:0]
 @22
 TOP.core_top.i_core_pipe_decode.s2_npc[63:0]
@@ -558,7 +558,7 @@ TOP.core_top.i_core_pipe_exec.e_pipe_progress
 @22
 TOP.core_top.i_core_pipe_exec.s2_imm[63:0]
 @2022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
+^1 /home/ben/projects/riscv/cores/uc64/work/unit/div/div.gtkwl
 TOP.core_top.i_core_pipe_exec.s2_instr[31:0]
 @22
 TOP.core_top.i_core_pipe_exec.s2_instr[31:0]
@@ -719,7 +719,7 @@ TOP.core_top.i_core_pipe_exec.s2_mdu_rem
 TOP.core_top.i_core_pipe_exec.s2_mdu_remu
 TOP.core_top.i_core_pipe_exec.s2_mdu_remuw
 TOP.core_top.i_core_pipe_exec.s2_mdu_remw
-@800200
+@c00200
 -MDU - Multiplier
 @28
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.mul_start
@@ -731,7 +731,7 @@ TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.sub_last
 @22
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.mul_add_l[64:0]
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.mul_add_r[64:0]
-@25
+@24
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.mul_ctr[6:0]
 @28
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.mul_hi
@@ -743,8 +743,38 @@ TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.mul_sum[64:0]
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.n_mul_state[127:0]
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.n_rs1_mul[63:0]
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.n_rs2_mul[63:0]
-@1000200
+@1401200
 -MDU - Multiplier
+@800200
+-MDU -  Divider
+@28
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.any_div
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.div_start
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.div_run
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.div_done
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.div_sign_lhs
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.div_sign_rhs
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.div_outsign
+@24
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.div_ctr[6:0]
+@22
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.qmask[63:0]
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.n_rs1_div[63:0]
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.n_rs2_div[63:0]
+@28
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.op_div
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.op_divu
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.div_less
+@22
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.dividend[63:0]
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.divisor[127:0]
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.quotient[63:0]
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.n_dividend[63:0]
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.n_divisor[127:0]
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.n_quotient[63:0]
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.result_div[63:0]
+@1000200
+-MDU -  Divider
 -MDU
 @c00200
 -Writeback
@@ -796,7 +826,7 @@ TOP.core_top.i_core_pipe_wb.s3_csr_op[3:0]
 @28
 TOP.core_top.i_core_pipe_wb.s3_full
 @2022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
+^3 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
 TOP.core_top.i_core_pipe_wb.s3_instr[31:0]
 @22
 TOP.core_top.i_core_pipe_wb.s3_pc[63:0]
