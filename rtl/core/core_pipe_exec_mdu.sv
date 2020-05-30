@@ -132,23 +132,24 @@ assign      result_mul=
     mul_hi  ?                       mdu_state[MW:64]  :
                                     mdu_state[XL: 0]  ;
 
-reg  [MW:0] n_mul_state;
-
 wire      n_mul_done= mdu_ctr == MUL_END && mul_run;
 
-reg           mul_run ;
-reg           mul_done;
-reg  [  XL:0] to_add  ;
-reg  [XLEN:0] mul_add_l;
-reg  [XLEN:0] mul_add_r;
-reg  [XLEN:0] mul_sum;
+reg           mul_run   ; // Is the multiplier currently running?
+reg           mul_done  ; // Is the multiplier complete.
+reg  [  XL:0] to_add    ; // The thing added to current accumulator.
+reg  [XLEN:0] mul_add_l ; // Left hand side of multiply addition.
+reg  [XLEN:0] mul_add_r ; // Right hand side of multiply addition.
+reg  [XLEN:0] mul_sum   ; // Output of multiply addition.
+reg           sub_last  ; // Subtract during final iteration? 
 
-reg         mul_l_sign;
-reg         mul_r_sign;
-reg         sub_last  ;
+// Treat inputs as signed?
+wire          lhs_signed = op_mulh || op_mulhsu;
+wire          rhs_signed = op_mulh;
 
-wire        lhs_signed = op_mulh || op_mulhsu;
-wire        rhs_signed = op_mulh;
+reg           mul_l_sign; // Sign of current left operand.
+reg           mul_r_sign; // Sign of current right operand.
+
+reg  [MW:0]  n_mul_state;
 
 integer i;
 always @(*) begin
@@ -160,9 +161,9 @@ always @(*) begin
         sub_last    = i == (MUL_UNROLL - 1) &&
                       mdu_ctr == MUL_UNROLL &&
                       rhs_signed && s_rs2[MUL_UNROLL-1];
-        to_add      = s_rs2[i] ? s_rs1 : 64'b0;
-        mul_l_sign  = lhs_signed ? n_mul_state[MW] : 1'b0;
-        mul_r_sign  = rhs_signed ? to_add[XL]      : 1'b0;
+        to_add      = s_rs2[i]   ? s_rs1           : 64'b0  ;
+        mul_l_sign  = lhs_signed ? n_mul_state[MW] : 1'b0   ;
+        mul_r_sign  = rhs_signed ? to_add[XL]      : 1'b0   ;
         mul_add_l   = {mul_l_sign,n_mul_state[MW:XLEN]};
         mul_add_r   = {mul_r_sign,to_add              };
         if(sub_last) begin
