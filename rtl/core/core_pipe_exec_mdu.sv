@@ -247,6 +247,7 @@ wire            div_outsign =
               (div_sign_lhs                )                  ;
 
 wire    [XL:0] neg_rs1      = -(op_word ? {{32{rs1[31]}},rs1[31:0]} : rs1);
+wire    [XL:0] neg_rs2      = -(op_word ? {{32{rs2[31]}},rs2[31:0]} : rs2);
 
 wire    [XL:0] div_out      = div_div     ? quotient  : dividend;
 
@@ -263,17 +264,16 @@ always @(*) begin
     n_divisor  = divisor >> 1;
 
     if(div_start) begin
-        if(op_word) begin
-            n_dividend = div_sign_lhs ? {        neg_rs1      } :
-                                        { 32'b0,     rs1[31:0]} ;
-            n_divisor  = (div_sign_rhs ? -{{XLEN+32{div_sign_rhs}}, rs2[31:0]}:
-                                          {{XLEN+32{1'b0        }}, rs2[31:0]}) << 31;
-        end else begin
-            n_dividend = div_sign_lhs ? neg_rs1 : rs1;
-            n_divisor  = (div_sign_rhs ? -{{XLEN{div_sign_rhs}}, rs2}:
-                                          {{XLEN{1'b0        }}, rs2}) << XL;
-        end
-        n_quotient  = 'b0;
+      n_dividend = div_sign_lhs ? neg_rs1                               :
+                                  rs1 & {{32{!op_word}}, {32{1'b1}}}    ;
+      if(op_word) begin
+          n_divisor  =(div_sign_rhs?{{XLEN+32{neg_rs2[32] }},neg_rs2[31:0]}:
+                                    {{XLEN+32{1'b0        }},rs2[31:0]}) << 31;
+      end else begin
+          n_divisor  = (div_sign_rhs ? -{{XLEN{div_sign_rhs}}, rs2}:
+                                        {{XLEN{1'b0        }}, rs2}) << XL;
+      end
+      n_quotient  = 'b0;
 
     end else if(div_run) begin
 
