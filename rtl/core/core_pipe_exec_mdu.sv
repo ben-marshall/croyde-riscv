@@ -64,7 +64,6 @@ wire [XL:0] n_rs1_div;
 wire [XL:0] n_rs2_div;
 
 reg  [MW:0]   mdu_state;
-wire [MW:0] n_mdu_state_div;
 
 always @(posedge g_clk) begin
     if(!g_resetn || flush) begin
@@ -73,7 +72,7 @@ always @(posedge g_clk) begin
     end else if(div_start || div_run) begin
         s_rs1       <= n_rs1_div;
         s_rs2       <= n_rs2_div;
-        mdu_state   <= n_mdu_state_div;
+        mdu_state   <= n_divisor;
     end else if(mul_start) begin
         s_rs1       <= rs1;
         s_rs2       <= rs2;
@@ -84,10 +83,6 @@ always @(posedge g_clk) begin
         if(!n_mul_done || MUL_UNROLL == 1) begin
             mdu_state   <= n_mul_state;
         end
-    end else if(div_run) begin
-        s_rs1       <= n_rs1_div;
-        s_rs2       <= n_rs2_div;
-        mdu_state   <= n_mdu_state_div;
     end
 end
 
@@ -177,7 +172,7 @@ end
 // rs1 = dividend
 // rs2 = divisor
 
-reg     [MW: 0]  divisor ;
+wire    [MW: 0]  divisor = mdu_state ;
 reg     [MW: 0]n_divisor ;
 
 wire    [XL: 0]  dividend    = s_rs1;
@@ -272,13 +267,11 @@ always @(posedge g_clk) begin
     end else if(div_start) begin
         div_run     <= 1'b1;
         div_ctr     <= op_word ? 'd32 : 'd64;
-        divisor     <= n_divisor ;
     end else if(div_run) begin
         if(div_ctr == 0) begin
             div_done<= n_div_done;
             div_run <= 1'b0;
         end else begin
-            divisor <= n_divisor ;
             div_ctr <= div_ctr - 7'd1;
         end
     end
