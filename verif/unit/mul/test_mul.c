@@ -25,6 +25,7 @@ INSTR_INLINE(mulhsu)
     uint64_t grm    = EXP;                                      \
     uint64_t dut    = FN(rs1,rs2);                              \
     if(grm  !=   dut){                                          \
+        __putstr(#FN       );                  __putchar('\n'); \
         __putstr("RS1   : "); __puthex64(rs1); __putchar('\n'); \
         __putstr("RS2   : "); __puthex64(rs2); __putchar('\n'); \
         __putstr("Expect: "); __puthex64(grm); __putchar('\n'); \
@@ -97,34 +98,119 @@ int test_mulw () {
     return 0;
 }
 
+int test_mul() {
+    
+    CHECK_IS(mul , 0                 , 0x0               , 0x0               )
+    CHECK_IS(mul , 0                 , 0x0               , 0x1               )
+    CHECK_IS(mul , 0                 , 0x0               , -0x1              )
+    CHECK_IS(mul , 0                 , 0x0               , 0x7fffffffffffffff)
+    CHECK_IS(mul , 0                 , 0x0               , 0x8000000000000000)
+
+    CHECK_IS(mul , 0                 , 0x1               , 0x0               )
+    CHECK_IS(mul , 0x0000000000000001, 0x1               , 0x1               )
+    CHECK_IS(mul , 0xffffffffffffffff, 0x1               , -0x1              )
+    CHECK_IS(mul , 0x7fffffffffffffff, 0x1               , 0x7fffffffffffffff)
+    CHECK_IS(mul , 0x8000000000000000, 0x1               , 0x8000000000000000)
+
+    CHECK_IS(mul , 0                 , -0x1              , 0x0               )
+    CHECK_IS(mul , 0xffffffffffffffff, -0x1              , 0x1               )
+    CHECK_IS(mul , 0x0000000000000001, -0x1              , -0x1              )
+    CHECK_IS(mul , 0x8000000000000001, -0x1              , 0x7fffffffffffffff)
+    CHECK_IS(mul , 0x8000000000000000, -0x1              , 0x8000000000000000)
+
+    CHECK_IS(mul , 0                 , 0x7fffffffffffffff, 0x0               )
+    CHECK_IS(mul , 0x7fffffffffffffff, 0x7fffffffffffffff, 0x1               )
+    CHECK_IS(mul , 0x8000000000000001, 0x7fffffffffffffff, -0x1              )
+    CHECK_IS(mul , 0x0000000000000001, 0x7fffffffffffffff, 0x7fffffffffffffff)
+    CHECK_IS(mul , 0x8000000000000000, 0x7fffffffffffffff, 0x8000000000000000)
+
+    CHECK_IS(mul , 0                 , 0x8000000000000000, 0x0               )
+    CHECK_IS(mul , 0x8000000000000000, 0x8000000000000000, 0x1               )
+    CHECK_IS(mul , 0x8000000000000000, 0x8000000000000000, -0x1              )
+    CHECK_IS(mul , 0x8000000000000000, 0x8000000000000000, 0x7fffffffffffffff)
+    CHECK_IS(mul , 0                 , 0x8000000000000000, 0x8000000000000000)
+
+    return 0;
+
+}
+
+
+int test_mulh () {
+
+    CHECK_IS(mulh, 0                 , 0x0               , 0x0               )
+	CHECK_IS(mulh, 0                 , 0x0               , 0x1               )
+	CHECK_IS(mulh, 0                 , 0x0               , -0x1              )
+	CHECK_IS(mulh, 0                 , 0x0               , 0x7fffffffffffffff)
+	CHECK_IS(mulh, 0                 , 0x0               , 0x8000000000000000)
+
+	CHECK_IS(mulh, 0                 , 0x1               , 0x0               )
+	CHECK_IS(mulh, 0                 , 0x1               , 0x1               )
+	CHECK_IS(mulh, 0xffffffffffffffff, 0x1               , -0x1              )
+	CHECK_IS(mulh, 0                 , 0x1               , 0x7fffffffffffffff)
+	CHECK_IS(mulh, 0xffffffffffffffff, 0x1               , 0x8000000000000000)
+
+	CHECK_IS(mulh, 0                 , -0x1              , 0x0               )
+	CHECK_IS(mulh, 0xffffffffffffffff, -0x1              , 0x1               )
+	CHECK_IS(mulh, 0                 , -0x1              , -0x1              )
+	CHECK_IS(mulh, 0xffffffffffffffff, -0x1              , 0x7fffffffffffffff)
+	CHECK_IS(mulh, 0                 , -0x1              , 0x8000000000000000)
+
+	CHECK_IS(mulh, 0                 , 0x7fffffffffffffff, 0x0               )
+	CHECK_IS(mulh, 0                 , 0x7fffffffffffffff, 0x1               )
+	CHECK_IS(mulh, 0xffffffffffffffff, 0x7fffffffffffffff, -0x1              )
+	CHECK_IS(mulh, 0x3fffffffffffffff, 0x7fffffffffffffff, 0x7fffffffffffffff)
+	CHECK_IS(mulh, 0xc000000000000000, 0x7fffffffffffffff, 0x8000000000000000)
+
+	CHECK_IS(mulh, 0                 , 0x8000000000000000, 0x0               )
+	CHECK_IS(mulh, 0xffffffffffffffff, 0x8000000000000000, 0x1               )
+	CHECK_IS(mulh, 0                 , 0x8000000000000000, -0x1              )
+	CHECK_IS(mulh, 0xc000000000000000, 0x8000000000000000, 0x7fffffffffffffff)
+	CHECK_IS(mulh, 0x4000000000000000, 0x8000000000000000, 0x8000000000000000)
+
+
+}
+
+
+int test_mulhsu () {
+
+    CHECK_IS(mulhsu, 0                 ,0x0               , 0x0               )
+	CHECK_IS(mulhsu, 0                 ,0x0               , 0x1               )
+	CHECK_IS(mulhsu, 0                 ,0x0               , -0x1              )
+	CHECK_IS(mulhsu, 0                 ,0x0               , 0x7fffffffffffffff)
+	CHECK_IS(mulhsu, 0                 ,0x0               , 0x8000000000000000)
+
+	CHECK_IS(mulhsu, 0                 ,0x1               , 0x0               )
+	CHECK_IS(mulhsu, 0                 ,0x1               , 0x1               )
+	CHECK_IS(mulhsu, 0                 ,0x1               , -0x1              )
+	CHECK_IS(mulhsu, 0                 ,0x1               , 0x7fffffffffffffff)
+	CHECK_IS(mulhsu, 0                 ,0x1               , 0x8000000000000000)
+
+	CHECK_IS(mulhsu, 0                 ,-0x1              , 0x0               )
+	CHECK_IS(mulhsu, 0xffffffffffffffff,-0x1              , 0x1               )
+	CHECK_IS(mulhsu, 0xffffffffffffffff,-0x1              , -0x1              )
+	CHECK_IS(mulhsu, 0xffffffffffffffff,-0x1              , 0x7fffffffffffffff)
+	CHECK_IS(mulhsu, 0xffffffffffffffff,-0x1              , 0x8000000000000000)
+
+	CHECK_IS(mulhsu, 0                 ,0x7fffffffffffffff, 0x0               )
+	CHECK_IS(mulhsu, 0                 ,0x7fffffffffffffff, 0x1               )
+	CHECK_IS(mulhsu, 0x7ffffffffffffffe,0x7fffffffffffffff, -0x1              )
+	CHECK_IS(mulhsu, 0x3fffffffffffffff,0x7fffffffffffffff, 0x7fffffffffffffff)
+	CHECK_IS(mulhsu, 0x3fffffffffffffff,0x7fffffffffffffff, 0x8000000000000000)
+
+	CHECK_IS(mulhsu, 0                 ,0x8000000000000000, 0x0               )
+	CHECK_IS(mulhsu, 0xffffffffffffffff,0x8000000000000000, 0x1               )
+	CHECK_IS(mulhsu, 0x8000000000000000,0x8000000000000000, -0x1              )
+	CHECK_IS(mulhsu, 0xc000000000000000,0x8000000000000000, 0x7fffffffffffffff)
+	CHECK_IS(mulhsu, 0xc000000000000000,0x8000000000000000, 0x8000000000000000)
+
+}
+
 int test_main() {
 
     test_mulw  ();
-
-    CHECK_LO_SS(mul   ,  0,  0);
-    CHECK_LO_SS(mul   ,  1,  0);
-    CHECK_LO_SS(mul   ,  0,  1);
-    CHECK_LO_SS(mul   ,  1,  1);
-    CHECK_LO_SS(mul   ,  2,  1);
-    CHECK_LO_SS(mul   ,  1,  2);
-    CHECK_LO_SS(mul   ,  0, -1);
-    CHECK_LO_SS(mul   , -1,  0);
-    CHECK_LO_SS(mul   , -1,  1);
-    CHECK_LO_SS(mul   ,  1, -1);
-    CHECK_LO_SS(mul   , -1, -1);
-    
-    CHECK_HI_SS(mulh  ,  0,  0);
-    CHECK_HI_SS(mulh  ,  1,  0);
-    CHECK_HI_SS(mulh  ,  0,  1);
-    CHECK_HI_SS(mulh  ,  1,  1);
-    CHECK_HI_SS(mulh  ,  2,  1);
-    CHECK_HI_SS(mulh  ,  1,  2);
-    CHECK_HI_SS(mulh  ,  0, -1);
-    CHECK_HI_SS(mulh  , -1,  0);
-    CHECK_HI_SS(mulh  , -1,  1);
-    CHECK_HI_SS(mulh  ,  1, -1);
-    CHECK_HI_SS(mulh  , -1, -1);
-    CHECK_HI_SS(mulh  , -1, -1);
+    test_mul   ();
+    test_mulh  ();
+    test_mulhsu();
     
     CHECK_HI_UU(mulhu ,  0,  0, 0);
     CHECK_HI_UU(mulhu ,  1,  0, 0);
