@@ -51,31 +51,39 @@ assign      ready       = any_mul ? mul_done    :
                                     1'b0        ;
 
 //
-// Argument storage
+// Argument / Variable storage
 // ------------------------------------------------------------
 
-reg [XL:0] s_rs1;
-reg [XL:0] s_rs2;
+reg  [XL:0] s_rs1;
+reg  [XL:0] s_rs2;
 
-reg [XL:0] n_rs1_mul;
-reg [XL:0] n_rs2_mul;
+reg  [XL:0] n_rs1_mul;
+reg  [XL:0] n_rs2_mul;
 
 wire [XL:0] n_rs1_div;
 wire [XL:0] n_rs2_div;
 
+reg  [MW:0]   mdu_state;
+wire [MW:0] n_mdu_state_div;
+wire [MW:0] n_mdu_state_mul;
+wire [MW:0] n_mdu_state = any_div ? n_mdu_state_div : n_mdu_state_mul;
+
 always @(posedge g_clk) begin
     if(!g_resetn || flush) begin
-        s_rs1 <= {XLEN{1'b0}};
-        s_rs2 <= {XLEN{1'b0}};
+        s_rs1       <= {XLEN{1'b0}};
+        s_rs2       <= {XLEN{1'b0}};
     end else if(div_start || div_run) begin
-        s_rs1 <= n_rs1_div;
-        s_rs2 <= n_rs2_div;
+        s_rs1       <= n_rs1_div;
+        s_rs2       <= n_rs2_div;
+        mdu_state   <= n_mdu_state;
     end else if(mul_start) begin
-        s_rs1 <= rs1;
-        s_rs2 <= rs2;
+        s_rs1       <= rs1;
+        s_rs2       <= rs2;
+        mdu_state   <= n_mdu_state;
     end else if(mul_run) begin
-        s_rs1 <= n_rs1_mul;
-        s_rs2 <= n_rs2_mul;
+        s_rs1       <= n_rs1_mul;
+        s_rs2       <= n_rs2_mul;
+        mdu_state   <= n_mdu_state;
     end
 end
 
@@ -94,7 +102,7 @@ assign      result_mul=
     mul_hi            ? mul_state[MW:64]                        :
                         mul_state[XL: 0]                        ;
 
-reg  [MW:0]   mul_state;
+reg  [MW:0]   mul_state= mdu_state;
 reg  [MW:0] n_mul_state;
 
 reg         mul_run ;
@@ -170,40 +178,50 @@ end
 // rs1 = dividend
 // rs2 = divisor
 
-reg     [MW:0]  divisor ;
-reg     [MW:0]n_divisor ;
+reg     [MW: 0]  divisor ;
+reg     [MW: 0]n_divisor ;
 
-wire    [XL:0]  dividend    = s_rs1;
-reg     [XL:0]n_dividend    ;
-assign        n_rs1_div     = n_dividend;
+wire    [XL: 0]  dividend    = s_rs1;
+reg     [XL: 0]n_dividend    ;
+assign         n_rs1_div     = n_dividend;
 
-wire    [XL:0]  quotient     = s_rs2;
-reg     [XL:0]n_quotient    ;
-assign        n_rs2_div     = n_quotient;
+wire    [XL: 0]  quotient     = s_rs2;
+reg     [XL: 0]n_quotient    ;
+assign         n_rs2_div     = n_quotient;
 
+reg             div_run ;
+reg             div_done;
+wire          n_div_done = div_run && div_ctr == 0;
+reg     [ 6: 0] div_ctr ;
 
+// start the divider running?
 wire            div_start   = valid && any_div && !div_run && !div_done;
+
+// Are we doing a signed operation?
 wire            div_signed  = op_div || op_rem;
+
+// Sign of the left/right hand operands.
 wire            div_sign_lhs= div_signed && (op_word ? rs1[31] : rs1[XL]);
 wire            div_sign_rhs= div_signed && (op_word ? rs2[31] : rs2[XL]);
 
+//
+// Are we doing a division or a remainder op?
 wire            div_div     = op_div || op_divu;
 wire            div_rem     = op_rem || op_remu;
 
 wire            div_less    = divisor <= {{XLEN{1'b0}},dividend};
 
-wire    [XL:0]  qmask       = 64'b1 << (div_ctr-1);
+// Used to set bits of the quotient.
+wire    [XL: 0] qmask       = 64'b1 << (div_ctr-1);
 
+// Is rs2 *not* zero? Used to determine sign of output.
 wire            div_rs2_nz  = op_word ? |rs2[31:0] : |rs2;
 
+
+// Sign of the output for  division / remainder.
 wire            div_outsign = 
     div_div ? (div_sign_lhs != div_sign_rhs) && div_rs2_nz    :
               (div_sign_lhs                )                  ;
-
-reg         div_run ;
-reg         div_done;
-wire      n_div_done = div_run && div_ctr == 0;
-reg  [ 6:0] div_ctr ;
 
 wire    [XL:0] neg_rs1      = -(op_word ? {{32{rs1[31]}},rs1[31:0]} : rs1);
 
@@ -215,10 +233,12 @@ wire    [XL:0] div_pre_sext = div_div ? div_qot_out : div_div_out;
 assign         result_div   = 
     op_word ? { {32{div_pre_sext[31]}}, div_pre_sext[31:0]} : div_pre_sext;
 
+//
+// Next divider state values.
 always @(*) begin
     n_dividend = dividend;
     n_quotient = quotient;
-    n_divisor = divisor >> 1;
+    n_divisor  = divisor >> 1;
 
     if(div_start) begin
         if(op_word) begin
@@ -243,7 +263,8 @@ always @(*) begin
     end
 end
 
-
+//
+// Divider register updating
 always @(posedge g_clk) begin
     if(!g_resetn || flush) begin
         div_run     <= 1'b0;
