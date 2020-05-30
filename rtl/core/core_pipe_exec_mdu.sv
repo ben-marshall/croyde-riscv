@@ -87,6 +87,37 @@ always @(posedge g_clk) begin
 end
 
 //
+// Op counter
+// ------------------------------------------------------------
+
+reg  [ 6:0 ]    mdu_ctr ;
+reg             mdu_done;
+wire          n_mdu_done = n_mul_done || n_div_done;
+reg             mdu_run ;
+
+wire            mdu_start = mul_start || div_start;
+
+always @(posedge g_clk) begin
+    if (!g_resetn || flush) begin
+        mdu_run     <= 1'b0;
+        mdu_done    <= 1'b0;
+        mdu_ctr     <= 'd0;
+    end else if (mdu_start) begin
+        mdu_run     <= 1'b1;
+        mdu_done    <= 1'b0;
+        mdu_ctr     <= op_word ? 'd32 : 'd64;
+    end else if(mdu_run) begin
+        if(any_mul && mdu_ctr == MUL_END    ||
+           any_div && mdu_ctr ==       0    ) begin
+            mdu_done    <= n_mdu_done;
+            mdu_run     <= 1'b0;
+        end else begin
+            mdu_ctr     <= mdu_ctr - (any_mul ? MUL_UNROLL : 7'd1);
+        end
+    end
+end
+
+//
 // Multiplier
 // ------------------------------------------------------------
 
@@ -103,11 +134,10 @@ assign      result_mul=
 
 reg  [MW:0] n_mul_state;
 
-wire      n_mul_done= mul_ctr == MUL_END && mul_run;
+wire      n_mul_done= mdu_ctr == MUL_END && mul_run;
 
 reg           mul_run ;
 reg           mul_done;
-reg  [   6:0] mul_ctr ;
 reg  [  XL:0] to_add  ;
 reg  [XLEN:0] mul_add_l;
 reg  [XLEN:0] mul_add_r;
@@ -128,7 +158,7 @@ always @(*) begin
 
     for(i = 0; i < MUL_UNROLL; i = i + 1) begin
         sub_last    = i == (MUL_UNROLL - 1) &&
-                      mul_ctr == MUL_UNROLL &&
+                      mdu_ctr == MUL_UNROLL &&
                       rhs_signed && s_rs2[MUL_UNROLL-1];
         to_add      = s_rs2[i] ? s_rs1 : 64'b0;
         mul_l_sign  = lhs_signed ? n_mul_state[MW] : 1'b0;
@@ -149,17 +179,13 @@ always @(posedge g_clk) begin
     if (!g_resetn || flush) begin
         mul_run     <= 1'b0;
         mul_done    <= 1'b0;
-        mul_ctr     <= 'd0;
     end else if (mul_start) begin
         mul_run     <= 1'b1;
         mul_done    <= 1'b0;
-        mul_ctr     <= op_word ? 'd32 : 'd64;
     end else if(mul_run) begin
-        if(mul_ctr == MUL_END) begin
+        if(mdu_ctr == MUL_END) begin
             mul_done    <= n_mul_done;
             mul_run     <= 1'b0;
-        end else begin
-            mul_ctr     <= mul_ctr - MUL_UNROLL;
         end
     end
 end
@@ -185,8 +211,7 @@ assign         n_rs2_div     = n_quotient;
 
 reg             div_run ;
 reg             div_done;
-wire          n_div_done = div_run && div_ctr == 0;
-reg     [ 6: 0] div_ctr ;
+wire          n_div_done = div_run && mdu_ctr == 0;
 
 // start the divider running?
 wire            div_start   = valid && any_div && !div_run && !div_done;
@@ -206,7 +231,7 @@ wire            div_rem     = op_rem || op_remu;
 wire            div_less    = divisor <= {{XLEN{1'b0}},dividend};
 
 // Used to set bits of the quotient.
-wire    [XL: 0] qmask       = 64'b1 << (div_ctr-1);
+wire    [XL: 0] qmask       = 64'b1 << (mdu_ctr-1);
 
 // Is rs2 *not* zero? Used to determine sign of output.
 wire            div_rs2_nz  = op_word ? |rs2[31:0] : |rs2;
@@ -263,16 +288,13 @@ always @(posedge g_clk) begin
     if(!g_resetn || flush) begin
         div_run     <= 1'b0;
         div_done    <= 1'b0;
-        div_ctr     <= 'b0;
     end else if(div_start) begin
         div_run     <= 1'b1;
-        div_ctr     <= op_word ? 'd32 : 'd64;
     end else if(div_run) begin
-        if(div_ctr == 0) begin
+        if(mdu_ctr == 0) begin
             div_done<= n_div_done;
             div_run <= 1'b0;
         end else begin
-            div_ctr <= div_ctr - 7'd1;
         end
     end
 end
