@@ -121,7 +121,7 @@ end
 // Multiplier
 // ------------------------------------------------------------
 
-parameter MUL_UNROLL = 1;
+parameter MUL_UNROLL = 4;
 localparam MUL_END   = (MUL_UNROLL & 'd1) ==0 ? 0 : 1;
 
 wire        mul_start = valid && any_mul && !mul_run && !mul_done;
