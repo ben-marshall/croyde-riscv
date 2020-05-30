@@ -99,7 +99,7 @@ int test_mulw () {
 }
 
 int test_mul() {
-    
+
     CHECK_IS(mul , 0                 , 0x0               , 0x0               )
     CHECK_IS(mul , 0                 , 0x0               , 0x1               )
     CHECK_IS(mul , 0                 , 0x0               , -0x1              )
@@ -167,6 +167,7 @@ int test_mulh () {
 	CHECK_IS(mulh, 0xc000000000000000, 0x8000000000000000, 0x7fffffffffffffff)
 	CHECK_IS(mulh, 0x4000000000000000, 0x8000000000000000, 0x8000000000000000)
 
+    return 0;
 
 }
 
@@ -203,6 +204,45 @@ int test_mulhsu () {
 	CHECK_IS(mulhsu, 0xc000000000000000,0x8000000000000000, 0x7fffffffffffffff)
 	CHECK_IS(mulhsu, 0xc000000000000000,0x8000000000000000, 0x8000000000000000)
 
+    return 0;
+
+}
+
+
+int test_mulhu () {
+
+    CHECK_IS(mulhu, 0                 ,0x0               , 0x0               )
+	CHECK_IS(mulhu, 0                 ,0x0               , 0x1               )
+	CHECK_IS(mulhu, 0                 ,0x0               , -0x1              )
+	CHECK_IS(mulhu, 0                 ,0x0               , 0x7fffffffffffffff)
+	CHECK_IS(mulhu, 0                 ,0x0               , 0x8000000000000000)
+
+	CHECK_IS(mulhu, 0                 ,0x1               , 0x0               )
+	CHECK_IS(mulhu, 0                 ,0x1               , 0x1               )
+	CHECK_IS(mulhu, 0                 ,0x1               , -0x1              )
+	CHECK_IS(mulhu, 0                 ,0x1               , 0x7fffffffffffffff)
+	CHECK_IS(mulhu, 0                 ,0x1               , 0x8000000000000000)
+
+	CHECK_IS(mulhu, 0                 ,-0x1              , 0x0               )
+	CHECK_IS(mulhu, 0                 ,-0x1              , 0x1               )
+	CHECK_IS(mulhu, 0xfffffffffffffffe,-0x1              , -0x1              )
+	CHECK_IS(mulhu, 0x7ffffffffffffffe,-0x1              , 0x7fffffffffffffff)
+	CHECK_IS(mulhu, 0x7fffffffffffffff,-0x1              , 0x8000000000000000)
+
+	CHECK_IS(mulhu, 0                 ,0x7fffffffffffffff, 0x0               )
+	CHECK_IS(mulhu, 0                 ,0x7fffffffffffffff, 0x1               )
+	CHECK_IS(mulhu, 0x7ffffffffffffffe,0x7fffffffffffffff, -0x1              )
+	CHECK_IS(mulhu, 0x3fffffffffffffff,0x7fffffffffffffff, 0x7fffffffffffffff)
+	CHECK_IS(mulhu, 0x3fffffffffffffff,0x7fffffffffffffff, 0x8000000000000000)
+
+	CHECK_IS(mulhu, 0                 ,0x8000000000000000, 0x0               )
+	CHECK_IS(mulhu, 0                 ,0x8000000000000000, 0x1               )
+	CHECK_IS(mulhu, 0x7fffffffffffffff,0x8000000000000000, -0x1              )
+	CHECK_IS(mulhu, 0x3fffffffffffffff,0x8000000000000000, 0x7fffffffffffffff)
+	CHECK_IS(mulhu, 0x4000000000000000,0x8000000000000000, 0x8000000000000000)
+
+    return 0;
+
 }
 
 int test_main() {
@@ -211,18 +251,7 @@ int test_main() {
     test_mul   ();
     test_mulh  ();
     test_mulhsu();
-    
-    CHECK_HI_UU(mulhu ,  0,  0, 0);
-    CHECK_HI_UU(mulhu ,  1,  0, 0);
-    CHECK_HI_UU(mulhu ,  0,  1, 0);
-    CHECK_HI_UU(mulhu ,  1,  1, 0);
-    CHECK_HI_UU(mulhu ,  2,  1, 0);
-    CHECK_HI_UU(mulhu ,  1,  2, 0);
-    CHECK_HI_UU(mulhu ,  0, -1, 0);
-    CHECK_HI_UU(mulhu , -1,  0, 0);
-    CHECK_HI_UU(mulhu , -1,  1, 0);
-    CHECK_HI_UU(mulhu ,  1, -1, 0);
-    CHECK_HI_UU(mulhu , -1, -1, 0xFFFFFFFFFFFFFFFE);
+    test_mulhu ();
 
     return 0;
 
