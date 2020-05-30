@@ -65,8 +65,6 @@ wire [XL:0] n_rs2_div;
 
 reg  [MW:0]   mdu_state;
 wire [MW:0] n_mdu_state_div;
-wire [MW:0] n_mdu_state_mul;
-wire [MW:0] n_mdu_state = any_div ? n_mdu_state_div : n_mdu_state_mul;
 
 always @(posedge g_clk) begin
     if(!g_resetn || flush) begin
@@ -75,15 +73,21 @@ always @(posedge g_clk) begin
     end else if(div_start || div_run) begin
         s_rs1       <= n_rs1_div;
         s_rs2       <= n_rs2_div;
-        mdu_state   <= n_mdu_state;
+        mdu_state   <= n_mdu_state_div;
     end else if(mul_start) begin
         s_rs1       <= rs1;
         s_rs2       <= rs2;
-        mdu_state   <= n_mdu_state;
+        mdu_state   <= {2*XLEN{1'b0}};
     end else if(mul_run) begin
         s_rs1       <= n_rs1_mul;
         s_rs2       <= n_rs2_mul;
-        mdu_state   <= n_mdu_state;
+        if(!n_mul_done || MUL_UNROLL == 1) begin
+            mdu_state   <= n_mul_state;
+        end
+    end else if(div_run) begin
+        s_rs1       <= n_rs1_div;
+        s_rs2       <= n_rs2_div;
+        mdu_state   <= n_mdu_state_div;
     end
 end
 
@@ -98,17 +102,18 @@ wire        mul_start = valid && any_mul && !mul_run && !mul_done;
 wire        mul_hi    = op_mulh || op_mulhu || op_mulhsu;
 
 assign      result_mul= 
-              op_word ? {{32{mul_state[XL]}}, mul_state[XL:32]} :
-    mul_hi            ? mul_state[MW:64]                        :
-                        mul_state[XL: 0]                        ;
+    op_word ? {{32{mdu_state[XL]}}, mdu_state[XL:32]} :
+    mul_hi  ?                       mdu_state[MW:64]  :
+                                    mdu_state[XL: 0]  ;
 
-reg  [MW:0]   mul_state= mdu_state;
 reg  [MW:0] n_mul_state;
 
-reg         mul_run ;
-reg         mul_done;
-reg  [ 6:0] mul_ctr ;
-reg  [XL:0] to_add  ;
+wire      n_mul_done= mul_ctr == MUL_END && mul_run;
+
+reg           mul_run ;
+reg           mul_done;
+reg  [   6:0] mul_ctr ;
+reg  [  XL:0] to_add  ;
 reg  [XLEN:0] mul_add_l;
 reg  [XLEN:0] mul_add_r;
 reg  [XLEN:0] mul_sum;
@@ -123,7 +128,7 @@ wire        rhs_signed = op_mulh;
 integer i;
 always @(*) begin
     
-    n_mul_state = mul_state;
+    n_mul_state = mdu_state;
     sub_last    = 1'b0;
 
     for(i = 0; i < MUL_UNROLL; i = i + 1) begin
@@ -150,22 +155,16 @@ always @(posedge g_clk) begin
         mul_run     <= 1'b0;
         mul_done    <= 1'b0;
         mul_ctr     <= 'd0;
-        mul_state   <= {MLEN{1'b0}};
     end else if (mul_start) begin
         mul_run     <= 1'b1;
         mul_done    <= 1'b0;
-        mul_state   <= 'b0;
         mul_ctr     <= op_word ? 'd32 : 'd64;
     end else if(mul_run) begin
         if(mul_ctr == MUL_END) begin
-            mul_done    <= 1'b1;
+            mul_done    <= n_mul_done;
             mul_run     <= 1'b0;
-            if(MUL_UNROLL == 1) begin
-                mul_state   <= n_mul_state;
-            end
         end else begin
             mul_ctr     <= mul_ctr - MUL_UNROLL;
-            mul_state   <= n_mul_state;
         end
     end
 end
