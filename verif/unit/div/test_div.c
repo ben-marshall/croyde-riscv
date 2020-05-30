@@ -3,29 +3,26 @@
 
 #include "unit_test.h"
 
-volatile inline uint64_t divw(int64_t rs1, int64_t rs2) {
-    uint64_t rd;
-    asm volatile("divw %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2));
-    return  rd;
-}
+#define INSTR_INLINE(INSTR)                                                 \
+    volatile inline uint64_t INSTR(int64_t rs1, int64_t rs2) {              \
+        uint64_t rd;                                                        \
+        asm volatile(#INSTR " %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2)); \
+        return  rd;                                                         \
+    }
 
-volatile inline uint64_t divuw(int64_t rs1, int64_t rs2) {
-    uint64_t rd;
-    asm volatile("divuw %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2));
-    return  rd;
-}
+//
+// 32-bit instructions.
+INSTR_INLINE(divw  )
+INSTR_INLINE(divuw )
+INSTR_INLINE(remw  )
+INSTR_INLINE(remuw )
 
-volatile inline uint64_t remw(int64_t rs1, int64_t rs2) {
-    uint64_t rd;
-    asm volatile("remw %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2));
-    return  rd;
-}
-
-volatile inline uint64_t remuw(int64_t rs1, int64_t rs2) {
-    uint64_t rd;
-    asm volatile("remuw %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2));
-    return  rd;
-}
+//
+// 64-bit instructions.
+INSTR_INLINE(div   )
+INSTR_INLINE(divu  )
+INSTR_INLINE(rem   )
+INSTR_INLINE(remu  )
 
 #define CHECK_IS(FN, EXP, rs1, rs2) {                           \
     uint64_t grm    = EXP;                                      \
@@ -115,6 +112,7 @@ int test_divuw (){
     return 0;
 }
 
+
 int test_remw (){
 
     //
@@ -192,7 +190,166 @@ int test_remuw (){
 }
 
 
+int test_div() {
+
+    //
+    //       func, expected          , rs1               , rs2
+    CHECK_IS(div  ,0xffffffffffffffff, 0x0               , 0x0               )
+	CHECK_IS(div  ,0                 , 0x0               , 0x1               )
+	CHECK_IS(div  ,0                 , 0x0               , -0x1              )
+	CHECK_IS(div  ,0                 , 0x0               , 0x7fffffffffffffff)
+	CHECK_IS(div  ,0                 , 0x0               , 0x8000000000000000)
+
+	CHECK_IS(div  ,0xffffffffffffffff, 0x1               , 0x0               )
+	CHECK_IS(div  ,0x0000000000000001, 0x1               , 0x1               )
+	CHECK_IS(div  ,0xffffffffffffffff, 0x1               , -0x1              )
+	CHECK_IS(div  ,0                 , 0x1               , 0x7fffffffffffffff)
+	CHECK_IS(div  ,0                 , 0x1               , 0x8000000000000000)
+
+	CHECK_IS(div  ,0xffffffffffffffff, -0x1              , 0x0               )
+	CHECK_IS(div  ,0xffffffffffffffff, -0x1              , 0x1               )
+	CHECK_IS(div  ,0x0000000000000001, -0x1              , -0x1              )
+	CHECK_IS(div  ,0                 , -0x1              , 0x7fffffffffffffff)
+	CHECK_IS(div  ,0                 , -0x1              , 0x8000000000000000)
+
+	CHECK_IS(div  ,0xffffffffffffffff, 0x7fffffffffffffff, 0x0               )
+	CHECK_IS(div  ,0x7fffffffffffffff, 0x7fffffffffffffff, 0x1               )
+	CHECK_IS(div  ,0x8000000000000001, 0x7fffffffffffffff, -0x1              )
+	CHECK_IS(div  ,0x0000000000000001, 0x7fffffffffffffff, 0x7fffffffffffffff)
+	CHECK_IS(div  ,0                 , 0x7fffffffffffffff, 0x8000000000000000)
+
+	CHECK_IS(div  ,0xffffffffffffffff, 0x8000000000000000, 0x0               )
+	CHECK_IS(div  ,0x8000000000000000, 0x8000000000000000, 0x1               )
+	CHECK_IS(div  ,0x8000000000000000, 0x8000000000000000, -0x1              )
+	CHECK_IS(div  ,0xffffffffffffffff, 0x8000000000000000, 0x7fffffffffffffff)
+	CHECK_IS(div  ,0x0000000000000001, 0x8000000000000000, 0x8000000000000000)
+
+    return 0;
+
+}
+
+
+int test_divu  (){
+
+    //
+    //       func, expected          , rs1       , rs2
+    CHECK_IS(divu, 0xffffffffffffffff, 0x0               , 0x0               )
+	CHECK_IS(divu, 0                 , 0x0               , 0x1               )
+	CHECK_IS(divu, 0                 , 0x0               , -0x1              )
+	CHECK_IS(divu, 0                 , 0x0               , 0x7fffffffffffffff)
+	CHECK_IS(divu, 0                 , 0x0               , 0x8000000000000000)
+
+	CHECK_IS(divu, 0xffffffffffffffff, 0x1               , 0x0               )
+	CHECK_IS(divu, 0x0000000000000001, 0x1               , 0x1               )
+	CHECK_IS(divu, 0                 , 0x1               , -0x1              )
+	CHECK_IS(divu, 0                 , 0x1               , 0x7fffffffffffffff)
+	CHECK_IS(divu, 0                 , 0x1               , 0x8000000000000000)
+
+	CHECK_IS(divu, 0xffffffffffffffff, -0x1              , 0x0               )
+	CHECK_IS(divu, 0xffffffffffffffff, -0x1              , 0x1               )
+	CHECK_IS(divu, 0x0000000000000001, -0x1              , -0x1              )
+	CHECK_IS(divu, 0x0000000000000002, -0x1              , 0x7fffffffffffffff)
+	CHECK_IS(divu, 0x0000000000000001, -0x1              , 0x8000000000000000)
+
+	CHECK_IS(divu, 0xffffffffffffffff, 0x7fffffffffffffff, 0x0               )
+	CHECK_IS(divu, 0x7fffffffffffffff, 0x7fffffffffffffff, 0x1               )
+	CHECK_IS(divu, 0                 , 0x7fffffffffffffff, -0x1              )
+	CHECK_IS(divu, 0x0000000000000001, 0x7fffffffffffffff, 0x7fffffffffffffff)
+	CHECK_IS(divu, 0                 , 0x7fffffffffffffff, 0x8000000000000000)
+
+	CHECK_IS(divu, 0xffffffffffffffff, 0x8000000000000000, 0x0               )
+	CHECK_IS(divu, 0x8000000000000000, 0x8000000000000000, 0x1               )
+	CHECK_IS(divu, 0                 , 0x8000000000000000, -0x1              )
+	CHECK_IS(divu, 0x0000000000000001, 0x8000000000000000, 0x7fffffffffffffff)
+	CHECK_IS(divu, 0x0000000000000001, 0x8000000000000000, 0x8000000000000000)
+
+    return 0;
+}
+
+
+int test_rem (){
+
+    //
+    //       func, expected          , rs1       , rs2
+    CHECK_IS(rem , 0                 , 0x0               , 0x0               )
+	CHECK_IS(rem , 0                 , 0x0               , 0x1               )
+	CHECK_IS(rem , 0                 , 0x0               , -0x1              )
+	CHECK_IS(rem , 0                 , 0x0               , 0x7fffffffffffffff)
+	CHECK_IS(rem , 0                 , 0x0               , 0x8000000000000000)
+
+	CHECK_IS(rem , 0x0000000000000001, 0x1               , 0x0               )
+	CHECK_IS(rem , 0                 , 0x1               , 0x1               )
+	CHECK_IS(rem , 0                 , 0x1               , -0x1              )
+	CHECK_IS(rem , 0x0000000000000001, 0x1               , 0x7fffffffffffffff)
+	CHECK_IS(rem , 0x0000000000000001, 0x1               , 0x8000000000000000)
+
+    CHECK_IS(rem , 0xffffffffffffffff, -0x1              , 0x0               )
+	CHECK_IS(rem , 0                 , -0x1              , 0x1               )
+	CHECK_IS(rem , 0                 , -0x1              , -0x1              )
+	CHECK_IS(rem , 0xffffffffffffffff, -0x1              , 0x7fffffffffffffff)
+	CHECK_IS(rem , 0xffffffffffffffff, -0x1              , 0x8000000000000000)
+
+	CHECK_IS(rem , 0x7fffffffffffffff, 0x7fffffffffffffff, 0x0               )
+	CHECK_IS(rem , 0                 , 0x7fffffffffffffff, 0x1               )
+	CHECK_IS(rem , 0                 , 0x7fffffffffffffff, -0x1              )
+	CHECK_IS(rem , 0                 , 0x7fffffffffffffff, 0x7fffffffffffffff)
+	CHECK_IS(rem , 0x7fffffffffffffff, 0x7fffffffffffffff, 0x8000000000000000)
+
+	CHECK_IS(rem , 0x8000000000000000, 0x8000000000000000, 0x0               )
+	CHECK_IS(rem , 0                 , 0x8000000000000000, 0x1               )
+	CHECK_IS(rem , 0                 , 0x8000000000000000, -0x1              )
+	CHECK_IS(rem , 0xffffffffffffffff, 0x8000000000000000, 0x7fffffffffffffff)
+	CHECK_IS(rem , 0                 , 0x8000000000000000, 0x8000000000000000)
+
+    return 0;
+}
+
+
+int test_remu (){
+
+    //
+    //       func, expected          , rs1       , rs2
+    CHECK_IS(remu, 0                 , 0x0               , 0x0               )
+	CHECK_IS(remu, 0                 , 0x0               , 0x1               )
+	CHECK_IS(remu, 0                 , 0x0               , -0x1              )
+	CHECK_IS(remu, 0                 , 0x0               , 0x7fffffffffffffff)
+	CHECK_IS(remu, 0                 , 0x0               , 0x8000000000000000)
+                                                                             
+	CHECK_IS(remu, 0x0000000000000001, 0x1               , 0x0               )
+	CHECK_IS(remu, 0                 , 0x1               , 0x1               )
+	CHECK_IS(remu, 0x0000000000000001, 0x1               , -0x1              )
+	CHECK_IS(remu, 0x0000000000000001, 0x1               , 0x7fffffffffffffff)
+	CHECK_IS(remu, 0x0000000000000001, 0x1               , 0x8000000000000000)
+                                                                             
+	CHECK_IS(remu, 0xffffffffffffffff, -0x1              , 0x0               )
+	CHECK_IS(remu, 0                 , -0x1              , 0x1               )
+	CHECK_IS(remu, 0                 , -0x1              , -0x1              )
+	CHECK_IS(remu, 0x0000000000000001, -0x1              , 0x7fffffffffffffff)
+	CHECK_IS(remu, 0x7fffffffffffffff, -0x1              , 0x8000000000000000)
+                                                                             
+	CHECK_IS(remu, 0x7fffffffffffffff, 0x7fffffffffffffff, 0x0               )
+	CHECK_IS(remu, 0                 , 0x7fffffffffffffff , 0x1              )
+	CHECK_IS(remu, 0x7fffffffffffffff, 0x7fffffffffffffff, -0x1              )
+	CHECK_IS(remu, 0                 , 0x7fffffffffffffff, 0x7fffffffffffffff)
+	CHECK_IS(remu, 0x7fffffffffffffff, 0x7fffffffffffffff, 0x8000000000000000)
+                                                                             
+	CHECK_IS(remu, 0x8000000000000000, 0x8000000000000000, 0x0               )
+	CHECK_IS(remu, 0                 , 0x8000000000000000, 0x1               )
+	CHECK_IS(remu, 0x8000000000000000, 0x8000000000000000, -0x1              )
+	CHECK_IS(remu, 0x0000000000000001, 0x8000000000000000, 0x7fffffffffffffff)
+	CHECK_IS(remu, 0                 , 0x8000000000000000, 0x8000000000000000)
+
+    return 0;
+
+}
+
+
 int test_main() {
+    
+    test_div  ();
+    test_divu ();
+    test_rem  ();
+    test_remu ();
 
     test_divw ();
     test_divuw();
