@@ -3,33 +3,40 @@
 
 #include "unit_test.h"
 
-volatile inline int64_t in_mul(int64_t rs1, int64_t rs2) {
-    int64_t rd;
-    asm volatile("mul %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2));
-    return  rd;
+#define INSTR_INLINE(INSTR)                                                 \
+    volatile inline uint64_t INSTR(int64_t rs1, int64_t rs2) {              \
+        uint64_t rd;                                                        \
+        asm volatile(#INSTR " %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2)); \
+        return  rd;                                                         \
+    }
+
+//
+// 32-bit instructions.
+INSTR_INLINE(mulw  )
+
+//
+// 64-bit instructions.
+INSTR_INLINE(mul   )
+INSTR_INLINE(mulh  )
+INSTR_INLINE(mulhu )
+INSTR_INLINE(mulhsu)
+
+#define CHECK_IS(FN, EXP, rs1, rs2) {                           \
+    uint64_t grm    = EXP;                                      \
+    uint64_t dut    = FN(rs1,rs2);                              \
+    if(grm  !=   dut){                                          \
+        __putstr("RS1   : "); __puthex64(rs1); __putchar('\n'); \
+        __putstr("RS2   : "); __puthex64(rs2); __putchar('\n'); \
+        __putstr("Expect: "); __puthex64(grm); __putchar('\n'); \
+        __putstr("Got   : "); __puthex64(dut); __putchar('\n'); \
+        test_fail();                                            \
+    }                                                           \
 }
 
-volatile inline int64_t in_mulh(int64_t rs1, int64_t rs2) {
-    int64_t rd;
-    asm volatile("mulh %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2));
-    return  rd;
-}
-
-volatile inline uint64_t in_mulhu(uint64_t rs1, uint64_t rs2) {
-    uint64_t rd;
-    asm volatile("mulhu %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2));
-    return  rd;
-}
-
-volatile inline int32_t in_mulw(int32_t rs1, int32_t rs2) {
-    int32_t rd;
-    asm volatile("mulw %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2));
-    return  rd;
-}
 
 #define CHECK_LO_SS(FN, rs1, rs2) {                             \
-    int grm    = (int64_t)rs1 * (int64_t)rs2;                   \
-    int dut    = FN(rs1,rs2);                                   \
+    int64_t grm    = (int64_t)rs1 * (int64_t)rs2;               \
+    int64_t dut    = FN(rs1,rs2);                               \
     if(grm  !=   dut){                                          \
         test_fail();                                            \
     }                                                           \
@@ -37,8 +44,8 @@ volatile inline int32_t in_mulw(int32_t rs1, int32_t rs2) {
 
 #define CHECK_HI_SS(FN, rs1, rs2) {                             \
     __int128 result = (int64_t)rs1 * (int64_t)rs2;              \
-      int    grm    = result >> 64;                             \
-      int    dut    = FN(rs1,rs2);                              \
+    int64_t grm    = result >> 64;                              \
+    int64_t dut    = FN(rs1,rs2);                               \
     if(grm    != dut){                                          \
         test_fail();                                            \
     }                                                           \
@@ -54,56 +61,82 @@ volatile inline int32_t in_mulw(int32_t rs1, int32_t rs2) {
     }                                                           \
 }
 
+
+int test_mulw () {
+
+    CHECK_IS(mulw, 0                    , 0x0       , 0x0       )
+    CHECK_IS(mulw, 0                    , 0x0       , 0x1       )
+    CHECK_IS(mulw, 0                    , 0x0       , -0x1      )
+    CHECK_IS(mulw, 0                    , 0x0       , 0x7fffffff)
+    CHECK_IS(mulw, 0                    , 0x0       , 0x80000000)
+
+    CHECK_IS(mulw, 0                    , 0x1       , 0x0       )
+    CHECK_IS(mulw, 0x0000000000000001   , 0x1       , 0x1       )
+    CHECK_IS(mulw, 0xffffffffffffffff   , 0x1       , -0x1      )
+    CHECK_IS(mulw, 0x000000007fffffff   , 0x1       , 0x7fffffff)
+    CHECK_IS(mulw, 0xffffffff80000000   , 0x1       , 0x80000000)
+
+    CHECK_IS(mulw, 0                    , -0x1      , 0x0       )
+    CHECK_IS(mulw, 0xffffffffffffffff   , -0x1      , 0x1       )
+    CHECK_IS(mulw, 0x0000000000000001   , -0x1      , -0x1      )
+    CHECK_IS(mulw, 0xffffffff80000001   , -0x1      , 0x7fffffff)
+    CHECK_IS(mulw, 0xffffffff80000000   , -0x1      , 0x80000000)
+
+    CHECK_IS(mulw, 0                    , 0x7fffffff, 0x0       )
+    CHECK_IS(mulw, 0x000000007fffffff   , 0x7fffffff, 0x1       )
+    CHECK_IS(mulw, 0xffffffff80000001   , 0x7fffffff, -0x1      )
+    CHECK_IS(mulw, 0x0000000000000001   , 0x7fffffff, 0x7fffffff)
+    CHECK_IS(mulw, 0xffffffff80000000   , 0x7fffffff, 0x80000000)
+
+    CHECK_IS(mulw, 0                    , 0x80000000, 0x0       )
+    CHECK_IS(mulw, 0xffffffff80000000   , 0x80000000, 0x1       )
+    CHECK_IS(mulw, 0xffffffff80000000   , 0x80000000, -0x1      )
+    CHECK_IS(mulw, 0xffffffff80000000   , 0x80000000, 0x7fffffff)
+    CHECK_IS(mulw, 0                    , 0x80000000, 0x80000000)
+
+    return 0;
+}
+
 int test_main() {
 
-    CHECK_LO_SS(in_mul   ,  0,  0);
-    CHECK_LO_SS(in_mul   ,  1,  0);
-    CHECK_LO_SS(in_mul   ,  0,  1);
-    CHECK_LO_SS(in_mul   ,  1,  1);
-    CHECK_LO_SS(in_mul   ,  2,  1);
-    CHECK_LO_SS(in_mul   ,  1,  2);
-    CHECK_LO_SS(in_mul   ,  0, -1);
-    CHECK_LO_SS(in_mul   , -1,  0);
-    CHECK_LO_SS(in_mul   , -1,  1);
-    CHECK_LO_SS(in_mul   ,  1, -1);
-    CHECK_LO_SS(in_mul   , -1, -1);
+    test_mulw  ();
+
+    CHECK_LO_SS(mul   ,  0,  0);
+    CHECK_LO_SS(mul   ,  1,  0);
+    CHECK_LO_SS(mul   ,  0,  1);
+    CHECK_LO_SS(mul   ,  1,  1);
+    CHECK_LO_SS(mul   ,  2,  1);
+    CHECK_LO_SS(mul   ,  1,  2);
+    CHECK_LO_SS(mul   ,  0, -1);
+    CHECK_LO_SS(mul   , -1,  0);
+    CHECK_LO_SS(mul   , -1,  1);
+    CHECK_LO_SS(mul   ,  1, -1);
+    CHECK_LO_SS(mul   , -1, -1);
     
-    CHECK_LO_SS(in_mulw  ,  0,  0);
-    CHECK_LO_SS(in_mulw  ,  1,  0);
-    CHECK_LO_SS(in_mulw  ,  0,  1);
-    CHECK_LO_SS(in_mulw  ,  1,  1);
-    CHECK_LO_SS(in_mulw  ,  2,  1);
-    CHECK_LO_SS(in_mulw  ,  1,  2);
-    CHECK_LO_SS(in_mulw  ,  0, -1);
-    CHECK_LO_SS(in_mulw  , -1,  0);
-    CHECK_LO_SS(in_mulw  , -1,  1);
-    CHECK_LO_SS(in_mulw  ,  1, -1);
-    CHECK_LO_SS(in_mulw  , -1, -1);
+    CHECK_HI_SS(mulh  ,  0,  0);
+    CHECK_HI_SS(mulh  ,  1,  0);
+    CHECK_HI_SS(mulh  ,  0,  1);
+    CHECK_HI_SS(mulh  ,  1,  1);
+    CHECK_HI_SS(mulh  ,  2,  1);
+    CHECK_HI_SS(mulh  ,  1,  2);
+    CHECK_HI_SS(mulh  ,  0, -1);
+    CHECK_HI_SS(mulh  , -1,  0);
+    CHECK_HI_SS(mulh  , -1,  1);
+    CHECK_HI_SS(mulh  ,  1, -1);
+    CHECK_HI_SS(mulh  , -1, -1);
+    CHECK_HI_SS(mulh  , -1, -1);
     
-    CHECK_HI_SS(in_mulh  ,  0,  0);
-    CHECK_HI_SS(in_mulh  ,  1,  0);
-    CHECK_HI_SS(in_mulh  ,  0,  1);
-    CHECK_HI_SS(in_mulh  ,  1,  1);
-    CHECK_HI_SS(in_mulh  ,  2,  1);
-    CHECK_HI_SS(in_mulh  ,  1,  2);
-    CHECK_HI_SS(in_mulh  ,  0, -1);
-    CHECK_HI_SS(in_mulh  , -1,  0);
-    CHECK_HI_SS(in_mulh  , -1,  1);
-    CHECK_HI_SS(in_mulh  ,  1, -1);
-    CHECK_HI_SS(in_mulh  , -1, -1);
-    CHECK_HI_SS(in_mulh  , -1, -1);
-    
-    CHECK_HI_UU(in_mulhu ,  0,  0, 0);
-    CHECK_HI_UU(in_mulhu ,  1,  0, 0);
-    CHECK_HI_UU(in_mulhu ,  0,  1, 0);
-    CHECK_HI_UU(in_mulhu ,  1,  1, 0);
-    CHECK_HI_UU(in_mulhu ,  2,  1, 0);
-    CHECK_HI_UU(in_mulhu ,  1,  2, 0);
-    CHECK_HI_UU(in_mulhu ,  0, -1, 0);
-    CHECK_HI_UU(in_mulhu , -1,  0, 0);
-    CHECK_HI_UU(in_mulhu , -1,  1, 0);
-    CHECK_HI_UU(in_mulhu ,  1, -1, 0);
-    CHECK_HI_UU(in_mulhu , -1, -1, 0xFFFFFFFFFFFFFFFE);
+    CHECK_HI_UU(mulhu ,  0,  0, 0);
+    CHECK_HI_UU(mulhu ,  1,  0, 0);
+    CHECK_HI_UU(mulhu ,  0,  1, 0);
+    CHECK_HI_UU(mulhu ,  1,  1, 0);
+    CHECK_HI_UU(mulhu ,  2,  1, 0);
+    CHECK_HI_UU(mulhu ,  1,  2, 0);
+    CHECK_HI_UU(mulhu ,  0, -1, 0);
+    CHECK_HI_UU(mulhu , -1,  0, 0);
+    CHECK_HI_UU(mulhu , -1,  1, 0);
+    CHECK_HI_UU(mulhu ,  1, -1, 0);
+    CHECK_HI_UU(mulhu , -1, -1, 0xFFFFFFFFFFFFFFFE);
 
     return 0;
 
