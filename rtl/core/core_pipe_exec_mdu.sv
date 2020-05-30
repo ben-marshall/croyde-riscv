@@ -202,14 +202,18 @@ wire            div_outsign =
 
 reg         div_run ;
 reg         div_done;
+wire      n_div_done = div_run && div_ctr == 0;
 reg  [ 6:0] div_ctr ;
 
-wire [XL:0] neg_rs1 = -(op_word ? {{32{rs1[31]}},rs1[31:0]} : rs1);
+wire    [XL:0] neg_rs1      = -(op_word ? {{32{rs1[31]}},rs1[31:0]} : rs1);
 
-wire    [XL:0] div_div_out = div_outsign ? -dividend : dividend;
-wire    [XL:0] div_qot_out = div_outsign ? -quotient : quotient;
+wire    [XL:0] div_div_out  = div_outsign ? -dividend : dividend;
+wire    [XL:0] div_qot_out  = div_outsign ? -quotient : quotient;
 
-assign      result_div = div_div ? div_qot_out : div_div_out;
+wire    [XL:0] div_pre_sext = div_div ? div_qot_out : div_div_out;
+
+assign         result_div   = 
+    op_word ? { {32{div_pre_sext[31]}}, div_pre_sext[31:0]} : div_pre_sext;
 
 always @(*) begin
     n_dividend = dividend;
@@ -231,7 +235,7 @@ always @(*) begin
 
     end else if(div_run) begin
 
-        if(div_less) begin
+        if(div_less && !n_div_done) begin
             n_dividend = dividend - divisor[XL:0];
             n_quotient = quotient | qmask;
         end
@@ -251,7 +255,7 @@ always @(posedge g_clk) begin
         divisor     <= n_divisor ;
     end else if(div_run) begin
         if(div_ctr == 0) begin
-            div_done<= 1'b1;
+            div_done<= n_div_done;
             div_run <= 1'b0;
         end else begin
             divisor <= n_divisor ;
