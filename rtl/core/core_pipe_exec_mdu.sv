@@ -235,7 +235,8 @@ wire            div_less    = divisor <= {{XLEN{1'b0}},dividend};
 wire    [XL: 0] qmask       = 64'b1 << (mdu_ctr-1);
 
 // Is rs2 *not* zero? Used to determine sign of output.
-wire            div_rs2_nz  = op_word ? |rs2[31:0] : |rs2;
+wire            div_rs2_nzw = |rs2[31:0];
+wire            div_rs2_nz  = op_word ? div_rs2_nzw : div_rs2_nzw || |rs2[XL:32];
 
 
 // Sign of the output for  division / remainder.
@@ -245,10 +246,9 @@ wire            div_outsign =
 
 wire    [XL:0] neg_rs1      = -(op_word ? {{32{rs1[31]}},rs1[31:0]} : rs1);
 
-wire    [XL:0] div_div_out  = div_outsign ? -dividend : dividend;
-wire    [XL:0] div_qot_out  = div_outsign ? -quotient : quotient;
+wire    [XL:0] div_out      = div_div     ? quotient  : dividend;
 
-wire    [XL:0] div_pre_sext = div_div ? div_qot_out : div_div_out;
+wire    [XL:0] div_pre_sext = div_outsign ? -div_out  : div_out ;
 
 assign         result_div   = 
     op_word ? { {32{div_pre_sext[31]}}, div_pre_sext[31:0]} : div_pre_sext;
