@@ -204,12 +204,15 @@ reg         div_run ;
 reg         div_done;
 reg  [ 6:0] div_ctr ;
 
-wire [XL:0] neg_rs1 = -(op_word ? {{32{rs1[31]}},rs1[31:0]} : rs1);
+wire    [XL:0] neg_rs1      = -(op_word ? {{32{rs1[31]}},rs1[31:0]} : rs1);
 
-wire    [XL:0] div_div_out = div_outsign ? -dividend : dividend;
-wire    [XL:0] div_qot_out = div_outsign ? -quotient : quotient;
+wire    [XL:0] div_div_out  = div_outsign ? -dividend : dividend;
+wire    [XL:0] div_qot_out  = div_outsign ? -quotient : quotient;
 
-assign      result_div = div_div ? div_qot_out : div_div_out;
+wire    [XL:0] div_pre_sext = div_div ? div_qot_out : div_div_out;
+
+assign         result_div   = 
+    op_word ? { {32{div_pre_sext[31]}}, div_pre_sext[31:0]} : div_pre_sext;
 
 always @(*) begin
     n_dividend = dividend;
