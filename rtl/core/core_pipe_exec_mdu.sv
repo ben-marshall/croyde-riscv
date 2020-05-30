@@ -137,6 +137,7 @@ wire      n_mul_done= mdu_ctr == MUL_END && mul_run;
 reg           mul_run   ; // Is the multiplier currently running?
 reg           mul_done  ; // Is the multiplier complete.
 reg  [  XL:0] to_add    ; // The thing added to current accumulator.
+reg           to_add_sign;// The thing added to current accumulator.
 reg  [XLEN:0] mul_add_l ; // Left hand side of multiply addition.
 reg  [XLEN:0] mul_add_r ; // Right hand side of multiply addition.
 reg  [XLEN:0] mul_sum   ; // Output of multiply addition.
@@ -162,8 +163,9 @@ always @(*) begin
                       mdu_ctr == MUL_UNROLL &&
                       rhs_signed && s_rs2[MUL_UNROLL-1];
         to_add      = s_rs2[i]   ? s_rs1           : 64'b0  ;
+        to_add_sign = op_word ? to_add[31] : to_add[XL]     ;
         mul_l_sign  = lhs_signed ? n_mul_state[MW] : 1'b0   ;
-        mul_r_sign  = rhs_signed ? to_add[XL]      : 1'b0   ;
+        mul_r_sign  = rhs_signed ? to_add_sign     : 1'b0   ;
         mul_add_l   = {mul_l_sign,n_mul_state[MW:XLEN]};
         mul_add_r   = {mul_r_sign,to_add              };
         if(sub_last) begin
