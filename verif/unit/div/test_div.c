@@ -103,6 +103,41 @@ int test_divuw () {
     return 0;
 }
 
+int test_remw () {
+
+    //
+    //       func , expected  , rs1       , rs2
+    CHECK_IS(remw ,  int64_t, 0                 , 0x0       , 0x0       )
+	CHECK_IS(remw ,  int64_t, 0                 , 0x0       , 0x1       )
+	CHECK_IS(remw ,  int64_t, 0                 , 0x0       , -0x1      )
+	CHECK_IS(remw ,  int64_t, 0                 , 0x0       , 0x7fffffff)
+	CHECK_IS(remw ,  int64_t, 0                 , 0x0       , 0x80000000)
+
+	CHECK_IS(remw ,  int64_t, 0x0000000000000001, 0x1       , 0x0       )
+	CHECK_IS(remw ,  int64_t, 0                 , 0x1       , 0x1       )
+	CHECK_IS(remw ,  int64_t, 0                 , 0x1       , -0x1      )
+	CHECK_IS(remw ,  int64_t, 0x0000000000000001, 0x1       , 0x7fffffff)
+	CHECK_IS(remw ,  int64_t, 0x0000000000000001, 0x1       , 0x80000000)
+
+    CHECK_IS(remw ,  int64_t, 0xffffffffffffffff, -0x1      , 0x0       )
+	CHECK_IS(remw ,  int64_t, 0                 , -0x1      , 0x1       )
+	CHECK_IS(remw ,  int64_t, 0                 , -0x1      , -0x1      )
+	CHECK_IS(remw ,  int64_t, 0xffffffffffffffff, -0x1      , 0x7fffffff)
+	CHECK_IS(remw ,  int64_t, 0xffffffffffffffff, -0x1      , 0x80000000)
+
+	CHECK_IS(remw ,  int64_t, 0x000000007fffffff, 0x7fffffff, 0x0       )
+	CHECK_IS(remw ,  int64_t, 0                 , 0x7fffffff, 0x1       )
+	CHECK_IS(remw ,  int64_t, 0                 , 0x7fffffff, -0x1      )
+	CHECK_IS(remw ,  int64_t, 0                 , 0x7fffffff, 0x7fffffff)
+	CHECK_IS(remw ,  int64_t, 0xffffffff7fffffff, 0x7fffffff, 0x80000000)
+
+	CHECK_IS(remw ,  int64_t, 0xFFFFFFFF80000000, 0x80000000, 0x0       )
+	CHECK_IS(remw ,  int64_t, 0                 , 0x80000000, 0x1       )
+	CHECK_IS(remw ,  int64_t, 0                 , 0x80000000, -0x1      )
+	CHECK_IS(remw ,  int64_t, 0xFFFFFFFFffffffff, 0x80000000, 0x7fffffff)
+	CHECK_IS(remw ,  int64_t, 0                 , 0x80000000, 0x80000000)
+}
+
 
 int test_main() {
 
@@ -113,4 +148,5 @@ int test_main() {
     return 0;
 
 }
+
 
