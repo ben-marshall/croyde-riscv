@@ -69,7 +69,7 @@ always @(posedge g_clk) begin
     if(!g_resetn || flush) begin
         s_rs1       <= {XLEN{1'b0}};
         s_rs2       <= {XLEN{1'b0}};
-    end else if(div_start || div_run) begin
+    end else if(n_div_start || div_start || div_run) begin
         s_rs1       <= n_rs1_div;
         s_rs2       <= n_rs2_div;
         mdu_state   <= n_divisor;
@@ -217,7 +217,9 @@ reg             div_done;
 wire          n_div_done = div_run && mdu_ctr == 0;
 
 // start the divider running?
-wire            div_start   = valid && any_div && !div_run && !div_done;
+wire          n_div_start   = valid && any_div && !div_run && !div_done &&
+                              !div_start;
+reg             div_start   ;
 
 // Are we doing a signed operation?
 wire            div_signed  = op_div || op_rem;
@@ -246,8 +248,8 @@ wire            div_outsign =
     div_div ? (div_sign_lhs != div_sign_rhs) && div_rs2_nz    :
               (div_sign_lhs                )                  ;
 
-wire    [XL:0] neg_rs1      = -(op_word ? {{32{rs1[31]}},rs1[31:0]} : rs1);
-wire    [XL:0] neg_rs2      = -(op_word ? {{32{rs2[31]}},rs2[31:0]} : rs2);
+wire    [XL:0] neg_rs1      = -(op_word?{{32{s_rs1[31]}},s_rs1[31:0]}:s_rs1);
+wire    [XL:0] neg_rs2      = -(op_word?{{32{s_rs2[31]}},s_rs2[31:0]}:s_rs2);
 
 wire    [XL:0] div_out      = div_div     ? quotient  : dividend;
 
@@ -263,15 +265,19 @@ always @(*) begin
     n_quotient = quotient;
     n_divisor  = divisor >> 1;
 
-    if(div_start) begin
-      n_dividend = div_sign_lhs ? neg_rs1                               :
-                                  rs1 & {{32{!op_word}}, {32{1'b1}}}    ;
+    if(n_div_start) begin
+        n_dividend = rs1;
+        n_quotient = rs2;
+        n_divisor  = 0;
+    end else if(div_start) begin
+      n_dividend = div_sign_lhs ? neg_rs1                                 :
+                                  s_rs1 & {{32{!op_word}}, {32{1'b1}}}    ;
       if(op_word) begin
           n_divisor  =(div_sign_rhs?{{XLEN+32{neg_rs2[32] }},neg_rs2[31:0]}:
-                                    {{XLEN+32{1'b0        }},rs2[31:0]}) << 31;
+                                    {{XLEN+32{1'b0        }},s_rs2[31:0]}) << 31;
       end else begin
-          n_divisor  = (div_sign_rhs ? -{{XLEN{div_sign_rhs}}, rs2}:
-                                        {{XLEN{1'b0        }}, rs2}) << XL;
+          n_divisor  = (div_sign_rhs ? -{{XLEN{div_sign_rhs}}, s_rs2}:
+                                        {{XLEN{1'b0        }}, s_rs2}) << XL;
       end
       n_quotient  = 'b0;
 
@@ -282,6 +288,14 @@ always @(*) begin
             n_quotient = quotient | qmask;
         end
 
+    end
+end
+
+always @(posedge g_clk) begin
+    if(!g_resetn || flush) begin
+        div_start <= 1'b0;
+    end else begin
+        div_start <= n_div_start;
     end
 end
 
