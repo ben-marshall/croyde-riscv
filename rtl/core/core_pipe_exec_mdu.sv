@@ -121,7 +121,7 @@ end
 // Multiplier
 // ------------------------------------------------------------
 
-parameter MUL_UNROLL = 4;
+parameter MUL_UNROLL = 1;
 localparam MUL_END   = (MUL_UNROLL & 'd1) ==0 ? 0 : 1;
 
 wire        mul_start = valid && any_mul && !mul_run && !mul_done;
@@ -162,10 +162,10 @@ always @(*) begin
         sub_last    = i == (MUL_UNROLL - 1) &&
                       mdu_ctr == MUL_UNROLL &&
                       rhs_signed && s_rs2[MUL_UNROLL-1];
-        to_add      = s_rs2[i]   ? s_rs1           : 64'b0  ;
-        to_add_sign = op_word ? to_add[31] : to_add[XL]     ;
-        mul_l_sign  = lhs_signed ? n_mul_state[MW] : 1'b0   ;
-        mul_r_sign  = rhs_signed ? to_add_sign     : 1'b0   ;
+        to_add      = s_rs2[i]   ? s_rs1      : 64'b0       ;
+        to_add_sign = op_word    ? to_add[31] : to_add[XL]  ;
+        mul_l_sign  = lhs_signed && n_mul_state[MW]         ;
+        mul_r_sign  = lhs_signed && to_add_sign             ;
         mul_add_l   = {mul_l_sign,n_mul_state[MW:XLEN]};
         mul_add_r   = {mul_r_sign,to_add              };
         if(sub_last) begin
