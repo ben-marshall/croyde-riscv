@@ -49,6 +49,39 @@ implement.
     - `MIE`  - WARL - Read/Write.
     - `SIE`  - WARL - Hard wired to zero.
     - `UIE`  - WARL - Hard wired to zero.
+- `mtvec`       CSR
+    - `BASE` - WARL - Read/write all `62` bits when `mode=0`.
+      If `mode=1` (vectored) then writable bits are parameterised.
+    - `MODE` - WARL - Vectored and directed mode implemented. In vectored
+      mode, `BASE` must be correctly aligned to allow or'ing in offset
+      from base.
+- `medeleg`     CSR - Hard wired to zero. Only M-Mode implemented.
+- `mideleg`     CSR - Hard wired to zero. Only M-Mode implemented.
+- `mtime`       CSR - Implemented. Alias for `mcycle`.
+- `mtimecmp`    CSR - Implemented.
+- `mcycle`      CSR - Implemented.
+- `minstret`    CSR - Implemented.
+- `mcounteren`  CSR - Hard wired to zero. Only M-Mode implemented.
+- `mcountinhibit` CSR - Implemented.
+    - `HPMn` - Hard wired to zero. No Hardware perf monitors implemented.
+    - `IR` - Read/Write.
+    - `CY` - Read/Write.
+- `mscratch`    CSR - Implemented. Read/Write.
+- `mepc`        CSR - Implemented. Read/Write.
+- `mcause`      CSR - Implemented. Read/Write.
+    - `IR`      - Read/Write.
+    - `CODE`    - WLRL.
+- `mtval`       CSR - Not implemented / hardwired to zero.
+
+
+**Supervisor Mode**
+
+Not implemented.
+
+
+**User Mode**
+
+Not implemented.
 
 
 ## Micro-architectural
