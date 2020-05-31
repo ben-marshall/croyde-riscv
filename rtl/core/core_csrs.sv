@@ -449,11 +449,10 @@ end
 // -------------------------------------------------------------------------
 
 reg mcountin_ir;
-reg mcountin_tm;
+reg mcountin_tm = 1'b0;
 reg mcountin_cy;
 
 assign inhibit_ir = mcountin_ir;
-assign inhibit_tm = mcountin_tm;
 assign inhibit_cy = mcountin_cy;
 
 wire wen_mcountin = csr_wr && csr_addr == ADDR_MCOUNTIN;
@@ -461,11 +460,9 @@ wire wen_mcountin = csr_wr && csr_addr == ADDR_MCOUNTIN;
 always @(posedge g_clk) begin
     if(!g_resetn) begin
         mcountin_ir <= 1'b0;
-        mcountin_tm <= 1'b0;
         mcountin_cy <= 1'b0;
     end else if(wen_mcountin) begin
         mcountin_ir <= csr_wdata[2];
-        mcountin_tm <= csr_wdata[1];
         mcountin_cy <= csr_wdata[0];
     end
 end

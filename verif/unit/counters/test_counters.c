@@ -68,8 +68,8 @@ int test_main() {
         return 6;
     }
     
-    // Disable the time counter register, re-enable the cycle register.
-    __wrmcountinhibit(0x2);
+    // re-enable the cycle register.
+    __wrmcountinhibit(0x0);
     
     a_cycle      = __rdcycle();
     a_time       = __rdtime();
@@ -82,11 +82,6 @@ int test_main() {
     if(a_cycle >= b_cycle) {
         __putstr("Cycle enabled, first reading should be smaller.\n");
         return 7;
-    }
-
-    if(a_time != b_time) {
-        __putstr("time register disabled. Should stay the same.\n");
-        return 8;
     }
 
     if(a_instret >= b_instret) {
