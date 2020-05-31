@@ -5,6 +5,8 @@
 
 ---
 
+[![Documentation Status](https://readthedocs.org/projects/uc64/badge/?version=latest)](https://uc64.readthedocs.io/en/latest/?badge=latest)
+
 - [Functional Requirements](functional-requirements.md)
 
 - [Memory Interface](memory-interface.md)
