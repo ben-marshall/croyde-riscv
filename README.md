@@ -11,7 +11,7 @@ This is a very simple 3-stage 64-bit micro-controller, implementing the
 - [Getting Started](#Getting-Started)
 - [Block Diagram](#Block-Diagram)
 - [Documentaton](docs/)
-- [Todo List](todo.md)
+- [Todo List](docs/todo.md)
 
 ## Block Diagram
 

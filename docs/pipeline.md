@@ -9,15 +9,15 @@
 
   - Fetch
 
-  - Decode / Operand Gather
+  - Decode + Execute
 
-  - Execute
+  - Writeback
 
 ## Fetch
 
-- 64-bit wide memory bus
+- `64`-bit wide memory bus
 
-- 96-bit fetch buffer.  96 bits = 64 bits (memory bus width) + 32 bits
+- `128`-bit fetch buffer.  `128` bits = `64` bits (memory bus width) * `2`
   (largest instruction size).
 
 - The fetch buffer also tracks bus error bits. Each 16-bit halfword
@@ -30,19 +30,22 @@
 - It makes the following data fields available to the decode and operand
   gather stage:
 
-    Bits | Name      | Description
-    -----|-----------|-----------------------------------------------------
-     32  | `s1_instr`| 32-bit instruction word ready for decoding.
-     1   | `s1_ferr` | Fetch error associated with these `s1_instr` bits?
-     1   | `s1_i16bit`| Eat a 16 bit instruction from the buffer.
-     1   | `s1_i32bit`| Eat a 32 bit instruction from the buffer.
+    Bits | Name       | Description
+    -----|------------|-----------------------------------------------------
+     32  | `s1_instr` | 32-bit instruction word ready for decoding.
+     1   | `s1_ferr`  | Fetch error associated with these `s1_instr` bits?
+     1   | `s1_i16bit`| `s1_instr` contains 16-bit instruction.
+     1   | `s1_i32bit`| `s1_instr` contains 32-bit instruction.
+     1   | `s1_eat_2` | Eat 2 bytes from the buffer.
+     1   | `s1_eat_4` | Eat 4 bytes from the buffer.
 
-  Note that `s1_i[16/32]bit` are driven by the decode stage, other signals
+  Note that `s1_eat_[2,4]` are driven by the decode stage, other signals
   are driven by the fetch stage.
     
-- The control flow change bus is driven from *either* decode *or*
-  execute, and communicates all interrupts, exceptions, branches and jumps to
-  the fetch stage.
+- The control flow change bus is driven from *either* execute *or*
+  writeback, and communicates all interrupts, exceptions, branches and jumps to
+  the fetch stage. The writeback stage takes priority in the event of
+  contention.
 
     Bits | Name         | Dir | Description
     -----|--------------|-----|---------------------------------------------
@@ -63,17 +66,18 @@
 
     Bits | Name         | Description
     -----|--------------|---------------------------------------------
-       1 | s2_valid     | Execute has instruction ready for writeback
-       1 | s2_ready     | Writeback ready for new instruction
-       2 | s2_full      | Instruction in writeback stage
-       5 | s2_rd        | Destination GPR
-    XLEN | s2_wdata     | Write data for CSRs / GPRs
-    XLEN | s2_pc        | Program counter for instruction
-       3 | s2_csr_op    | Control & Status Register operation
-       4 | s2_cfu_op    | Control flow change operations: mret/ebreak etc
-       5 | s2_lsu_op    | Load/store unit operation
-       2 | s2_wb_op     | Writeback data sourcing
-       1 | s2_trap      | Raise trap.
+       1 |`s3_valid    `| Execute has instruction ready for writeback
+       1 |`s3_ready    `| Writeback ready for new instruction
+       2 |`s3_full     `| Instruction in writeback stage
+       5 |`s3_rd       `| Destination GPR
+    XLEN |`s3_wdata    `| Write data for CSRs / GPRs
+    XLEN |`s3_npc      `| Next program counter - for jump and link.
+    XLEN |`s3_pc       `| Program counter for instruction
+       3 |`s3_csr_op   `| Control & Status Register operation
+       4 |`s3_cfu_op   `| Control flow change operations: mret/ebreak etc
+       5 |`s3_lsu_op   `| Load/store unit operation
+       2 |`s3_wb_op    `| Writeback data sourcing
+       1 |`s3_trap     `| Raise trap.
 
 ## Writeback
 
