@@ -14,6 +14,8 @@
     - [Synthesis](flows-synthesis.md)
     
     - [Unit Tests](flows-unit-tests.md)
+    
+    - [riscv-formal](flows-riscv-formal.md)
 
 - [Memory Interface](memory-interface.md)
 

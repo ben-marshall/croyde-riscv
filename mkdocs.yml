@@ -9,5 +9,6 @@ nav:
   - Memory Interfaces: memory-interface.md
   - Flow - Synthesis: flows-synthesis.md
   - Flow - Unit Tests: flows-unit-tests.md
+  - Flow - riscv-formal: flows-riscv-formal.md
   - Todo: todo.md
   
