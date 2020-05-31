@@ -2,6 +2,8 @@
 # uc64
 
 *A 3-stage, 64-bit RISC-V rv64imc micro-controller.*
+[![Build Status](https://travis-ci.org/ben-marshall/uc64.svg?branch=master)](https://travis-ci.org/ben-marshall/uc64)
+[![Documentation Status](https://readthedocs.org/projects/uc64/badge/?version=latest)](https://uc64.readthedocs.io/en/latest/?badge=latest)
 
 ---
 
