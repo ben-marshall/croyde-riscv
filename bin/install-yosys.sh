@@ -5,7 +5,7 @@ if [[ -z "$TOOLS_DIR" ]]; then
 fi
 
 if [[ -z "$YOSYS_ROOT" ]]; then
-    export YOSYS_ROOT=$TOOLS_DIR/verilator
+    export YOSYS_ROOT=$TOOLS_DIR/yosys
 fi
 
 YOSYS_BIN=$YOSYS_ROOT/yosys
