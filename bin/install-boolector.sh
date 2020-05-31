@@ -36,6 +36,7 @@ if [ ! -e  $BOOLECTOR_BIN ]; then
     ./contrib/setup-lingeling.sh
     ./configure.sh
     make -C build -j$(nproc)
+    mkdir -p $BOOLECTOR_PATH
     sudo cp build/bin/{boolector,btor*} $BOOLECTOR_PATH
     sudo cp deps/btor2tools/bin/btorsim $BOOLECTOR_PATH
     
