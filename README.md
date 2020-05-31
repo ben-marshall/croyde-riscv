@@ -8,7 +8,14 @@
 This is a very simple 3-stage 64-bit micro-controller, implementing the
 `rv64imc` instruction set.
 
-![Pipeline Diagram](docs/pipeline-diagram.png)
+- [Getting Started](#Getting-Started)
+- [Block Diagram](#Block-Diagram)
+- [Documentaton](docs/)
+- [Todo List](todo.md)
+
+## Block Diagram
+
+![Block Diagram](docs/pipeline-diagram.png)
 
 ## Getting Started
 
@@ -53,6 +60,13 @@ This is a very simple 3-stage 64-bit micro-controller, implementing the
 
   ```
   make  design-assertions
+  ```
+
+- Run the unit tests set:
+
+  ```
+  make unit-tests-build
+  make unit-tests-run
   ```
 
 ## Documentation 
