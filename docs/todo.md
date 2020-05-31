@@ -15,6 +15,14 @@
 
   - [ ] Trap on bad jump/branch target address.
 
+  - [ ] Set by default to by `SV39` compatible.
+
+- [ ] `WFI` instruction implementation.
+
+  - [ ] Hardware.
+
+  - [ ] Unit Test.
+
 - [ ] MPU
 
 - [ ] Trace
