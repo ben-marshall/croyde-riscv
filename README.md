@@ -1,13 +1,12 @@
 
 # uc64
 
-*A 3-stage, 64-bit RISC-V RV64IC micro-controller.*
+*A 3-stage, 64-bit RISC-V rv64imc micro-controller.*
 
 ---
 
 This is a very simple 3-stage 64-bit micro-controller, implementing the
-`rv64ic` instruction set, with support for the `M` Multiply/Divide
-extension in the works.
+`rv64imc` instruction set.
 
 ![Pipeline Diagram](docs/pipeline-diagram.png)
 
@@ -58,11 +57,11 @@ extension in the works.
 
 ## Documentation 
 
-- See the [Documentation](docs/doc-home.md) in `docs/`.
-- [Functional Requirements](functional-requirements.md)
-- [Instruction Listing](instruction-listing.md)
-- [Memory interfaces](memory-interface.md)
-- [Pipeline Structure](pipeline.md)
-- [Project Organisation](project-organisation.md)
+- See the [Documentation](docs/) in `docs/`.
+  - [Functional Requirements](docs/functional-requirements.md)
+  - [Instruction Listing](docs/instruction-listing.md)
+  - [Memory interfaces](docs/memory-interface.md)
+  - [Pipeline Structure](docs/pipeline.md)
+  - [Project Organisation](docs/project-organisation.md)
 - [Todo List](todo.md)
 
