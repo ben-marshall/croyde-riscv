@@ -48,6 +48,5 @@ else
 
 fi
 
-
-
+echo "SBY executable path: $(which sby)"
 
