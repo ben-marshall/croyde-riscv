@@ -7,5 +7,7 @@ nav:
   - Instruction Listing: instruction-listing.md
   - Pipeline: pipeline.md
   - Memory Interfaces: memory-interface.md
+  - Flow - Synthesis: flows-synthesis.md
+  - Flow - Unit Tests: flows-unit-tests.md
   - Todo: todo.md
   

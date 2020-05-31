@@ -69,13 +69,3 @@ This is a very simple 3-stage 64-bit micro-controller, implementing the
   make unit-tests-run
   ```
 
-## Documentation 
-
-- See the [Documentation](docs/) in `docs/`.
-  - [Functional Requirements](docs/functional-requirements.md)
-  - [Instruction Listing](docs/instruction-listing.md)
-  - [Memory interfaces](docs/memory-interface.md)
-  - [Pipeline Structure](docs/pipeline.md)
-  - [Project Organisation](docs/project-organisation.md)
-- [Todo List](todo.md)
-

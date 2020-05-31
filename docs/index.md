@@ -9,6 +9,12 @@
 
 - [Functional Requirements](functional-requirements.md)
 
+- Project Tool Flows:
+
+    - [Synthesis](flows-synthesis.md)
+    
+    - [Unit Tests](flows-unit-tests.md)
+
 - [Memory Interface](memory-interface.md)
 
 - [Pipeline](pipeline.md)
