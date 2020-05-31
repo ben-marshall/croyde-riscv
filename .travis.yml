@@ -22,6 +22,7 @@ jobs:
   - name: "Designer Assertions"
     script:
     - source ./bin/install-yosys.sh
+    - source ./bin/install-symbiyosys.sh
     - source ./bin/conf.sh
     - echo "Designer assertions flow not implemented"
   - name: "riscv-formal"
@@ -38,5 +39,6 @@ cache   :
   directories:
   - ~/tools/verilator
   - ~/tools/yosys
+  - ~/tools/symbiyosys
   - ~/tools/riscv64-unknown-elf
 
