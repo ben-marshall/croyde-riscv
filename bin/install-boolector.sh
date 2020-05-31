@@ -12,7 +12,7 @@ BOOLECTOR_PATH=$BOOLECTOR_ROOT/install
 
 export PATH=$BOOLECTOR_PATH:$PATH
 
-BOOLECTOR_BIN=$BOOLECTOR_DIR/boolector
+BOOLECTOR_BIN=$BOOLECTOR_PATH/boolector
 
 echo "------------------- Installing Tools --------------------------"
 echo "TOOLS_DIR         '$TOOLS_DIR'"
