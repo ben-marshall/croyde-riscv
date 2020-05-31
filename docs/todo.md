@@ -9,22 +9,6 @@
 
   - [ ] SLTU[.w] optimisation / reuse adder circuit
 
-- [ ] M Extension
-
-    - [ ] insn div
-    - [ ] insn divu
-    - [ ] insn divuw
-    - [ ] insn divw
-    - [x] insn mul
-    - [x] insn mulh
-    - [x] insn mulhsu
-    - [x] insn mulhu
-    - [x] insn mulw
-    - [ ] insn rem
-    - [ ] insn remu
-    - [ ] insn remuw
-    - [ ] insn remw
-
 - [ ] Configurable physical address bit width
 
   - [ ] Top level parameter
@@ -34,8 +18,6 @@
 - [ ] MPU
 
 - [ ] Trace
-
-  - [ ] Fix tracing of instructions which trapped.
 
 - [ ] Core Complex
 
@@ -66,17 +48,3 @@
 
 - [ ] csrw mcycle
 - [ ] csrw minstret
-- [ ] insn div
-- [ ] insn divu
-- [ ] insn divuw
-- [ ] insn divw
-- [ ] insn mul
-- [ ] insn mulh
-- [ ] insn mulhsu
-- [ ] insn mulhu
-- [ ] insn mulw
-- [ ] insn rem
-- [ ] insn remu
-- [ ] insn remuw
-- [ ] insn remw
-
