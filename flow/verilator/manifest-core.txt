@@ -5,6 +5,7 @@ $REPO_HOME/rtl/core/core_pipe_decode.sv
 $REPO_HOME/rtl/core/core_pipe_exec_alu.sv
 $REPO_HOME/rtl/core/core_pipe_exec_cfu.sv
 $REPO_HOME/rtl/core/core_pipe_exec_lsu.sv
+$REPO_HOME/rtl/core/core_pipe_exec_mdu.sv
 $REPO_HOME/rtl/core/core_pipe_exec.sv
 $REPO_HOME/rtl/core/core_pipe_wb.sv
 $REPO_HOME/rtl/core/core_csrs.sv

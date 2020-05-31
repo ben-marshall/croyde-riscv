@@ -155,6 +155,34 @@ wire        alu_cmp_ltu     ; // Result of opr_a <  opr_b
 wire [XL:0] alu_result      ; // Operation result
 
 //
+// MDU interfacing
+// ------------------------------------------------------------
+
+wire        mdu_valid   =
+    s2_mdu_mul      || s2_mdu_mulh     || s2_mdu_mulhsu   || s2_mdu_mulhu ||
+    s2_mdu_div      || s2_mdu_divu     || s2_mdu_rem      || s2_mdu_remu  ||
+    s2_mdu_mulw     || s2_mdu_divw     || s2_mdu_divuw    || s2_mdu_remw  ||
+    s2_mdu_remuw    ;
+
+wire        mdu_mul     = s2_mdu_mulw || s2_mdu_mul     ;
+wire        mdu_div     = s2_mdu_div  || s2_mdu_divw    ;
+wire        mdu_divu    = s2_mdu_divu || s2_mdu_divuw   ;
+wire        mdu_rem     = s2_mdu_rem  || s2_mdu_remw    ;
+wire        mdu_remu    = s2_mdu_remu || s2_mdu_remuw   ;
+
+wire        mdu_word    =
+    s2_mdu_mulw     || s2_mdu_divw     || s2_mdu_divuw    || s2_mdu_remw  ||
+    s2_mdu_remuw    ;
+
+wire [XL:0] s2_mdu_lhs  = s2_alu_lhs;
+wire [XL:0] s2_mdu_rhs  = s2_alu_rhs;
+
+wire        mdu_ready   ;
+wire [XL:0] mdu_result  ;
+
+wire        mdu_flush   = e_new_instr;
+
+//
 // CFU interfacing
 // ------------------------------------------------------------
 
@@ -209,14 +237,6 @@ assign  csr_new_op[CSR_OP_CLR   ] = s2_csr_clr  ;
 
 wire    wdata_csr = |csr_new_op;
 
-//
-// MDU interfacing
-// ------------------------------------------------------------
-
-wire        mdu_valid       ;
-wire        mdu_ready       = mdu_valid;
-wire [XL:0] mdu_result      = {XLEN{1'b0}};
-
 
 //
 // Writeback data multiplexing
@@ -225,12 +245,14 @@ wire [XL:0] mdu_result      = {XLEN{1'b0}};
 assign               s2_ready    =
      s3_ready                           &&
     (cfu_op_any ? cfu_finished : 1'b1)  &&
-    (lsu_valid  ? lsu_ready    : 1'b1)  ;
+    (lsu_valid  ? lsu_ready    : 1'b1)  &&
+    (mdu_valid  ? mdu_ready    : 1'b1)  ;
 
 assign              s3_valid     =
      s2_valid                           &&
     (cfu_op_any ? cfu_finished : 1'b1)  &&
-    (lsu_valid  ? lsu_ready    : 1'b1)  ;
+    (lsu_valid  ? lsu_ready    : 1'b1)  &&
+    (mdu_valid  ? mdu_ready    : 1'b1)  ;
 
 wire                 n_s3_full   = s3_valid && s3_ready && !s2_flush;
 wire [         XL:0] n_s3_pc     = s2_pc        ;
@@ -331,6 +353,29 @@ core_pipe_exec_alu i_core_pipe_exec_alu (
 .cmp_lt     (alu_cmp_lt     ), // Result of opr_a <  opr_b
 .cmp_ltu    (alu_cmp_ltu    ), // Result of opr_a <  opr_b
 .result     (alu_result     )  // Operation result
+);
+
+//
+// MDU
+
+core_pipe_exec_mdu i_core_pipe_exec_mdu(
+.g_clk      (g_clk          ) , // Clock
+.g_resetn   (g_resetn       ) , // Active low synchronous reset.
+.flush      (mdu_flush      ) , // Flush and stop any execution.
+.valid      (mdu_valid      ) , // Inputs are valid.
+.op_word    (mdu_word       ) , // word-wise operation on 32-bit data.
+.op_mul     (mdu_mul        ) , //
+.op_mulh    (s2_mdu_mulh    ) , //
+.op_mulhu   (s2_mdu_mulhu   ) , //
+.op_mulhsu  (s2_mdu_mulhsu  ) , //
+.op_div     (mdu_div        ) , //
+.op_divu    (mdu_divu       ) , //
+.op_rem     (mdu_rem        ) , //
+.op_remu    (mdu_remu       ) , //
+.rs1        (s2_mdu_lhs     ) , // Source register 1
+.rs2        (s2_mdu_rhs     ) , // Source register 2
+.ready      (mdu_ready      ) , // Finished computing
+.rd         (mdu_result     )   // Result
 );
 
 //

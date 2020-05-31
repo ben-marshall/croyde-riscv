@@ -1,0 +1,7 @@
+
+TEST_NAME = div
+TEST_SRC  = $(UNIT_ROOT)/div/test_div.c
+
+$(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
+
+

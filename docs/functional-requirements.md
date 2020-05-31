@@ -23,32 +23,42 @@ implement.
 
 ## Micro-architectural
 
-- Three stages: Fetch, Decode/Pre-execute, Execute/Writeback
+- Three stages: Fetch, Decode + Execute, Writeback
 
 - Separate instruction fetch and data memory busses.
 
-- Fetch:
+
+**Fetch:**
 
   - 32-bit instruction fetch bus.
 
-  - 64-bit fetch buffer.
+  - 128-bit fetch buffer.
 
   - Decoder: 1x 32/16 bit instructions decoded per cycle.
 
-- Decode/Pre-execute:
+
+**Decode+Execute:**
 
   - Decode operands
   
   - Read registers
 
-  - Select functional units: ALU / LSU / CSR etc.
+  - Select functional units: ALU / LSU / CSR / CFU etc.
 
-- Execute:
+    - Non-trapping control flow changes are taken here.
 
-  - Compute results and write-back.
+  - Compute results for writeback.
+
+
+**Writeback:**
+
+  - GPR writes.
 
   - CSR access.
 
   - Data Memory access.
 
   - Single forwarding path from execute to Decode.
+
+  - Traps and interrupts are raised here.
+

@@ -1,15 +1,21 @@
 
 # uc64
 
-*A 3-stage, 64-bit RISC-V RV64IC micro-controller.*
+*A 3-stage, 64-bit RISC-V rv64imc micro-controller.*
 
 ---
 
 This is a very simple 3-stage 64-bit micro-controller, implementing the
-`rv64ic` instruction set, with support for the `M` Multiply/Divide
-extension in the works.
+`rv64imc` instruction set.
 
-![Pipeline Diagram](docs/pipeline-diagram.png)
+- [Getting Started](#Getting-Started)
+- [Block Diagram](#Block-Diagram)
+- [Documentaton](docs/)
+- [Todo List](docs/todo.md)
+
+## Block Diagram
+
+![Block Diagram](docs/pipeline-diagram.png)
 
 ## Getting Started
 
@@ -56,13 +62,10 @@ extension in the works.
   make  design-assertions
   ```
 
-## Documentation 
+- Run the unit tests set:
 
-- See the [Documentation](docs/doc-home.md) in `docs/`.
-- [Functional Requirements](functional-requirements.md)
-- [Instruction Listing](instruction-listing.md)
-- [Memory interfaces](memory-interface.md)
-- [Pipeline Structure](pipeline.md)
-- [Project Organisation](project-organisation.md)
-- [Todo List](todo.md)
+  ```
+  make unit-tests-build
+  make unit-tests-run
+  ```
 

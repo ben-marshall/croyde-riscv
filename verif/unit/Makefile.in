@@ -7,12 +7,12 @@ UNIT_TESTS_RUN  =
 
 UNIT_TESTS_CLEAN=
 
-UNIT_TIMEOUT    = 20000
+UNIT_TIMEOUT    = 25000
 UNIT_FAIL       = 0x10000086
 UNIT_PASS       = 0x10000090
 
 UNIT_CFLAGS     = -I$(UNIT_ROOT)/share -nostartfiles -O1
-UNIT_CFLAGS    += -march=rv64ic -mabi=lp64
+UNIT_CFLAGS    += -march=rv64imc -mabi=lp64
 UNIT_CFLAGS    += -T $(UNIT_ROOT)/share/link.ld
 
 UNIT_SRCS       = $(UNIT_ROOT)/share/boot.S \
@@ -95,6 +95,8 @@ UNIT_TESTS_CLEAN += $(call unit_test_waves,${1}) \
 endef
 
 include $(REPO_HOME)/verif/unit/example/Makefile.in
+include $(REPO_HOME)/verif/unit/mul/Makefile.in
+include $(REPO_HOME)/verif/unit/div/Makefile.in
 include $(REPO_HOME)/verif/unit/mtime-read/Makefile.in
 include $(REPO_HOME)/verif/unit/mtime-write/Makefile.in
 include $(REPO_HOME)/verif/unit/counters/Makefile.in
