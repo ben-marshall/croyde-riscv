@@ -271,6 +271,11 @@ assign trap_cause     = raise_int ? int_cause           :
                                     'b0                 ;
 
 assign trap_mtval     = 0 ;
+
+// FIXME: Bug with trap epc on an interrupt.
+// - should be n_s3_pc iff we are trapping due to an interrupt.
+// - Note that if the interrupted instruction is a control flow
+//   change, then we must select the target of the control flow change.
 assign trap_pc        = s3_pc ;
 
 //
