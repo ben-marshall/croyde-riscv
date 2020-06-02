@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Thu May 28 19:35:54 2020
+[*] Tue Jun  2 18:51:58 2020
 [*]
-[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/unit/div/div.vcd"
-[dumpfile_mtime] "Thu May 28 18:31:12 2020"
-[dumpfile_size] 6083744
+[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/unit/branch-tgt-trap/branch-tgt-trap.vcd"
+[dumpfile_mtime] "Tue Jun  2 18:50:03 2020"
+[dumpfile_size] 332011
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/verilator.gtkw"
-[timestart] 1225
+[timestart] 1
 [size] 1920 1025
 [pos] -1 -1
-*-7.148241 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-8.148241 1206 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.core_top.
 [treeopen] TOP.core_top.i_core_pipe_exec.
@@ -22,7 +22,7 @@
 TOP.core_top.i_core_pipe_fetch.g_clk
 TOP.core_top.i_core_pipe_fetch.g_resetn
 @c02022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/div/div.gtkwl
+^4 /home/ben/projects/riscv/cores/uc64/work/unit/branch-tgt-trap/branch-tgt-trap.gtkwl
 TOP.core_top.trs_instr[31:0]
 @28
 (0)TOP.core_top.trs_instr[31:0]
@@ -558,7 +558,7 @@ TOP.core_top.i_core_pipe_exec.e_pipe_progress
 @22
 TOP.core_top.i_core_pipe_exec.s2_imm[63:0]
 @2022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/div/div.gtkwl
+^4 /home/ben/projects/riscv/cores/uc64/work/unit/branch-tgt-trap/branch-tgt-trap.gtkwl
 TOP.core_top.i_core_pipe_exec.s2_instr[31:0]
 @22
 TOP.core_top.i_core_pipe_exec.s2_instr[31:0]
@@ -694,7 +694,7 @@ TOP.core_top.i_core_pipe_exec.dmem_wen
 -DMEM
 @1401200
 -LSU
-@800200
+@c00200
 -MDU
 @28
 TOP.core_top.i_core_pipe_exec.mdu_ready
@@ -731,14 +731,11 @@ TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.sub_last
 @22
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.mul_add_l[64:0]
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.mul_add_r[64:0]
-@24
-TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.mul_ctr[6:0]
 @28
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.mul_hi
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.mul_l_sign
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.mul_r_sign
 @22
-TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.mul_state[127:0]
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.mul_sum[64:0]
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.n_mul_state[127:0]
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.n_rs1_mul[63:0]
@@ -755,11 +752,8 @@ TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.div_done
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.div_sign_lhs
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.div_sign_rhs
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.div_outsign
-@24
-TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.div_ctr[6:0]
-@23
-TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.qmask[63:0]
 @22
+TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.qmask[63:0]
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.n_rs1_div[63:0]
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.n_rs2_div[63:0]
 @28
@@ -776,6 +770,7 @@ TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.n_quotient[63:0]
 TOP.core_top.i_core_pipe_exec.i_core_pipe_exec_mdu.result_div[63:0]
 @1000200
 -MDU -  Divider
+@1401200
 -MDU
 @c00200
 -Writeback
@@ -808,7 +803,7 @@ TOP.core_top.i_core_pipe_exec.n_s3_wdata[63:0]
 -Next Stage
 @1000200
 -Pipeline  - Execute
-@c00200
+@800200
 -Pipeline - Writeback
 @28
 TOP.core_top.i_core_pipe_wb.g_clk
@@ -869,18 +864,13 @@ TOP.core_top.i_core_pipe_wb.dmem_gnt
 TOP.core_top.i_core_pipe_wb.dmem_err
 @22
 TOP.core_top.i_core_pipe_wb.dmem_rdata[63:0]
-@c00200
--TOP.core_top.i_core_pipe_wb.dmem_addr
-@1401200
--group_end
-@22
 TOP.core_top.i_core_pipe_wb.dmem_strb[7:0]
 TOP.core_top.i_core_pipe_wb.dmem_wdata[63:0]
 @28
 TOP.core_top.i_core_pipe_wb.dmem_wen
 @1000200
 -DMEM
-@c00200
+@800200
 -CSR
 @22
 TOP.core_top.i_core_pipe_wb.csr_addr[11:0]
@@ -899,7 +889,7 @@ TOP.core_top.i_core_pipe_wb.csr_wdata[63:0]
 TOP.core_top.i_core_pipe_wb.csr_wr
 TOP.core_top.i_core_pipe_wb.csr_wr_clr
 TOP.core_top.i_core_pipe_wb.csr_wr_set
-@1401200
+@1000200
 -CSR
 -Pipeline - Writeback
 @c00200

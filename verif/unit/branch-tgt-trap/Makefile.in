@@ -1,0 +1,6 @@
+
+TEST_NAME = branch-tgt-trap
+TEST_SRC  = $(UNIT_ROOT)/branch-tgt-trap/test_branch_tgt_trap.c
+
+$(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
+
