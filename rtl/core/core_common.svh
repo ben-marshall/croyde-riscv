@@ -12,7 +12,7 @@ localparam  XL          = XLEN-1;   // For signals which are XLEN wide.
 localparam  ILEN        = 32    ;
 localparam  NRET        = 1     ;
 
-parameter   MEM_ADDR_W  = 36;       // Memory address bus width
+parameter   MEM_ADDR_W  = 39;       // Memory address bus width
 parameter   MEM_STRB_W  =  8;       // Memory strobe bits width
 parameter   MEM_DATA_W  = 64;       // Memory data bits width
 
