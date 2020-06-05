@@ -15,9 +15,12 @@ DECL_RD_CSR(mcause)
 DECL_RD_CSR(mtvec)
 DECL_WR_CSR(mtvec)
 
-__attribute__((noreturn))
-__attribute__((aligned(4)))
-void trap_handler()  {
+// Flag set/cleared by c_trap_handler.
+int test_passed = 0;
+
+extern void test_trap_handler();
+
+void c_trap_handler()  {
 
     int64_t mcause = (int64_t)rd_mcause();
 
@@ -27,16 +30,30 @@ void trap_handler()  {
     }
 
     __putstr("mcause: "); __puthex8(mcause); __putchar('\n');
+
+    if(mcause == CAUSE_CODE_IACCESS) {
+        test_passed += 1;
+    } else {
+        test_fail();
+    }
     
-    // Return from m-mode exception.
-    asm ("mret");
+    return;
 }
 
 int test_main() {
 
     // Set MTVEC to the trap handler.
-    void * trap_handler_addr = &trap_handler;
-    wr_mtvec((uint64_t)trap_handler_addr);
+    wr_mtvec((uint64_t)(&test_trap_handler));
+
+    // Jump to a non-existant physical address. -1 in this case.
+    int tgt_addr = -1;
+    asm ("jr %0" : : "r"(tgt_addr));
+
+    if(test_passed == 1) {
+        test_pass();
+    } else {
+        test_fail();
+    }
 
     return 0;
 
