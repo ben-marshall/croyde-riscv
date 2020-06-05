@@ -242,6 +242,9 @@ assign      exec_mret    = s3_cfu_op == CFU_OP_MRET && e_instr_ret;
 // Traps and interrupts.
 // ------------------------------------------------------------
 
+// Raise trap due to CFU in previous cycle.
+wire   trap_cfu       = s3_cfu_op == CFU_OP_TRAP;
+
 wire   trapped        = trap_cpu || r_trapped;
 reg    r_trapped      ;
 
@@ -258,15 +261,16 @@ wire   raise_int      = int_pending;
 assign int_ack        = raise_int && e_cf_change;
 
 // trap occured due to CPU
-assign trap_cpu       = !raise_int && (
-    s3_trap                 ||
+assign trap_cpu       = s3_full && !raise_int && (
+    s3_trap     ||
+    trap_cfu    ||
     trap_csr
 );
 
 assign trap_int       = int_ack; // trap occured due to interrupt
 
 assign trap_cause     = raise_int ? int_cause           :
-                        s3_trap   ? {2'b00, s3_rd_addr} :
+                        s3_trap   ? {2'b00, s3_rd       } :
                         csr_error ? TRAP_IOPCODE        :
                                     'b0                 ;
 

@@ -257,11 +257,18 @@ assign              s3_valid     =
 wire                 n_s3_full   = s3_valid && s3_ready && !s2_flush;
 wire [         XL:0] n_s3_pc     = s2_pc        ;
 wire [         31:0] n_s3_instr  = s2_instr     ;
-wire [ REG_ADDR_R:0] n_s3_rd     = s2_rd        ;
+
+// RD bits used to carry trap cause code.
+// lsu_trap_addr ? 4 -> LDALIGN.
+wire [ REG_ADDR_R:0] n_s3_rd     = 
+    cfu_trap_raise ? cfu_trap_cause[REG_ADDR_R:0]   :
+    lsu_trap_addr  ? 5'4                            :
+                     s2_rd                          ;
+
 wire [   LSU_OP_R:0] n_s3_lsu_op = lsu_new_op   ;
 wire [   CSR_OP_R:0] n_s3_csr_op = csr_new_op   ;
 wire [   CFU_OP_R:0] n_s3_cfu_op = cfu_new_op   ;
-wire                 n_s3_trap   = s2_trap      || lsu_trap_addr;
+wire                 n_s3_trap   = s2_trap || lsu_trap_addr || cfu_trap_raise;
 
 wire [    WB_OP_R:0] n_s3_wb_op  =
     {WB_OP_W{s2_wb_alu}} & WB_OP_WDATA  |
