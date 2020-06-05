@@ -11,11 +11,13 @@
 
 - [ ] Configurable physical address bit width
 
-  - [ ] Top level parameter
+  - [X] Top level parameter
 
-  - [ ] Trap on bad jump/branch target address.
+  - [X] Trap on bad jump/branch target address.
 
-  - [ ] Set by default to by `SV39` compatible.
+  - [X] Set by default to by `SV39` compatible.
+
+  - [ ] Trap on bad write to mepc.
 
 - [ ] `WFI` instruction implementation.
 
