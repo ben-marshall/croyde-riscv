@@ -262,7 +262,7 @@ wire [         31:0] n_s3_instr  = s2_instr     ;
 // lsu_trap_addr ? 4 -> LDALIGN.
 wire [ REG_ADDR_R:0] n_s3_rd     = 
     cfu_trap_raise ? cfu_trap_cause[REG_ADDR_R:0]   :
-    lsu_trap_addr  ? 5'4                            :
+    lsu_trap_addr  ? 5'd4                           :
                      s2_rd                          ;
 
 wire [   LSU_OP_R:0] n_s3_lsu_op = lsu_new_op   ;
