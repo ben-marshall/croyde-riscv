@@ -107,6 +107,7 @@ wire [         XL:0] s2_pc          ; // Current program counter.
 wire [         XL:0] s2_npc         ; // Next    program counter.
 wire [         31:0] s2_instr       ; // Current instruction word.
 wire                 s2_trap        ; // Raise a trap
+wire [          6:0] s2_trap_cause  ; // Cause of trap being raised.
 
 wire [         XL:0] s2_alu_lhs     ; // ALU left  operand
 wire [         XL:0] s2_alu_rhs     ; // ALU right operand
@@ -188,10 +189,10 @@ wire [ REG_ADDR_R:0] s3_rs1_addr    ;
 wire [ REG_ADDR_R:0] s3_rs2_addr    ;
 wire [         XL:0] s3_rs1_rdata   ;
 wire [         XL:0] s3_rs2_rdata   ;
-wire [ MEM_ADDR_R:0] s3_dmem_valid  ;
+wire                 s3_dmem_valid  ;
 wire [ MEM_ADDR_R:0] s3_dmem_addr   ;
 wire [ MEM_STRB_R:0] s3_dmem_strb   ;
-wire [ MEM_ADDR_R:0] s3_dmem_wdata  ;
+wire [ MEM_DATA_R:0] s3_dmem_wdata  ;
 `endif
 
 wire                 s3_rd_wen      ; // Destination register write enable
@@ -270,7 +271,8 @@ wire                 mmio_error  ; // MMIO error
 //  Pipeline Fetch Stage
 //
 core_pipe_fetch #(
-.PC_RESET_ADDRESS(PC_RESET_ADDRESS)
+.PC_RESET_ADDRESS(PC_RESET_ADDRESS),
+.MEM_ADDR_W      (MEM_ADDR_W      )
 ) i_core_pipe_fetch (
 .g_clk        (g_clk        ), // Global clock
 .g_resetn     (g_resetn     ), // Global active low sync reset.
@@ -299,7 +301,9 @@ core_pipe_fetch #(
 //
 //  Pipeline decode / operand gather stage.
 //
-core_pipe_decode i_core_pipe_decode (
+core_pipe_decode #(
+.MEM_ADDR_W      (MEM_ADDR_W      )
+) i_core_pipe_decode (
 .g_clk           (g_clk           ), // Global clock
 .g_resetn        (g_resetn        ), // Global active low sync reset.
 .s1_i16bit       (s1_i16bit       ), // 16 bit instruction?
@@ -328,6 +332,7 @@ core_pipe_decode i_core_pipe_decode (
 .s2_npc          (s2_npc          ), // Next    program counter.
 .s2_instr        (s2_instr        ), // Current instruction word.
 .s2_trap         (s2_trap         ), // Raise a trap
+.s2_trap_cause   (s2_trap_cause   ), // Cause of trap being raised.
 .s2_alu_lhs      (s2_alu_lhs      ), // ALU left  operand
 .s2_alu_rhs      (s2_alu_rhs      ), // ALU right operand
 .s2_alu_add      (s2_alu_add      ), // ALU Operation to perform.
@@ -391,7 +396,9 @@ core_pipe_decode i_core_pipe_decode (
 //
 //  Top level for the execute stage of the pipeline.
 //
-core_pipe_exec i_core_pipe_exec(
+core_pipe_exec #(
+.MEM_ADDR_W     (MEM_ADDR_W     )
+) i_core_pipe_exec(
 .g_clk           (g_clk           ), // Global clock
 .g_resetn        (g_resetn        ), // Global active low sync reset.
 .s2_cf_valid     (s2_cf_valid     ), // Control flow change?
@@ -411,6 +418,7 @@ core_pipe_exec i_core_pipe_exec(
 .s2_npc          (s2_npc          ), // Next    program counter.
 .s2_instr        (s2_instr        ), // Current instruction word.
 .s2_trap         (s2_trap         ), // Raise a trap
+.s2_trap_cause   (s2_trap_cause   ), // Cause of trap being raised.
 .s2_alu_lhs      (s2_alu_lhs      ), // ALU left  operand
 .s2_alu_rhs      (s2_alu_rhs      ), // ALU right operand
 .s2_alu_add      (s2_alu_add      ), // ALU Operation to perform.
@@ -507,7 +515,9 @@ core_pipe_exec i_core_pipe_exec(
 //  Writeback stage. Responsible for GPR writebacks, CSR accesses,
 //  Load data processing, trap raising.
 //
-core_pipe_wb i_core_pipe_wb (
+core_pipe_wb #(
+.MEM_ADDR_W     (MEM_ADDR_W     )
+) i_core_pipe_wb (
 .g_clk           (g_clk           ), // Global clock
 .g_resetn        (g_resetn        ), // Global active low sync reset.
 .s3_cf_valid     (s3_cf_valid     ), // Control flow change?
@@ -669,7 +679,8 @@ core_interrupts i_core_interrupts (
 //
 core_counters #(
 .MMIO_BASE_ADDR(MMIO_BASE_ADDR),
-.MMIO_BASE_MASK(MMIO_BASE_MASK)
+.MMIO_BASE_MASK(MMIO_BASE_MASK),
+.MEM_ADDR_W    (MEM_ADDR_W    )
 ) i_core_counters (
 .g_clk           (g_clk           ), // global clock
 .g_resetn        (g_resetn        ), // synchronous reset
@@ -699,7 +710,8 @@ core_counters #(
 //
 core_mmio_mux #(
 .MMIO_BASE_ADDR(MMIO_BASE_ADDR),
-.MMIO_BASE_MASK(MMIO_BASE_MASK)
+.MMIO_BASE_MASK(MMIO_BASE_MASK),
+.MEM_ADDR_W    (MEM_ADDR_W    )
 ) i_core_mmio_mux (
 .g_clk           (g_clk           ), // Global clock
 .g_resetn        (g_resetn        ), // Synchronous active low reset.

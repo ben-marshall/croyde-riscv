@@ -64,8 +64,6 @@ wire    branch_conditional  = cfu_beq   || cfu_bge  || cfu_bgeu ||
 wire    branch_always       = cfu_j     || cfu_jal  || cfu_jalr ||
                               cfu_mret  || cfu_ebrk || cfu_ecall;
 
-wire    branch_trap         = cfu_ebrk  || cfu_ecall;
-
 //
 // Compute branch target address
 // ------------------------------------------------------------
@@ -80,18 +78,50 @@ wire    [XL:0]  target_addr = target_lhs + offset;
 
 wire    target_misaligned   = target_addr[0] && !cfu_jalr;
 
-assign  trap_raise          = cfu_ebrk  || cfu_ecall || target_misaligned;
+// The physical target address does not exist in the memory space.
+wire    target_non_existant ;
 
-assign  trap_cause          = cfu_ecall ? TRAP_ECALLM   :
-                              cfu_ebrk  ? TRAP_BREAKPT  :
-                                          TRAP_IALIGN   ;
+assign  trap_raise          = (branch_conditional || branch_always) &&
+                              (cfu_ebrk            || 
+                               cfu_ecall           || 
+                               target_misaligned   ||
+                               target_non_existant );
+
+assign  trap_cause          =
+    target_non_existant ? TRAP_IACCESS  :
+    cfu_ecall           ? TRAP_ECALLM   :
+    cfu_ebrk            ? TRAP_BREAKPT  :
+                          TRAP_IALIGN   ;
+
+generate if(MEM_ADDR_R < XL) begin : check_phy_addr_exists
+
+    //
+    // Raise a trap if any of the upper bits of the target physical
+    // address are set, indicating we are jumping to a non-existant
+    // part of the physical address space.
+
+    localparam PHY_UPPR_W = XL - MEM_ADDR_R;
+    localparam PHY_UPPR_R = PHY_UPPR_W - 1 ;
+
+    wire [PHY_UPPR_R:0] phy_addr_upper = target_addr[XL:1+MEM_ADDR_R];
+
+    assign target_non_existant = |phy_addr_upper;
+
+end else begin : phy_addr_always_exists
+
+    //
+    // The entire physcial address space is mapped, so never raise this
+    // sort of trap.
+    assign target_non_existant = 1'b0;
+
+end endgenerate
 
 //
 // Did we take the branch?
 // ------------------------------------------------------------
 
 wire    branch_taken        =
-    branch_always && !branch_trap   ||
+    branch_always && !trap_raise    ||
     cfu_beq  &&  cmp_eq             ||
     cfu_bge  && (cmp_eq || !cmp_lt )||
     cfu_bgeu && (cmp_eq || !cmp_ltu)||

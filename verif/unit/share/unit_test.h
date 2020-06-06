@@ -115,5 +115,7 @@ void __puthex32(uint32_t w);
 //! Print an 8-bit number as hex
 void __puthex8(uint8_t w);
 
+#define CAUSE_CODE_IACCESS 0x1l
+
 #endif
 

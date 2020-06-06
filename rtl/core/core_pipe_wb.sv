@@ -72,10 +72,10 @@ input  wire [ REG_ADDR_R:0] s3_rs1_addr     ,
 input  wire [ REG_ADDR_R:0] s3_rs2_addr     ,
 input  wire [         XL:0] s3_rs1_rdata    ,
 input  wire [         XL:0] s3_rs2_rdata    ,
-input  wire [ MEM_ADDR_R:0] s3_dmem_valid   ,
+input  wire                 s3_dmem_valid   ,
 input  wire [ MEM_ADDR_R:0] s3_dmem_addr    ,
 input  wire [ MEM_STRB_R:0] s3_dmem_strb    ,
-input  wire [ MEM_ADDR_R:0] s3_dmem_wdata   ,
+input  wire [ MEM_DATA_R:0] s3_dmem_wdata   ,
 `RVFI_OUTPUTS                               ,
 `endif
 
@@ -242,6 +242,9 @@ assign      exec_mret    = s3_cfu_op == CFU_OP_MRET && e_instr_ret;
 // Traps and interrupts.
 // ------------------------------------------------------------
 
+// Raise trap due to CFU in previous cycle.
+wire   trap_cfu       = s3_cfu_op == CFU_OP_TRAP;
+
 wire   trapped        = trap_cpu || r_trapped;
 reg    r_trapped      ;
 
@@ -258,15 +261,16 @@ wire   raise_int      = int_pending;
 assign int_ack        = raise_int && e_cf_change;
 
 // trap occured due to CPU
-assign trap_cpu       = !raise_int && (
-    s3_trap                 ||
+assign trap_cpu       = s3_full && !raise_int && (
+    s3_trap     ||
+    trap_cfu    ||
     trap_csr
 );
 
 assign trap_int       = int_ack; // trap occured due to interrupt
 
 assign trap_cause     = raise_int ? int_cause           :
-                        s3_trap   ? {2'b00, s3_rd_addr} :
+                        s3_trap   ? {2'b00, s3_rd       } :
                         csr_error ? TRAP_IOPCODE        :
                                     'b0                 ;
 

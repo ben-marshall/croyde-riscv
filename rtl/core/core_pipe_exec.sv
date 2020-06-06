@@ -29,6 +29,7 @@ input  wire [         XL:0] s2_pc           , // Current program counter.
 input  wire [         XL:0] s2_npc          , // Next    program counter.
 input  wire [         31:0] s2_instr        , // Current instruction word.
 input  wire                 s2_trap         , // Raise a trap
+input  wire [          6:0] s2_trap_cause   , // Trap cause
 
 input  wire [         XL:0] s2_alu_lhs      , // ALU left  operand
 input  wire [         XL:0] s2_alu_rhs      , // ALU right operand
@@ -110,10 +111,10 @@ output reg  [ REG_ADDR_R:0] s3_rs1_addr     ,
 output reg  [ REG_ADDR_R:0] s3_rs2_addr     ,
 output reg  [         XL:0] s3_rs1_rdata    ,
 output reg  [         XL:0] s3_rs2_rdata    ,
-output reg  [ MEM_ADDR_R:0] s3_dmem_valid   ,
+output reg                  s3_dmem_valid   ,
 output reg  [ MEM_ADDR_R:0] s3_dmem_addr    ,
 output reg  [ MEM_STRB_R:0] s3_dmem_strb    ,
-output reg  [ MEM_ADDR_R:0] s3_dmem_wdata   ,
+output reg  [ MEM_DATA_R:0] s3_dmem_wdata   ,
 `endif
 
 output wire                 dmem_req        , // Memory request
@@ -257,11 +258,26 @@ assign              s3_valid     =
 wire                 n_s3_full   = s3_valid && s3_ready && !s2_flush;
 wire [         XL:0] n_s3_pc     = s2_pc        ;
 wire [         31:0] n_s3_instr  = s2_instr     ;
-wire [ REG_ADDR_R:0] n_s3_rd     = s2_rd        ;
+
+// RD bits used to carry trap cause code.
+// lsu_trap_addr ? 4 -> LDALIGN.
+wire [ REG_ADDR_R:0] n_s3_rd     = 
+    s2_trap        ? s2_trap_cause [REG_ADDR_R:0]   :
+    cfu_trap_raise ? cfu_trap_cause[REG_ADDR_R:0]   :
+    lsu_trap_addr  ? 5'd4                           :
+                     s2_rd                          ;
+
+// Next load/store unit op.
 wire [   LSU_OP_R:0] n_s3_lsu_op = lsu_new_op   ;
-wire [   CSR_OP_R:0] n_s3_csr_op = csr_new_op   ;
+
+// Next control & status register op.
+wire [   CSR_OP_R:0] n_s3_csr_op = n_s3_trap ? {CSR_OP_W{1'b0}} :csr_new_op ;
+
+// Next control flow unit op.
 wire [   CFU_OP_R:0] n_s3_cfu_op = cfu_new_op   ;
-wire                 n_s3_trap   = s2_trap      || lsu_trap_addr;
+
+// Raise a trap in the WB stage?
+wire                 n_s3_trap   = s2_trap || lsu_trap_addr || cfu_trap_raise;
 
 wire [    WB_OP_R:0] n_s3_wb_op  =
     {WB_OP_W{s2_wb_alu}} & WB_OP_WDATA  |
@@ -381,7 +397,9 @@ core_pipe_exec_mdu i_core_pipe_exec_mdu(
 //
 // LSU
 
-core_pipe_exec_lsu i_core_pipe_exec_lsu (
+core_pipe_exec_lsu #(
+.MEM_ADDR_W     (MEM_ADDR_W     )
+) i_core_pipe_exec_lsu (
 .g_clk      (g_clk          ), // Global clock enable.
 .g_resetn   (g_resetn       ), // Global synchronous reset
 .new_instr  (lsu_new_instr  ), // New instruciton next cycle
@@ -411,7 +429,9 @@ core_pipe_exec_lsu i_core_pipe_exec_lsu (
 //
 // CFU
 
-core_pipe_exec_cfu i_core_pipe_exec_cfu (
+core_pipe_exec_cfu #(
+.MEM_ADDR_W     (MEM_ADDR_W )
+) i_core_pipe_exec_cfu (
 .g_clk      (g_clk          ),
 .g_resetn   (g_resetn       ),
 .new_instr  (cfu_new_instr  ), // Being fed a new instruction.
