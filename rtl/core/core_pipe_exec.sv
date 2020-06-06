@@ -267,9 +267,16 @@ wire [ REG_ADDR_R:0] n_s3_rd     =
     lsu_trap_addr  ? 5'd4                           :
                      s2_rd                          ;
 
+// Next load/store unit op.
 wire [   LSU_OP_R:0] n_s3_lsu_op = lsu_new_op   ;
-wire [   CSR_OP_R:0] n_s3_csr_op = csr_new_op   ;
+
+// Next control & status register op.
+wire [   CSR_OP_R:0] n_s3_csr_op = n_s3_trap ? {CSR_OP_W{1'b0}} :csr_new_op ;
+
+// Next control flow unit op.
 wire [   CFU_OP_R:0] n_s3_cfu_op = cfu_new_op   ;
+
+// Raise a trap in the WB stage?
 wire                 n_s3_trap   = s2_trap || lsu_trap_addr || cfu_trap_raise;
 
 wire [    WB_OP_R:0] n_s3_wb_op  =

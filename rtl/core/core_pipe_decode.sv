@@ -36,7 +36,7 @@ output wire [ REG_ADDR_R:0] s2_rd           , // Destination reg address.
 output wire [         XL:0] s2_rs1_data     , // RS1 value.
 output wire [         XL:0] s2_rs2_data     , // RS2 value.
 output wire [         XL:0] s2_imm          , // Immediate value
-output reg  [         XL:0] s2_pc           , // Current program counter.
+output wire [         XL:0] s2_pc           , // Current program counter.
 output wire [         XL:0] s2_npc          , // Next    program counter.
 output wire [         31:0] s2_instr        , // Current instruction word.
 output wire                 s2_trap         , // Raise a trap
@@ -126,19 +126,31 @@ assign s2_instr     = {s1_i32bit ? s1_instr[31:16] : 16'b0, s1_instr[15:0]};
 // ------------------------------------------------------------
 
 // Inital address of the program counter post reset.
-parameter   PC_RESET_ADDRESS      = 64'h10000000;
+parameter   PC_RESET_ADDRESS      = 'h10000000;
+
+// Only use as many register bits for the PC as there are physical
+// memory address bits.
+reg     [MEM_ADDR_R:0] s2_pc_reg ; 
+
+// Pad s2_pc signal with zeros as needed.
+generate if(MEM_ADDR_R < XL) begin
+    assign      s2_pc   = {{XL-MEM_ADDR_R{1'b0}}, s2_pc_reg};
+end else begin
+    assign      s2_pc   = s2_pc_reg;
+end endgenerate
 
 wire        e_cf_change = cf_valid && cf_ack;
 
 assign      s2_npc      = s2_pc + {61'b0, s1_i32bit, s1_i16bit, 1'b0};
 
+
 always @(posedge g_clk) begin
     if(!g_resetn) begin
-        s2_pc <= PC_RESET_ADDRESS;
+        s2_pc_reg <= PC_RESET_ADDRESS;
     end else if(e_cf_change) begin
-        s2_pc <= cf_target;
+        s2_pc_reg <= cf_target[MEM_ADDR_R:0];
     end else if(s1_eat_2 || s1_eat_4) begin
-        s2_pc <= s2_npc;
+        s2_pc_reg <= s2_npc[MEM_ADDR_R:0];
     end
 end
 
@@ -407,12 +419,16 @@ assign  s2_cfu_mret = dec_mret                  ;
 //
 // LSU
 
-assign  s2_lsu_load = dec_lb    || dec_lbu  || dec_lh   || dec_lhu      ||
-                      dec_lw    || dec_lwu  || dec_ld   || dec_c_lwsp   ||
-                      dec_c_lw  || dec_c_ldsp || dec_c_ld;
+assign  s2_lsu_load = !s2_iaccess_trap && (
+    dec_lb    || dec_lbu    || dec_lh   || dec_lhu      ||
+    dec_lw    || dec_lwu    || dec_ld   || dec_c_lwsp   ||
+    dec_c_lw  || dec_c_ldsp || dec_c_ld
+);
 
-assign  s2_lsu_store= dec_sb        || dec_sh   || dec_sw     || dec_sd   || 
-                      dec_c_swsp    || dec_c_sw || dec_c_sdsp || dec_c_sd ;
+assign  s2_lsu_store= !s2_iaccess_trap && (
+    dec_sb        || dec_sh   || dec_sw     || dec_sd   || 
+    dec_c_swsp    || dec_c_sw || dec_c_sdsp || dec_c_sd 
+);
 
 assign  s2_lsu_byte = dec_lb    || dec_lbu  || dec_sb;
 
@@ -455,22 +471,22 @@ assign  s2_csr_wr     = dec_csrrsi || dec_csrrs || dec_csrrw || dec_csrrwi;
 //
 // Writeback data selection
 
-assign  s2_wb_alu     = !s2_wb_npc && !cfu_op_conditonal && (
+assign  s2_wb_alu     = !s2_trap && !s2_wb_npc && !cfu_op_conditonal && (
     s2_alu_add      || s2_alu_and      || s2_alu_or       || s2_alu_sll ||
     s2_alu_srl      || s2_alu_slt      || s2_alu_sltu     || s2_alu_sra ||
     s2_alu_sub      || s2_alu_xor      || s2_alu_word     );
 
-assign  s2_wb_csr     = s2_csr_rd   ;
+assign  s2_wb_csr     = !s2_trap && s2_csr_rd   ;
 
-assign  s2_wb_mdu     = 
+assign  s2_wb_mdu     =!s2_trap && ( 
     s2_mdu_mul      || s2_mdu_mulh     || s2_mdu_mulhsu   || s2_mdu_mulhu ||
     s2_mdu_div      || s2_mdu_divu     || s2_mdu_rem      || s2_mdu_remu  ||
     s2_mdu_mulw     || s2_mdu_divw     || s2_mdu_divuw    || s2_mdu_remw  ||
-    s2_mdu_remuw    ;
+    s2_mdu_remuw    );
 
-assign  s2_wb_lsu     = s2_lsu_load ;
+assign  s2_wb_lsu     = !s2_trap && s2_lsu_load ;
 
-assign  s2_wb_npc     = s2_cfu_jal  || s2_cfu_jalr;
+assign  s2_wb_npc     = !s2_trap && (s2_cfu_jal  || s2_cfu_jalr);
 
 //
 // Traps
@@ -479,6 +495,7 @@ assign  s2_wb_npc     = s2_cfu_jal  || s2_cfu_jalr;
 
 wire    s2_iaccess_trap_16  =  s1_ferr[  0] && s1_i16bit    ;
 wire    s2_iaccess_trap_32  = |s1_ferr[1:0] && s1_i32bit    ;
+wire    s2_iaccess_trap     = s2_iaccess_trap_16 || s2_iaccess_trap_32;
 
 assign  s2_trap             = dec_invalid_opcode            ||
                               s2_iaccess_trap_16            ||
