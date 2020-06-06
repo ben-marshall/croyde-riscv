@@ -39,7 +39,7 @@ input  wire                 cfu_mret    , //
 
 output wire                 cf_valid    , // Control flow change?
 input  wire                 cf_ack      , // Control flow acknwoledged
-output wire [ MEM_ADDR_R:0] cf_target   , // Control flow destination
+output wire [         XL:0] cf_target   , // Control flow destination
 
 output wire [         XL:0] new_pc      , // New program counter
 output wire [   CFU_OP_R:0] new_op      , // New operation to perform in wb.
@@ -53,10 +53,6 @@ output wire                 finished      // CFU instruction finished.
 
 // Common parameters and width definitions.
 `include "core_common.svh"
-
-// Difference between XLEN and physical address bits
-localparam PHY_UPPR_W = XL - MEM_ADDR_R;
-localparam PHY_UPPR_R = PHY_UPPR_W - 1 ;
 
 //
 // MISC Useful signals
@@ -74,8 +70,7 @@ wire    branch_always       = cfu_j     || cfu_jal  || cfu_jalr ||
 
 wire    [XL:0]  target_lhs  = cfu_jalr   ? rs1   : pc;
 
-wire    [MEM_ADDR_W:0]  target_addr =
-    target_lhs[MEM_ADDR_R:0] + offset[MEM_ADDR_R:0];
+wire    [XL:0]  target_addr = target_lhs + offset;
 
 //
 // Raise a trap?
@@ -105,12 +100,12 @@ generate if(MEM_ADDR_R < XL) begin : check_phy_addr_exists
     // address are set, indicating we are jumping to a non-existant
     // part of the physical address space.
 
-    wire [PHY_UPPR_R:0] addr_base_upper = target_lhs[XL:1+MEM_ADDR_R];
-    wire [PHY_UPPR_R:0] addr_offs_upper = offset    [XL:1+MEM_ADDR_R];
-    wire                addr_cout       = target_addr[MEM_ADDR_W];
+    localparam PHY_UPPR_W = XL - MEM_ADDR_R;
+    localparam PHY_UPPR_R = PHY_UPPR_W - 1 ;
 
-    assign target_non_existant = 
-        |(addr_base_upper + addr_offs_upper + {{PHY_UPPR_R{1'b0}},addr_cout});
+    wire [PHY_UPPR_R:0] phy_addr_upper = target_addr[XL:1+MEM_ADDR_R];
+
+    assign target_non_existant = |phy_addr_upper;
 
 end else begin : phy_addr_always_exists
 
@@ -136,8 +131,7 @@ wire    branch_taken        =
 
 wire    branch_ignore       = branch_conditional && !branch_taken;
 
-assign  new_pc              = branch_taken ? {{PHY_UPPR_R{1'b0}},target_addr}:
-                                             npc        ;
+assign  new_pc              = branch_taken ? target_addr : npc;
 
 assign  new_op              = trap_raise    ? CFU_OP_TRAP   :
                               cfu_mret      ? CFU_OP_MRET   :
@@ -158,8 +152,7 @@ wire    n_cf_change_done = (cf_valid && cf_ack) || cf_change_done;
 
 assign  finished    = n_cf_change_done || trap_raise || branch_ignore;
 
-assign  cf_target   = cfu_mret ? csr_mepc   [MEM_ADDR_R:0] :
-                                 target_addr[MEM_ADDR_R:0] ;
+assign  cf_target   = cfu_mret ? csr_mepc : target_addr;
 
 assign  cf_valid    = branch_taken && !cf_change_done && valid;
 
