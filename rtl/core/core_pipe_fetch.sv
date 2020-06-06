@@ -154,8 +154,8 @@ reg         buf_fill_8      ; // Load top 8 bytes of input data.
 wire [31:0] buf_data_out    ; // Data out of the buffer.
 wire [ 1:0] buf_error_out   ; // Is data tagged with fetch error?
 
-wire        buf_drain_2     = s1_i16bit && s1_eat_2;
-wire        buf_drain_4     = s1_i32bit && s1_eat_4;
+wire        buf_drain_2     = s1_eat_2;
+wire        buf_drain_4     = s1_eat_4;
 
 // Is the buffer ready to accept more data?
 wire        buf_ready       = n_buf_depth  <= 8 && !e_imem_req;
