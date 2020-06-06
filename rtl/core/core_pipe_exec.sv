@@ -111,10 +111,10 @@ output reg  [ REG_ADDR_R:0] s3_rs1_addr     ,
 output reg  [ REG_ADDR_R:0] s3_rs2_addr     ,
 output reg  [         XL:0] s3_rs1_rdata    ,
 output reg  [         XL:0] s3_rs2_rdata    ,
-output reg  [ MEM_ADDR_R:0] s3_dmem_valid   ,
+output reg                  s3_dmem_valid   ,
 output reg  [ MEM_ADDR_R:0] s3_dmem_addr    ,
 output reg  [ MEM_STRB_R:0] s3_dmem_strb    ,
-output reg  [ MEM_ADDR_R:0] s3_dmem_wdata   ,
+output reg  [ MEM_DATA_R:0] s3_dmem_wdata   ,
 `endif
 
 output wire                 dmem_req        , // Memory request
@@ -397,7 +397,9 @@ core_pipe_exec_mdu i_core_pipe_exec_mdu(
 //
 // LSU
 
-core_pipe_exec_lsu i_core_pipe_exec_lsu (
+core_pipe_exec_lsu #(
+.MEM_ADDR_W     (MEM_ADDR_W     )
+) i_core_pipe_exec_lsu (
 .g_clk      (g_clk          ), // Global clock enable.
 .g_resetn   (g_resetn       ), // Global synchronous reset
 .new_instr  (lsu_new_instr  ), // New instruciton next cycle

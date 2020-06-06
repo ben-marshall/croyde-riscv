@@ -7,7 +7,7 @@
 //
 
 
-parameter   XLEN        = 64;       // Word width of the CPU
+localparam  XLEN        = 64;       // Word width of the CPU
 localparam  XL          = XLEN-1;   // For signals which are XLEN wide.
 localparam  ILEN        = 32    ;
 localparam  NRET        = 1     ;

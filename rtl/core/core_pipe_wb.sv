@@ -72,10 +72,10 @@ input  wire [ REG_ADDR_R:0] s3_rs1_addr     ,
 input  wire [ REG_ADDR_R:0] s3_rs2_addr     ,
 input  wire [         XL:0] s3_rs1_rdata    ,
 input  wire [         XL:0] s3_rs2_rdata    ,
-input  wire [ MEM_ADDR_R:0] s3_dmem_valid   ,
+input  wire                 s3_dmem_valid   ,
 input  wire [ MEM_ADDR_R:0] s3_dmem_addr    ,
 input  wire [ MEM_STRB_R:0] s3_dmem_strb    ,
-input  wire [ MEM_ADDR_R:0] s3_dmem_wdata   ,
+input  wire [ MEM_DATA_R:0] s3_dmem_wdata   ,
 `RVFI_OUTPUTS                               ,
 `endif
 
