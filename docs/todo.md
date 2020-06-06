@@ -9,16 +9,6 @@
 
   - [ ] SLTU[.w] optimisation / reuse adder circuit
 
-- [ ] Configurable physical address bit width
-
-  - [X] Top level parameter
-
-  - [X] Trap on bad jump/branch target address.
-
-  - [X] Set by default to by `SV39` compatible.
-
-  - [ ] Trap on bad write to mepc.
-
 - [ ] `WFI` instruction implementation.
 
   - [ ] Hardware.
