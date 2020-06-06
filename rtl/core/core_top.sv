@@ -778,7 +778,11 @@ always @(posedge g_clk) if(g_resetn && $past(g_resetn)) begin
 
     cover(cf_valid &&  cf_ack);
 
-    if($past(s2_cf_valid) && !$past(s2_cf_ack)) begin
+    if($past(s2_cf_valid) && !$past(s2_cf_ack) && !s3_cf_valid) begin
+        
+        // Don't enforce these when s3_cf_valid is set, since
+        // s3 takes precedence, and can cancel an s2 control flow
+        // change request.
         
         assert($stable(s2_cf_target));
         assert($stable(s2_cf_valid ));
