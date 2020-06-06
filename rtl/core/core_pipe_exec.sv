@@ -429,7 +429,9 @@ core_pipe_exec_lsu #(
 //
 // CFU
 
-core_pipe_exec_cfu i_core_pipe_exec_cfu (
+core_pipe_exec_cfu #(
+.MEM_ADDR_W     (MEM_ADDR_W )
+) i_core_pipe_exec_cfu (
 .g_clk      (g_clk          ),
 .g_resetn   (g_resetn       ),
 .new_instr  (cfu_new_instr  ), // Being fed a new instruction.
