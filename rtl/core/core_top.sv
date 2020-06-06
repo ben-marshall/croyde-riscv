@@ -58,15 +58,15 @@ parameter   MMIO_BASE_MASK  = 'h0000_0000_0001_FFFF;
 // See also: DESIGNER_ASSERTION_CONTROL_FLOW_BUS
 wire                 cf_valid    ; // Control flow change?
 wire                 cf_ack      ; // Control flow change acknwoledged
-wire [         XL:0] cf_target   ; // Control flow change destination
+wire [ MEM_ADDR_R:0] cf_target   ; // Control flow change destination
 
 wire                 s2_cf_valid ; // Control flow change?
 wire                 s2_cf_ack   = cf_ack;
-wire [         XL:0] s2_cf_target; // Control flow destination
+wire [ MEM_ADDR_R:0] s2_cf_target; // Control flow destination
 
 wire                 s3_cf_valid ; // Control flow change?
 wire                 s3_cf_ack   = cf_ack;
-wire [         XL:0] s3_cf_target; // Control flow destination
+wire [ MEM_ADDR_R:0] s3_cf_target; // Control flow destination
 
 assign  cf_valid    = s2_cf_valid || s3_cf_valid;
 assign  cf_target   = s3_cf_valid ? s3_cf_target : s2_cf_target;

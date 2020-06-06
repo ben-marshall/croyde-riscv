@@ -20,7 +20,7 @@ input  wire                 s2_flush        , // Stage 2 flush
 
 input  wire                 cf_valid        , // Control flow change?
 input  wire                 cf_ack          , // Control flow acknwoledged
-input  wire [         XL:0] cf_target       , // Control flow destination
+input  wire [ MEM_ADDR_R:0] cf_target       , // Control flow destination
 
 output wire [ REG_ADDR_R:0] s1_rs1_addr     , // RS1 Address
 input  wire [         XL:0] s1_rs1_data     , // RS1 Read Data (Forwarded)

@@ -11,7 +11,7 @@ input  wire                 g_resetn        , // Global active low sync reset.
 
 output wire                 s2_cf_valid     , // Control flow change?
 input  wire                 s2_cf_ack       , // Control flow acknwoledged
-output wire [         XL:0] s2_cf_target    , // Control flow destination
+output wire [ MEM_ADDR_R:0] s2_cf_target    , // Control flow destination
 
 input  wire                 s2_flush        , // Flush pipestage contents
 input  wire [         XL:0] csr_mepc        , // return address for mret

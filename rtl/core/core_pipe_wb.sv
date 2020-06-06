@@ -12,7 +12,7 @@ input  wire                 g_resetn        , // Global active low sync reset.
 
 output wire                 s3_cf_valid     , // Control flow change?
 input  wire                 s3_cf_ack       , // Control flow acknwoledged
-output wire [         XL:0] s3_cf_target    , // Control flow destination
+output wire [ MEM_ADDR_R:0] s3_cf_target    , // Control flow destination
 
 input  wire                 int_pending     , // Interrupt pending
 input  wire [ CF_CAUSE_R:0] int_cause       , // Cause code for the interrupt.
@@ -244,7 +244,8 @@ end
 
 wire        cfu_wait     = s3_cf_valid && !s3_cf_ack;
 
-assign      s3_cf_target = raise_int ? int_tvec : mtvec_base;
+assign      s3_cf_target = raise_int ? int_tvec  [MEM_ADDR_R:0]: 
+                                       mtvec_base[MEM_ADDR_R:0];
 assign      s3_cf_valid  = !cf_done && (trap_cpu || raise_int);
 
 assign      exec_mret    = s3_cfu_op == CFU_OP_MRET && e_instr_ret;
