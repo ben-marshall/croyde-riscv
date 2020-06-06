@@ -34,6 +34,7 @@ input  wire [   CFU_OP_R:0] s3_cfu_op       , // Writeback CFU op
 input  wire [    WB_OP_R:0] s3_wb_op        , // Writeback Data source.
 input  wire                 s3_trap         , // Raise a trap
 
+output wire                 s3_fwd_rd_wen   , // RD write en for fwd network
 output wire                 s3_rd_wen       , // RD write enable
 output wire [ REG_ADDR_R:0] s3_rd_addr      , // RD write addr
 output wire [         XL:0] s3_rd_wdata     , // RD write data.
@@ -127,8 +128,18 @@ wire    wb_wdata   = s3_wb_op == WB_OP_WDATA   ;
 wire    wb_lsu     = s3_wb_op == WB_OP_LSU     ;
 wire    wb_csr     = s3_wb_op == WB_OP_CSR     ;
 
-assign  s3_rd_wen  = rd_wen_enable && (wb_wdata || lsu_wen || wb_csr) &&
-                     !(trap_cpu) && !trapped && s3_full;
+wire    wb_gpr_any = wb_wdata || lsu_wen || wb_csr;
+
+// Faster write enable signal without cancelation due to a CPU trap.
+// Used for the forwarding network only.
+assign  s3_fwd_rd_wen = rd_wen_enable && s3_full && wb_gpr_any;
+
+// Slower write enable signal which is cleared on a trap, used for the
+// actual GPR register write enables.
+assign  s3_rd_wen  =  s3_fwd_rd_wen     &&
+                     !trap_cpu          &&
+                     !trapped           ;
+
 
 assign  s3_rd_wdata=
     {XLEN{wb_wdata  }}  & s3_wdata  |

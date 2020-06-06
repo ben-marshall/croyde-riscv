@@ -29,11 +29,8 @@ input  wire [        XL:0] rd_wdata
 
 wire [XL:0] regs[31:0];
 
-wire    fwd_rs1     = rd_wen  && rd_addr == rs1_addr && |rs1_addr;
-wire    fwd_rs2     = rd_wen  && rd_addr == rs2_addr && |rs2_addr;
-
-assign  rs1_data    = fwd_rs1 ? rd_wdata : regs[rs1_addr];
-assign  rs2_data    = fwd_rs2 ? rd_wdata : regs[rs2_addr];
+assign  rs1_data    = regs[rs1_addr];
+assign  rs2_data    = regs[rs2_addr];
 
 assign regs[0]      = 0;
 

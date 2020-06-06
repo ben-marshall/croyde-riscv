@@ -261,6 +261,26 @@ wire [ MEM_DATA_R:0] mmio_rdata  ; // MMIO read data
 wire                 mmio_error  ; // MMIO error
 
 //
+// Pipeline forwarding
+// ------------------------------------------------------------
+
+wire [XL:0] gpr_rs1_data;
+wire [XL:0] gpr_rs2_data;
+
+// Writeback stage gpr writeback enable *used only for forwarding*.
+// This signal is ignorant of whether a WB instruction *will* write back
+// a GPR value. It only idicates if it *could*. This removes things
+// like trap calculation and calcalation of a GPR write from the
+// critical path.
+wire        s3_fwd_rd_wen;
+
+wire    fwd_rs1     = s3_fwd_rd_wen && |s3_rd_addr && s3_rd_addr==s1_rs1_addr;
+wire    fwd_rs2     = s3_fwd_rd_wen && |s3_rd_addr && s3_rd_addr==s1_rs2_addr;
+
+assign  s1_rs1_data = fwd_rs1 ? s3_rd_wdata : gpr_rs1_data;
+assign  s1_rs2_data = fwd_rs2 ? s3_rd_wdata : gpr_rs2_data;
+
+//
 // Submodule instances.
 // ------------------------------------------------------------
 
@@ -541,6 +561,7 @@ core_pipe_wb #(
 .s3_cfu_op       (s3_cfu_op       ), // Writeback CFU op
 .s3_wb_op        (s3_wb_op        ), // Writeback Data source.
 .s3_trap         (s3_trap         ), // Raise a trap
+.s3_fwd_rd_wen   (s3_fwd_rd_wen   ), // RD write en for forwarding network.
 .s3_rd_wen       (s3_rd_wen       ), // RD write enable
 .s3_rd_addr      (s3_rd_addr      ), // RD write addr
 .s3_rd_wdata     (s3_rd_wdata     ), // RD write data.
@@ -596,8 +617,8 @@ core_regfile i_core_regfile (
 .g_resetn (g_resetn    ),
 .rs1_addr (s1_rs1_addr ),
 .rs2_addr (s1_rs2_addr ),
-.rs1_data (s1_rs1_data ),
-.rs2_data (s1_rs2_data ),
+.rs1_data (gpr_rs1_data),
+.rs2_data (gpr_rs2_data),
 .rd_wen   (s3_rd_wen   ),
 .rd_addr  (s3_rd_addr  ),
 .rd_wdata (s3_rd_wdata ) 
