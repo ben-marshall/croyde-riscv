@@ -4,8 +4,6 @@
 // module: core_regfile
 //
 //  Core register file. 2 read, 1 write.
-//  
-//  Note: automatically forwards from rd to rs*.
 //
 module core_regfile (
 
