@@ -40,6 +40,7 @@ output reg  [         XL:0] s2_pc           , // Current program counter.
 output wire [         XL:0] s2_npc          , // Next    program counter.
 output wire [         31:0] s2_instr        , // Current instruction word.
 output wire                 s2_trap         , // Raise a trap
+output wire [          6:0] s2_trap_cause   , // Trap cause
 
 output wire [         XL:0] s2_alu_lhs      , // ALU left  operand
 output wire [         XL:0] s2_alu_rhs      , // ALU right operand
@@ -476,7 +477,17 @@ assign  s2_wb_npc     = s2_cfu_jal  || s2_cfu_jalr;
 // ------------------------------------------------------------
 
 
-assign  s2_trap = dec_invalid_opcode;
+wire    s2_iaccess_trap_16  =  s1_ferr[  0] && s1_i16bit    ;
+wire    s2_iaccess_trap_32  = |s1_ferr[1:0] && s1_i32bit    ;
+
+assign  s2_trap             = dec_invalid_opcode            ||
+                              s2_iaccess_trap_16            ||
+                              s2_iaccess_trap_32            ;
+
+assign  s2_trap_cause       = s2_iaccess_trap_16    ? TRAP_IACCESS  :
+                              s2_iaccess_trap_32    ? TRAP_IACCESS  :
+                              dec_invalid_opcode    ? TRAP_IOPCODE  :
+                                                      7'b0          ;
 
 //
 // Submodule instances

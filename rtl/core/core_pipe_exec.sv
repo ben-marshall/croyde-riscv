@@ -29,6 +29,7 @@ input  wire [         XL:0] s2_pc           , // Current program counter.
 input  wire [         XL:0] s2_npc          , // Next    program counter.
 input  wire [         31:0] s2_instr        , // Current instruction word.
 input  wire                 s2_trap         , // Raise a trap
+input  wire [          6:0] s2_trap_cause   , // Trap cause
 
 input  wire [         XL:0] s2_alu_lhs      , // ALU left  operand
 input  wire [         XL:0] s2_alu_rhs      , // ALU right operand
@@ -261,6 +262,7 @@ wire [         31:0] n_s3_instr  = s2_instr     ;
 // RD bits used to carry trap cause code.
 // lsu_trap_addr ? 4 -> LDALIGN.
 wire [ REG_ADDR_R:0] n_s3_rd     = 
+    s2_trap        ? s2_trap_cause [REG_ADDR_R:0]   :
     cfu_trap_raise ? cfu_trap_cause[REG_ADDR_R:0]   :
     lsu_trap_addr  ? 5'd4                           :
                      s2_rd                          ;

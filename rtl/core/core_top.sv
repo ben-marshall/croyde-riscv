@@ -107,6 +107,7 @@ wire [         XL:0] s2_pc          ; // Current program counter.
 wire [         XL:0] s2_npc         ; // Next    program counter.
 wire [         31:0] s2_instr       ; // Current instruction word.
 wire                 s2_trap        ; // Raise a trap
+wire [          6:0] s2_trap_cause  ; // Cause of trap being raised.
 
 wire [         XL:0] s2_alu_lhs     ; // ALU left  operand
 wire [         XL:0] s2_alu_rhs     ; // ALU right operand
@@ -328,6 +329,7 @@ core_pipe_decode i_core_pipe_decode (
 .s2_npc          (s2_npc          ), // Next    program counter.
 .s2_instr        (s2_instr        ), // Current instruction word.
 .s2_trap         (s2_trap         ), // Raise a trap
+.s2_trap_cause   (s2_trap_cause   ), // Cause of trap being raised.
 .s2_alu_lhs      (s2_alu_lhs      ), // ALU left  operand
 .s2_alu_rhs      (s2_alu_rhs      ), // ALU right operand
 .s2_alu_add      (s2_alu_add      ), // ALU Operation to perform.
@@ -411,6 +413,7 @@ core_pipe_exec i_core_pipe_exec(
 .s2_npc          (s2_npc          ), // Next    program counter.
 .s2_instr        (s2_instr        ), // Current instruction word.
 .s2_trap         (s2_trap         ), // Raise a trap
+.s2_trap_cause   (s2_trap_cause   ), // Cause of trap being raised.
 .s2_alu_lhs      (s2_alu_lhs      ), // ALU left  operand
 .s2_alu_rhs      (s2_alu_rhs      ), // ALU right operand
 .s2_alu_add      (s2_alu_add      ), // ALU Operation to perform.
