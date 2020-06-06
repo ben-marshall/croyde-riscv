@@ -13,11 +13,24 @@ module rvfi_wrapper (
 
 //
 // Common core parameters and constants.
-`include "core_common.svh"
+
+localparam  XLEN        = 64;       // Word width of the CPU
+localparam  XL          = XLEN-1;   // For signals which are XLEN wide.
+localparam  ILEN        = 32    ;
+localparam  NRET        = 1     ;
+
+parameter   MEM_ADDR_W  = 64;       // Memory address bus width
+parameter   MEM_STRB_W  =  8;       // Memory strobe bits width
+parameter   MEM_DATA_W  = 64;       // Memory data bits width
+
+localparam  MEM_ADDR_R  = MEM_ADDR_W - 1; // Memory address bus width
+localparam  MEM_STRB_R  = MEM_STRB_W - 1; // Memory strobe bits width
+localparam  MEM_DATA_R  = MEM_DATA_W - 1; // Memory data bits width
+
 
 // Base address of the memory mapped IO region.
-parameter   MMIO_BASE_ADDR  = 64'h0000_0000_0000_1000;
-parameter   MMIO_BASE_MASK  = 64'h0000_0000_0000_1FFF;
+parameter   MMIO_BASE_ADDR  = 'h0000_0000_0000_1000;
+parameter   MMIO_BASE_MASK  = 'h0000_0000_0000_1FFF;
 
 (*keep*)      wire                 g_resetn     = !reset;
 (*keep*)      
@@ -53,7 +66,8 @@ parameter   MMIO_BASE_MASK  = 64'h0000_0000_0000_1FFF;
 
 rvfi_fairness #(
 .MMIO_BASE_ADDR(MMIO_BASE_ADDR),
-.MMIO_BASE_MASK(MMIO_BASE_MASK)
+.MMIO_BASE_MASK(MMIO_BASE_MASK),
+.MEM_ADDR_W    (MEM_ADDR_W    )
 ) i_rvfi_fairness (
 .g_clk        (clock        ), // Global clock
 .g_resetn     (g_resetn     ), // Global active low sync reset.
@@ -89,7 +103,8 @@ rvfi_fairness #(
 
 core_top #(
 .MMIO_BASE_ADDR(MMIO_BASE_ADDR),
-.MMIO_BASE_MASK(MMIO_BASE_MASK)
+.MMIO_BASE_MASK(MMIO_BASE_MASK),
+.MEM_ADDR_W    (MEM_ADDR_W    )
 ) i_dut (
 .g_clk        (clock        ), // Global clock
 .g_resetn     (g_resetn     ), // Global active low sync reset.
