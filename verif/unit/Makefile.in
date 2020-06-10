@@ -95,6 +95,7 @@ UNIT_TESTS_CLEAN += $(call unit_test_waves,${1}) \
 endef
 
 include $(REPO_HOME)/verif/unit/example/Makefile.in
+include $(REPO_HOME)/verif/unit/wfi/Makefile.in
 include $(REPO_HOME)/verif/unit/branch-tgt-trap/Makefile.in
 include $(REPO_HOME)/verif/unit/imem-access-trap/Makefile.in
 include $(REPO_HOME)/verif/unit/mul/Makefile.in
