@@ -3,19 +3,6 @@
 
 #include "unit_test.h"
 
-#define DECL_RD_CSR(CSR) volatile inline uint64_t rd_##CSR() { \
-    uint64_t rd; asm volatile ("csrr %0, " #CSR : "=r"(rd)); return rd; \
-}
-
-#define DECL_WR_CSR(CSR) volatile inline void wr_##CSR(uint64_t rs1) { \
-    asm volatile ("csrw " #CSR ", %0" : : "r"(rs1));   \
-}
-
-DECL_RD_CSR(mepc)
-DECL_RD_CSR(mcause)
-DECL_RD_CSR(mtvec)
-DECL_WR_CSR(mtvec)
-
 // Flag set/cleared by c_trap_handler.
 int test_passed = 0;
 

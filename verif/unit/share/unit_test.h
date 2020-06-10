@@ -4,6 +4,45 @@
 #ifndef UNIT_TEST_H
 #define UNIT_TEST_H
 
+// ----------- CSR Read / Write --------------------
+
+#define DECL_RD_CSR(CSR) volatile inline uint64_t rd_##CSR() { \
+    uint64_t rd; asm volatile ("csrr %0, " #CSR : "=r"(rd)); return rd; \
+}
+
+#define DECL_WR_CSR(CSR) volatile inline void wr_##CSR(uint64_t rs1) { \
+    asm volatile ("csrw " #CSR ", %0" : : "r"(rs1));   \
+}
+
+#define DECL_CLR_CSR(CSR) volatile inline void clr_##CSR(uint64_t rs1) { \
+    asm volatile ("csrc " #CSR ", %0" : : "r"(rs1));   \
+}
+
+#define DECL_SET_CSR(CSR) volatile inline void set_##CSR(uint64_t rs1) { \
+    asm volatile ("csrs " #CSR ", %0" : : "r"(rs1));   \
+}
+
+DECL_RD_CSR(mepc)
+DECL_RD_CSR(mcause)
+DECL_RD_CSR(mtvec)
+DECL_WR_CSR(mtvec)
+
+DECL_RD_CSR(mstatus)
+DECL_WR_CSR(mstatus)
+DECL_CLR_CSR(mstatus)
+DECL_SET_CSR(mstatus)
+
+DECL_RD_CSR(mie)
+DECL_WR_CSR(mie)
+DECL_CLR_CSR(mie)
+DECL_SET_CSR(mie)
+
+#define MSTATUS_MIE   ( 0b1 << 1 )
+#define MIE_MTIE      ( 0b1 << 7 )
+
+volatile inline void __wfi() {
+    asm volatile ("wfi");
+}
 
 // ----------- Defined in boot.S -------------------
 
