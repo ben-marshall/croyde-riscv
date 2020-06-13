@@ -68,6 +68,7 @@ output wire                 s2_cfu_j        , //
 output wire                 s2_cfu_jal      , //
 output wire                 s2_cfu_jalr     , //
 output wire                 s2_cfu_mret     , //
+output wire                 s2_cfu_wfi      , //
 
 output wire                 s2_lsu_load     , // LSU Load
 output wire                 s2_lsu_store    , // "   Store
@@ -415,6 +416,7 @@ assign  s2_cfu_j    = dec_c_j                   ;
 assign  s2_cfu_jal  = dec_jal                   ;
 assign  s2_cfu_jalr = dec_jalr   || dec_c_jalr  || dec_c_jr;
 assign  s2_cfu_mret = dec_mret                  ;
+assign  s2_cfu_wfi  = dec_wfi                   ;
 
 //
 // LSU

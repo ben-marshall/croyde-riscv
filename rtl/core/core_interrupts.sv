@@ -26,7 +26,8 @@ output wire                 mip_meip     , // External interrupt pending
 output wire                 mip_mtip     , // Timer interrupt pending
 output wire                 mip_msip     , // Software interrupt pending
 
-output wire                 int_pending  , // To exec stage
+output wire                 int_pending  , // Pending but not enabled.
+output wire                 int_request  , // Interrupt to be taken
 output wire [ CF_CAUSE_R:0] int_cause    , // Cause code for the interrupt.
 output wire [         XL:0] int_tvec     , // Interrupt trap vector
 input  wire                 int_ack        // Interrupt taken acknowledge
@@ -57,7 +58,11 @@ assign  mip_meip            = int_pend_ext                  ;
 assign  mip_mtip            = int_pend_ti                   ;
 assign  mip_msip            = int_pend_sw                   ;
 
-assign  int_pending         = mstatus_mie && (
+assign  int_pending         = int_ext                       ||
+                              int_ti                        ||
+                              int_sw                        ;
+
+assign  int_request         = mstatus_mie && (
                                     int_pend_ext    ||
                                     int_pend_ti     ||
                                     int_pend_sw

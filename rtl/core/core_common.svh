@@ -101,5 +101,6 @@ localparam CFU_OP_NOP       = 3'b000;
 localparam CFU_OP_TAKEN     = 3'b001;
 localparam CFU_OP_IGNORE    = 3'b010;
 localparam CFU_OP_MRET      = 3'b101;
+localparam CFU_OP_WFI       = 3'b110;
 localparam CFU_OP_TRAP      = 3'b111;
 

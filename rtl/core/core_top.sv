@@ -71,7 +71,8 @@ wire [         XL:0] s3_cf_target; // Control flow destination
 assign  cf_valid    = s2_cf_valid || s3_cf_valid;
 assign  cf_target   = s3_cf_valid ? s3_cf_target : s2_cf_target;
 
-wire                 int_pending ; // To exec stage from core_interrupts
+wire                 int_pending ; // Int pending but not enabled
+wire                 int_request ; // Int pending and enabled.
 wire [ CF_CAUSE_R:0] int_cause   ; // Cause code for the interrupt.
 wire [         XL:0] int_tvec    ; // Interrupt trap vector
 wire                 int_ack     ; // Interrupt taken acknowledge
@@ -134,7 +135,8 @@ wire                 s2_cfu_ecall   ; //
 wire                 s2_cfu_j       ; //
 wire                 s2_cfu_jal     ; //
 wire                 s2_cfu_jalr    ; //
-wire                 s2_cfu_mret    ; //
+wire                 s2_cfu_mret    ; // Machine trap return
+wire                 s2_cfu_wfi     ; // Wait for interrupt
 
 wire                 s2_lsu_load    ; // LSU Load
 wire                 s2_lsu_store   ; // "   Store
@@ -378,6 +380,7 @@ core_pipe_decode #(
 .s2_cfu_jal      (s2_cfu_jal      ), //
 .s2_cfu_jalr     (s2_cfu_jalr     ), //
 .s2_cfu_mret     (s2_cfu_mret     ), //
+.s2_cfu_wfi      (s2_cfu_wfi      ), //
 .s2_lsu_load     (s2_lsu_load     ), // LSU Load
 .s2_lsu_store    (s2_lsu_store    ), // "   Store
 .s2_lsu_byte     (s2_lsu_byte     ), // Byte width
@@ -464,6 +467,7 @@ core_pipe_exec #(
 .s2_cfu_jal      (s2_cfu_jal      ), //
 .s2_cfu_jalr     (s2_cfu_jalr     ), //
 .s2_cfu_mret     (s2_cfu_mret     ), //
+.s2_cfu_wfi      (s2_cfu_wfi      ), //
 .s2_lsu_load     (s2_lsu_load     ), // LSU Load
 .s2_lsu_store    (s2_lsu_store    ), // "   Store
 .s2_lsu_byte     (s2_lsu_byte     ), // Byte width
@@ -543,7 +547,8 @@ core_pipe_wb #(
 .s3_cf_valid     (s3_cf_valid     ), // Control flow change?
 .s3_cf_ack       (s3_cf_ack       ), // Control flow acknwoledged
 .s3_cf_target    (s3_cf_target    ), // Control flow destination
-.int_pending     (int_pending     ), // To exec stage
+.int_pending     (int_pending     ), // Pending but disabled.
+.int_request     (int_request     ), // Pending and enabled, so taken.
 .int_cause       (int_cause       ), // Cause code for the interrupt.
 .int_tvec        (int_tvec        ), // Interrupt trap vector
 .int_ack         (int_ack         ), // Interrupt taken acknowledge
@@ -686,7 +691,8 @@ core_interrupts i_core_interrupts (
 .mip_meip     (mip_meip         ), // External interrupt pending
 .mip_mtip     (mip_mtip         ), // Timer interrupt pending
 .mip_msip     (mip_msip         ), // Software interrupt pending
-.int_pending  (int_pending      ), // To exec stage
+.int_pending  (int_pending      ), // Pending but disabled.
+.int_request  (int_request      ), // Pending and enabled, so taken.
 .int_cause    (int_cause        ), // Cause code for the interrupt.
 .int_tvec     (int_tvec         ), // Interrupt trap vector
 .int_ack      (int_ack          )  // Interrupt taken acknowledge

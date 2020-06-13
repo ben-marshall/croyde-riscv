@@ -14,7 +14,8 @@ output wire                 s3_cf_valid     , // Control flow change?
 input  wire                 s3_cf_ack       , // Control flow acknwoledged
 output wire [         XL:0] s3_cf_target    , // Control flow destination
 
-input  wire                 int_pending     , // Interrupt pending
+input  wire                 int_pending     , // Interrupt pending but disabled
+input  wire                 int_request     , // Interrupt pending to be taken
 input  wire [ CF_CAUSE_R:0] int_cause       , // Cause code for the interrupt.
 input  wire [         XL:0] int_tvec        , // Interrupt trap vector
 output wire                 int_ack         , // Interrupt taken acknowledge
@@ -227,6 +228,9 @@ assign      lsu_rdata      =
     lsu_half    ? rdata_half    :
     lsu_word    ? rdata_word    :
                   dmem_rdata ;
+//
+// Control flow changes
+// ------------------------------------------------------------
 
 //
 // Control flow changes
@@ -242,7 +246,12 @@ always @(posedge g_clk) begin
     end
 end
 
-wire        cfu_wait     = s3_cf_valid && !s3_cf_ack;
+// Wait for interrupt instruction.
+wire        wfi_sleep    = s3_cfu_op == CFU_OP_WFI && !int_pending;
+wire        wfi_wakeup   = s3_cfu_op == CFU_OP_WFI &&  int_pending;
+
+wire        cfu_wait     = s3_cf_valid && !s3_cf_ack    ||
+                           wfi_sleep                    ;
 
 assign      s3_cf_target = raise_int ? int_tvec : mtvec_base;
 assign      s3_cf_valid  = !cf_done && (trap_cpu || raise_int);
@@ -267,7 +276,7 @@ always @(posedge g_clk) begin
     end
 end
 
-wire   raise_int      = int_pending;
+wire   raise_int      = int_request;
 
 assign int_ack        = raise_int && e_cf_change;
 

@@ -57,6 +57,7 @@ input  wire                 s2_cfu_j        , //
 input  wire                 s2_cfu_jal      , //
 input  wire                 s2_cfu_jalr     , //
 input  wire                 s2_cfu_mret     , //
+input  wire                 s2_cfu_wfi      , //
 
 input  wire                 s2_lsu_load     , // LSU Load
 input  wire                 s2_lsu_store    , // "   Store
@@ -190,7 +191,7 @@ wire        mdu_flush   = e_new_instr;
 wire                 cfu_op_any      =
     s2_cfu_beq  || s2_cfu_bge  || s2_cfu_bgeu || s2_cfu_blt  || s2_cfu_bltu ||
     s2_cfu_bne  || s2_cfu_ebrk || s2_cfu_ecall|| s2_cfu_j    || s2_cfu_jal  ||
-    s2_cfu_jalr || s2_cfu_mret ;
+    s2_cfu_jalr || s2_cfu_mret || s2_cfu_wfi  ;
 
 wire                 cfu_new_instr   = e_new_instr;
 wire [         XL:0] cfu_new_pc      ; // New program counter
@@ -456,6 +457,7 @@ core_pipe_exec_cfu #(
 .cfu_jal    (s2_cfu_jal     ), //
 .cfu_jalr   (s2_cfu_jalr    ), //
 .cfu_mret   (s2_cfu_mret    ), //
+.cfu_wfi    (s2_cfu_wfi     ), //
 .cf_valid   (s2_cf_valid    ), // Control flow change?
 .cf_ack     (s2_cf_ack      ), // Control flow acknwoledged
 .cf_target  (s2_cf_target   ), // Control flow destination

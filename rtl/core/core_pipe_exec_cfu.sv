@@ -36,6 +36,7 @@ input  wire                 cfu_j       , //
 input  wire                 cfu_jal     , //
 input  wire                 cfu_jalr    , //
 input  wire                 cfu_mret    , //
+input  wire                 cfu_wfi     , //
 
 output wire                 cf_valid    , // Control flow change?
 input  wire                 cf_ack      , // Control flow acknwoledged
@@ -129,11 +130,13 @@ wire    branch_taken        =
     cfu_bltu &&             cmp_ltu ||
     cfu_bne  && !cmp_eq             ;
 
-wire    branch_ignore       = branch_conditional && !branch_taken;
+wire    branch_ignore       = branch_conditional && !branch_taken   ||
+                              cfu_wfi                               ;
 
 assign  new_pc              = branch_taken ? target_addr : npc;
 
 assign  new_op              = trap_raise    ? CFU_OP_TRAP   :
+                              cfu_wfi       ? CFU_OP_WFI    :
                               cfu_mret      ? CFU_OP_MRET   :
                               branch_taken  ? CFU_OP_TAKEN  :
                               branch_ignore ? CFU_OP_IGNORE :
