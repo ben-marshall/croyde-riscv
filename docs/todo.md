@@ -37,6 +37,7 @@
 
   - [ ] Embench
 
+- [ ] User mode
 
 ## Verif
 
