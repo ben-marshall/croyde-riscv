@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sat Jun 13 14:39:52 2020
+[*] Sat Jun 13 14:57:39 2020
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/uc64/work/unit/wfi/wfi.vcd"
-[dumpfile_mtime] "Sat Jun 13 14:39:16 2020"
-[dumpfile_size] 957225
+[dumpfile_mtime] "Sat Jun 13 14:55:34 2020"
+[dumpfile_size] 1790085
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/verilator.gtkw"
-[timestart] 2190
+[timestart] 8940
 [size] 1920 1025
 [pos] -1 -1
-*-8.917427 2526 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-7.705312 9846 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.core_top.
 [treeopen] TOP.core_top.i_core_pipe_exec.
@@ -568,10 +568,15 @@ TOP.core_top.i_core_pipe_exec.s2_rd[4:0]
 @28
 TOP.core_top.i_core_pipe_exec.s2_ready
 TOP.core_top.i_core_pipe_exec.s2_valid
-@22
+@2025
+^2 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
 TOP.core_top.i_core_pipe_exec.s2_rs1_addr[4:0]
+@22
 TOP.core_top.i_core_pipe_exec.s2_rs1_data[63:0]
+@2025
+^2 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
 TOP.core_top.i_core_pipe_exec.s2_rs2_addr[4:0]
+@22
 TOP.core_top.i_core_pipe_exec.s2_rs2_data[63:0]
 @28
 TOP.core_top.i_core_pipe_exec.s2_trap
@@ -965,7 +970,7 @@ TOP.core_top.i_core_csrs.reg_mtval[63:0]
 @28
 TOP.core_top.i_core_csrs.reg_mstatus_mie
 TOP.core_top.i_core_csrs.reg_mstatus_mpie
-@23
+@22
 TOP.core_top.i_core_csrs.reg_mtvec[63:0]
 @28
 TOP.core_top.i_core_csrs.reg_mstatus_mpp[1:0]

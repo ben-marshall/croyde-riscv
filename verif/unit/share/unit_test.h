@@ -37,8 +37,10 @@ DECL_WR_CSR(mie)
 DECL_CLR_CSR(mie)
 DECL_SET_CSR(mie)
 
-#define MSTATUS_MIE   ( 0b1 << 1 )
+#define MSTATUS_MIE   ( 0b1 << 3 )
 #define MIE_MTIE      ( 0b1 << 7 )
+
+#define MCAUSE_MACHINE_TIMER_INTERRUPT ( 0x7)
 
 volatile inline void __wfi() {
     asm volatile ("wfi");
