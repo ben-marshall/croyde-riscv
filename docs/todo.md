@@ -9,12 +9,6 @@
 
   - [ ] SLTU[.w] optimisation / reuse adder circuit
 
-- [ ] `WFI` instruction implementation.
-
-  - [ ] Hardware.
-
-  - [ ] Unit Test.
-
 - [ ] MPU
 
 - [ ] Trace

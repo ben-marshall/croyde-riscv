@@ -26,7 +26,7 @@ c.jr      |         |         |        | J      |       |          |
 ecall     |         |         |        | ECALL  |       |          | 1
 ebreak    |         |         |        | EBREAK |       |          | 1
 mret      |         |         |        | MRET   |       |          |
-wfi       |         |         |        | NOP    |       |          |
+wfi       |         |         |        | WFI    |       |          |
 
 
 ## ALU instructions
