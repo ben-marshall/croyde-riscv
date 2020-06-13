@@ -52,6 +52,8 @@ int test_wfi_interrupts_disabled() {
     expect_interrupt    = 0;
     expect_cause        = 0;
     expect_code         = 100;
+
+    uint64_t mepc_pre   = rd_mepc();
     
     // Setup timer interrupt for a short time in the future.
     uint64_t  delay     = 100;
@@ -68,12 +70,16 @@ int test_wfi_interrupts_disabled() {
     // Wake up again and check instructions retired.
     uint64_t iret_post  = __rdinstret();
     uint64_t time_post  = __rdtime   ();
+    uint64_t mepc_post  = rd_mepc();
 
     uint64_t iret_total = iret_post - iret_pre;
     uint64_t time_total = time_post - time_pre;
 
     // Check we didn't trap.
     if(trap_handler_seen == expect_code){test_fail();}
+
+    // Check mepc did not change.
+    if(mepc_pre != mepc_post) {test_fail();}
 
     // Check very few instructions were retired.
     if(iret_total        >   20) {test_fail();}
