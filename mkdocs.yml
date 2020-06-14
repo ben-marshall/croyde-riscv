@@ -6,6 +6,7 @@ nav:
   - Requirements: functional-requirements.md
   - Instruction Listing: instruction-listing.md
   - Pipeline: pipeline.md
+  - Core Complex: ccx.md
   - Memory Interfaces: memory-interface.md
   - Flow - Synthesis: flows-synthesis.md
   - Flow - Unit Tests: flows-unit-tests.md
