@@ -26,17 +26,22 @@ parameter   MMIO_BASE_MASK  = 'h0000_0000_0001_FFFF;
 // Internal address mapping.
 // ------------------------------------------------------------
 
-parameter ROM_MASK  = 'hFFFFFE00;
-parameter ROM_BASE  = 'h00000000;
-parameter ROM_SIZE  = 'h000003FF;
+parameter   ROM_MEMH  = ""        ;
+parameter   ROM_BASE  = 'h00000000;
+parameter   ROM_SIZE  = 'h000003FF;
+localparam  ROM_MASK  = ~ROM_SIZE ;
+localparam  ROM_WIDTH = 64        ;
+localparam  ROM_DEPTH = ROM_SIZE+1;
 
-parameter RAM_MASK  = 'hFFFE0000;
-parameter RAM_BASE  = 'h00010000;
-parameter RAM_SIZE  = 'h0000FFFF;
+parameter   RAM_BASE  = 'h00010000;
+parameter   RAM_SIZE  = 'h0000FFFF;
+localparam  RAM_MASK  =  ~RAM_SIZE;
+localparam  RAM_WIDTH = 64        ;
+localparam  RAM_DEPTH = RAM_SIZE+1;
 
-parameter EXT_MASK  = 'hE0000000;
-parameter EXT_BASE  = 'h10000000;
-parameter EXT_SIZE  = 'h0FFFFFFF;
+parameter   EXT_BASE  = 'h10000000;
+parameter   EXT_SIZE  = 'h0FFFFFFF;
+localparam  EXT_MASK  = ~EXT_SIZE ;
 
 //
 // Internal interfaces / buses / wires
@@ -120,6 +125,47 @@ ccx_ic_top #(
 .if_ram    (if_rom          ),
 .if_ext    (if_ext          )
 );
+
+//
+// Memories
+// ------------------------------------------------------------
+
+mem_sram_wxd  i_rom #(
+.WIDTH (ROM_WIDTH),
+.ROM   (        1),
+.DEPTH (ROM_DEPTH),
+.MEMH  (ROM_MEMH ) 
+)(
+.g_clk       (g_clk             ),
+.g_resetn    (g_resetn          ),
+.cen         (if_rom.req        ),
+.wstrb       (if_rom.strb       ),
+.addr        (if_rom.addr       ),
+.wdata       (if_rom.wdata      ),
+.rdata       (if_rom.rdata      ) 
+);
+
+assign if_rom.gnt = 1'b1;
+assign if_rom.err = 1'b0;
+
+
+mem_sram_wxd  i_ram #(
+.WIDTH (RAM_WIDTH),
+.ROM   (        1),
+.DEPTH (RAM_DEPTH),
+.MEMH  (RAM_MEMH ) 
+)(
+.g_clk       (g_clk             ),
+.g_resetn    (g_resetn          ),
+.cen         (if_ram.req        ),
+.wstrb       (if_ram.strb       ),
+.addr        (if_ram.addr       ),
+.wdata       (if_ram.wdata      ),
+.rdata       (if_ram.rdata      ) 
+);
+
+assign if_ram.gnt = 1'b1;
+assign if_ram.err = 1'b0;
 
 endmodule
 
