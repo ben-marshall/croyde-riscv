@@ -325,6 +325,7 @@ core_pipe_fetch #(
 //  Pipeline decode / operand gather stage.
 //
 core_pipe_decode #(
+.PC_RESET_ADDRESS(PC_RESET_ADDRESS),
 .MEM_ADDR_W      (MEM_ADDR_W      )
 ) i_core_pipe_decode (
 .g_clk           (g_clk           ), // Global clock
