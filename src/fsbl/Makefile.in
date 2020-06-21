@@ -1,0 +1,64 @@
+
+FSBL_ROOT       = $(REPO_HOME)/src/fsbl
+
+FSBL_SRC_CCX    = $(FSBL_ROOT)/fsbl_boot.S \
+                  $(FSBL_ROOT)/fsbl_ccx.c
+
+FSBL_LD         = $(FSBL_ROOT)/fsbl.ld
+
+FSBL_FLAGS      = -Wall -march=rv64imc -mabi=lp64 -O3 -nostdlib
+
+#
+# 1. FSBL unique name
+define map_fsbl_dir
+$(REPO_WORK)/fsbl/$(strip ${1})
+endef
+
+#
+# 1. FSBL unique name
+define map_fsbl_elf
+$(call map_fsbl_dir,${1})/fsbl-$(strip ${1}).elf
+endef
+
+#
+# 1. FSBL unique name
+define map_fsbl_dis
+$(call map_fsbl_dir,${1})/fsbl-$(strip ${1}).dis
+endef
+
+#
+# 1. FSBL unique name
+define map_fsbl_hex
+$(call map_fsbl_dir,${1})/fsbl-$(strip ${1}).hex
+endef
+
+#
+# 1. FSBL unique name
+# 2. FSBL source code
+# 3. FSBL linker script
+define add_tgt_fsbl
+
+$(call map_fsbl_elf,${1}) : ${2} ${3}
+	@mkdir -p $(call map_fsbl_dir,${1})
+	$(CC) -T${3} $(FSBL_FLAGS) -o $${@} ${2}
+
+$(call map_fsbl_dis,${1}) : $(call map_fsbl_elf,${1})
+	$(OBJDUMP) -D $${<} > $${@}
+
+$(call map_fsbl_hex,${1}) : $(call map_fsbl_elf,${1})
+	$(OBJCOPY) -O verilog $${<} $${@}
+
+fsbl-${1} : $(call map_fsbl_elf,${1}) \
+            $(call map_fsbl_dis,${1}) \
+            $(call map_fsbl_hex,${1})
+
+
+endef
+
+#
+# Used by the CCX verilator build flow found in
+# flow/verilator/Makefile.in
+FSBL_HEX_CCX = $(call map_fsbl_hex,ccx)
+
+$(eval $(call add_tgt_fsbl,ccx,$(FSBL_SRC_CCX),$(FSBL_LD)))
+
