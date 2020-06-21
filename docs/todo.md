@@ -19,6 +19,14 @@
 
   - [ ] Debug
 
+  - [ ] Tests
+
+    - [ ] Write to ROM.
+
+    - [ ] Read / write RAM.
+
+    - [ ] Read / write External memory.
+
 - [ ] Performance Optmisations
 
   - [ ] `c.add`, `c.ld/w/h/b[u]` fusion.
