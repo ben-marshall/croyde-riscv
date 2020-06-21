@@ -19,6 +19,11 @@ jobs:
     - make build-core_top
     - make unit-tests-build
     - make unit-tests-run
+  - name: "Core Complex (CCX)"
+    - source ./bin/install-verilator.sh
+    - source ./bin/install-toolchain.sh
+    - source ./bin/conf.sh
+    - make build-ccx_top
   - name: "Designer Assertions"
     script:
     - source ./bin/install-yosys.sh

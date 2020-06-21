@@ -1,0 +1,14 @@
+--cc
+-O3
+-CFLAGS -O2
+-CFLAGS -g
+-CFLAGS -I -CFLAGS $(REPO_HOME)/verif/share/verilator
+-y $REPO_HOME/rtl/core
+-y $REPO_HOME/rtl/ccx
+--exe
+--trace
+-F $REPO_HOME/flow/verilator/manifest-tb-ccx.txt
+-F $REPO_HOME/flow/verilator/manifest-tb-share.txt
+-F $REPO_HOME/flow/verilator/manifest-rtl-core.txt
+-F $REPO_HOME/flow/verilator/manifest-rtl-ccx.txt
+$REPO_HOME/rtl/mem/mem_sram_wxd.v

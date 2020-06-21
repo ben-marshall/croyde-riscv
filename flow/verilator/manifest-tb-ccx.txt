@@ -1,0 +1,3 @@
+$REPO_HOME/verif/ccx/verilator/main.cpp
+$REPO_HOME/verif/ccx/verilator/dut_wrapper.cpp
+$REPO_HOME/verif/ccx/verilator/testbench.cpp
