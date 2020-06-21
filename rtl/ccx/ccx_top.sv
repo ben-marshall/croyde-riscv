@@ -23,7 +23,7 @@ output wire [ 63:0] trs_pc         // Instruction trace PC
 );
 
 // Inital address of the program counter post reset.
-parameter   PC_RESET_ADDRESS= 'h10000000;
+parameter   PC_RESET_ADDRESS= 'h00000000;
 
 // Base address of the memory mapped IO region.
 parameter   MMIO_BASE_ADDR  = 'h0000_0000_0001_0000;
@@ -141,8 +141,8 @@ ccx_ic_top #(
 .g_resetn  (g_resetn        ),
 .if_imem   (core_imem       ), // cpu instruction memory
 .if_dmem   (core_dmem       ), // cpu data        memory
-.if_rom    (if_ram          ),
-.if_ram    (if_rom          ),
+.if_rom    (if_rom          ),
+.if_ram    (if_ram          ),
 .if_ext    (if_ext          )
 );
 
