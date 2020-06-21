@@ -1,0 +1,11 @@
+--cc
+-O3
+-CFLAGS -O2
+-CFLAGS -g
+-CFLAGS -I -CFLAGS $(REPO_HOME)/verif/share/verilator
+-y $REPO_HOME/rtl/core
+--exe
+--trace
+-F $REPO_HOME/flow/verilator/manifest-rtl-core.txt
+-F $REPO_HOME/flow/verilator/manifest-tb-core.txt
+-F $REPO_HOME/flow/verilator/manifest-tb-share.txt

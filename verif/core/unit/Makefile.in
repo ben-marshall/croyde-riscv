@@ -61,8 +61,8 @@ $(call unit_test_gtkwave,${1}) : $(call unit_test_objdump,${1})
 	    | sed 's/\(^....    \)    /0000\1/' \
 	    > $(call unit_test_gtkwave,${1})
 
-run-unit-${1} : $(call unit_test_srec,${1}) $(VL_OUT) ;
-	$(VL_OUT) +IMEM=$(call unit_test_srec,${1}) \
+run-unit-${1} : $(call unit_test_srec,${1}) $(EXE_CORE) ;
+	$(EXE_CORE) +IMEM=$(call unit_test_srec,${1}) \
 	          +WAVES=$(call unit_test_waves,${1}) \
 	          +TIMEOUT=$(UNIT_TIMEOUT) \
 	          +PASS_ADDR=$(UNIT_PASS) +FAIL_ADDR=$(UNIT_FAIL) 

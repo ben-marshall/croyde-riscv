@@ -16,7 +16,7 @@ jobs:
     - source ./bin/install-verilator.sh
     - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
-    - make verilator-build-core
+    - make build-core_top
     - make unit-tests-build
     - make unit-tests-run
   - name: "Designer Assertions"

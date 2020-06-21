@@ -1,47 +1,43 @@
 
-VL_DIR   = $(REPO_WORK)/verilator
-VL_OUT   = $(REPO_WORK)/verilator/verilated
+#
+# 1. Top module name
+define map_vl_mdir
+$(REPO_WORK)/verilator/${1}
+endef
 
-VL_WAVES    = $(VL_DIR)/waves.vcd
-VL_TIMEOUT  = 2000
-VL_ARGS     = +IMEM=$(REPO_WORK)/riscv-compliance/rv64i/ADDIW.elf.srec
+#
+# 1. Top module name
+define map_vl_exe
+$(call map_vl_mdir,${1})/verilated-${1}
+endef
 
-SHARE_TB_DIR = $(REPO_HOME)/verif/share/verilator
+#
+# 1. Top module name
+define map_vl_makefile
+$(call map_vl_mdir,${1})/V${1}.mk
+endef
 
-VL_CORE_RTL_MANIFEST    = $(REPO_HOME)/flow/verilator/manifest-rtl-core.txt
-VL_CORE_TB_MANIFEST     = $(REPO_HOME)/flow/verilator/manifest-tb-core.txt
-VL_SHARE_TB_MANIFEST    = $(REPO_HOME)/flow/verilator/manifest-tb-share.txt
+#
+# 1. Top Module Name
+# 2. target command file
+define add_vl_target
 
-VL_CORE_RTL_SRC     = $(shell cat $(VL_CORE_RTL_MANIFEST) | envsubst)
-VL_CORE_TB_SRC      = $(shell cat $(VL_CORE_TB_MANIFEST)  | envsubst)
-VL_SHARE_TB_SRC     = $(shell cat $(VL_SHARE_TB_MANIFEST) | envsubst)
-
-VL_TOP      = core_top
-
-VL_FLAGS = --cc -CFLAGS "-O2" --Mdir $(VL_DIR) -O3 -CFLAGS -g\
-            -I$(CORE_RTL_DIR) \
-            -CFLAGS -I$(SHARE_TB_DIR) \
-            --exe --trace \
-            --top-module $(VL_TOP) $(VL_BUILD_FLAGS)
-
-.PHONY: $(VL_CSRC)
-
-$(VL_OUT) : $(VL_CORE_RTL_SRC) $(VL_CORE_TB_SRC) $(VL_SHARE_TB_SRC)
-	@mkdir -p $(dir $(VL_OUT))
+$(call map_vl_exe,${1}) : ${2}
+	mkdir -p $(call map_vl_mdir,${1})
 	$(VERILATOR) \
-        $(VL_FLAGS) \
-        -o $@ \
-        -f $(VL_CORE_RTL_MANIFEST) \
-        -f $(VL_CORE_TB_MANIFEST) \
-        -f $(VL_SHARE_TB_MANIFEST)
-	$(MAKE) -C $(VL_DIR) -f V$(VL_TOP).mk
+        -f ${2} \
+        -o $(call map_vl_exe,${1}) \
+        --Mdir $(call map_vl_mdir,${1}) \
+        --top-module ${1}
+	$(MAKE) -C $(call map_vl_mdir,${1}) -f $(call map_vl_makefile,${1})
 
-verilator-build-core: $(VL_OUT)
+build-${1}: $(call map_vl_exe,${1})
 
-verilator-run-core-waves: $(VL_OUT)
-	$(VL_OUT) $(VL_ARGS) +WAVES=$(VL_WAVES) +TIMEOUT=$(VL_TIMEOUT)
+endef
 
-verilator-clean:
-	rm -rf $(VL_DIR)
+CMD_CORE = $(REPO_HOME)/flow/verilator/cmd-core.txt
+TOP_CORE = core_top
+EXE_CORE = $(call map_vl_exe,$(TOP_CORE))
 
+$(eval $(call add_vl_target,$(TOP_CORE),$(CMD_CORE)))
 
