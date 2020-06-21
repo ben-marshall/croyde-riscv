@@ -14,6 +14,7 @@ input  wire                 s2_cf_ack       , // Control flow acknwoledged
 output wire [         XL:0] s2_cf_target    , // Control flow destination
 
 input  wire                 s2_flush        , // Flush pipestage contents
+input  wire                 s2_cancel       , // Stop S2 instrs doing stuff.
 input  wire [         XL:0] csr_mepc        , // return address for mret
 
 output wire                 s2_ready        , // EX ready for new instruction
@@ -207,7 +208,7 @@ wire                 cfu_finished    ; // CFU instruction finished.
 // LSU interfacing
 // ------------------------------------------------------------
 
-wire        lsu_valid       =  s2_valid && !s3_trap && !s2_flush &&
+wire        lsu_valid       =  s2_valid && !s3_trap && !s2_cancel&&
                               (s2_lsu_load || s2_lsu_store);
 wire        lsu_ready       ;
 wire        lsu_trap_addr   ;

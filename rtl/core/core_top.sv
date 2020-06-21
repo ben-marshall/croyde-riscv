@@ -77,7 +77,8 @@ wire [ CF_CAUSE_R:0] int_cause   ; // Cause code for the interrupt.
 wire [         XL:0] int_tvec    ; // Interrupt trap vector
 wire                 int_ack     ; // Interrupt taken acknowledge
 
-wire                 s2_flush    = s3_cf_valid;
+wire                 s2_flush    = s3_cf_valid && s3_cf_ack;
+wire                 s2_cancel   = s3_cf_valid ;
 
 //
 // Inter-stage wiring
@@ -428,6 +429,7 @@ core_pipe_exec #(
 .s2_cf_ack       (s2_cf_ack       ), // Control flow acknwoledged
 .s2_cf_target    (s2_cf_target    ), // Control flow destination
 .s2_flush        (s2_flush        ), // Flush stage contents.
+.s2_cancel       (s2_cancel       ), // Stage 1 flush
 .csr_mepc        (csr_mepc        ), // MRET return address
 .s2_ready        (s2_ready        ), // EX ready for new instruction
 .s2_valid        (s2_valid        ), // Decode -> EX instr valid.
