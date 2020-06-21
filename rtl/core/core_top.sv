@@ -77,7 +77,7 @@ wire [ CF_CAUSE_R:0] int_cause   ; // Cause code for the interrupt.
 wire [         XL:0] int_tvec    ; // Interrupt trap vector
 wire                 int_ack     ; // Interrupt taken acknowledge
 
-wire                 s2_flush    = s3_cf_valid && s3_cf_ack;
+wire                 s2_flush    = s3_cf_valid;
 
 //
 // Inter-stage wiring
