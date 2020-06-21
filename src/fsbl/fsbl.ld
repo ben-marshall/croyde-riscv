@@ -20,6 +20,8 @@ SECTIONS {
 
     /DISCARD/ : { *(.comment) }
 
+    . = ALIGN(16);
+
     PROVIDE (__fsbl_stack_start = .);
 
 }
