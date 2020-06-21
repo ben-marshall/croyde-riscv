@@ -28,7 +28,7 @@ include $(REPO_HOME)/flow/verilator/Makefile.in
 include $(REPO_HOME)/flow/design-assertions/Makefile.in
 include $(REPO_HOME)/flow/synthesis/Makefile.in
 include $(REPO_HOME)/flow/riscv-formal/Makefile.in
-include $(REPO_HOME)/verif/unit/Makefile.in
+include $(REPO_HOME)/verif/core/unit/Makefile.in
 
 clean:
 	rm -rf work/*

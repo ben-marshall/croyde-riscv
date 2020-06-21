@@ -1,6 +1,6 @@
 
 UNIT_TESTS      = 
-UNIT_ROOT       = $(REPO_HOME)/verif/unit
+UNIT_ROOT       = $(REPO_HOME)/verif/core/unit
 UNIT_TEST_BUILD = $(REPO_HOME)/work/unit
 
 UNIT_TESTS_RUN  = 
@@ -94,19 +94,19 @@ UNIT_TESTS_CLEAN += $(call unit_test_waves,${1}) \
 
 endef
 
-include $(REPO_HOME)/verif/unit/example/Makefile.in
-include $(REPO_HOME)/verif/unit/wfi/Makefile.in
-include $(REPO_HOME)/verif/unit/branch-tgt-trap/Makefile.in
-include $(REPO_HOME)/verif/unit/imem-access-trap/Makefile.in
-include $(REPO_HOME)/verif/unit/mul/Makefile.in
-include $(REPO_HOME)/verif/unit/div/Makefile.in
-include $(REPO_HOME)/verif/unit/mtime-read/Makefile.in
-include $(REPO_HOME)/verif/unit/mtime-write/Makefile.in
-include $(REPO_HOME)/verif/unit/counters/Makefile.in
-include $(REPO_HOME)/verif/unit/timer/Makefile.in
-include $(REPO_HOME)/verif/unit/interrupts-enablebits/Makefile.in
-include $(REPO_HOME)/verif/unit/interrupts-timer-direct/Makefile.in
-include $(REPO_HOME)/verif/unit/interrupts-timer-vectored/Makefile.in
+include $(UNIT_ROOT)/example/Makefile.in
+include $(UNIT_ROOT)/wfi/Makefile.in
+include $(UNIT_ROOT)/branch-tgt-trap/Makefile.in
+include $(UNIT_ROOT)/imem-access-trap/Makefile.in
+include $(UNIT_ROOT)/mul/Makefile.in
+include $(UNIT_ROOT)/div/Makefile.in
+include $(UNIT_ROOT)/mtime-read/Makefile.in
+include $(UNIT_ROOT)/mtime-write/Makefile.in
+include $(UNIT_ROOT)/counters/Makefile.in
+include $(UNIT_ROOT)/timer/Makefile.in
+include $(UNIT_ROOT)/interrupts-enablebits/Makefile.in
+include $(UNIT_ROOT)/interrupts-timer-direct/Makefile.in
+include $(UNIT_ROOT)/interrupts-timer-vectored/Makefile.in
 
 .PHONY: unit-tests-build
 unit-tests-build: $(UNIT_TESTS)

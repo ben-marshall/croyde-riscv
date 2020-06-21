@@ -1,0 +1,7 @@
+$REPO_HOME/verif/share/verilator/core_mem_agent.cpp
+$REPO_HOME/verif/share/verilator/memory_bus.cpp
+$REPO_HOME/verif/share/verilator/memory_device.cpp
+$REPO_HOME/verif/share/verilator/memory_device_ram.cpp
+$REPO_HOME/verif/share/verilator/memory_device_uart.cpp
+$REPO_HOME/verif/share/verilator/srec.cpp
+

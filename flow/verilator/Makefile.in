@@ -6,29 +6,34 @@ VL_WAVES    = $(VL_DIR)/waves.vcd
 VL_TIMEOUT  = 2000
 VL_ARGS     = +IMEM=$(REPO_WORK)/riscv-compliance/rv64i/ADDIW.elf.srec
 
-VL_CORE_MANIFEST    = $(REPO_HOME)/flow/verilator/manifest-core.txt
-VL_VERIF_MANIFEST   = $(REPO_HOME)/flow/verilator/manifest-verif.txt
+SHARE_TB_DIR = $(REPO_HOME)/verif/share/verilator
 
-VL_CORE_RTL_SRC     = $(shell cat $(VL_CORE_MANIFEST) | envsubst)
+VL_CORE_RTL_MANIFEST    = $(REPO_HOME)/flow/verilator/manifest-rtl-core.txt
+VL_CORE_TB_MANIFEST     = $(REPO_HOME)/flow/verilator/manifest-tb-core.txt
+VL_SHARE_TB_MANIFEST    = $(REPO_HOME)/flow/verilator/manifest-tb-share.txt
+
+VL_CORE_RTL_SRC     = $(shell cat $(VL_CORE_RTL_MANIFEST) | envsubst)
+VL_CORE_TB_SRC      = $(shell cat $(VL_CORE_TB_MANIFEST)  | envsubst)
+VL_SHARE_TB_SRC     = $(shell cat $(VL_SHARE_TB_MANIFEST) | envsubst)
 
 VL_TOP      = core_top
 
-VL_CSRC_DIR=$(REPO_HOME)/verif/verilator
-
 VL_FLAGS = --cc -CFLAGS "-O2" --Mdir $(VL_DIR) -O3 -CFLAGS -g\
             -I$(CORE_RTL_DIR) \
+            -CFLAGS -I$(SHARE_TB_DIR) \
             --exe --trace \
             --top-module $(VL_TOP) $(VL_BUILD_FLAGS)
 
 .PHONY: $(VL_CSRC)
 
-$(VL_OUT) : $(VL_VERIF_MANIFEST) $(VL_CORE_MANIFEST) $(VL_CORE_RTL_SRC)
+$(VL_OUT) : $(VL_CORE_RTL_SRC) $(VL_CORE_TB_SRC) $(VL_SHARE_TB_SRC)
 	@mkdir -p $(dir $(VL_OUT))
 	$(VERILATOR) \
         $(VL_FLAGS) \
         -o $@ \
-        -f $(VL_VERIF_MANIFEST) \
-        -f $(VL_CORE_MANIFEST)
+        -f $(VL_CORE_RTL_MANIFEST) \
+        -f $(VL_CORE_TB_MANIFEST) \
+        -f $(VL_SHARE_TB_MANIFEST)
 	$(MAKE) -C $(VL_DIR) -f V$(VL_TOP).mk
 
 verilator-build-core: $(VL_OUT)
