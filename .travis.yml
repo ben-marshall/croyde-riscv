@@ -20,6 +20,7 @@ jobs:
     - make unit-tests-build
     - make unit-tests-run
   - name: "Core Complex (CCX)"
+    script:
     - source ./bin/install-verilator.sh
     - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
