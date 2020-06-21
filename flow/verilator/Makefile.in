@@ -20,6 +20,7 @@ endef
 #
 # 1. Top Module Name
 # 2. target command file
+# 3. Extra verilator flags
 define add_vl_target
 
 $(call map_vl_exe,${1}) : ${2}
@@ -28,7 +29,7 @@ $(call map_vl_exe,${1}) : ${2}
         -f ${2} \
         -o $(call map_vl_exe,${1}) \
         --Mdir $(call map_vl_mdir,${1}) \
-        --top-module ${1}
+        --top-module ${1} ${3}
 	$(MAKE) -C $(call map_vl_mdir,${1}) -f $(call map_vl_makefile,${1})
 
 build-${1}: $(call map_vl_exe,${1})
@@ -42,8 +43,9 @@ endef
 CMD_CORE = $(REPO_HOME)/flow/verilator/cmd-core.txt
 TOP_CORE = core_top
 EXE_CORE = $(call map_vl_exe,$(TOP_CORE))
+FLG_CORE =
 
-$(eval $(call add_vl_target,$(TOP_CORE),$(CMD_CORE)))
+$(eval $(call add_vl_target,$(TOP_CORE),$(CMD_CORE),$(FLG_CORE)))
 
 #
 # Core Complex (CCX) level testbench
@@ -52,6 +54,7 @@ $(eval $(call add_vl_target,$(TOP_CORE),$(CMD_CORE)))
 CMD_CCX  = $(REPO_HOME)/flow/verilator/cmd-ccx.txt
 TOP_CCX  = ccx_top 
 EXE_CCX  = $(call map_vl_exe,$(TOP_CCX))
+FLG_CCX  = -GROM_MEMH=\"$(FSBL_HEX_CCX)\"
 
-$(eval $(call add_vl_target,$(TOP_CCX),$(CMD_CCX)))
+$(eval $(call add_vl_target,$(TOP_CCX),$(CMD_CCX),$(FLG_CCX)))
 

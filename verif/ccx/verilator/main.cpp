@@ -13,7 +13,7 @@
 #include "dut_wrapper.hpp"
 #include "testbench.hpp"
 
-uint32_t    TB_PASS_ADDRESS     = 0;
+uint32_t    TB_PASS_ADDRESS     = -1;
 uint32_t    TB_FAIL_ADDRESS     = -1;
 
 bool        quiet               = false;

@@ -24,6 +24,8 @@ AR              = $(RISCV)/bin/riscv$(RISCV_XLEN)-unknown-elf-ar
 OBJDUMP         = $(RISCV)/bin/riscv$(RISCV_XLEN)-unknown-elf-objdump
 OBJCOPY         = $(RISCV)/bin/riscv$(RISCV_XLEN)-unknown-elf-objcopy
 
+include $(REPO_HOME)/src/fsbl/Makefile.in
+
 include $(REPO_HOME)/flow/verilator/Makefile.in
 include $(REPO_HOME)/flow/design-assertions/Makefile.in
 include $(REPO_HOME)/flow/synthesis/Makefile.in
