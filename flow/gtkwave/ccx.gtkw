@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sun Jun 21 16:43:07 2020
+[*] Sun Jun 21 17:04:20 2020
 [*]
 [dumpfile] "/home/ben/projects/riscv/cores/uc64/work/verilator/ccx_top/waves.vcd"
-[dumpfile_mtime] "Sun Jun 21 16:39:07 2020"
-[dumpfile_size] 839234
+[dumpfile_mtime] "Sun Jun 21 16:51:33 2020"
+[dumpfile_size] 1406848
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/ccx.gtkw"
 [timestart] 1
 [size] 1920 1025
 [pos] -1 -1
-*-7.306888 155 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-9.632350 1916 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.ccx_top.
 [treeopen] TOP.ccx_top.i_ccx_ic_top.
@@ -29,8 +29,17 @@ TOP.ccx_top.int_sw
 @22
 TOP.ccx_top.trs_instr[31:0]
 TOP.ccx_top.trs_pc[63:0]
+@8022
+TOP.ccx_top.trs_pc[63:0]
+@20000
+-
 @28
 TOP.ccx_top.trs_valid
+@24
+TOP.ccx_top.i_core_top.trap_cause[6:0]
+@28
+TOP.ccx_top.i_core_top.trap_cpu
+TOP.ccx_top.i_core_top.trap_int
 @1000200
 -Trace
 @c00200
@@ -61,9 +70,7 @@ TOP.ccx_top.i_rom.cen
 @22
 TOP.ccx_top.i_rom.addr[10:0]
 TOP.ccx_top.i_rom.rdata[63:0]
-@23
 TOP.ccx_top.i_rom.wdata[63:0]
-@22
 TOP.ccx_top.i_rom.wstrb[7:0]
 @1000200
 -ROM
@@ -134,7 +141,7 @@ TOP.ccx_top.core_imem.rdata[63:0]
 TOP.ccx_top.core_imem.err
 @1000200
 -Memory - Instructions
-@c00200
+@800200
 -S2
 @28
 TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_valid
@@ -250,7 +257,7 @@ TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_wb_csr
 TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_wb_lsu
 TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_wb_mdu
 TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_wb_npc
-@1401200
+@1000200
 -S2
 @c00200
 -Decode
@@ -363,6 +370,43 @@ TOP.ccx_top.i_core_top.i_core_pipe_decode.dec_xor
 TOP.ccx_top.i_core_top.i_core_pipe_decode.dec_xori
 @1401200
 -Decode
+@800201
+-GPRs
+@23
+TOP.ccx_top.i_core_top.i_core_regfile.regs(0)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(1)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(2)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(3)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(4)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(5)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(6)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(7)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(8)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(9)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(10)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(11)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(12)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(13)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(14)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(15)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(16)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(17)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(18)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(19)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(20)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(21)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(22)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(23)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(24)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(25)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(26)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(27)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(28)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(29)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(30)[63:0]
+TOP.ccx_top.i_core_top.i_core_regfile.regs(31)[63:0]
+@1000201
+-GPRs
 @1000200
 -CPU
 [pattern_trace] 1
