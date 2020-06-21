@@ -13,11 +13,11 @@ parameter   DW = 64     // Data width
 input  wire      g_clk      ,
 input  wire      g_resetn   ,
 
-core_mem_bus.REQ if_core    , // CPU instruction memory
+core_mem_bus.RSP if_core    , // CPU instruction memory
 
-core_mem_bus.RSP if_rom     ,
-core_mem_bus.RSP if_ram     ,
-core_mem_bus.RSP if_ext
+core_mem_bus.REQ if_rom     ,
+core_mem_bus.REQ if_ram     ,
+core_mem_bus.REQ if_ext
 
 );
 
@@ -25,17 +25,17 @@ core_mem_bus.RSP if_ext
 // Parameters
 // ------------------------------------------------------------
 
-parameter ROM_MASK  = 'hFFFFFE00;
-parameter ROM_BASE  = 'h00000000;
-parameter ROM_SIZE  = 'h000003FF;
+parameter ROM_MASK  = 39'h7FFFFFFE00;
+parameter ROM_BASE  = 39'h0000000000;
+parameter ROM_SIZE  = 39'h00000003FF;
 
-parameter RAM_MASK  = 'hFFFE0000;
-parameter RAM_BASE  = 'h00010000;
-parameter RAM_SIZE  = 'h0000FFFF;
+parameter RAM_MASK  = 39'h7FFFFE0000;
+parameter RAM_BASE  = 39'h0000010000;
+parameter RAM_SIZE  = 39'h000000FFFF;
 
-parameter EXT_MASK  = 'hE0000000;
-parameter EXT_BASE  = 'h10000000;
-parameter EXT_SIZE  = 'h0FFFFFFF;
+parameter EXT_MASK  = 39'h7FE0000000;
+parameter EXT_BASE  = 39'h7F10000000;
+parameter EXT_SIZE  = 39'h000FFFFFFF;
 
 //
 // Utility functions
@@ -44,7 +44,7 @@ parameter EXT_SIZE  = 'h0FFFFFFF;
 //
 // Function to check if an address matches a particular peripheral
 //
-function [AW-1:0] address_match(
+function [0:0] address_match (
 input [AW-1:0] address  ,   // The address to match
 input [AW-1:0] mask     ,   // Mask bits to match top addr bits with
 input [AW-1:0] base     ,   // Base address of the range
@@ -130,20 +130,20 @@ end
 // Response Routing.
 // ------------------------------------------------------------
 
-assign if_core.gnt  = map_core_rom   ? if_rom.gnt :
-                      map_core_ram   ? if_ram.gnt :
-                      map_core_ext   ? if_ext.gnt :
-                                       1'b1       ;
+assign if_core.gnt  = map_core_rom   ? if_rom.gnt   :
+                      map_core_ram   ? if_ram.gnt   :
+                      map_core_ext   ? if_ext.gnt   :
+                                       1'b1         ;
 
-assign if_core.err  = rsp_route_rom  ? if_rom.err :
-                      rsp_route_ram  ? if_ram.err :
-                      rsp_route_ext  ? if_ext.err :
-                                       1'b1       ;
+assign if_core.err  = rsp_route_rom  ? if_rom.err   :
+                      rsp_route_ram  ? if_ram.err   :
+                      rsp_route_ext  ? if_ext.err   :
+                                       1'b1         ;
 
-assign if_core.rdata= rsp_route_rom  ? if_rom.err :
-                      rsp_route_ram  ? if_ram.err :
-                      rsp_route_ext  ? if_ext.err :
-                                       'b0        ;
+assign if_core.rdata= rsp_route_rom  ? if_rom.rdata :
+                      rsp_route_ram  ? if_ram.rdata :
+                      rsp_route_ext  ? if_ext.rdata :
+                                       64'b0        ;
 
 endmodule
 

@@ -9,15 +9,15 @@ parameter   AW = 39,    // Address width
 parameter   DW = 64     // Data width
 )(
 
-input  wire         g_clk           ,
-input  wire         g_resetn        ,
+input  wire       g_clk     ,
+input  wire       g_resetn  ,
 
-core_mem_bus.rsp #(.AW(AW),.DW(DW)) if_imem, // CPU instruction memory
-core_mem_bus.rsp #(.AW(AW),.DW(DW)) if_dmem, // CPU data        memory
+core_mem_bus.RSP  if_imem   , // CPU instruction memory
+core_mem_bus.RSP  if_dmem   , // CPU data        memory
 
-core_mem_bus.req #(.AW(AW),.DW(DW)) if_rom ,
-core_mem_bus.req #(.AW(AW),.DW(DW)) if_ram ,
-core_mem_bus.req #(.AW(AW),.DW(DW)) if_ext
+core_mem_bus.REQ  if_rom    ,
+core_mem_bus.REQ  if_ram    ,
+core_mem_bus.REQ  if_ext
 
 );
 
