@@ -48,7 +48,7 @@ generate if(ROM == 0) for (i = 0; i < WIDTH / 8; i = i + 1) begin
     // Reads
     always @(posedge g_clk) begin
         if(cen) begin
-            rdata[8*i:+8] <= mem[addr + i];
+            rdata[8*i+:8] <= mem[addr + i];
         end
     end
 
@@ -56,7 +56,7 @@ generate if(ROM == 0) for (i = 0; i < WIDTH / 8; i = i + 1) begin
     // Writes
     always @(posedge g_clk) begin
         if(cen && wstrb[i]) begin
-            mem[addr+i] <= wdata[8*i:+8];
+            mem[addr+i] <= wdata[8*i+:8];
         end
     end
 
