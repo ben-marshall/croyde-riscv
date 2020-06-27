@@ -23,7 +23,10 @@
 }
 
 DECL_RD_CSR(mepc)
+DECL_WR_CSR(mepc)
+
 DECL_RD_CSR(mcause)
+
 DECL_RD_CSR(mtvec)
 DECL_WR_CSR(mtvec)
 
@@ -156,7 +159,8 @@ void __puthex32(uint32_t w);
 //! Print an 8-bit number as hex
 void __puthex8(uint8_t w);
 
-#define CAUSE_CODE_IACCESS 0x1l
+#define CAUSE_CODE_IACCESS  0x1l
+#define CAUSE_CODE_LDACCESS 0x5l
 
 #endif
 

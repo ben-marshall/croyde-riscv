@@ -140,6 +140,7 @@ CCX_UNIT_TESTS_CLEAN += $(call cxx_unit_waves,${1}) \
 endef
 
 include $(CCX_UNIT_ROOT)/example/Makefile.in
+include $(CCX_UNIT_ROOT)/access-traps/Makefile.in
 
 .PHONY: ccx-unit-tests-build
 ccx-unit-tests-build: $(CCX_UNIT_TESTS)

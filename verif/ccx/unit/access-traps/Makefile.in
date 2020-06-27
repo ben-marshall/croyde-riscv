@@ -1,0 +1,8 @@
+
+
+TEST_NAME = ccx-access-traps
+TEST_SRC  = $(CCX_UNIT_ROOT)/access-traps/access-traps.c \
+            $(CCX_UNIT_ROOT)/access-traps/access-traps.S \
+
+$(eval $(call add_cxx_unit_test,$(TEST_NAME),$(TEST_SRC)))
+
