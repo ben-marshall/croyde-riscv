@@ -25,6 +25,8 @@ jobs:
     - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
     - make build-ccx_top
+    - make cxx-unit-tests-build
+    - make cxx-unit-tests-run
   - name: "Designer Assertions"
     script:
     - source ./bin/install-yosys.sh
