@@ -31,7 +31,7 @@ localparam W      = WIDTH-1;
 localparam D      = DEPTH-1;
 localparam S      = WIDTH/8-1;
 localparam B      = (WIDTH/8 * DEPTH)-1;
-localparam A      = $clog2(DEPTH); 
+localparam A      = $clog2(DEPTH)-1; 
 
 // Byte array of memory.
 reg [7:0] mem [B:0];

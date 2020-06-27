@@ -26,8 +26,8 @@ output wire [ 63:0] trs_pc         // Instruction trace PC
 parameter   PC_RESET_ADDRESS= 'h00000000;
 
 // Base address of the memory mapped IO region.
-parameter   MMIO_BASE_ADDR  = 'h0000_0000_0001_0000;
-parameter   MMIO_BASE_MASK  = 'h0000_0000_0001_FFFF;
+parameter   MMIO_BASE_ADDR  = 'h0000_0000_0002_0000;
+parameter   MMIO_BASE_MASK  = 'h0000_0000_0002_FFFF;
 
 localparam  AW = 39;    // Address width
 localparam  DW = 64;    // Data width
@@ -43,6 +43,7 @@ localparam  ROM_MASK  = ~ROM_SIZE ;
 localparam  ROM_WIDTH = 64        ;
 localparam  ROM_DEPTH = ROM_SIZE+1;
 
+parameter   RAM_MEMH  = ""          ;
 parameter   RAM_BASE  = 39'h00010000;
 parameter   RAM_SIZE  = 39'h0000FFFF;
 localparam  RAM_MASK  =  ~RAM_SIZE;
@@ -160,7 +161,7 @@ mem_sram_wxd #(
 .g_resetn    (g_resetn          ),
 .cen         (if_rom.req        ),
 .wstrb       (if_rom.strb       ),
-.addr        (if_rom.addr[10:0] ),
+.addr        (if_rom.addr[ 9:0] ),
 .wdata       (if_rom.wdata      ),
 .rdata       (if_rom.rdata      ) 
 );
@@ -172,13 +173,14 @@ assign if_rom.err = 1'b0;
 mem_sram_wxd #(
 .WIDTH (RAM_WIDTH),
 .ROM   (        1),
-.DEPTH (RAM_DEPTH)
+.DEPTH (RAM_DEPTH),
+.MEMH  (RAM_MEMH ) 
 ) i_ram (
 .g_clk       (g_clk             ),
 .g_resetn    (g_resetn          ),
 .cen         (if_ram.req        ),
 .wstrb       (if_ram.strb       ),
-.addr        (if_ram.addr[16:0] ),
+.addr        (if_ram.addr[15:0] ),
 .wdata       (if_ram.wdata      ),
 .rdata       (if_ram.rdata      ) 
 );
