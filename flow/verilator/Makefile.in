@@ -23,6 +23,7 @@ endef
 # 3. Extra verilator flags
 define add_vl_target
 
+.PHONY: $(call map_vl_exe,${1})
 $(call map_vl_exe,${1}) : ${2}
 	mkdir -p $(call map_vl_mdir,${1})
 	$(VERILATOR) \
@@ -54,7 +55,8 @@ $(eval $(call add_vl_target,$(TOP_CORE),$(CMD_CORE),$(FLG_CORE)))
 CMD_CCX  = $(REPO_HOME)/flow/verilator/cmd-ccx.txt
 TOP_CCX  = ccx_top 
 EXE_CCX  = $(call map_vl_exe,$(TOP_CCX))
-FLG_CCX  = -GROM_MEMH=\"$(FSBL_HEX_CCX)\"
+FLG_CCX  = -GROM_MEMH=\"rom.hex\"
+FLG_CCX += -GRAM_MEMH=\"ram.hex\"
 
 $(eval $(call add_vl_target,$(TOP_CCX),$(CMD_CCX),$(FLG_CCX)))
 
