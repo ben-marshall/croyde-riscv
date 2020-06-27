@@ -13,9 +13,9 @@ The core complex (CCX) contains:
 
 - The micro-controller CPU.
 
-- A dual port, configurably sized RAM.
+- A single port, configurably sized RAM.
 
-- A dual port 1K ROM.
+- A single port 1K ROM.
 
 - An external bus port, with bridge modules for conversion between
   different standards.
@@ -32,11 +32,8 @@ All ports have a 64-bit data bus.
 
 Peripheral  | Base Address | Range        | CPU Data | CPU Instructions
 ------------|--------------|--------------|----------|------------------
-ROM Port 0  |`0x0000000000`| 1K           |       x  | 
-ROM Port 1  |`0x0000000000`| 1K           |          | x
-RAM Port 0  |`0x0000010000`| 4-64K        |       x  | 
-RAM Port 1  |`0x0000010000`| 4-64K        |          | x
-Ext Port 0  |`0x0100000000`| 4GB          |       x  | 
-Ext Port 1  |`0x0100000000`| 4GB          |          | x
+ROM Port 0  |`0x0000000000`| 1K           |       x  | x
+RAM Port 0  |`0x0000010000`| 4-64K        |       x  | x
+Ext Port 0  |`0x0100000000`| 4GB          |       x  | x
 
 
