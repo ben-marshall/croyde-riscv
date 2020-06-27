@@ -13,7 +13,7 @@ volatile uint64_t * __mtime     = (uint64_t*)0x00020000;
 //! Direct access to mtimecmp
 volatile uint64_t * __mtimecmp  = (uint64_t*)0x00020008;
 
-volatile uint32_t * UART = (volatile uint32_t*)0x10000000;
+volatile uint32_t * UART = (volatile uint32_t*)0x11000000;
 
 //! Write a character to the uart.
 void __putchar(char c) {

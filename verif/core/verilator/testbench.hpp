@@ -86,7 +86,7 @@ protected:
     size_t      default_ram_base_addr = 0x10000000;
     
     //! Default base address of the default memory.
-    size_t      uart_base_addr = 0x10000000;
+    size_t      uart_base_addr = 0x11000000;
 
     //! Default size of the default memory.
     size_t      default_ram_size = 0x20000;

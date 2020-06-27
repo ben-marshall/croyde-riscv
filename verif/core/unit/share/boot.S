@@ -55,7 +55,7 @@ _boot:
     j       test_fail           // Nonzero -> fail.
 
 
-.align 2
+.balign 4
 _trap_handler:                  // Main trap handler function.
     j test_fail
     nop
@@ -64,6 +64,7 @@ _trap_handler:                  // Main trap handler function.
     nop
 
 
+.balign 4
 .global test_fail
 .func
 test_fail:                      // Test ends here if it fails
@@ -74,6 +75,7 @@ test_fail:                      // Test ends here if it fails
     j test_fail
 .endfunc
 
+.balign 4
 .global test_pass
 .func
 test_pass:                      // Test ends here if it passes

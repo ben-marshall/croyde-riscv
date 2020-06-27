@@ -79,7 +79,7 @@ protected:
     bool        waves_dump;
     
     //! Default base address of the default memory.
-    size_t      uart_base_addr = 0x10000000;
+    size_t      uart_base_addr = 0x11000000;
 
 };
 
