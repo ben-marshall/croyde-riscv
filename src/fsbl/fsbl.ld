@@ -10,14 +10,14 @@ SECTIONS {
 
     . = ORIGIN(rom);
 
-    .text ALIGN(4) : SUBALIGN(4) {
+    .text ALIGN(8) : SUBALIGN(8) {
         *(.text.fsbl) 
         *(.text.*) 
         *(.text) 
         . = ALIGN(4);
     } > rom
-    .data ALIGN(4) : SUBALIGN(4) { *(.data.*) } > rom
-    .bss  ALIGN(4) : SUBALIGN(4) { *(.bss)    } > rom
+    .data ALIGN(8) : SUBALIGN(8) { *(.data.*) } > rom
+    .bss  ALIGN(8) : SUBALIGN(8) { *(.bss)    } > rom
 
     /DISCARD/ : { *(.comment) }
 
