@@ -18,6 +18,7 @@ SECTIONS {
     } > rom
     .data ALIGN(8) : SUBALIGN(8) { *(.data.*) } > rom
     .bss  ALIGN(8) : SUBALIGN(8) { *(.bss)    } > rom
+    .sbss  ALIGN(8) : SUBALIGN(8) { *(.sbss)    } > rom
 
     /DISCARD/ : { *(.comment) }
 
