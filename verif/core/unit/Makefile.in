@@ -1,7 +1,7 @@
 
 UNIT_TESTS      = 
 UNIT_ROOT       = $(REPO_HOME)/verif/core/unit
-UNIT_TEST_BUILD = $(REPO_HOME)/work/unit
+UNIT_TEST_BUILD = $(REPO_WORK)/core/unit
 
 UNIT_TESTS_RUN  = 
 

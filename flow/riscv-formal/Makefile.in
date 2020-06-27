@@ -6,7 +6,7 @@ RV_FORMAL_CFG   = $(REPO_HOME)/flow/riscv-formal/checks.cfg
 
 RV_FORMAL_GEN   = $(RV_FORMAL_DIR)/checks/genchecks.py
 
-RV_FORMAL_WORK  = $(REPO_WORK)/riscv-formal
+RV_FORMAL_WORK  = $(REPO_WORK)/core/riscv-formal
 
 RV_FORMAL_NJOBS = 4
 

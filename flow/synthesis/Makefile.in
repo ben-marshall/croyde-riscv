@@ -1,14 +1,14 @@
 
 SYNTH_SCRIPT        = $(REPO_HOME)/flow/synthesis/synth-cmos.tcl
 
-SYNTH_DIR           = $(REPO_WORK)/synthesis
+SYNTH_DIR           = $(REPO_WORK)/core/synthesis
 
 SYNTH_LOG_OUT       = $(SYNTH_DIR)/synth.log
 SYNTH_CELLS_RPT     = $(SYNTH_DIR)/synth-cells.rpt
 SYNTH_LOOPS_RPT     = $(SYNTH_DIR)/logic-loops.rpt
 SYNTH_VERILOG_OUT   = $(SYNTH_DIR)/synth-cmos.v
 
-$(SYNTH_VERILOG_OUT) : export SYNTH_DIR = $(REPO_WORK)/synthesise
+$(SYNTH_VERILOG_OUT) : export SYNTH_DIR = $(REPO_WORK)/core/synthesise
 $(SYNTH_VERILOG_OUT) : $(SYNTH_SCRIPT) $(CPU_RTL_SRCS)
 	@mkdir -p $(dir $(SYNTH_VERILOG_OUT))
 	$(YOSYS_ROOT)/yosys -QT \
