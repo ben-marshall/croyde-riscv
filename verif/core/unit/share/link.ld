@@ -9,4 +9,8 @@ SECTIONS {
 
     /DISCARD/ : { *(.comment) }
 
+    . = ALIGN(16);
+
+    PROVIDE (__fsbl_stack_start = 0x10003FF0);
+
 }

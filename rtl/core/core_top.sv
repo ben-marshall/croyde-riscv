@@ -48,8 +48,8 @@ output wire [         XL:0] trs_pc         // Instruction trace PC
 parameter   PC_RESET_ADDRESS= 'h10000000;
 
 // Base address of the memory mapped IO region.
-parameter   MMIO_BASE_ADDR  = 'h0000_0000_0001_0000;
-parameter   MMIO_BASE_MASK  = 'h0000_0000_0001_FFFF;
+parameter   MMIO_BASE_ADDR  = 'h0000_0000_0002_0000;
+parameter   MMIO_BASE_MASK  = 'h0000_0000_0002_FFFF;
 
 //
 // Control flow change busses

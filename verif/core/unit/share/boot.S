@@ -9,7 +9,7 @@ _start:                         // Entry point for the basic bootloader.
 .align 4
 _boot:
     li x1 , 0
-    li x2 , 0
+    la sp , __fsbl_stack_start
     li x3 , 0
     li x4 , 0
     li x5 , 0
@@ -39,8 +39,6 @@ _boot:
     li x29, 0
     li x30, 0
     li x31, 0
-
-    la sp , _start + 0x3FF0
 
     la   t0 , _trap_handler     // Setup the trap handler.
     csrw mtvec, t0

@@ -5,15 +5,15 @@
 char * lut = "0123456789ABCDEF";
 
 // Base address of the memory mapped IO region
-volatile uint64_t * __mmio_base = (uint64_t*)0x00010000;
+volatile uint64_t * __mmio_base = (uint64_t*)0x00020000;
 
 //! Direct access to mtime
-volatile uint64_t * __mtime     = (uint64_t*)0x00010000;
+volatile uint64_t * __mtime     = (uint64_t*)0x00020000;
 
 //! Direct access to mtimecmp
-volatile uint64_t * __mtimecmp  = (uint64_t*)0x00010008;
+volatile uint64_t * __mtimecmp  = (uint64_t*)0x00020008;
 
-volatile uint32_t * UART = (volatile uint32_t*)0x40600000;
+volatile uint32_t * UART = (volatile uint32_t*)0x10000000;
 
 //! Write a character to the uart.
 void __putchar(char c) {
