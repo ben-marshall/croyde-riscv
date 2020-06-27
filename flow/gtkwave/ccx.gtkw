@@ -1,22 +1,22 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sun Jun 21 17:04:20 2020
+[*] Sat Jun 27 13:01:50 2020
 [*]
-[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/verilator/ccx_top/waves.vcd"
-[dumpfile_mtime] "Sun Jun 21 16:51:33 2020"
-[dumpfile_size] 1406848
+[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/ccx/unit/ccx-example/ccx-example.vcd"
+[dumpfile_mtime] "Sat Jun 27 12:59:44 2020"
+[dumpfile_size] 3911645
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/ccx.gtkw"
-[timestart] 1
+[timestart] 1734
 [size] 1920 1025
 [pos] -1 -1
-*-9.632350 1916 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-6.093467 1826 1926 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.ccx_top.
-[treeopen] TOP.ccx_top.i_ccx_ic_top.
 [treeopen] TOP.ccx_top.i_core_top.
 [treeopen] TOP.ccx_top.i_core_top.i_core_pipe_decode.
+[treeopen] TOP.ccx_top.i_core_top.i_core_pipe_exec.
 [sst_width] 361
-[signals_width] 371
+[signals_width] 436
 [sst_expanded] 1
 [sst_vpaned_height] 290
 @28
@@ -26,15 +26,17 @@ TOP.ccx_top.int_ext
 TOP.ccx_top.int_sw
 @800200
 -Trace
-@22
-TOP.ccx_top.trs_instr[31:0]
-TOP.ccx_top.trs_pc[63:0]
-@8022
-TOP.ccx_top.trs_pc[63:0]
-@20000
--
 @28
 TOP.ccx_top.trs_valid
+@22
+TOP.ccx_top.trs_pc[63:0]
+@2022
+^1 /home/ben/projects/riscv/cores/uc64/work/ccx/unit/ccx-example/ccx-example.gtkwl
+TOP.ccx_top.trs_instr[31:0]
+@22
+TOP.ccx_top.trs_instr[31:0]
+@20000
+-
 @24
 TOP.ccx_top.i_core_top.trap_cause[6:0]
 @28
@@ -42,7 +44,7 @@ TOP.ccx_top.i_core_top.trap_cpu
 TOP.ccx_top.i_core_top.trap_int
 @1000200
 -Trace
-@c00200
+@800200
 -External Memory
 @28
 TOP.ccx_top.emem_req
@@ -55,27 +57,69 @@ TOP.ccx_top.emem_strb[7:0]
 TOP.ccx_top.emem_wdata[63:0]
 @28
 TOP.ccx_top.emem_gnt
-@22
+@23
 TOP.ccx_top.emem_rdata[63:0]
 @28
 TOP.ccx_top.emem_err
-@1401200
+@1000200
 -External Memory
-@800200
+@c00200
 -ROM
 @28
-TOP.ccx_top.i_rom.g_clk
-TOP.ccx_top.i_rom.g_resetn
 TOP.ccx_top.i_rom.cen
 @22
-TOP.ccx_top.i_rom.addr[10:0]
+TOP.ccx_top.i_rom.addr[9:0]
 TOP.ccx_top.i_rom.rdata[63:0]
 TOP.ccx_top.i_rom.wdata[63:0]
 TOP.ccx_top.i_rom.wstrb[7:0]
-@1000200
+@1401200
 -ROM
-@c00200
+@800200
+-RAM
+@28
+TOP.ccx_top.i_ram.cen
+@c00022
+TOP.ccx_top.i_ram.addr[15:0]
+@28
+(0)TOP.ccx_top.i_ram.addr[15:0]
+(1)TOP.ccx_top.i_ram.addr[15:0]
+(2)TOP.ccx_top.i_ram.addr[15:0]
+(3)TOP.ccx_top.i_ram.addr[15:0]
+(4)TOP.ccx_top.i_ram.addr[15:0]
+(5)TOP.ccx_top.i_ram.addr[15:0]
+(6)TOP.ccx_top.i_ram.addr[15:0]
+(7)TOP.ccx_top.i_ram.addr[15:0]
+(8)TOP.ccx_top.i_ram.addr[15:0]
+(9)TOP.ccx_top.i_ram.addr[15:0]
+(10)TOP.ccx_top.i_ram.addr[15:0]
+(11)TOP.ccx_top.i_ram.addr[15:0]
+(12)TOP.ccx_top.i_ram.addr[15:0]
+(13)TOP.ccx_top.i_ram.addr[15:0]
+(14)TOP.ccx_top.i_ram.addr[15:0]
+(15)TOP.ccx_top.i_ram.addr[15:0]
+@1401200
+-group_end
+@22
+TOP.ccx_top.i_ram.rdata[63:0]
+TOP.ccx_top.i_ram.wdata[63:0]
+@c00022
+TOP.ccx_top.i_ram.wstrb[7:0]
+@28
+(0)TOP.ccx_top.i_ram.wstrb[7:0]
+(1)TOP.ccx_top.i_ram.wstrb[7:0]
+(2)TOP.ccx_top.i_ram.wstrb[7:0]
+(3)TOP.ccx_top.i_ram.wstrb[7:0]
+(4)TOP.ccx_top.i_ram.wstrb[7:0]
+(5)TOP.ccx_top.i_ram.wstrb[7:0]
+(6)TOP.ccx_top.i_ram.wstrb[7:0]
+(7)TOP.ccx_top.i_ram.wstrb[7:0]
+@1401200
+-group_end
+@1000200
+-RAM
+@800200
 -IC
+@c00200
 -Router - Instr Mem
 @28
 TOP.ccx_top.i_ccx_ic_top.i_ccx_ic_router_imem.g_clk
@@ -94,6 +138,43 @@ TOP.ccx_top.i_ccx_ic_top.i_ccx_ic_router_imem.rsp_route_ram
 TOP.ccx_top.i_ccx_ic_top.i_ccx_ic_router_imem.rsp_route_rom
 @1401200
 -Router - Instr Mem
+@c00200
+-Router - Data Mem
+@28
+TOP.ccx_top.i_ccx_ic_top.i_ccx_ic_router_dmem.g_clk
+TOP.ccx_top.i_ccx_ic_top.i_ccx_ic_router_dmem.g_resetn
+TOP.ccx_top.i_ccx_ic_top.i_ccx_ic_router_dmem.map_core_ext
+TOP.ccx_top.i_ccx_ic_top.i_ccx_ic_router_dmem.map_core_none
+TOP.ccx_top.i_ccx_ic_top.i_ccx_ic_router_dmem.map_core_ram
+TOP.ccx_top.i_ccx_ic_top.i_ccx_ic_router_dmem.map_core_rom
+TOP.ccx_top.i_ccx_ic_top.i_ccx_ic_router_dmem.n_rsp_route_ext
+TOP.ccx_top.i_ccx_ic_top.i_ccx_ic_router_dmem.n_rsp_route_none
+TOP.ccx_top.i_ccx_ic_top.i_ccx_ic_router_dmem.n_rsp_route_ram
+TOP.ccx_top.i_ccx_ic_top.i_ccx_ic_router_dmem.n_rsp_route_rom
+TOP.ccx_top.i_ccx_ic_top.i_ccx_ic_router_dmem.rsp_route_ext
+TOP.ccx_top.i_ccx_ic_top.i_ccx_ic_router_dmem.rsp_route_none
+TOP.ccx_top.i_ccx_ic_top.i_ccx_ic_router_dmem.rsp_route_ram
+TOP.ccx_top.i_ccx_ic_top.i_ccx_ic_router_dmem.rsp_route_rom
+@1401200
+-Router - Data Mem
+@c00200
+-Core DMEM
+@22
+TOP.ccx_top.core_dmem.addr[38:0]
+@28
+TOP.ccx_top.core_dmem.err
+TOP.ccx_top.core_dmem.gnt
+@22
+TOP.ccx_top.core_dmem.rdata[63:0]
+@28
+TOP.ccx_top.core_dmem.req
+@22
+TOP.ccx_top.core_dmem.strb[7:0]
+TOP.ccx_top.core_dmem.wdata[63:0]
+@28
+TOP.ccx_top.core_dmem.wen
+@1401200
+-Core DMEM
 @c00200
 -Arbiter Rom
 @28
@@ -125,9 +206,11 @@ TOP.ccx_top.i_ccx_ic_top.if_imem_rom.err
 TOP.ccx_top.i_ccx_ic_top.if_imem_rom.rdata[63:0]
 @1401200
 -if_imem_rom
+@1000200
 -IC
 @800200
 -CPU
+@c00200
 -Memory - Instructions
 @28
 TOP.ccx_top.core_imem.req
@@ -139,9 +222,24 @@ TOP.ccx_top.core_imem.gnt
 TOP.ccx_top.core_imem.rdata[63:0]
 @28
 TOP.ccx_top.core_imem.err
-@1000200
+@1401200
 -Memory - Instructions
-@800200
+@c00200
+-Memory - Data
+@28
+TOP.ccx_top.i_core_top.dmem_req
+TOP.ccx_top.i_core_top.dmem_gnt
+TOP.ccx_top.i_core_top.dmem_wen
+@22
+TOP.ccx_top.i_core_top.dmem_addr[38:0]
+TOP.ccx_top.i_core_top.dmem_strb[7:0]
+TOP.ccx_top.i_core_top.dmem_wdata[63:0]
+TOP.ccx_top.i_core_top.dmem_rdata[63:0]
+@28
+TOP.ccx_top.i_core_top.dmem_err
+@1401200
+-Memory - Data
+@c00200
 -S2
 @28
 TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_valid
@@ -203,6 +301,8 @@ TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_iaccess_trap_16
 TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_iaccess_trap_32
 @22
 TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_imm[63:0]
+@2022
+^1 /home/ben/projects/riscv/cores/uc64/work/ccx/unit/ccx-example/ccx-example.gtkwl
 TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_instr[31:0]
 @c00200
 -LSU
@@ -257,8 +357,196 @@ TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_wb_csr
 TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_wb_lsu
 TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_wb_mdu
 TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_wb_npc
-@1000200
+@1401200
 -S2
+@c00200
+-CPU - Writeback
+-CSR
+@22
+TOP.ccx_top.i_core_top.i_core_pipe_wb.csr_addr[11:0]
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_wb.csr_en
+TOP.ccx_top.i_core_top.i_core_pipe_wb.csr_error
+TOP.ccx_top.i_core_top.i_core_pipe_wb.csr_op_any
+TOP.ccx_top.i_core_top.i_core_pipe_wb.csr_op_clr
+TOP.ccx_top.i_core_top.i_core_pipe_wb.csr_op_done
+TOP.ccx_top.i_core_top.i_core_pipe_wb.csr_op_error
+TOP.ccx_top.i_core_top.i_core_pipe_wb.csr_op_rd
+TOP.ccx_top.i_core_top.i_core_pipe_wb.csr_op_set
+TOP.ccx_top.i_core_top.i_core_pipe_wb.csr_op_wr
+@22
+TOP.ccx_top.i_core_top.i_core_pipe_wb.csr_rdata[63:0]
+TOP.ccx_top.i_core_top.i_core_pipe_wb.csr_wdata[63:0]
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_wb.csr_wr
+TOP.ccx_top.i_core_top.i_core_pipe_wb.csr_wr_clr
+TOP.ccx_top.i_core_top.i_core_pipe_wb.csr_wr_set
+@1401200
+-CSR
+@c00200
+-DMEM
+@22
+TOP.ccx_top.i_core_top.i_core_pipe_wb.dmem_addr[38:0]
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_wb.dmem_err
+TOP.ccx_top.i_core_top.i_core_pipe_wb.dmem_gnt
+@22
+TOP.ccx_top.i_core_top.i_core_pipe_wb.dmem_rdata[63:0]
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_wb.dmem_req
+@22
+TOP.ccx_top.i_core_top.i_core_pipe_wb.dmem_strb[7:0]
+TOP.ccx_top.i_core_top.i_core_pipe_wb.dmem_wdata[63:0]
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_wb.dmem_wen
+@1401200
+-DMEM
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_wb.e_cf_change
+TOP.ccx_top.i_core_top.i_core_pipe_wb.cf_done
+TOP.ccx_top.i_core_top.i_core_pipe_wb.cfu_wait
+TOP.ccx_top.i_core_top.i_core_pipe_wb.e_instr_ret
+TOP.ccx_top.i_core_top.i_core_pipe_wb.e_new_instr
+TOP.ccx_top.i_core_top.i_core_pipe_wb.exec_mret
+TOP.ccx_top.i_core_top.i_core_pipe_wb.g_clk
+TOP.ccx_top.i_core_top.i_core_pipe_wb.g_resetn
+TOP.ccx_top.i_core_top.i_core_pipe_wb.instr_ret
+@c00200
+-Interrupts
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_wb.int_ack
+@22
+TOP.ccx_top.i_core_top.i_core_pipe_wb.int_cause[6:0]
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_wb.int_pending
+TOP.ccx_top.i_core_top.i_core_pipe_wb.int_request
+@22
+TOP.ccx_top.i_core_top.i_core_pipe_wb.int_tvec[63:0]
+@1401200
+-Interrupts
+@800200
+-LSU
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_wb.lsu_trap_load
+TOP.ccx_top.i_core_top.i_core_pipe_wb.lsu_trap_store
+TOP.ccx_top.i_core_top.i_core_pipe_wb.lsu_byte
+TOP.ccx_top.i_core_top.i_core_pipe_wb.lsu_double
+TOP.ccx_top.i_core_top.i_core_pipe_wb.lsu_half
+TOP.ccx_top.i_core_top.i_core_pipe_wb.lsu_load
+@22
+TOP.ccx_top.i_core_top.i_core_pipe_wb.lsu_rdata[63:0]
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_wb.lsu_sext
+TOP.ccx_top.i_core_top.i_core_pipe_wb.lsu_store
+TOP.ccx_top.i_core_top.i_core_pipe_wb.lsu_wen
+TOP.ccx_top.i_core_top.i_core_pipe_wb.lsu_word
+@1000200
+-LSU
+@c00200
+-S3
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_cf_ack
+@22
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_cf_target[63:0]
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_cf_valid
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_cfu_op[2:0]
+@22
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_csr_addr[11:0]
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_csr_op[3:0]
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_full
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_fwd_rd_wen
+@22
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_instr[31:0]
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_lsu_op[6:0]
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_n_pc[63:0]
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_pc[63:0]
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_rd[4:0]
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_rd_addr[4:0]
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_rd_wdata[63:0]
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_rd_wen
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_ready
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_trap
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_valid
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_wb_op[1:0]
+@22
+TOP.ccx_top.i_core_top.i_core_pipe_wb.s3_wdata[63:0]
+@1401200
+-S3
+@c00200
+-Traps
+@22
+TOP.ccx_top.i_core_top.i_core_pipe_wb.trap_cause[6:0]
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_wb.trap_cfu
+TOP.ccx_top.i_core_top.i_core_pipe_wb.trap_cpu
+TOP.ccx_top.i_core_top.i_core_pipe_wb.trap_csr
+TOP.ccx_top.i_core_top.i_core_pipe_wb.trap_int
+@22
+TOP.ccx_top.i_core_top.i_core_pipe_wb.trap_mtval[63:0]
+TOP.ccx_top.i_core_top.i_core_pipe_wb.trap_pc[63:0]
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_wb.trapped
+@1401200
+-Traps
+@c00200
+-Trace
+@22
+TOP.ccx_top.i_core_top.i_core_pipe_wb.trs_instr[31:0]
+TOP.ccx_top.i_core_top.i_core_pipe_wb.trs_pc[63:0]
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_wb.trs_valid
+@1401200
+-Trace
+-CPU - Writeback
+@c00200
+-LSU
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.valid
+@22
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.addr[38:0]
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.addr_err
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.d_byte
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.d_double
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.d_half
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.d_word
+@22
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.data_shift[5:0]
+@c00200
+-DMEM
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.dmem_req
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.dmem_gnt
+@22
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.dmem_addr[38:0]
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.dmem_rdata[63:0]
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.dmem_strb[7:0]
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.dmem_wdata[63:0]
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.dmem_wen
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.dmem_err
+@1401200
+-DMEM
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.finished
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.g_clk
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.g_resetn
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.load
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.new_instr
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.ready
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.req_sent
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.sext
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.store
+@22
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.strb[7:0]
+@28
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.trap_addr
+TOP.ccx_top.i_core_top.i_core_pipe_exec.i_core_pipe_exec_lsu.txn_okay
+@1401200
+-LSU
 @c00200
 -Decode
 @28
@@ -370,9 +658,9 @@ TOP.ccx_top.i_core_top.i_core_pipe_decode.dec_xor
 TOP.ccx_top.i_core_top.i_core_pipe_decode.dec_xori
 @1401200
 -Decode
-@800201
+@c00200
 -GPRs
-@23
+@22
 TOP.ccx_top.i_core_top.i_core_regfile.regs(0)[63:0]
 TOP.ccx_top.i_core_top.i_core_regfile.regs(1)[63:0]
 TOP.ccx_top.i_core_top.i_core_regfile.regs(2)[63:0]
@@ -405,7 +693,7 @@ TOP.ccx_top.i_core_top.i_core_regfile.regs(28)[63:0]
 TOP.ccx_top.i_core_top.i_core_regfile.regs(29)[63:0]
 TOP.ccx_top.i_core_top.i_core_regfile.regs(30)[63:0]
 TOP.ccx_top.i_core_top.i_core_regfile.regs(31)[63:0]
-@1000201
+@1401200
 -GPRs
 @1000200
 -CPU
