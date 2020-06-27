@@ -268,7 +268,7 @@ wire        cfu_wait     = s3_cf_valid && !s3_cf_ack    ||
                            wfi_sleep                    ;
 
 assign      s3_cf_target = raise_int ? int_tvec : mtvec_base;
-assign      s3_cf_valid  = !cf_done && (trap_cpu || raise_int);
+assign      s3_cf_valid  = !cf_done && (r_trapped || trap_cpu || raise_int);
 
 assign      exec_mret    = s3_cfu_op == CFU_OP_MRET && e_instr_ret;
 
