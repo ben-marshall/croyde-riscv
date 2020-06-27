@@ -229,8 +229,17 @@ assign      lsu_rdata      =
     lsu_word    ? rdata_word    :
                   dmem_rdata ;
 
-wire        lsu_trap_load  = lsu_load   && dmem_err;
-wire        lsu_trap_store = lsu_store  && dmem_err;
+reg         p_lsu_req      ;
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        p_lsu_req <= 1'b0;
+    end else begin
+        p_lsu_req <= dmem_req && dmem_gnt;
+    end
+end
+
+wire        lsu_trap_load  = lsu_load   && dmem_err && p_lsu_req;
+wire        lsu_trap_store = lsu_store  && dmem_err && p_lsu_req;
 wire        trap_lsu       = lsu_trap_load || lsu_trap_store;
 
 //
