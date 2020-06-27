@@ -228,6 +228,11 @@ assign      lsu_rdata      =
     lsu_half    ? rdata_half    :
     lsu_word    ? rdata_word    :
                   dmem_rdata ;
+
+wire        lsu_trap_load  = lsu_load   && dmem_err;
+wire        lsu_trap_store = lsu_store  && dmem_err;
+wire        trap_lsu       = lsu_trap_load || lsu_trap_store;
+
 //
 // Control flow changes
 // ------------------------------------------------------------
@@ -284,15 +289,18 @@ assign int_ack        = raise_int && e_cf_change;
 assign trap_cpu       = s3_full && !raise_int && (
     s3_trap     ||
     trap_cfu    ||
-    trap_csr
+    trap_csr    ||
+    trap_lsu
 );
 
 assign trap_int       = int_ack; // trap occured due to interrupt
 
-assign trap_cause     = raise_int ? int_cause           :
-                        s3_trap   ? {2'b00, s3_rd       } :
-                        csr_error ? TRAP_IOPCODE        :
-                                    'b0                 ;
+assign trap_cause     = raise_int       ? int_cause             :
+                        s3_trap         ? {2'b00, s3_rd       } :
+                        lsu_trap_load   ? TRAP_LDACCESS         :
+                        lsu_trap_store  ? TRAP_STACCESS         :
+                        csr_error       ? TRAP_IOPCODE          :
+                                        'b0                     ;
 
 assign trap_mtval     = 0 ;
 
