@@ -102,7 +102,8 @@ $(call cxx_unit_gtkwave,${1}) : $(call cxx_unit_objdump,${1})
 	    | sed 's/\(^....    \)    /0000\1/' \
 	    > $(call cxx_unit_gtkwave,${1})
 
-run-unit-${1} : $(call ccx_unit_ram_hex,${1}) $(EXE_CCX) $(CCX_UNIT_ROM_HEX)
+run-unit-${1} : $(call cxx_unit_ram_hex,${1}) $(EXE_CCX) $(CCX_UNIT_ROM_HEX)
+	mkdir -p $(call cxx_unit_dir,${1})
 	cp $(CCX_UNIT_ROM_HEX) $(call cxx_unit_rom_hex,${1})
 	cp $(EXE_CCX) $(call cxx_model,${1})
 	cd $(dir $(call cxx_model,${1})) && \
