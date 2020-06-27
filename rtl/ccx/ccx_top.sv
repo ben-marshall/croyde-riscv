@@ -172,7 +172,7 @@ assign if_rom.err = 1'b0;
 
 mem_sram_wxd #(
 .WIDTH (RAM_WIDTH),
-.ROM   (        1),
+.ROM   (        0),
 .DEPTH (RAM_DEPTH),
 .MEMH  (RAM_MEMH ) 
 ) i_ram (
