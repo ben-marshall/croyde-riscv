@@ -15,7 +15,7 @@
 
 - [ ] Core Complex
 
-  - [ ] Integrated Memories
+  - [X] Integrated Memories
 
   - [ ] Debug
 
@@ -23,7 +23,7 @@
 
     - [ ] Write to ROM.
 
-    - [ ] Read / write RAM.
+    - [X] Read / write RAM.
 
     - [ ] Read / write External memory.
 
