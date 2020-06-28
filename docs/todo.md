@@ -13,23 +13,21 @@
 
 - [ ] Trace
 
-- [ ] Core Complex
+- [ ] Debug
 
-  - [X] Integrated Memories
+- [ ] Core Complex Tests
 
-  - [ ] Debug
+  - [ ] Write to ROM.
 
-  - [ ] Tests
-
-    - [ ] Write to ROM.
-
-    - [X] Read / write RAM.
-
-    - [ ] Read / write External memory.
+  - [ ] Read / write External memory.
 
 - [ ] Performance Optmisations
 
   - [ ] `c.add`, `c.ld/w/h/b[u]` fusion.
+
+- [ ] Timing Optimisations
+
+  - CFU `target_addr`, `target_lhs`, `alu_lhs` path.
 
 - [ ] Energy Optimisations
 
