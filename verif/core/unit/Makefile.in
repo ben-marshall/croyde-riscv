@@ -1,5 +1,4 @@
 
-CORE_UNIT_TESTS      = 
 CORE_UNIT_ROOT       = $(REPO_HOME)/verif/core/unit
 CORE_UNIT_TEST_BUILD = $(REPO_WORK)/core/unit
 
@@ -19,78 +18,20 @@ CORE_UNIT_SRCS       = $(REPO_HOME)/verif/share/unit/boot.S \
                   $(REPO_HOME)/verif/share/unit/util.S \
                   $(REPO_HOME)/verif/share/unit/unit_test.c
 
-define core_unit_test_elf
-$(CORE_UNIT_TEST_BUILD)/${1}/${1}.elf
-endef
-
-define core_unit_test_objdump
-$(CORE_UNIT_TEST_BUILD)/${1}/${1}.objdump
-endef
-
-define core_unit_test_srec
-$(CORE_UNIT_TEST_BUILD)/${1}/${1}.srec
-endef
-
-define core_unit_test_waves
-$(CORE_UNIT_TEST_BUILD)/${1}/${1}.vcd
-endef
-
-define core_unit_test_gtkwave
-$(CORE_UNIT_TEST_BUILD)/${1}/${1}.gtkwl
-endef
-
-define core_unit_test_log
-$(CORE_UNIT_TEST_BUILD)/${1}/${1}.log
-endef
-
+#
+# 1. Core unit test name
+# 2. Core unit test sources.
 define add_unit_test
-$(call core_unit_test_elf,${1}) : ${2} $(CORE_UNIT_SRCS) ;
-	@mkdir -p $(dir $(call core_unit_test_elf,${1}))
-	$(CC) -Wall $(CORE_UNIT_CFLAGS) -o $(call core_unit_test_elf,${1}) $(CORE_UNIT_SRCS) ${2}
 
-$(call core_unit_test_objdump,${1}) : $(call core_unit_test_elf,${1}) ;
-	$(OBJDUMP) -D $(call core_unit_test_elf,${1}) > $(call core_unit_test_objdump,${1})
+$(call build_unit_test,core,${1},${CORE_UNIT_CFLAGS},$(CORE_UNIT_SRCS) ${2},)
 
-$(call core_unit_test_srec,${1}) : $(call core_unit_test_elf,${1}) ;
-	$(OBJCOPY) -O srec --srec-forceS3 --srec-len=4 $(call core_unit_test_elf,${1})  $(call core_unit_test_srec,${1})
-        
-$(call core_unit_test_gtkwave,${1}) : $(call core_unit_test_objdump,${1})
-	grep "10.*:" $(call core_unit_test_objdump,${1}) \
-	    | grep -v ">:" | cut -c 14- | sed 's/\t//' \
-	    | sort | uniq | sed 's/ +/ /' | sed 's/\t/ /' \
-	    | sed 's/\(^....    \)    /0000\1/' \
-	    > $(call core_unit_test_gtkwave,${1})
-
-run-unit-${1} : $(call core_unit_test_srec,${1}) $(EXE_CORE) ;
-	$(EXE_CORE) +IMEM=$(call core_unit_test_srec,${1}) \
-	          +WAVES=$(call core_unit_test_waves,${1}) \
+run-unit-core-${1} : $(call map_unit_test_srec,core,${1}) $(EXE_CORE) ;
+	$(EXE_CORE) +IMEM=$(call map_unit_test_srec,core,${1}) \
+	          +WAVES=$(call map_unit_test_vcd,core,${1}) \
 	          +TIMEOUT=$(CORE_UNIT_TIMEOUT) \
 	          +PASS_ADDR=$(CORE_UNIT_PASS) +FAIL_ADDR=$(CORE_UNIT_FAIL) 
 
-$(call core_unit_test_waves,${1}) : run-unit-${1}
-$(call core_unit_test_log,${1}) : run-unit-${1}
-
-CORE_UNIT_TESTS += $(call core_unit_test_srec,${1}) \
-              $(call core_unit_test_objdump,${1}) \
-              $(call core_unit_test_elf,${1}) \
-              $(call core_unit_test_gtkwave,${1})
-
-build-unit-${1} : $(call core_unit_test_srec,${1}) \
-                  $(call core_unit_test_objdump,${1}) \
-                  $(call core_unit_test_elf,${1}) \
-                  $(call core_unit_test_gtkwave,${1})
-
-CORE_UNIT_TESTS_RUN += $(call core_unit_test_waves,${1}) \
-                  $(call core_unit_test_objdump,${1}) \
-                  $(call core_unit_test_log,${1}) \
-                  $(call core_unit_test_gtkwave,${1})
-
-CORE_UNIT_TESTS_CLEAN += $(call core_unit_test_waves,${1}) \
-                    $(call core_unit_test_objdump,${1}) \
-                    $(call core_unit_test_srec,${1}) \
-                    $(call core_unit_test_elf,${1}) \
-                    $(call core_unit_test_log,${1}) \
-                    $(call core_unit_test_gtkwave,${1})
+UNIT_TEST_RUN_TARGETS += run-unit-core-${1}
 
 endef
 
@@ -107,15 +48,4 @@ include $(CORE_UNIT_ROOT)/timer/Makefile.in
 include $(CORE_UNIT_ROOT)/interrupts-enablebits/Makefile.in
 include $(CORE_UNIT_ROOT)/interrupts-timer-direct/Makefile.in
 include $(CORE_UNIT_ROOT)/interrupts-timer-vectored/Makefile.in
-
-.PHONY: unit-tests-build
-unit-tests-build: $(CORE_UNIT_TESTS)
-
-.PHONY: unit-tests-run
-unit-tests-run: $(CORE_UNIT_TESTS_RUN)
-
-.PHONY: unit-tests-clean
-unit-tests-clean:
-	rm -f $(CORE_UNIT_TESTS_CLEAN)
-	rm -rf $(dir $(CORE_UNIT_TESTS_CLEAN))
 

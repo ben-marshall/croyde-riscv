@@ -30,8 +30,15 @@ include $(REPO_HOME)/flow/verilator/Makefile.in
 include $(REPO_HOME)/flow/design-assertions/Makefile.in
 include $(REPO_HOME)/flow/synthesis/Makefile.in
 include $(REPO_HOME)/flow/riscv-formal/Makefile.in
+
+include $(REPO_HOME)/verif/share/unit/unit-common.mk
 include $(REPO_HOME)/verif/core/unit/Makefile.in
 include $(REPO_HOME)/verif/ccx/unit/Makefile.in
+
+build-unit-tests-core: $(filter build-unit-core%,$(UNIT_TEST_BUILD_TARGETS))
+build-unit-tests-ccx : $(filter build-unit-ccx%,$(UNIT_TEST_BUILD_TARGETS))
+run-unit-tests-core: $(filter run-unit-core%,$(UNIT_TEST_RUN_TARGETS))
+run-unit-tests-ccx : $(filter run-unit-ccx%,$(UNIT_TEST_RUN_TARGETS))
 
 clean:
 	rm -rf work/*

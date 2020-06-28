@@ -10,17 +10,16 @@ CCX_UNIT_TESTS_RUN  =
 
 CCX_UNIT_TESTS_CLEAN=
 
-CXX_UNIT_OBJCOPY_FLAGS = --change-addresses=0xFFFF0000
+CCX_UNIT_OBJCOPY_FLAGS = --change-addresses=0xFFFF0000
 
 CCX_UNIT_TIMEOUT    = 25000
 CCX_UNIT_FAIL       = 0x00010086
 CCX_UNIT_PASS       = 0x00010090
 
 CCX_UNIT_CFLAGS     = -I$(CCX_UNIT_ROOT)/share
-CCX_UNIT_CFLAGS     = -I$(REPO_HOME)/verif/share/unit
+CCX_UNIT_CFLAGS    += -I$(REPO_HOME)/verif/share/unit
 CCX_UNIT_CFLAGS    += -nostartfiles -O1
 CCX_UNIT_CFLAGS    += -march=rv64imc -mabi=lp64
-
 CCX_UNIT_CFLAGS    += -T $(CCX_UNIT_ROOT)/share/link-ram.ld
 
 CCX_ROM_UNIT_CFLAGS = -nostartfiles -O1 -nostdlib
@@ -31,45 +30,22 @@ CCX_UNIT_SRCS       = $(REPO_HOME)/verif/share/unit/boot.S \
                       $(REPO_HOME)/verif/share/unit/util.S \
                       $(REPO_HOME)/verif/share/unit/unit_test.c
 
-define cxx_unit_dir
-$(CCX_UNIT_BUILD)/${1}
-endef
-
-define cxx_unit_elf
-$(call cxx_unit_dir,${1})/${1}.elf
-endef
-
 define cxx_model
-$(call cxx_unit_dir,${1})/verilated_cxx
+$(call unit_test_build_dir,ccx)/${1}/verilated_cxx
 endef
 
 define cxx_unit_rom_hex
-$(call cxx_unit_dir,${1})/rom.hex
+$(call unit_test_build_dir,ccx)/${1}/rom.hex
 endef
 
-define cxx_unit_objdump
-$(call cxx_unit_dir,${1})/${1}.objdump
+define ccx_unit_ram_hex
+$(call unit_test_build_dir,ccx)/${1}/ram.hex
 endef
 
-define cxx_unit_ram_hex
-$(call cxx_unit_dir,${1})/ram.hex
-endef
 
-define cxx_unit_waves
-$(call cxx_unit_dir,${1})/${1}.vcd
-endef
-
-define cxx_unit_gtkwave
-$(call cxx_unit_dir,${1})/${1}.gtkwl
-endef
-
-define cxx_unit_log
-$(call cxx_unit_dir,${1})/${1}.log
-endef
-
-CCX_UNIT_ROM_ELF    = $(call cxx_unit_elf,rom)
-CCX_UNIT_ROM_OBJDUMP= $(call cxx_unit_objdump,rom)
-CCX_UNIT_ROM_HEX    = $(call cxx_unit_rom_hex,rom)
+CCX_UNIT_ROM_ELF    = $(call map_unit_test_elf,ccx,rom)
+CCX_UNIT_ROM_OBJDUMP= $(call map_unit_test_objdump,ccx,rom)
+CCX_UNIT_ROM_HEX    = $(call map_unit_test_hex,ccx,rom)
 
 $(CCX_UNIT_ROM_ELF) : $(CCX_UNIT_ROM_SRC) ;
 	@mkdir -p $(dir $(CCX_UNIT_ROM_ELF))
@@ -83,73 +59,27 @@ $(CCX_UNIT_ROM_HEX) : $(CCX_UNIT_ROM_ELF)
 
 ccx-unit-fsbl : $(CCX_UNIT_ROM_ELF) $(CCX_UNIT_ROM_OBJDUMP) $(CCX_UNIT_ROM_HEX)
 
+#
+# 1. CCX unit test name
+# 2. CCX unit test sources.
 define add_cxx_unit_test
-$(call cxx_unit_elf,${1}) : ${2} $(CCX_UNIT_SRCS) ;
-	@mkdir -p $(dir $(call cxx_unit_elf,${1}))
-	$(CC) -Wall $(CCX_UNIT_CFLAGS) -o $(call cxx_unit_elf,${1}) $(CCX_UNIT_SRCS) ${2}
 
-$(call cxx_unit_objdump,${1}) : $(call cxx_unit_elf,${1}) ;
-	$(OBJDUMP) -D $(call cxx_unit_elf,${1}) > $(call cxx_unit_objdump,${1})
+$(call build_unit_test,ccx,${1},${CCX_UNIT_CFLAGS},${CCX_UNIT_SRCS} ${2}, $(CCX_UNIT_OBJCOPY_FLAGS))
 
-$(call cxx_unit_ram_hex,${1}) : $(call cxx_unit_elf,${1}) ;
-	$(OBJCOPY) -O verilog $(CXX_UNIT_OBJCOPY_FLAGS) \
-        $(call cxx_unit_elf,${1})  $(call cxx_unit_ram_hex,${1})
-        
-$(call cxx_unit_gtkwave,${1}) : $(call cxx_unit_objdump,${1})
-	grep "10.*:" $(call cxx_unit_objdump,${1}) \
-	    | grep -v ">:" | cut -c 10- | sed 's/\t//' \
-	    | sort | uniq | sed 's/ +/ /' | sed 's/\t/ /' \
-	    | sed 's/\(^....    \)    /0000\1/' \
-	    > $(call cxx_unit_gtkwave,${1})
-
-run-unit-${1} : $(call cxx_unit_ram_hex,${1}) $(EXE_CCX) $(CCX_UNIT_ROM_HEX)
-	mkdir -p $(call cxx_unit_dir,${1})
+run-unit-ccx-${1} : $(call map_unit_test_hex,ccx,${1}) $(EXE_CCX) $(CCX_UNIT_ROM_HEX)
 	cp $(CCX_UNIT_ROM_HEX) $(call cxx_unit_rom_hex,${1})
 	cp $(EXE_CCX) $(call cxx_model,${1})
+	cp $(call map_unit_test_hex,ccx,${1}) $(call ccx_unit_ram_hex,${1})
 	cd $(dir $(call cxx_model,${1})) && \
 	$(call cxx_model,${1}) \
-	    +WAVES=$(call cxx_unit_waves,${1}) \
+	    +WAVES=$(call map_unit_test_vcd,ccx,${1}) \
 	    +TIMEOUT=$(CCX_UNIT_TIMEOUT) \
 	    +PASS_ADDR=$(CCX_UNIT_PASS) +FAIL_ADDR=$(CCX_UNIT_FAIL) 
 
-$(call cxx_unit_waves,${1}) : run-unit-${1}
-$(call cxx_unit_log,${1}) : run-unit-${1}
-
-CCX_UNIT_TESTS += $(call cxx_unit_ram_hex,${1}) \
-              $(call cxx_unit_objdump,${1}) \
-              $(call cxx_unit_elf,${1}) \
-              $(call cxx_unit_gtkwave,${1})
-
-build-unit-${1} : $(call cxx_unit_ram_hex,${1}) \
-                  $(call cxx_unit_objdump,${1}) \
-                  $(call cxx_unit_elf,${1}) \
-                  $(call cxx_unit_gtkwave,${1})
-
-CCX_UNIT_TESTS_RUN += $(call cxx_unit_waves,${1}) \
-                  $(call cxx_unit_objdump,${1}) \
-                  $(call cxx_unit_log,${1}) \
-                  $(call cxx_unit_gtkwave,${1})
-
-CCX_UNIT_TESTS_CLEAN += $(call cxx_unit_waves,${1}) \
-                    $(call cxx_unit_objdump,${1}) \
-                    $(call cxx_unit_ram_hex,${1}) \
-                    $(call cxx_unit_elf,${1}) \
-                    $(call cxx_unit_log,${1}) \
-                    $(call cxx_unit_gtkwave,${1})
+UNIT_TEST_RUN_TARGETS += run-unit-ccx-${1}
 
 endef
 
 include $(CCX_UNIT_ROOT)/example/Makefile.in
 include $(CCX_UNIT_ROOT)/access-traps/Makefile.in
-
-.PHONY: ccx-unit-tests-build
-ccx-unit-tests-build: $(CCX_UNIT_TESTS)
-
-.PHONY: ccx-unit-tests-run
-ccx-unit-tests-run: $(CCX_UNIT_TESTS_RUN)
-
-.PHONY: ccx-unit-tests-clean
-ccx-unit-tests-clean:
-	rm -f $(CCX_UNIT_TESTS_CLEAN)
-	rm -rf $(dir $(CCX_UNIT_TESTS_CLEAN))
 
