@@ -1,6 +1,6 @@
 
 TEST_NAME = example
-TEST_SRC  = $(UNIT_ROOT)/example/test_example.c
+TEST_SRC  = $(CORE_UNIT_ROOT)/example/test_example.c
 
 $(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
 

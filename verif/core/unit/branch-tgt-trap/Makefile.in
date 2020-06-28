@@ -1,7 +1,7 @@
 
 TEST_NAME = branch-tgt-trap
-TEST_SRC  = $(UNIT_ROOT)/branch-tgt-trap/test_branch_tgt_trap.c \
-            $(UNIT_ROOT)/branch-tgt-trap/test_branch_tgt_trap.S
+TEST_SRC  = $(CORE_UNIT_ROOT)/branch-tgt-trap/test_branch_tgt_trap.c \
+            $(CORE_UNIT_ROOT)/branch-tgt-trap/test_branch_tgt_trap.S
 
 $(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
 

@@ -1,7 +1,7 @@
 
 TEST_NAME = wfi
-TEST_SRC  = $(UNIT_ROOT)/wfi/test_wfi.c \
-            $(UNIT_ROOT)/wfi/test_wfi.S
+TEST_SRC  = $(CORE_UNIT_ROOT)/wfi/test_wfi.c \
+            $(CORE_UNIT_ROOT)/wfi/test_wfi.S
 
 $(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
 

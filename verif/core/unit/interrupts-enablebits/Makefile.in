@@ -1,7 +1,7 @@
 
 TEST_NAME = interrupts-enablebits
-TEST_SRC  = $(UNIT_ROOT)/$(TEST_NAME)/test_interrupts.c \
-            $(UNIT_ROOT)/$(TEST_NAME)/test_interrupts.S
+TEST_SRC  = $(CORE_UNIT_ROOT)/$(TEST_NAME)/test_interrupts.c \
+            $(CORE_UNIT_ROOT)/$(TEST_NAME)/test_interrupts.S
 
 $(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
 

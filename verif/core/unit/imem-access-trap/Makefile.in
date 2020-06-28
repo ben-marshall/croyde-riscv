@@ -1,7 +1,7 @@
 
 TEST_NAME = imem-access-trap
-TEST_SRC  = $(UNIT_ROOT)/imem-access-trap/test_imem_access_trap.c \
-            $(UNIT_ROOT)/imem-access-trap/test_imem_access_trap.S
+TEST_SRC  = $(CORE_UNIT_ROOT)/imem-access-trap/test_imem_access_trap.c \
+            $(CORE_UNIT_ROOT)/imem-access-trap/test_imem_access_trap.S
 
 $(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
 
