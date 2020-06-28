@@ -11,13 +11,13 @@ UNIT_TIMEOUT    = 25000
 UNIT_FAIL       = 0x10000086
 UNIT_PASS       = 0x10000090
 
-UNIT_CFLAGS     = -I$(UNIT_ROOT)/share -nostartfiles -O1
+UNIT_CFLAGS     = -I$(REPO_HOME)/verif/share/unit -nostartfiles -O1
 UNIT_CFLAGS    += -march=rv64imc -mabi=lp64
 UNIT_CFLAGS    += -T $(UNIT_ROOT)/share/link.ld
 
-UNIT_SRCS       = $(UNIT_ROOT)/share/boot.S \
-                  $(UNIT_ROOT)/share/util.S \
-                  $(UNIT_ROOT)/share/unit_test.c
+UNIT_SRCS       = $(REPO_HOME)/verif/share/unit/boot.S \
+                  $(REPO_HOME)/verif/share/unit/util.S \
+                  $(REPO_HOME)/verif/share/unit/unit_test.c
 
 define unit_test_elf
 $(UNIT_TEST_BUILD)/${1}/${1}.elf

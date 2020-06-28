@@ -17,7 +17,7 @@ CCX_UNIT_FAIL       = 0x00010086
 CCX_UNIT_PASS       = 0x00010090
 
 CCX_UNIT_CFLAGS     = -I$(CCX_UNIT_ROOT)/share
-CCX_UNIT_CFLAGS     = -I$(UNIT_ROOT)/share
+CCX_UNIT_CFLAGS     = -I$(REPO_HOME)/verif/share/unit
 CCX_UNIT_CFLAGS    += -nostartfiles -O1
 CCX_UNIT_CFLAGS    += -march=rv64imc -mabi=lp64
 
@@ -27,9 +27,9 @@ CCX_ROM_UNIT_CFLAGS = -nostartfiles -O1 -nostdlib
 CCX_ROM_UNIT_CFLAGS+= -march=rv64imc -mabi=lp64
 CCX_ROM_UNIT_CFLAGS+= -T $(FSBL_LD)
 
-CCX_UNIT_SRCS       = $(UNIT_ROOT)/share/boot.S \
-                      $(UNIT_ROOT)/share/util.S \
-                      $(UNIT_ROOT)/share/unit_test.c
+CCX_UNIT_SRCS       = $(REPO_HOME)/verif/share/unit/boot.S \
+                      $(REPO_HOME)/verif/share/unit/util.S \
+                      $(REPO_HOME)/verif/share/unit/unit_test.c
 
 define cxx_unit_dir
 $(CCX_UNIT_BUILD)/${1}
