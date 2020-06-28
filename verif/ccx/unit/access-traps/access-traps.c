@@ -59,9 +59,8 @@ void test_trap_handler() {
 @brief Perform several memory accesses to just inside/outside the
        supplied ranges and check we get the expected errors.
 */
-int test_data_range(
-    volatile uint64_t * base    ,
-    volatile uint64_t * top     ,
+int test_address (
+    volatile uint64_t* addr    ,
     int                readable,
     int                writeable
 ) {
@@ -70,38 +69,44 @@ int test_data_range(
 
     uint64_t    old_mtvec = rd_mtvec();
 
-    // Don't expect any traps while loading inside the range.
-    // So set mtvec to test fail.
-    wr_mtvec((uint64_t)&test_fail);
-    
-    sum += base[ 0];
-    sum += top [-1];
+    if (readable) {
 
-    // Do expect a trap for these, so set to our custom trap handler.
-    wr_mtvec((uint64_t)&__access_traps_trap_handler);
+        // Don't expect any traps while loading inside the range.
+        // So set mtvec to test fail.
+        wr_mtvec((uint64_t)&test_fail);
+        
+        expect_trap =  0;
+        expect_cause= -1;
 
-    trap_seen   = 0;
-    expect_trap = 1;
-    expect_cause= CAUSE_CODE_LDACCESS;
+    } else {
 
-    // Bottom of range.
-    sum += base[-1];
+        // Do expect a trap for these, so set to our custom trap handler.
+        wr_mtvec((uint64_t)&__access_traps_trap_handler);
 
-    if(trap_seen != 1) {
-        test_fail();
+        expect_trap = 1;
+        expect_cause= CAUSE_CODE_LDACCESS;
+
     }
     
-    trap_seen   = 0;
-    expect_trap = 1;
-    expect_cause= CAUSE_CODE_LDACCESS;
+    // Perform the access
+    sum += addr[0];
 
-    // Top of range.
-    sum += top [ 0];
+    if(readable) {
+        
+        // Do nothing
 
-    if(trap_seen != 1) {
-        test_fail();
+    } else {
+        
+        // If we didn't trap but expected to, then fail.
+        if(trap_seen != 1) {
+            test_fail();
+        }
+
     }
+    
+    trap_seen = 0;
 
+    // Restore original trap handler address.
     wr_mtvec (old_mtvec);
 
     return sum;
@@ -110,8 +115,20 @@ int test_data_range(
 
 int test_main() {
 
-    test_data_range(&__rom_begin, &__rom_end, 1, 0);
-    //test_data_range(&__ram_begin, &__ram_end, 1, 1);
+    //           Address            , R,  W
+    test_address(&__rom_begin       , 1 , 0);
+    test_address(&__rom_begin - 1   , 0 , 0);
+
+    test_address(&__rom_end         , 0 , 0);
+    test_address(&__rom_end   - 1   , 1 , 0);
+    
+    test_address(&__ram_begin       , 1 , 0);
+    test_address(&__ram_begin - 1   , 0 , 0);
+
+    // RAM end address is base of MMIO region, so should be readable.
+    test_address(&__ram_end         , 1 , 0);
+    test_address(&__ram_end   - 1   , 1 , 0);
+
     test_pass();
     return 0;
 
