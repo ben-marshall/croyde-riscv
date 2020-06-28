@@ -17,16 +17,16 @@ jobs:
     - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
     - make build-core_top
-    - make unit-tests-build
-    - make unit-tests-run
+    - make build-unit-tests-core
+    - make run-unit-tests-core
   - name: "Core Complex (CCX)"
     script:
     - source ./bin/install-verilator.sh
     - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
     - make build-ccx_top
-    - make ccx-unit-tests-build
-    - make ccx-unit-tests-run
+    - make build-unit-tests-ccx
+    - make run-unit-tests-ccx
   - name: "Designer Assertions"
     script:
     - source ./bin/install-yosys.sh
