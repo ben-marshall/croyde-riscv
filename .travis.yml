@@ -27,6 +27,16 @@ jobs:
     - make build-ccx_top
     - make build-unit-tests-ccx
     - make run-unit-tests-ccx
+  - name: "Embench IoT"
+    script:
+    - source ./bin/install-verilator.sh
+    - source ./bin/install-toolchain.sh
+    - source ./bin/conf.sh
+    - make build-ccx_top
+    - make build-embench-binaries
+    - make build-embench-targets
+    - make run-embench-targets
+    - grep -rn ">> Finished after .* simulated clock cycles" work/embench/src/
   - name: "Designer Assertions"
     script:
     - source ./bin/install-yosys.sh
