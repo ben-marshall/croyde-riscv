@@ -1,3 +1,6 @@
 [submodule "extern/riscv-formal"]
 	path = extern/riscv-formal
 	url = https://github.com/SymbioticEDA/riscv-formal.git
+[submodule "extern/embench-iot"]
+	path = extern/embench-iot
+	url = https://github.com/embench/embench-iot.git
