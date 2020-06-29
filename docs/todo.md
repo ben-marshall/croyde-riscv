@@ -15,12 +15,6 @@
 
 - [ ] Debug
 
-- [ ] Core Complex Tests
-
-  - [ ] Write to ROM.
-
-  - [X] Read / write External memory.
-
 - [ ] Performance Optmisations
 
   - [ ] `c.add`, `c.ld/w/h/b[u]` fusion.
