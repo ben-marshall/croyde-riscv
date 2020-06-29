@@ -1,6 +1,7 @@
 
 #include "memory_txns.hpp"
 #include "memory_device.hpp"
+#include "memory_device_ram.hpp"
 #include "memory_device_uart.hpp"
 #include "memory_bus.hpp"
 
@@ -30,6 +31,9 @@ public:
     
     //! UART device used to print messages.
     memory_device_uart * uart_0;
+
+    //! External memory ram.
+    memory_device_ram  * ext_ram;
 
     //! The design under test.
     dut_wrapper * dut;
@@ -78,8 +82,15 @@ protected:
     //! Whether or not to dump waveforms.
     bool        waves_dump;
     
-    //! Default base address of the default memory.
+    //! Default base address of the UART.
     size_t      uart_base_addr = 0x11000000;
+
+    //! Default base address of "external" memory
+    size_t      ext_ram_base_addr = 0x12000000;
+
+    //! Size of the external memory
+    size_t      ext_ram_size      = 0x00010000;
+
 
 };
 

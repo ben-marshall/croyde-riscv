@@ -10,6 +10,8 @@ extern uint64_t __rom_begin   ;
 extern uint64_t __rom_end     ;
 extern uint64_t __ram_begin   ;
 extern uint64_t __ram_end     ;
+extern uint64_t __ext_begin   ;
+extern uint64_t __ext_end     ;
 
 //
 // Control fields for test_trap_handler
@@ -122,12 +124,18 @@ int test_main() {
     test_address(&__rom_end         , 0 , 0);
     test_address(&__rom_end   - 1   , 1 , 0);
     
-    test_address(&__ram_begin       , 1 , 0);
+    test_address(&__ram_begin       , 1 , 1);
     test_address(&__ram_begin - 1   , 0 , 0);
 
     // RAM end address is base of MMIO region, so should be readable.
-    test_address(&__ram_end         , 1 , 0);
+    test_address(&__ram_end         , 1 , 1);
     test_address(&__ram_end   - 1   , 1 , 0);
+    
+    test_address(&__ext_begin       , 1 , 1);
+    test_address(&__ext_begin - 1   , 0 , 0);
+
+    test_address(&__ext_end         , 0 , 0);
+    test_address(&__ext_end   - 1   , 1 , 1);
 
     test_pass();
     return 0;

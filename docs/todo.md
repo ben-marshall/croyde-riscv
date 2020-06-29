@@ -19,7 +19,7 @@
 
   - [ ] Write to ROM.
 
-  - [ ] Read / write External memory.
+  - [X] Read / write External memory.
 
 - [ ] Performance Optmisations
 

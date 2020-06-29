@@ -11,8 +11,14 @@ void testbench::build() {
     this -> uart_0 = new memory_device_uart (
         this -> uart_base_addr
     );
+    
+    this -> ext_ram = new memory_device_ram (
+        this -> ext_ram_base_addr,
+        this -> ext_ram_size
+    );
 
     this -> bus -> add_device(this -> uart_0);
+    this -> bus -> add_device(this -> ext_ram);
 
     this -> dut = new dut_wrapper(
         this -> bus,
