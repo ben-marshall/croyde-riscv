@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sun Jun 28 11:09:26 2020
+[*] Mon Jun 29 13:10:41 2020
 [*]
-[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/ccx/unit/ccx-access-traps/ccx-access-traps.vcd"
-[dumpfile_mtime] "Sun Jun 28 11:07:10 2020"
-[dumpfile_size] 3765325
+[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/embench/src/aha-mont64/aha-mont64.vcd"
+[dumpfile_mtime] "Mon Jun 29 13:10:22 2020"
+[dumpfile_size] 25105820
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/ccx.gtkw"
-[timestart] 15830
+[timestart] 1
 [size] 1920 1025
 [pos] -1 -1
-*-6.760161 16186 3066 6946 12286 16186 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-15.192801 16186 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.ccx_top.
 [treeopen] TOP.ccx_top.i_core_top.
@@ -31,7 +31,7 @@ TOP.ccx_top.trs_valid
 @22
 TOP.ccx_top.trs_pc[63:0]
 @2022
-^2 /home/ben/projects/riscv/cores/uc64/work/ccx/unit/ccx-access-traps/ccx-access-traps.gtkwl
+^1 /home/ben/projects/riscv/cores/uc64/work/ccx/unit/ccx-access-traps/ccx-access-traps.gtkwl
 TOP.ccx_top.trs_instr[31:0]
 @22
 TOP.ccx_top.trs_instr[31:0]
@@ -46,7 +46,7 @@ TOP.ccx_top.i_core_top.trap_cpu
 TOP.ccx_top.i_core_top.trap_int
 @1000200
 -Trace
-@c00201
+@c00200
 -External Memory
 @28
 TOP.ccx_top.emem_req
@@ -63,7 +63,7 @@ TOP.ccx_top.emem_gnt
 TOP.ccx_top.emem_rdata[63:0]
 @28
 TOP.ccx_top.emem_err
-@1401201
+@1401200
 -External Memory
 @c00200
 -ROM
@@ -304,7 +304,7 @@ TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_iaccess_trap_32
 @22
 TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_imm[63:0]
 @2022
-^1 /home/ben/projects/riscv/cores/uc64/work/ccx/unit/ccx-example/ccx-example.gtkwl
+^2 /home/ben/projects/riscv/cores/uc64/work/ccx/unit/ccx-example/ccx-example.gtkwl
 TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_instr[31:0]
 @c00200
 -LSU
