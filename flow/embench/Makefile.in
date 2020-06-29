@@ -6,8 +6,8 @@ EMBENCH_LOG     = $(EMBENCH_BUILD)
 EMBENCH_LD      = $(REPO_HOME)/flow/embench/link.ld
 EMBENCH_BOOT    = $(REPO_HOME)/flow/embench/boot.S
 
-EMBENCH_CFLAGS  = "-march=rv64imac -mabi=lp64 -nostartfiles -c"
-EMBENCH_LDFLAGS = "-march=rv64imac -mabi=lp64 -nostartfiles -T$(EMBENCH_LD)"
+EMBENCH_CFLAGS  = "-march=rv64imac -O3 -mabi=lp64 -nostartfiles -c"
+EMBENCH_LDFLAGS = "-march=rv64imac -O3 -mabi=lp64 -nostartfiles -T$(EMBENCH_LD)"
 EMBENCH_ULIBS   = "$(EMBENCH_BOOT) -lm"
 
 EMBENCH_BMARKS  = aha-mont64        \
@@ -124,6 +124,7 @@ run-embench-${1}: $(EXE_CCX) $(call map_embench_hex,${1}) $(CCX_UNIT_ROM_HEX) $(
         +PASS_ADDR=$(EMBENCH_PASS_ADDR) \
         +FAIL_ADDR=$(EMBENCH_FAIL_ADDR) \
         +TIMEOUT=$(EMBENCH_TIMEOUT) \
+        +WAVES=$(call map_embench_vcd,${1}) \
         | tee $(call map_embench_log,${1})
 
 EMBENCH_BUILD_TARGETS += $(call map_embench_objdump,${1})
