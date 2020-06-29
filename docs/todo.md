@@ -31,10 +31,6 @@
 
   - [ ] Clock request lines
 
-- [ ] Benchmarking
-
-  - [ ] Embench
-
 - [ ] User mode
 
 ## Verif
