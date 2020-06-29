@@ -37,3 +37,19 @@
 
 - [ ] csrw mcycle
 - [ ] csrw minstret
+
+
+## Docs
+
+- [ ] Update flow documentation
+
+  - [ ] Unit tests
+
+  - [ ] Core Complex
+
+  - [ ] Embench
+
+- [ ] Update project organisation
+
+- [ ] Extend CCX documentation
+
