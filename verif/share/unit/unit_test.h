@@ -161,6 +161,7 @@ void __puthex8(uint8_t w);
 
 #define CAUSE_CODE_IACCESS  0x1l
 #define CAUSE_CODE_LDACCESS 0x5l
+#define CAUSE_CODE_STACCESS 0x7l
 
 #endif
 
