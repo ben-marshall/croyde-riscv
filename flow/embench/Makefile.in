@@ -1,0 +1,124 @@
+
+EMBENCH_DIR     = $(REPO_HOME)/extern/embench-iot
+EMBENCH_BUILD   = $(REPO_WORK)/embench
+EMBENCH_LOG     = $(EMBENCH_BUILD)
+
+EMBENCH_LD      = $(REPO_HOME)/flow/embench/link.ld
+EMBENCH_BOOT    = $(REPO_HOME)/flow/embench/boot.S
+
+EMBENCH_CFLAGS  = "-march=rv64imac -mabi=lp64 -nostartfiles -c"
+EMBENCH_LDFLAGS = "-march=rv64imac -mabi=lp64 -nostartfiles -T$(EMBENCH_LD)"
+EMBENCH_ULIBS   = "$(EMBENCH_BOOT) -lm"
+
+EMBENCH_BMARKS  = aha-mont64        \
+                  crc32             \
+                  cubic             \
+                  edn               \
+                  huffbench         \
+                  matmult-int       \
+                  minver            \
+                  nbody             \
+                  nettle-aes        \
+                  nettle-sha256     \
+                  nsichneu          \
+                  picojpeg          \
+                  qrduino           \
+                  sglib-combined    \
+                  slre              \
+                  st                \
+                  statemate         \
+                  ud                \
+                  wikisort
+
+EMBENCH_TARGETS  =
+EMBENCH_TIMEOUT  = 2000
+
+EMBENCH_OBJCOPY_FLAGS = --change-addresses=0xFFFF0000
+
+EMBENCH_PASS_ADDR= 0x10070
+EMBENCH_FAIL_ADDR= 0x10068
+
+build-embench-binaries:
+	rm -rf $(EMBENCH_BUILD)/
+	mkdir -p $(EMBENCH_BUILD)
+	cd $(EMBENCH_DIR) &&                \
+    ./build_all.py                      \
+	    --builddir $(EMBENCH_BUILD)     \
+	    --logdir $(EMBENCH_BUILD)       \
+        --arch  riscv32                 \
+        --chip  generic                 \
+        --board ri5cyverilator          \
+	    --cc    $(CC)                   \
+        --cflags $(EMBENCH_CFLAGS)      \
+        --ldflags $(EMBENCH_LDFLAGS)    \
+        --user-libs $(EMBENCH_ULIBS)
+
+#
+# 1. Benchmark name
+define map_embench_dir
+$(EMBENCH_BUILD)/src/${1}
+endef
+
+#
+# 1. Benchmark name
+define map_embench_exe
+$(call map_embench_dir,${1})/${1}
+endef
+
+#
+# 1. Benchmark name
+define map_embench_objdump
+$(call map_embench_exe,${1}).dis
+endef
+
+#
+# 1. Benchmark name
+define map_embench_hex
+$(call map_embench_dir,${1})/ram.hex
+endef
+
+#
+# 1. Benchmark name
+define map_embench_rom
+$(call map_embench_dir,${1})/rom.hex
+endef
+
+#
+# 1. Benchmark name
+define map_embench_vcd
+$(call map_embench_dir,${1})/${1}.vcd
+endef
+
+#
+# 1. Benchmark name
+define map_embench_ccx_model
+$(call map_embench_dir,${1})/verilated_ccx
+endef
+
+#
+# 1. Benchmark name
+define embench_add
+
+$(call map_embench_objdump,${1}) : $(call map_embench_exe,${1})
+	$(OBJDUMP) -D $${<} > $${@}
+
+$(call map_embench_hex,${1}) : $(call map_embench_exe,${1})
+	$(OBJCOPY) $(EMBENCH_OBJCOPY_FLAGS) -O verilog $${<} $${@}
+
+run-embench-${1}: $(EXE_CCX) $(call map_embench_hex,${1}) $(CCX_UNIT_ROM_HEX) $(call map_embench_objdump,${1})
+	cp $(CCX_UNIT_ROM_HEX) $(call map_embench_rom,${1})
+	cp $(EXE_CCX) $(call map_embench_ccx_model,${1})
+	cd $(call map_embench_dir,${1}) && \
+    $(call map_embench_ccx_model,${1}) \
+        +PASS_ADDR=$(EMBENCH_PASS_ADDR) \
+        +FAIL_ADDR=$(EMBENCH_FAIL_ADDR) \
+        +TIMEOUT=$(EMBENCH_TIMEOUT)
+
+EMBENCH_TARGETS += $(call map_embench_objdump,${1})
+EMBENCH_TARGETS += $(call map_embench_hex,${1})
+
+endef
+
+$(foreach BM,$(EMBENCH_BMARKS),$(eval $(call embench_add,${BM})))
+
+build-embench-targets: $(EMBENCH_TARGETS)

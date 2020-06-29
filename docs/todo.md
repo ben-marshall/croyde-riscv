@@ -33,8 +33,6 @@
 
 - [ ] Benchmarking
 
-  - [ ] Dhrystone
-
   - [ ] Embench
 
 - [ ] User mode
