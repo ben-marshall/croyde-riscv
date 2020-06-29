@@ -163,11 +163,11 @@ mem_sram_wxd #(
 .wstrb       (if_rom.strb       ),
 .addr        (if_rom.addr[ 9:0] ),
 .wdata       (if_rom.wdata      ),
-.rdata       (if_rom.rdata      ) 
+.rdata       (if_rom.rdata      ), 
+.err         (if_rom.err        )
 );
 
 assign if_rom.gnt = 1'b1;
-assign if_rom.err = 1'b0;
 
 
 mem_sram_wxd #(
@@ -182,11 +182,11 @@ mem_sram_wxd #(
 .wstrb       (if_ram.strb       ),
 .addr        (if_ram.addr[15:0] ),
 .wdata       (if_ram.wdata      ),
-.rdata       (if_ram.rdata      ) 
+.rdata       (if_ram.rdata      ),
+.err         (if_ram.err        )
 );
 
 assign if_ram.gnt = 1'b1;
-assign if_ram.err = 1'b0;
 
 endmodule
 

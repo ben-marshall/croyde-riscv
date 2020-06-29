@@ -20,7 +20,8 @@ input  wire         cen         ,
 input  wire [S:0]   wstrb       ,
 input  wire [A:0]   addr        ,
 input  wire [W:0]   wdata       ,
-output reg  [W:0]   rdata        
+output reg  [W:0]   rdata       ,
+output reg          err
 );
 
 /* verilator lint_off WIDTH */
@@ -42,6 +43,18 @@ initial begin
         $readmemh(MEMH, mem);
     end
 end
+
+generate if(ROM == 0) begin
+    always @(*) err = 1'b0;
+end else begin
+    always @(posedge g_clk) begin
+        if(!g_resetn) begin
+            err <= 1'b0;
+        end else begin
+            err <= |wstrb;
+        end
+    end
+end endgenerate
 
 genvar i;
 
