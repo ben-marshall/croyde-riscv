@@ -35,8 +35,8 @@ jobs:
     - make build-ccx_top
     - make build-embench-binaries
     - make build-embench-targets
-    - make run-embench-targets
-    - grep -rn ">> Finished after .* simulated clock cycles" work/embench/src/
+    - make -j 2 run-embench-targets
+    - grep -rn ">> Finished after .* clock cycles" work/embench/src/ | sort
   - name: "Designer Assertions"
     script:
     - source ./bin/install-yosys.sh
