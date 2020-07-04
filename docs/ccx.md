@@ -34,6 +34,10 @@ Peripheral  | Base Address | Range        | CPU Data | CPU Instructions
 ------------|--------------|--------------|----------|------------------
 ROM Port 0  |`0x0000000000`| 1K           |       x  | x
 RAM Port 0  |`0x0000010000`| 4-64K        |       x  | x
-Ext Port 0  |`0x0100000000`| 4GB          |       x  | x
+Ext Port 0  |`0x0120000000`| 1GB          |       x  | x
 
+- Accessing an un-mapped part of the address space will cause a
+  `LDACCESS` or `STACCESS` exception.
+
+- Trying to write to the ROM will cause an `STACCESS` exception.
 
