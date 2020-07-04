@@ -41,6 +41,8 @@ EMBENCH_OBJCOPY_FLAGS = --change-addresses=0xFFFF0000
 EMBENCH_PASS_ADDR= 0x10070
 EMBENCH_FAIL_ADDR= 0x10068
 
+EMBENCH_WAVES    = 0
+
 build-embench-binaries:
 	rm -rf $(EMBENCH_BUILD)/
 	mkdir -p $(EMBENCH_BUILD)
@@ -96,6 +98,15 @@ endef
 
 #
 # 1. Benchmark name
+# 2. EMBENCH_WAVES
+ifeq ($(EMBENCH_WAVES),1)
+define map_embench_waves_or_not
++WAVES=$(call map_embench_vcd,${1})
+endef
+endif
+
+#
+# 1. Benchmark name
 define map_embench_log
 $(call map_embench_dir,${1})/${1}.log
 endef
@@ -123,7 +134,7 @@ run-embench-${1}: $(EXE_CCX) $(call map_embench_hex,${1}) $(CCX_UNIT_ROM_HEX) $(
     $(call map_embench_ccx_model,${1}) \
         +PASS_ADDR=$(EMBENCH_PASS_ADDR) \
         +FAIL_ADDR=$(EMBENCH_FAIL_ADDR) \
-        +TIMEOUT=$(EMBENCH_TIMEOUT) \
+        +TIMEOUT=$(EMBENCH_TIMEOUT) $(call map_embench_waves_or_not,${1}) \
         | tee $(call map_embench_log,${1})
 
 EMBENCH_BUILD_TARGETS += $(call map_embench_objdump,${1})
