@@ -4,7 +4,7 @@ ENTRY(test_main)
 MEMORY {
     rom ( rx)    : ORIGIN = 0x00000000, LENGTH = 1K
     ram (rwx)    : ORIGIN = 0x00010000, LENGTH = 64K
-    ext (rwx)    : ORIGIN = 0x12000000, LENGTH = 1024M
+    ext (rwx)    : ORIGIN = 0x12000000, LENGTH = 64K
 }
 
 SECTIONS {
