@@ -15,14 +15,14 @@ output  wire    clk_out         // Output clock
 // Enable clock if clock request or test enable.
 wire    clk_en = clk_req || tst_en;
 
-reg     latch_out;
-
 `ifndef RISCV_FORMAL
+
+reg     latch_out /* verilator clock_enable */;
 
 //
 // Not running in formal proof environment, so latches are fine.
 
-assign  clk_out= latch_out && clk_en;
+assign  clk_out= latch_out && clk_in;
 
 //
 // Negative level latch.

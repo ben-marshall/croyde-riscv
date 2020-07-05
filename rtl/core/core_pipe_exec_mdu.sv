@@ -7,6 +7,7 @@
 module core_pipe_exec_mdu (
 
 input  wire         g_clk       , // Clock
+output wire         g_clk_req   , // Clock Request
 input  wire         g_resetn    , // Active low synchronous reset.
 
 input  wire         flush       , // Flush and stop any execution.
@@ -33,6 +34,9 @@ output wire [XL: 0] rd            // Result
 
 localparam MLEN = XLEN*2;
 localparam MW   = MLEN-1;
+
+// When to request a clock signal.
+assign      g_clk_req   = valid || flush;
 
 //
 // Result signals.

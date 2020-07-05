@@ -3,6 +3,7 @@ module ccx_top (
 
 input  wire         f_clk        , // Global free-running clock.
 input  wire         g_resetn     , // Synchronous negative level reset.
+input  wire         g_clk_test_en, // Clock test enable.
 
 input  wire         int_sw       , // External interrupt
 input  wire         int_ext      , // Software interrupt
@@ -104,6 +105,7 @@ core_top #(
 .MMIO_BASE_MASK     (MMIO_BASE_MASK  )
 ) i_core_top (
 .f_clk        (f_clk             ), // global free running clock
+.g_clk_test_en(g_clk_test_en     ), // Gated clock test enable.
 .g_resetn     (g_resetn          ), // global active low sync reset.
 .int_sw       (int_sw            ), // software interrupt
 .int_ext      (int_ext           ), // hardware interrupt

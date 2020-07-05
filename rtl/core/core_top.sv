@@ -8,6 +8,7 @@ module core_top (
 
 input  wire                 f_clk        , // Global free-running clock.
 input  wire                 g_resetn     , // global active low sync reset.
+input  wire                 g_clk_test_en, // Clock test enable.
 
 input  wire                 int_sw       , // software interrupt
 input  wire                 int_ext      , // hardware interrupt
@@ -54,11 +55,18 @@ parameter   MMIO_BASE_ADDR  = 'h0000_0000_0002_0000;
 parameter   MMIO_BASE_MASK  = 'h0000_0000_0002_FFFF;
 
 //
-// Clock control
+// Clock request and delivery wires.
 // ------------------------------------------------------------
 
-// Core level gated clock
-wire g_clk = f_clk;
+parameter CLK_GATE_EN      = 1'b1; // Enable core-level clock gating
+
+wire g_clk                  ;       // Core level gated clock.
+wire g_clk_rf               ;       // Register file gated clock
+wire g_clk_rf_req           ;       // Register file clock request
+wire g_clk_mul              ;       // Multiplier gated clock
+wire g_clk_mul_req          ;       // Multiplier clock request
+
+wire g_clk_req      = 1'b1  ;       // Gore level clock request.
 
 //
 // Control flow change busses
@@ -434,6 +442,8 @@ core_pipe_exec #(
 .MEM_ADDR_W     (MEM_ADDR_W     )
 ) i_core_pipe_exec(
 .g_clk           (g_clk           ), // Global clock
+.g_clk_mul       (g_clk_mul       ), // Gated multiplier clock
+.g_clk_mul_req   (g_clk_mul_req   ), // Gated multiplier clock request
 .g_resetn        (g_resetn        ), // Global active low sync reset.
 .s2_cf_valid     (s2_cf_valid     ), // Control flow change?
 .s2_cf_ack       (s2_cf_ack       ), // Control flow acknwoledged
@@ -631,7 +641,8 @@ core_pipe_wb #(
 //  Core register file. 2 read, 1 write.
 //
 core_regfile i_core_regfile (
-.g_clk    (g_clk       ),
+.g_clk    (g_clk_rf    ),
+.g_clk_req(g_clk_rf_req),
 .g_resetn (g_resetn    ),
 .rs1_addr (s1_rs1_addr ),
 .rs2_addr (s1_rs2_addr ),
@@ -778,6 +789,26 @@ core_mmio_mux #(
 .mmio_gnt        (mmio_gnt        ), // Request grant.
 .mmio_rdata      (mmio_rdata      ), // MMIO read data
 .mmio_error      (mmio_error      )  // MMIO error
+);
+
+
+//
+// instance: core_clock_ctrl
+//
+//  Core-level clock gating control.
+//
+core_clock_ctrl #(
+.CLK_GATE_EN    (CLK_GATE_EN    ) // Enable core-level clock gating
+) i_core_clock_ctrl(
+.f_clk        (f_clk        ), // Global free running clock
+.g_resetn     (g_resetn     ), // Global active low synchronous reset.
+.g_clk_test_en(g_clk_test_en), // Clock test enable.
+.g_clk_req    (g_clk_req    ), // Core level gated clock request
+.g_clk        (g_clk        ), // Core level gated clock
+.g_clk_rf_req (g_clk_rf_req ), // Register file gated clock request
+.g_clk_rf     (g_clk_rf     ), // Register file gated clock
+.g_clk_mul_req(g_clk_mul_req), // Multiplier gated clock request
+.g_clk_mul    (g_clk_mul    )  // Multiplier gated clock
 );
 
 

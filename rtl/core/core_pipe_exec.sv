@@ -7,6 +7,8 @@
 module core_pipe_exec (
 
 input  wire                 g_clk           , // Global clock
+input  wire                 g_clk_mul       , // Multiplier clock
+output wire                 g_clk_mul_req   , // Multiplier clock request
 input  wire                 g_resetn        , // Global active low sync reset.
 
 output wire                 s2_cf_valid     , // Control flow change?
@@ -183,7 +185,7 @@ wire [XL:0] s2_mdu_rhs  = s2_alu_rhs;
 wire        mdu_ready   ;
 wire [XL:0] mdu_result  ;
 
-wire        mdu_flush   = e_new_instr;
+wire        mdu_flush   = e_new_instr && mdu_valid;
 
 //
 // CFU interfacing
@@ -377,7 +379,8 @@ core_pipe_exec_alu i_core_pipe_exec_alu (
 // MDU
 
 core_pipe_exec_mdu i_core_pipe_exec_mdu(
-.g_clk      (g_clk          ) , // Clock
+.g_clk      (g_clk_mul      ) , // Clock
+.g_clk_req  (g_clk_mul_req  ) , // Clock request
 .g_resetn   (g_resetn       ) , // Active low synchronous reset.
 .flush      (mdu_flush      ) , // Flush and stop any execution.
 .valid      (mdu_valid      ) , // Inputs are valid.

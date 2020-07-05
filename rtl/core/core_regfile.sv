@@ -7,17 +7,18 @@
 //
 module core_regfile (
 
-input  wire                g_clk    ,
-input  wire                g_resetn ,
+input  wire                g_clk        , // Gated register file clock
+output wire                g_clk_req    , // Register file clock request
+input  wire                g_resetn     , // Global negative level reset.
 
-input  wire [REG_ADDR_R:0] rs1_addr ,
-input  wire [REG_ADDR_R:0] rs2_addr ,
+input  wire [REG_ADDR_R:0] rs1_addr     ,
+input  wire [REG_ADDR_R:0] rs2_addr     ,
 
-output wire [        XL:0] rs1_data ,
-output wire [        XL:0] rs2_data ,
+output wire [        XL:0] rs1_data     ,
+output wire [        XL:0] rs2_data     ,
 
-input  wire                rd_wen   ,
-input  wire [REG_ADDR_R:0] rd_addr  ,
+input  wire                rd_wen       ,
+input  wire [REG_ADDR_R:0] rd_addr      ,
 input  wire [        XL:0] rd_wdata  
 
 );
@@ -29,6 +30,8 @@ wire [XL:0] regs[31:0];
 
 assign  rs1_data    = regs[rs1_addr];
 assign  rs2_data    = regs[rs2_addr];
+
+assign  g_clk_req   = rd_wen;
 
 assign regs[0]      = 0;
 
