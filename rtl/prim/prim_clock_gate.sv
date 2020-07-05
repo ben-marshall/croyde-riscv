@@ -1,10 +1,10 @@
 
 //
-// module: core_clock_gate
+// module: prim_clock_gate
 //
-//  Clock gate cell for the core - simulation model.
+//  Primitive gate cell for the core - simulation model.
 //
-module core_clock_gate (
+module prim_clock_gate (
 input   wire    clk_in      ,   // Free-running clock input
 input   wire    clk_req     ,   // Clock request
 input   wire    tst_en      ,   // Test enable.

@@ -33,7 +33,7 @@ end else begin : clk_gating_enabled
 
 //
 // Core level clock gating
-core_clock_gate i_core_clock_core (
+prim_clock_gate i_core_clock_core (
 .clk_in (f_clk          ),   // Free-running clock input
 .clk_req(g_clk_req      ),   // Clock request
 .tst_en (g_clk_test_en  ),   // Test enable.
@@ -42,7 +42,7 @@ core_clock_gate i_core_clock_core (
 
 //
 // Register file clock gating
-core_clock_gate i_core_clock_rf (
+prim_clock_gate i_core_clock_rf (
 .clk_in (f_clk          ),   // Free-running clock input
 .clk_req(g_clk_rf_req   ),   // Clock request
 .tst_en (g_clk_test_en  ),   // Test enable.
@@ -51,7 +51,7 @@ core_clock_gate i_core_clock_rf (
 
 //
 // MDU file clock gating
-core_clock_gate i_core_clock_mul (
+prim_clock_gate i_core_clock_mul (
 .clk_in (f_clk          ),   // Free-running clock input
 .clk_req(g_clk_mul_req  ),   // Clock request
 .tst_en (g_clk_test_en  ),   // Test enable.

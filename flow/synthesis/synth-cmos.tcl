@@ -2,7 +2,7 @@
 yosys -import
 
 # Read in the design
-read_verilog -sv $::env(REPO_HOME)/rtl/core/core_clock_gate.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/prim/prim_clock_gate.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_clock_ctrl.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_counters.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_mmio_mux.sv
