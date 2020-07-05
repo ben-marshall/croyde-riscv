@@ -9,7 +9,7 @@
 
   - [ ] SLTU[.w] optimisation / reuse adder circuit
 
-- [ ] MPU
+- [ ] PMP Implementation
 
 - [ ] Trace
 
@@ -28,8 +28,6 @@
   - [ ] High halves of operand registers.
 
   - [ ] Register file sign extension bits.
-
-  - [ ] Clock request lines
 
 - [ ] User mode
 
