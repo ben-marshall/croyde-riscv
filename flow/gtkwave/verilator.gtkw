@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sat Jun 13 14:57:39 2020
+[*] Sun Jul  5 14:30:52 2020
 [*]
-[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/unit/wfi/wfi.vcd"
-[dumpfile_mtime] "Sat Jun 13 14:55:34 2020"
-[dumpfile_size] 1790085
+[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/core/unit/mul/mul.vcd"
+[dumpfile_mtime] "Sun Jul  5 14:18:37 2020"
+[dumpfile_size] 7562815
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/verilator.gtkw"
-[timestart] 8940
+[timestart] 1
 [size] 1920 1025
 [pos] -1 -1
-*-7.705312 9846 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-13.744822 707 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.core_top.
 [treeopen] TOP.core_top.i_core_pipe_exec.
@@ -21,8 +21,7 @@
 @28
 TOP.core_top.i_core_pipe_fetch.g_clk
 TOP.core_top.i_core_pipe_fetch.g_resetn
-@c02022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/wfi/wfi.gtkwl
+@c00022
 TOP.core_top.trs_instr[31:0]
 @28
 (0)TOP.core_top.trs_instr[31:0]
@@ -136,12 +135,28 @@ TOP.core_top.cf_target[63:0]
 @1401200
 -group_end
 @2024
-^2 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
+^1 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
 TOP.core_top.i_core_pipe_wb.s3_rd_addr[4:0]
 @22
 TOP.core_top.i_core_pipe_wb.s3_rd_wdata[63:0]
 @28
 TOP.core_top.i_core_pipe_wb.s3_rd_wen
+@800200
+-Clock Control
+@28
+TOP.core_top.i_core_clock_ctrl.f_clk
+TOP.core_top.i_core_clock_ctrl.g_clk
+TOP.core_top.i_core_clock_ctrl.g_clk_mul
+@29
+TOP.core_top.i_core_clock_ctrl.g_clk_mul_req
+@28
+TOP.core_top.i_core_clock_ctrl.g_clk_req
+TOP.core_top.i_core_clock_ctrl.g_clk_rf
+TOP.core_top.i_core_clock_ctrl.g_clk_rf_req
+TOP.core_top.i_core_clock_ctrl.g_clk_test_en
+TOP.core_top.i_core_clock_ctrl.g_resetn
+@1000200
+-Clock Control
 @c00200
 -Pipeline - Fetch
 @800200
@@ -249,8 +264,6 @@ TOP.core_top.i_core_pipe_fetch.e_eat_4
 TOP.core_top.i_core_pipe_fetch.s1_ferr[1:0]
 @22
 TOP.core_top.i_core_pipe_fetch.s1_instr[31:0]
-@2022
-^3 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
 TOP.core_top.i_core_pipe_fetch.s1_instr[31:0]
 @1401200
 -Fetch -> Decode
@@ -440,10 +453,7 @@ TOP.core_top.i_core_pipe_decode.s2_ready
 TOP.core_top.i_core_pipe_decode.s2_flush
 @22
 TOP.core_top.i_core_pipe_decode.s2_imm[63:0]
-@2022
-^3 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
 TOP.core_top.i_core_pipe_decode.s2_instr[31:0]
-@22
 TOP.core_top.i_core_pipe_decode.s2_npc[63:0]
 TOP.core_top.i_core_pipe_decode.s2_pc[63:0]
 TOP.core_top.i_core_pipe_decode.s2_rd[4:0]
@@ -544,7 +554,7 @@ TOP.core_top.i_core_pipe_decode.s2_wb_npc
 @1401200
 -Interface Execute
 -Pipeline - Decode
-@800200
+@c00200
 -Pipeline  - Execute
 @28
 TOP.core_top.i_core_pipe_exec.g_clk
@@ -557,10 +567,7 @@ TOP.core_top.i_core_pipe_exec.e_new_instr
 TOP.core_top.i_core_pipe_exec.e_pipe_progress
 @22
 TOP.core_top.i_core_pipe_exec.s2_imm[63:0]
-@2022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/wfi/wfi.gtkwl
 TOP.core_top.i_core_pipe_exec.s2_instr[31:0]
-@22
 TOP.core_top.i_core_pipe_exec.s2_instr[31:0]
 TOP.core_top.i_core_pipe_exec.s2_npc[63:0]
 TOP.core_top.i_core_pipe_exec.s2_pc[63:0]
@@ -568,13 +575,13 @@ TOP.core_top.i_core_pipe_exec.s2_rd[4:0]
 @28
 TOP.core_top.i_core_pipe_exec.s2_ready
 TOP.core_top.i_core_pipe_exec.s2_valid
-@2025
-^2 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
+@2024
+^1 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
 TOP.core_top.i_core_pipe_exec.s2_rs1_addr[4:0]
 @22
 TOP.core_top.i_core_pipe_exec.s2_rs1_data[63:0]
-@2025
-^2 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
+@2024
+^1 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
 TOP.core_top.i_core_pipe_exec.s2_rs2_addr[4:0]
 @22
 TOP.core_top.i_core_pipe_exec.s2_rs2_data[63:0]
@@ -806,7 +813,6 @@ TOP.core_top.i_core_pipe_exec.n_s3_wb_op[1:0]
 TOP.core_top.i_core_pipe_exec.n_s3_wdata[63:0]
 @1401200
 -Next Stage
-@1000200
 -Pipeline  - Execute
 @800200
 -Pipeline - Writeback
@@ -826,10 +832,8 @@ TOP.core_top.i_core_pipe_wb.s3_csr_addr[11:0]
 TOP.core_top.i_core_pipe_wb.s3_csr_op[3:0]
 @28
 TOP.core_top.i_core_pipe_wb.s3_full
-@2022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/wfi/wfi.gtkwl
-TOP.core_top.i_core_pipe_wb.s3_instr[31:0]
 @22
+TOP.core_top.i_core_pipe_wb.s3_instr[31:0]
 TOP.core_top.i_core_pipe_wb.s3_pc[63:0]
 TOP.core_top.i_core_pipe_wb.s3_wdata[63:0]
 @28
@@ -842,7 +846,7 @@ TOP.core_top.i_core_pipe_wb.wb_wdata
 @28
 TOP.core_top.i_core_pipe_wb.rd_wen_enable
 @2024
-^2 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
+^1 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
 TOP.core_top.i_core_pipe_wb.s3_rd[4:0]
 @22
 TOP.core_top.i_core_pipe_wb.s3_rd_addr[4:0]
