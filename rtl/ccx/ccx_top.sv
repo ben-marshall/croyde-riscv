@@ -61,6 +61,8 @@ localparam  EXT_MASK  = ~EXT_SIZE ;
 // Clock control
 // ------------------------------------------------------------
 
+parameter CLK_GATE_EN      = 1'b1; // Enable core-level clock gating
+
 // CCX level gated clock
 wire g_clk = f_clk;
 
@@ -102,7 +104,8 @@ core_mem_bus #(.AW(AW),.DW(DW)) if_rom;
 core_top #(
 .PC_RESET_ADDRESS   (PC_RESET_ADDRESS),
 .MMIO_BASE_ADDR     (MMIO_BASE_ADDR  ),
-.MMIO_BASE_MASK     (MMIO_BASE_MASK  )
+.MMIO_BASE_MASK     (MMIO_BASE_MASK  ),
+.CLK_GATE_EN        (CLK_GATE_EN     )
 ) i_core_top (
 .f_clk        (f_clk             ), // global free running clock
 .g_clk_test_en(g_clk_test_en     ), // Gated clock test enable.
