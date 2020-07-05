@@ -33,6 +33,8 @@ input  wire [ MEM_DATA_R:0] dmem_rdata   , // Memory response read data
 
 `RVFI_INPUTS                             , // Formal checker interface.
 
+input  wire                 wfi_sleep    , // Core is asleep due to WFI.
+
 input  wire                 trs_valid    , // Instruction trace valid
 input  wire [         31:0] trs_instr    , // Instruction trace data
 input  wire [         XL:0] trs_pc         // Instruction trace PC
@@ -114,6 +116,10 @@ end
 
 `ifdef CORE_FAIRNESS
 
+//
+// Stop the memory busses stalling for more than 5 cycles in a row.
+// ------------------------------------------------------------
+
 reg [4:0] delay_imem;
 reg [4:0] delay_dmem;
 
@@ -140,6 +146,28 @@ always @(posedge g_clk) begin
         delay_dmem <= delay_dmem + 1;
     end
     assume(delay_dmem < MAX_DELAY_DMEM);
+end
+
+//
+// Assume we never stay asleep due to a WFI for more than N cycles
+// in a row.
+// ------------------------------------------------------------
+
+parameter MAX_WFI_SLEEP_CYCLES = 10;
+
+reg  [4:0]   wfi_sleep_counter;
+wire [4:0] n_wfi_sleep_counter = wfi_sleep_counter + 5'd1;
+
+always @(posedge g_clk) begin
+    if(!wfi_sleep || !g_resetn) begin
+        wfi_sleep_counter <= 5'b0;
+    end else if(wfi_sleep) begin
+        wfi_sleep_counter <= n_wfi_sleep_counter;
+    end
+end
+
+always @(posedge g_clk) begin
+    assume(wfi_sleep_counter < MAX_WFI_SLEEP_CYCLES);
 end
 
 `endif

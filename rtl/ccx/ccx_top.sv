@@ -16,6 +16,8 @@ input  wire         emem_gnt     , // Memory response valid
 input  wire         emem_err     , // Memory response error
 input  wire [ 63:0] emem_rdata   , // Memory response read data
 
+output wire         wfi_sleep    , // Core is asleep due to WFI.
+
 output wire         trs_valid    , // Instruction trace valid
 output wire [ 31:0] trs_instr    , // Instruction trace data
 output wire [ 63:0] trs_pc         // Instruction trace PC
@@ -114,6 +116,7 @@ core_top #(
 .dmem_gnt     (core_dmem.gnt     ), // Memory response valid
 .dmem_err     (core_dmem.err     ), // Memory response error
 .dmem_rdata   (core_dmem.rdata   ), // Memory response read data
+.wfi_sleep    (wfi_sleep         ), // Core asleep due to WFI
 .trs_valid    (trs_valid         ), // Instruction trace valid
 .trs_instr    (trs_instr         ), // Instruction trace data
 .trs_pc       (trs_pc            )  // Instruction trace PC
@@ -160,7 +163,7 @@ mem_sram_wxd #(
 .g_clk       (g_clk             ),
 .g_resetn    (g_resetn          ),
 .cen         (if_rom.req        ),
-.wstrb       (if_rom.strb       ),
+.wstrb       (rom_wstrb         ),
 .addr        (if_rom.addr[ 9:0] ),
 .wdata       (if_rom.wdata      ),
 .rdata       (if_rom.rdata      ), 
@@ -168,6 +171,7 @@ mem_sram_wxd #(
 );
 
 assign if_rom.gnt = 1'b1;
+wire   [7:0] rom_wstrb = if_rom.wen ? if_rom.strb : 8'b0;
 
 
 mem_sram_wxd #(
@@ -179,7 +183,7 @@ mem_sram_wxd #(
 .g_clk       (g_clk             ),
 .g_resetn    (g_resetn          ),
 .cen         (if_ram.req        ),
-.wstrb       (if_ram.strb       ),
+.wstrb       (ram_wstrb         ),
 .addr        (if_ram.addr[15:0] ),
 .wdata       (if_ram.wdata      ),
 .rdata       (if_ram.rdata      ),
@@ -187,6 +191,7 @@ mem_sram_wxd #(
 );
 
 assign if_ram.gnt = 1'b1;
+wire   [7:0] ram_wstrb = if_ram.wen ? if_ram.strb : 8'b0;
 
 endmodule
 

@@ -84,7 +84,7 @@ assign  dmem_addr    = {addr[MEM_ADDR_R:3], 3'b000};
 
 assign  dmem_wdata   = wdata    << data_shift           ;
 
-assign  dmem_strb    = valid && store ? strb : 8'b0          ;
+assign  dmem_strb    = valid ? strb : 8'b0              ;
 
 wire    [7:0] strb   ;
 

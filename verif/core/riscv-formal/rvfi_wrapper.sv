@@ -52,6 +52,8 @@ parameter   MMIO_BASE_MASK  = 'h0000_0000_0000_1FFF;
 (*keep*) rand reg                  dmem_err     ; // Mem response error
 (*keep*) rand reg  [ MEM_DATA_R:0] dmem_rdata   ; // Mem response read data
 
+(*keep*)      wire                 wfi_sleep    ; // Core asleep due to WFI  
+
 (*keep*)      wire                 trs_valid    ; // Instruction trace valid
 (*keep*)      wire [         31:0] trs_instr    ; // Instruction trace data
 (*keep*)      wire [         XL:0] trs_pc       ; // Instruction trace PC
@@ -90,6 +92,7 @@ rvfi_fairness #(
 .dmem_err     (dmem_err     ), // Memory response error
 .dmem_rdata   (dmem_rdata   ), // Memory response read data
 `RVFI_CONN                   , // Formal checker interface.
+.wfi_sleep    (wfi_sleep    ), // Core asleep due to WFI.
 .trs_valid    (trs_valid    ), // Instruction trace valid
 .trs_instr    (trs_instr    ), // Instruction trace data
 .trs_pc       (trs_pc       )  // Instruction trace PC
@@ -127,6 +130,7 @@ core_top #(
 .dmem_err     (dmem_err     ), // Memory response error
 .dmem_rdata   (dmem_rdata   ), // Memory response read data
 `RVFI_CONN                   , // Formal checker interface.
+.wfi_sleep    (wfi_sleep    ), // Core asleep due to WFI.
 .trs_valid    (trs_valid    ), // Instruction trace valid
 .trs_instr    (trs_instr    ), // Instruction trace data
 .trs_pc       (trs_pc       )  // Instruction trace PC
