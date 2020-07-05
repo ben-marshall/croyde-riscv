@@ -81,6 +81,8 @@ input  wire [ MEM_DATA_R:0] s3_dmem_wdata   ,
 `RVFI_OUTPUTS                               ,
 `endif
 
+output wire                 wfi_sleep       , // Core asleep due to WFI.
+
 output wire                 trs_valid       , // Instruction trace valid
 output wire [         31:0] trs_instr       , // Instruction trace data
 output wire [         XL:0] trs_pc            // Instruction trace PC
@@ -261,7 +263,7 @@ always @(posedge g_clk) begin
 end
 
 // Wait for interrupt instruction.
-wire        wfi_sleep    = s3_cfu_op == CFU_OP_WFI && !int_pending;
+assign      wfi_sleep    = s3_cfu_op == CFU_OP_WFI && !int_pending;
 wire        wfi_wakeup   = s3_cfu_op == CFU_OP_WFI &&  int_pending;
 
 wire        cfu_wait     = s3_cf_valid && !s3_cf_ack    ||

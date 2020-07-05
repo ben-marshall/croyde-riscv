@@ -34,6 +34,8 @@ input  wire [ MEM_DATA_R:0] dmem_rdata   , // Memory response read data
 `RVFI_OUTPUTS                            , // Formal checker interface.
 `endif
 
+output wire                 wfi_sleep    , // Core is asleep due to WFI.
+
 output wire                 trs_valid    , // Instruction trace valid
 output wire [         31:0] trs_instr    , // Instruction trace data
 output wire [         XL:0] trs_pc         // Instruction trace PC
@@ -608,6 +610,7 @@ core_pipe_wb #(
 .s3_dmem_wdata   (s3_dmem_wdata   ),
 `RVFI_CONN                         ,
 `endif
+.wfi_sleep       (wfi_sleep       ), // Core asleep due to WFI.
 .trs_valid       (trs_valid       ), // Instruction trace valid
 .trs_instr       (trs_instr       ), // Instruction trace data
 .trs_pc          (trs_pc          )  // Instruction trace PC

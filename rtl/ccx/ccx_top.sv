@@ -16,6 +16,8 @@ input  wire         emem_gnt     , // Memory response valid
 input  wire         emem_err     , // Memory response error
 input  wire [ 63:0] emem_rdata   , // Memory response read data
 
+output wire         wfi_sleep    , // Core is asleep due to WFI.
+
 output wire         trs_valid    , // Instruction trace valid
 output wire [ 31:0] trs_instr    , // Instruction trace data
 output wire [ 63:0] trs_pc         // Instruction trace PC
@@ -114,6 +116,7 @@ core_top #(
 .dmem_gnt     (core_dmem.gnt     ), // Memory response valid
 .dmem_err     (core_dmem.err     ), // Memory response error
 .dmem_rdata   (core_dmem.rdata   ), // Memory response read data
+.wfi_sleep    (wfi_sleep         ), // Core asleep due to WFI
 .trs_valid    (trs_valid         ), // Instruction trace valid
 .trs_instr    (trs_instr         ), // Instruction trace data
 .trs_pc       (trs_pc            )  // Instruction trace PC
