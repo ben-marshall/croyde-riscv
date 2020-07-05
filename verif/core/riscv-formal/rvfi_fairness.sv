@@ -7,7 +7,7 @@
 //
 module rvfi_fairness (
 
-input  wire                 g_clk        , // Global clock
+input  wire                 f_clk        , // Global clock
 input  wire                 g_resetn     , // Global active low sync reset.
 
 input  wire                 int_sw       , // software interrupt
@@ -64,7 +64,7 @@ initial assume(g_resetn == 1'b0);
 
 //
 // Assume no interrupts for now - TODO
-always @(posedge g_clk) begin
+always @(posedge f_clk) begin
 
     assume(!int_sw);
     
@@ -83,7 +83,7 @@ generate if(MEM_ADDR_W < XLEN) begin
     wire [UPPER_BITS_R:0] imem_upper_bits = imem_addr[XLEN:XLEN-UPPER_BITS_W];
     wire [UPPER_BITS_R:0] dmem_upper_bits = dmem_addr[XLEN:XLEN-UPPER_BITS_W];
 
-    always @(posedge g_clk) begin
+    always @(posedge f_clk) begin
         if($past(imem_req) && $past(imem_gnt)) begin
             if(|$past(imem_upper_bits) == 0) begin
                 assume(imem_err);
@@ -101,7 +101,7 @@ end endgenerate
 
 //
 // Assume that we do not get memory bus errors  TODO
-always @(posedge g_clk) begin
+always @(posedge f_clk) begin
 
     if($past(imem_req) && $past(imem_gnt)) begin
         assume(!imem_err);
@@ -126,7 +126,7 @@ reg [4:0] delay_dmem;
 localparam MAX_DELAY_IMEM = 5;
 localparam MAX_DELAY_DMEM = 5;
 
-always @(posedge g_clk) begin
+always @(posedge f_clk) begin
     if(!g_resetn) begin
         delay_imem <= 0;
     end else if(imem_req && imem_gnt) begin
