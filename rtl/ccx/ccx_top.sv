@@ -160,7 +160,7 @@ mem_sram_wxd #(
 .g_clk       (g_clk             ),
 .g_resetn    (g_resetn          ),
 .cen         (if_rom.req        ),
-.wstrb       (if_rom.strb       ),
+.wstrb       (rom_wstrb         ),
 .addr        (if_rom.addr[ 9:0] ),
 .wdata       (if_rom.wdata      ),
 .rdata       (if_rom.rdata      ), 
@@ -168,6 +168,7 @@ mem_sram_wxd #(
 );
 
 assign if_rom.gnt = 1'b1;
+wire   [7:0] rom_wstrb = if_rom.wen ? if_rom.strb : 8'b0;
 
 
 mem_sram_wxd #(
@@ -179,7 +180,7 @@ mem_sram_wxd #(
 .g_clk       (g_clk             ),
 .g_resetn    (g_resetn          ),
 .cen         (if_ram.req        ),
-.wstrb       (if_ram.strb       ),
+.wstrb       (ram_wstrb         ),
 .addr        (if_ram.addr[15:0] ),
 .wdata       (if_ram.wdata      ),
 .rdata       (if_ram.rdata      ),
@@ -187,6 +188,7 @@ mem_sram_wxd #(
 );
 
 assign if_ram.gnt = 1'b1;
+wire   [7:0] ram_wstrb = if_ram.wen ? if_ram.strb : 8'b0;
 
 endmodule
 
