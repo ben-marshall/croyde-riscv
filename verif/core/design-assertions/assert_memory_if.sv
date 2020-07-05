@@ -6,7 +6,7 @@
 //
 module assert_memory_if (
 
-input  wire                 g_clk        , // Global clock
+input  wire                 f_clk        , // Global clock
 input  wire                 g_resetn     , // Global active low sync reset.
               
 input  wire                 mem_req      , // Memory request
@@ -26,7 +26,7 @@ input  wire [ MEM_DATA_R:0] mem_rdata      // Memory response read data
 
 //
 // Assume that we do not get memory bus errors
-always @(posedge g_clk) if(g_resetn && $stable(g_resetn)) begin
+always @(posedge f_clk) if(g_resetn && $stable(g_resetn)) begin
 
     cover(mem_req);
 

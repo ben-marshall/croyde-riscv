@@ -8,7 +8,7 @@
 //
 module design_assertions_fairness (
 
-input  wire                 g_clk        , // Global clock
+input  wire                 f_clk        , // Global clock
 input  wire                 g_resetn     , // Global active low sync reset.
 
 input  wire                 int_sw       , // software interrupt

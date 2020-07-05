@@ -57,7 +57,7 @@ design_assertions_fairness #(
 .MMIO_BASE_ADDR(MMIO_BASE_ADDR),
 .MMIO_BASE_MASK(MMIO_BASE_MASK)
 ) i_design_assertions_fairness (
-.g_clk        (clock        ), // Global clock
+.f_clk        (clock        ), // Global clock
 .g_resetn     (g_resetn     ), // Global active low sync reset.
 .int_sw       (int_sw       ), // Software interrupt
 .int_ext      (int_ext      ), // External interrupt
@@ -88,7 +88,7 @@ design_assertions_fairness #(
 
 `ifdef DESIGNER_ASSERTION_INSTRUCTION_MEMORY_INTERFACE
 assert_memory_if i_assert_memory_if(
-.g_clk        (clock        ), // Global clock
+.f_clk        (clock        ), // Global clock
 .g_resetn     (g_resetn     ), // Global active low sync reset.
 .mem_req      (imem_req     ), // Memory request
 .mem_addr     (imem_addr    ), // Memory request address
@@ -103,7 +103,7 @@ assert_memory_if i_assert_memory_if(
 
 `ifdef DESIGNER_ASSERTION_DATA_MEMORY_INTERFACE
 assert_memory_if i_assert_memory_if(
-.g_clk        (clock        ), // Global clock
+.f_clk        (clock        ), // Global clock
 .g_resetn     (g_resetn     ), // Global active low sync reset.
 .mem_req      (dmem_req     ), // Memory request
 .mem_addr     (dmem_addr    ), // Memory request address
@@ -126,7 +126,7 @@ core_top #(
 .MMIO_BASE_ADDR(MMIO_BASE_ADDR),
 .MMIO_BASE_MASK(MMIO_BASE_MASK)
 ) i_dut (
-.g_clk        (clock        ), // Global clock
+.f_clk        (clock        ), // Global clock
 .g_resetn     (g_resetn     ), // Global active low sync reset.
 .int_sw       (int_sw       ), // Software interrupt
 .int_ext      (int_ext      ), // External interrupt

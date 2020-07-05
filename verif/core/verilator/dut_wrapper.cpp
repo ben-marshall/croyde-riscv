@@ -60,7 +60,7 @@ void dut_wrapper::dut_set_reset() {
 
     // Put model in reset.
     this -> dut -> g_resetn     = 0;
-    this -> dut -> g_clk        = 0;
+    this -> dut -> f_clk        = 0;
 
     this -> imem_agent -> set_reset();
     this -> dmem_agent -> set_reset();
@@ -85,9 +85,9 @@ void dut_wrapper::dut_step_clk() {
 
         if(i == this -> evals_per_clock / 2) {
             
-            this -> dut -> g_clk = !this -> dut -> g_clk;
+            this -> dut -> f_clk = !this -> dut -> f_clk;
             
-            if(this -> dut -> g_clk == 1){
+            if(this -> dut -> f_clk == 1){
 
                 this -> posedge_gclk();
             }

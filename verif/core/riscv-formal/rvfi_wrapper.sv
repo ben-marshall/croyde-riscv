@@ -71,7 +71,7 @@ rvfi_fairness #(
 .MMIO_BASE_MASK(MMIO_BASE_MASK),
 .MEM_ADDR_W    (MEM_ADDR_W    )
 ) i_rvfi_fairness (
-.g_clk        (clock        ), // Global clock
+.f_clk        (clock        ), // Global clock
 .g_resetn     (g_resetn     ), // Global active low sync reset.
 .int_sw       (int_sw       ), // Software interrupt
 .int_ext      (int_ext      ), // External interrupt
@@ -109,7 +109,7 @@ core_top #(
 .MMIO_BASE_MASK(MMIO_BASE_MASK),
 .MEM_ADDR_W    (MEM_ADDR_W    )
 ) i_dut (
-.g_clk        (clock        ), // Global clock
+.f_clk        (clock        ), // Global clock
 .g_resetn     (g_resetn     ), // Global active low sync reset.
 .int_sw       (int_sw       ), // Software interrupt
 .int_ext      (int_ext      ), // External interrupt

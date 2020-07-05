@@ -6,7 +6,7 @@
 //
 module core_top (
 
-input  wire                 g_clk        , // global clock
+input  wire                 f_clk        , // Global free-running clock.
 input  wire                 g_resetn     , // global active low sync reset.
 
 input  wire                 int_sw       , // software interrupt
@@ -52,6 +52,13 @@ parameter   PC_RESET_ADDRESS= 'h10000000;
 // Base address of the memory mapped IO region.
 parameter   MMIO_BASE_ADDR  = 'h0000_0000_0002_0000;
 parameter   MMIO_BASE_MASK  = 'h0000_0000_0002_FFFF;
+
+//
+// Clock control
+// ------------------------------------------------------------
+
+// Core level gated clock
+wire g_clk = f_clk;
 
 //
 // Control flow change busses

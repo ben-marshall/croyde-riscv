@@ -18,12 +18,11 @@ Clock Signal | Usage
 -------------|--------------------------------------------------
 `fclk`       | Global free-running clock, used for in-core timers.
 `gclk`       | Global gated clock, used by default in the core.
-`gclk_rf_a`  | Register file group A gated clock. Argument registers.
-`gclk_rf_t`  | Register file group T gated clock. Temporary registers.
-`gclk_rf_s`  | Register file group S gated clock. Saved & Other registers.
+`gclk_rf`    | Register file gated clock.
 `gclk_mdu`   | Multiplier gated clock.
 `gclk_csr`   | CSR unit gated clock.
 
+- The core level `g_clk_*` is derived from the `f_clk`.
 
 - Each `gclk*` clock signal has an associated `*_req` line:
 

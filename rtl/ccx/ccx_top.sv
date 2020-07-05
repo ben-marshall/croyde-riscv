@@ -1,7 +1,7 @@
 
 module ccx_top (
 
-input  wire         g_clk        , // Global clock.
+input  wire         f_clk        , // Global free-running clock.
 input  wire         g_resetn     , // Synchronous negative level reset.
 
 input  wire         int_sw       , // External interrupt
@@ -57,6 +57,13 @@ parameter   EXT_SIZE  = 39'h0FFFFFFF;
 localparam  EXT_MASK  = ~EXT_SIZE ;
 
 //
+// Clock control
+// ------------------------------------------------------------
+
+// CCX level gated clock
+wire g_clk = f_clk;
+
+//
 // Internal interfaces / buses / wires
 // ------------------------------------------------------------
 
@@ -96,7 +103,7 @@ core_top #(
 .MMIO_BASE_ADDR     (MMIO_BASE_ADDR  ),
 .MMIO_BASE_MASK     (MMIO_BASE_MASK  )
 ) i_core_top (
-.g_clk        (g_clk             ), // global clock
+.f_clk        (f_clk             ), // global free running clock
 .g_resetn     (g_resetn          ), // global active low sync reset.
 .int_sw       (int_sw            ), // software interrupt
 .int_ext      (int_ext           ), // hardware interrupt
