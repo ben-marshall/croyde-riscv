@@ -15,7 +15,15 @@ output  wire    clk_out         // Output clock
 // Enable clock if clock request or test enable.
 wire    clk_en = clk_req || tst_en;
 
-`ifndef RISCV_FORMAL
+`ifdef CLOCK_GATE_NO_LATCH
+
+//
+// Running in formal proof environment, so avoid latches and just use
+// a simple AND gate.
+
+assign clk_out = clk_in && clk_en;
+
+`else
 
 reg     latch_out /* verilator clock_enable */;
 
@@ -29,14 +37,6 @@ assign  clk_out= latch_out && clk_in;
 always @(*) begin if(!clk_in) begin
     latch_out = clk_en;
 end end
-
-`else
-
-//
-// Running in formal proof environment, so avoid latches and just use
-// a simple AND gate.
-
-assign clk_out = clk_in && clk_en;
 
 `endif
 

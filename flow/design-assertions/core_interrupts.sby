@@ -25,4 +25,4 @@ REPO_HOME/extern/riscv-formal/checks/rvfi_macros.vh
 
 [file defines.svh]
 `define DESIGNER_ASSERTION_CORE_INTERRUPTS 1
-
+`define CLOCK_GATE_NO_LATCH 1

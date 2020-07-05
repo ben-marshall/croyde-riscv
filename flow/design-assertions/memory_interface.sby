@@ -29,4 +29,5 @@ REPO_HOME/extern/riscv-formal/checks/rvfi_macros.vh
 [file defines.svh]
 imem: `define DESIGNER_ASSERTION_INSTRUCTION_MEMORY_INTERFACE 1
 dmem: `define DESIGNER_ASSERTION_DATA_MEMORY_INTERFACE        1
+`define CLOCK_GATE_NO_LATCH 1
 

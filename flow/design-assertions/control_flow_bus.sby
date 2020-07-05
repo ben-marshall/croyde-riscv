@@ -25,4 +25,5 @@ REPO_HOME/extern/riscv-formal/checks/rvfi_macros.vh
 
 [file defines.svh]
 `define DESIGNER_ASSERTION_CONTROL_FLOW_BUS 1
+`define CLOCK_GATE_NO_LATCH 1
 
