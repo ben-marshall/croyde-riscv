@@ -11,7 +11,7 @@ input g_resetn  ,
 // Inputs which the core uses to drive the RVFI interface.
 input wire                         n_valid          ,
 input wire [NRET * ILEN   - 1 : 0] n_insn           ,
-input wire [NRET * ILEN   - 1 : 0] n_intr           ,
+input wire                         n_intr           ,
 input wire                         n_trap           ,
 
 input wire [NRET *    5   - 1 : 0] n_rs1_addr       ,
@@ -117,8 +117,8 @@ always @(posedge g_clk) begin
         rvfi_pc_rdata    <= n_pc_rdata    ;
     end
 
-    if(n_valid || n_cf_change) begin
-        rvfi_pc_wdata    <= n_cf_change ? n_cf_target : n_pc_wdata    ;
+    if(n_valid || (n_cf_change && !n_intr)) begin
+        rvfi_pc_wdata    <= n_cf_change && !n_intr ? n_cf_target : n_pc_wdata    ;
     end
 end
 

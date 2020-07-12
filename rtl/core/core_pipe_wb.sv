@@ -336,7 +336,16 @@ assign trs_instr = s3_instr     ;
 
 `ifdef RVFI
 
-wire [ILEN   - 1 : 0] n_rvfi_intr           =  'b0;
+reg                   r_rvfi_intr           ;
+always @(posedge g_clk) begin
+    if(!g_resetn || e_instr_ret) begin
+        r_rvfi_intr <= 1'b0;
+    end else begin
+        r_rvfi_intr <= trap_int || r_rvfi_intr;
+    end
+end
+
+reg                   n_rvfi_intr           = trap_int || r_rvfi_intr;
 wire                  n_rvfi_trap           = trap_cpu;
 
 wire                  n_rvfi_mem_req_valid  = lsu_load || lsu_store;
@@ -357,7 +366,7 @@ core_rvfi i_core_rvfi (
 `RVFI_CONN                                   ,
 .n_valid            (e_instr_ret            ),
 .n_insn             (s3_instr               ),
-.n_intr             (rvfi_intr              ),
+.n_intr             (n_rvfi_intr            ),
 .n_trap             (n_rvfi_trap            ),
 .n_rs1_addr         (s3_rs1_addr            ),
 .n_rs2_addr         (s3_rs2_addr            ),
