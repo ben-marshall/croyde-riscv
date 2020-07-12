@@ -4,22 +4,15 @@
 
 #include "test_interrupts.h"
 
-volatile int interrupt_seen = 0;
+volatile char interrupt_seen = 0;
 
 //! Used to communicate status codes between mtvec trap handler and test code.
 volatile char mtvec_test_code = 0;
 
 //! Vectored interrupt table.
 extern void vector_interrupt_table();
-
-//! Handler for mtvec related exceptions - aligned to 64b boundary.
-extern void mtvec_trap_handler_aligned();
-
-//! Handler for mtvec related exceptions - aligned to 64b boundary.
-extern void mtvec_trap_handler_unaligned;
-
     
-int trigger_timer_interrupt(volatile int * interrupt_seen, int delay) {
+int trigger_timer_interrupt(volatile char * interrupt_seen, int delay) {
 
     __putstr("Triggering interrupt...\n");
 
@@ -47,6 +40,12 @@ int trigger_timer_interrupt(volatile int * interrupt_seen, int delay) {
     __clr_mstatus(MSTATUS_MIE);
 
     return spins;
+}
+
+
+void test_fail_bad_cause() {
+    __putstr("Bad cause value.\n");
+    test_fail();
 }
 
 
