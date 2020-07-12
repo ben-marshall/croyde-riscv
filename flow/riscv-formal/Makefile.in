@@ -27,4 +27,4 @@ riscv-formal-prepare: $(RV_FORMAL_CFG)
 	sed -i "s+\$$REPO_WORK+$(REPO_WORK)+g" $(RV_FORMAL_WORK)/*.sby
 
 riscv-formal-run:
-	$(MAKE) -j $(RV_FORMAL_NJOBS) -C $(RV_FORMAL_WORK) all
+	$(MAKE) -k -j $(RV_FORMAL_NJOBS) -C $(RV_FORMAL_WORK) all
