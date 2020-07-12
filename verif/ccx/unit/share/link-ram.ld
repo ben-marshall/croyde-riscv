@@ -37,5 +37,8 @@ SECTIONS {
     PROVIDE (__ext_length       =               LENGTH(ext) );
     PROVIDE (__ext_end          = ORIGIN(ext) + LENGTH(ext) );
 
+    PROVIDE (__mtime            = 0x20000                   );
+    PROVIDE (__mtimecmp         = 0x20008                   );
+
 }
 
