@@ -118,7 +118,7 @@ always @(posedge g_clk) begin
     end
 
     if(n_valid || (n_cf_change && !n_intr)) begin
-        rvfi_pc_wdata    <= n_cf_change && !n_intr ? n_cf_target : n_pc_wdata    ;
+        rvfi_pc_wdata <= n_cf_change && !n_intr ? n_cf_target : n_pc_wdata    ;
     end
 end
 
