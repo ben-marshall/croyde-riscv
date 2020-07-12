@@ -21,6 +21,8 @@ extern void mtvec_trap_handler_unaligned;
     
 int trigger_timer_interrupt(volatile int * interrupt_seen, int delay) {
 
+    __putstr("Triggering interrupt...\n");
+
     // Add a big value to mtime and set mtimecmp to this.
     __mtimecmp[0] = __mtime[0] + delay;
 
@@ -32,6 +34,7 @@ int trigger_timer_interrupt(volatile int * interrupt_seen, int delay) {
     for(int i = 0; i < 200; i ++) {
         // Spin round doing nothing, waiting to see the interrupt.
         if(*interrupt_seen) {
+            __putstr("Seen\n");
             break;
         }
         spins ++;
@@ -66,12 +69,14 @@ int test_vectored_timer_interrupt() {
     // Enable timer interrupts.
     __set_mie(MIE_MTIE);
 
-    trigger_timer_interrupt(&interrupt_seen, 400);
+    int spins = trigger_timer_interrupt(&interrupt_seen, 400);
 
     // Restore the original trap handler before returning.
     mtvec((void*)save, 0);
 
     if(interrupt_seen) {
+        __putstr("Seen int\n");
+        __puthex32(spins); __putchar('\n');
         return 0;
     } else {
         __putstr("- Never saw expected interrupt.\n");
@@ -89,7 +94,12 @@ int test_main() {
 
     __putstr("Test Vectored Timer Interrupt...\n");
     fail = test_vectored_timer_interrupt();
-    if(fail){return fail;}
+    if(fail){
+        __putstr("Failed\n");
+        return fail;
+    } else {
+        __putstr("Pass\n");
+    }
 
     return 0;
 }
