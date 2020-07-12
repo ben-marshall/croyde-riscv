@@ -26,7 +26,7 @@ int trigger_timer_interrupt(volatile char * interrupt_seen, int delay) {
 
     for(int i = 0; i < 200; i ++) {
         // Spin round doing nothing, waiting to see the interrupt.
-        if(*interrupt_seen) {
+        if(interrupt_seen[0]) {
             __putstr("Seen\n");
             break;
         }

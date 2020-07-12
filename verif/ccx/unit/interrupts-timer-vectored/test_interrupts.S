@@ -1,10 +1,6 @@
 
 .data
 
-.balign 4
-original_mtvec: .word 0x0
-int_seen_addr:  .word 0x0
-
 .extern interrupt_seen
 .extern __mtime
 .extern __mtimecmp
@@ -34,7 +30,7 @@ mtvec_trap_handler_aligned:
     addi t0, t0, 4
     csrw mepc, t0
     
-    la t3, __mtimecmp   // Set mtime cmp to something enormous.
+    la t3, 0x20008      // Set mtime cmp to something enormous.
     li t4, -1
     sd t4, 0(t3)
     
