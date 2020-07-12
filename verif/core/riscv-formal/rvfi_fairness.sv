@@ -77,6 +77,8 @@ always @(posedge f_clk) begin
     
     assume(!int_ext);
 
+    assume(!int_ti );
+
 end
 
 //
