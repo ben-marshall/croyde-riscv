@@ -42,10 +42,6 @@ input  wire [         XL:0] trs_pc         // Instruction trace PC
 // Common core parameters and constants.
 `include "core_common.svh"
 
-// Base address of the memory mapped IO region.
-parameter   MMIO_BASE_ADDR  = 64'h0000_0000_0000_1000;
-parameter   MMIO_BASE_MASK  = 64'h0000_0000_0000_1FFF;
-
 //
 // Assume that we start in reset.
 initial assume(g_resetn == 1'b0);

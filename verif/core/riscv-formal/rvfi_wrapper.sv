@@ -28,10 +28,7 @@ localparam  MEM_STRB_R  = MEM_STRB_W - 1; // Memory strobe bits width
 localparam  MEM_DATA_R  = MEM_DATA_W - 1; // Memory data bits width
 
 
-// Base address of the memory mapped IO region.
-parameter   MMIO_BASE_ADDR  = 'h0000_0000_0000_1000;
-parameter   MMIO_BASE_MASK  = 'h0000_0000_0000_1FFF;
-
+(*keep*) rand reg                  clock_test   ; // Gated clock test
 (*keep*)      wire                 g_resetn     = !reset;
 (*keep*)      
 (*keep*)      wire                 imem_req     ; // Mem request
@@ -60,6 +57,17 @@ parameter   MMIO_BASE_MASK  = 'h0000_0000_0000_1FFF;
 
 (*keep*) rand reg                  int_sw       ; // software interrupt
 (*keep*) rand reg                  int_ext      ; // hardware interrupt
+(*keep*) rand reg                  int_ti       ; // timer    interrupt
+
+(*keep*) wire                      instr_ret    ; // Instruction retired;
+
+(*keep*) rand reg  [         63:0] ctr_time     ; // The time counter value.
+(*keep*) rand reg  [         63:0] ctr_cycle    ; // The cycle counter value.
+(*keep*) rand reg  [         63:0] ctr_instret  ; // The instret counter value.
+
+(*keep*) wire                      inhibit_cy   ; // Stop cycle counter.
+(*keep*) wire                      inhibit_tm   ; // Stop time counter.
+(*keep*) wire                      inhibit_ir   ; // Stop instret incrementing.
 
 
 //
@@ -67,14 +75,13 @@ parameter   MMIO_BASE_MASK  = 'h0000_0000_0000_1FFF;
 // ------------------------------------------------------------
 
 rvfi_fairness #(
-.MMIO_BASE_ADDR(MMIO_BASE_ADDR),
-.MMIO_BASE_MASK(MMIO_BASE_MASK),
 .MEM_ADDR_W    (MEM_ADDR_W    )
 ) i_rvfi_fairness (
 .f_clk        (clock        ), // Global clock
 .g_resetn     (g_resetn     ), // Global active low sync reset.
 .int_sw       (int_sw       ), // Software interrupt
 .int_ext      (int_ext      ), // External interrupt
+.int_ti       (int_ti       ), // A timer interrupt has fired.
 .imem_req     (imem_req     ), // Memory request
 .imem_addr    (imem_addr    ), // Memory request address
 .imem_wen     (imem_wen     ), // Memory request write enable
@@ -93,6 +100,13 @@ rvfi_fairness #(
 .dmem_rdata   (dmem_rdata   ), // Memory response read data
 `RVFI_CONN                   , // Formal checker interface.
 .wfi_sleep    (wfi_sleep    ), // Core asleep due to WFI.
+.instr_ret    (instr_ret    ), // Instruction retired;
+.ctr_time     (ctr_time     ), // The time counter value.
+.ctr_cycle    (ctr_cycle    ), // The cycle counter value.
+.ctr_instret  (ctr_instret  ), // The instret counter value.
+.inhibit_cy   (inhibit_cy   ), // Stop cycle counter incrementing.
+.inhibit_tm   (inhibit_tm   ), // Stop time counter incrementing.
+.inhibit_ir   (inhibit_ir   ), // Stop instret incrementing.
 .trs_valid    (trs_valid    ), // Instruction trace valid
 .trs_instr    (trs_instr    ), // Instruction trace data
 .trs_pc       (trs_pc       )  // Instruction trace PC
@@ -105,14 +119,14 @@ rvfi_fairness #(
 
 
 core_top #(
-.MMIO_BASE_ADDR(MMIO_BASE_ADDR),
-.MMIO_BASE_MASK(MMIO_BASE_MASK),
 .MEM_ADDR_W    (MEM_ADDR_W    )
 ) i_dut (
 .f_clk        (clock        ), // Global clock
+.g_clk_test_en(clock_test   ), // Global clock test
 .g_resetn     (g_resetn     ), // Global active low sync reset.
 .int_sw       (int_sw       ), // Software interrupt
 .int_ext      (int_ext      ), // External interrupt
+.int_ti       (int_ti       ), // A timer interrupt has fired.
 .imem_req     (imem_req     ), // Memory request
 .imem_addr    (imem_addr    ), // Memory request address
 .imem_wen     (imem_wen     ), // Memory request write enable
@@ -131,6 +145,13 @@ core_top #(
 .dmem_rdata   (dmem_rdata   ), // Memory response read data
 `RVFI_CONN                   , // Formal checker interface.
 .wfi_sleep    (wfi_sleep    ), // Core asleep due to WFI.
+.instr_ret    (instr_ret    ), // Instruction retired;
+.ctr_time     (ctr_time     ), // The time counter value.
+.ctr_cycle    (ctr_cycle    ), // The cycle counter value.
+.ctr_instret  (ctr_instret  ), // The instret counter value.
+.inhibit_cy   (inhibit_cy   ), // Stop cycle counter incrementing.
+.inhibit_tm   (inhibit_tm   ), // Stop time counter incrementing.
+.inhibit_ir   (inhibit_ir   ), // Stop instret incrementing.
 .trs_valid    (trs_valid    ), // Instruction trace valid
 .trs_instr    (trs_instr    ), // Instruction trace data
 .trs_pc       (trs_pc       )  // Instruction trace PC

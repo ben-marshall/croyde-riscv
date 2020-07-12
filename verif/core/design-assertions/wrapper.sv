@@ -17,10 +17,7 @@ module design_assertions_wrapper (
 // Common core parameters and constants.
 `include "core_common.svh"
 
-// Base address of the memory mapped IO region.
-parameter   MMIO_BASE_ADDR  = 64'h0000_0000_0000_1000;
-parameter   MMIO_BASE_MASK  = 64'h0000_0000_0000_1FFF;
-
+(*keep*) rand reg                  clock_test   ; // Gated clock test
 (*keep*)      wire                 g_resetn     = !reset;
 (*keep*)      
 (*keep*)      wire                 imem_req     ; // Mem request
@@ -47,16 +44,24 @@ parameter   MMIO_BASE_MASK  = 64'h0000_0000_0000_1FFF;
 
 (*keep*) rand reg                  int_sw       ; // software interrupt
 (*keep*) rand reg                  int_ext      ; // hardware interrupt
+(*keep*) rand reg                  int_ti       ; // timer    interrupt
+
+(*keep*) wire                      instr_ret    ; // Instruction retired;
+
+(*keep*) rand reg  [         63:0] ctr_time     ; // The time counter value.
+(*keep*) rand reg  [         63:0] ctr_cycle    ; // The cycle counter value.
+(*keep*) rand reg  [         63:0] ctr_instret  ; // The instret counter value.
+
+(*keep*) wire                      inhibit_cy   ; // Stop cycle counter.
+(*keep*) wire                      inhibit_tm   ; // Stop time counter.
+(*keep*) wire                      inhibit_ir   ; // Stop instret incrementing.
 
 
 //
 // Fairness and assumptions
 // ------------------------------------------------------------
 
-design_assertions_fairness #(
-.MMIO_BASE_ADDR(MMIO_BASE_ADDR),
-.MMIO_BASE_MASK(MMIO_BASE_MASK)
-) i_design_assertions_fairness (
+design_assertions_fairness i_design_assertions_fairness (
 .f_clk        (clock        ), // Global clock
 .g_resetn     (g_resetn     ), // Global active low sync reset.
 .int_sw       (int_sw       ), // Software interrupt
@@ -122,14 +127,13 @@ assert_memory_if i_assert_memory_if(
 // ------------------------------------------------------------
 
 
-core_top #(
-.MMIO_BASE_ADDR(MMIO_BASE_ADDR),
-.MMIO_BASE_MASK(MMIO_BASE_MASK)
-) i_dut (
+core_top #() i_dut (
 .f_clk        (clock        ), // Global clock
+.g_clk_test_en(clock_test   ), // Global clock test
 .g_resetn     (g_resetn     ), // Global active low sync reset.
 .int_sw       (int_sw       ), // Software interrupt
 .int_ext      (int_ext      ), // External interrupt
+.int_ti       (int_ti       ), // Timer    interrupt
 .imem_req     (imem_req     ), // Memory request
 .imem_addr    (imem_addr    ), // Memory request address
 .imem_wen     (imem_wen     ), // Memory request write enable
@@ -146,6 +150,13 @@ core_top #(
 .dmem_gnt     (dmem_gnt     ), // Memory response valid
 .dmem_err     (dmem_err     ), // Memory response error
 .dmem_rdata   (dmem_rdata   ), // Memory response read data
+.instr_ret    (instr_ret    ), // Instruction retired;
+.ctr_time     (ctr_time     ), // The time counter value.
+.ctr_cycle    (ctr_cycle    ), // The cycle counter value.
+.ctr_instret  (ctr_instret  ), // The instret counter value.
+.inhibit_cy   (inhibit_cy   ), // Stop cycle counter incrementing.
+.inhibit_tm   (inhibit_tm   ), // Stop time counter incrementing.
+.inhibit_ir   (inhibit_ir   ), // Stop instret incrementing.
 .trs_valid    (trs_valid    ), // Instruction trace valid
 .trs_instr    (trs_instr    ), // Instruction trace data
 .trs_pc       (trs_pc       )  // Instruction trace PC
