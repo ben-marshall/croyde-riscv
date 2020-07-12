@@ -29,6 +29,10 @@
 
   - [ ] Register file sign extension bits.
 
+- [ ] CCX: Re-arrange interconnect so that arbiters are connected
+           directly to core interfaces, so only one router and
+           one arbiter is needed, rather than 4 arbiters and two routers.
+
 - [ ] User mode
 
 ## Verif
