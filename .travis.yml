@@ -11,7 +11,7 @@ before_install :
 - sudo apt-get --yes install flex bison libfl2 libfl-dev perl build-essential clang bison flex libreadline-dev gawk tcl-dev libffi-dev graphviz xdot pkg-config python3 libboost-system-dev libboost-python-dev libboost-filesystem-dev zlib1g-dev
 jobs:
   include:
-  - name: "Unit Tests"
+  - name: "Confidence Checks - Core"
     script:
     - source ./bin/install-verilator.sh
     - source ./bin/install-toolchain.sh
@@ -19,7 +19,7 @@ jobs:
     - make -B build-core_top
     - make -B build-unit-tests-core
     - make -B run-unit-tests-core
-  - name: "Core Complex (CCX)"
+  - name: "Confidence Checks - CCX"
     script:
     - source ./bin/install-verilator.sh
     - source ./bin/install-toolchain.sh
@@ -27,16 +27,6 @@ jobs:
     - make -B build-ccx_top
     - make -B build-unit-tests-ccx
     - make -B run-unit-tests-ccx
-  - name: "Embench IoT"
-    script:
-    - source ./bin/install-verilator.sh
-    - source ./bin/install-toolchain.sh
-    - source ./bin/conf.sh
-    - make build-ccx_top
-    - make build-embench-binaries
-    - make build-embench-targets
-    - make -j 2 run-embench-targets
-    - grep -rn ">> Finished after .* clock cycles" work/embench/src/ | sort
   - name: "Designer Assertions"
     script:
     - source ./bin/install-yosys.sh
@@ -47,13 +37,30 @@ jobs:
   - name: "riscv-formal"
     script:
     - source ./bin/install-yosys.sh
+    - source ./bin/install-symbiyosys.sh
+    - source ./bin/install-boolector.sh
     - source ./bin/conf.sh
-    - echo "riscv-formal flow not implemented"
-  - name: "Synthesis"
+    - make riscv-formal-clean riscv-formal-prepare
+    - export PATH=$YOSYS_ROOT:$PATH
+    - make -C work/core/riscv-formal insn_add_ch0
+    - make -C work/core/riscv-formal insn_beq_ch0
+    - make -C work/core/riscv-formal insn_ld_ch0
+    - make -C work/core/riscv-formal insn_sd_ch0
+  - name: "Synthesis - Core"
     script:
     - source ./bin/install-yosys.sh
     - source ./bin/conf.sh
     - make synthesise-cmos
+  - name: "Benchmarks - Embench IoT"
+    script:
+    - source ./bin/install-verilator.sh
+    - source ./bin/install-toolchain.sh
+    - source ./bin/conf.sh
+    - make build-ccx_top
+    - make build-embench-binaries
+    - make build-embench-targets
+    - make -j 2 run-embench-targets
+    - grep -rn ">> Finished after .* clock cycles" work/embench/src/ | sort
 cache   :
   directories:
   - ~/tools/verilator
