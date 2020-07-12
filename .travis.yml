@@ -16,17 +16,17 @@ jobs:
     - source ./bin/install-verilator.sh
     - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
-    - make build-core_top
-    - make build-unit-tests-core
-    - make run-unit-tests-core
+    - make -B build-core_top
+    - make -B build-unit-tests-core
+    - make -B run-unit-tests-core
   - name: "Core Complex (CCX)"
     script:
     - source ./bin/install-verilator.sh
     - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
-    - make build-ccx_top
-    - make build-unit-tests-ccx
-    - make run-unit-tests-ccx
+    - make -B build-ccx_top
+    - make -B build-unit-tests-ccx
+    - make -B run-unit-tests-ccx
   - name: "Embench IoT"
     script:
     - source ./bin/install-verilator.sh
