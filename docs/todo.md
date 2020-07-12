@@ -36,4 +36,7 @@
 - [ ] csrw mcycle
 - [ ] csrw minstret
 
+- [ ] Re-enable pc_fwd riscv-formal check
+- [ ] Re-enable liveness riscv-formal check
+
 
