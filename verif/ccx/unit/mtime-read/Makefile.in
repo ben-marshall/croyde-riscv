@@ -1,0 +1,6 @@
+
+TEST_NAME = mtime-read
+TEST_SRC  = $(CCX_UNIT_ROOT)/mtime-read/test_mtime_read.c
+
+$(eval $(call add_ccx_unit_test,$(TEST_NAME),$(TEST_SRC)))
+

@@ -17,7 +17,8 @@ core_mem_bus.RSP  if_dmem   , // CPU data        memory
 
 core_mem_bus.REQ  if_rom    ,
 core_mem_bus.REQ  if_ram    ,
-core_mem_bus.REQ  if_ext
+core_mem_bus.REQ  if_ext    ,
+core_mem_bus.REQ  if_mmio
 
 );
 
@@ -37,6 +38,10 @@ parameter EXT_MASK  = 'hE0000000;
 parameter EXT_BASE  = 'h10000000;
 parameter EXT_SIZE  = 'h0FFFFFFF;
 
+parameter MMIO_MASK ;
+parameter MMIO_BASE ;
+parameter MMIO_SIZE ;
+
 //
 // Internal busses
 // ------------------------------------------------------------
@@ -45,11 +50,13 @@ parameter EXT_SIZE  = 'h0FFFFFFF;
 core_mem_bus if_imem_rom;
 core_mem_bus if_imem_ram;
 core_mem_bus if_imem_ext;
+core_mem_bus if_imem_mmio;
 
 // Data memory busses.
 core_mem_bus if_dmem_rom;
 core_mem_bus if_dmem_ram;
 core_mem_bus if_dmem_ext;
+core_mem_bus if_dmem_mmio;
 
 //
 // Submodule instances
@@ -58,47 +65,55 @@ core_mem_bus if_dmem_ext;
 //
 // Core instruction memory router.
 ccx_ic_router #(
-.AW      (AW        ),    // Address width
-.DW      (DW        ),    // Data width
-.ROM_MASK(ROM_MASK  ),
-.ROM_BASE(ROM_BASE  ),
-.ROM_SIZE(ROM_SIZE  ),
-.RAM_MASK(RAM_MASK  ),
-.RAM_BASE(RAM_BASE  ),
-.RAM_SIZE(RAM_SIZE  ),
-.EXT_MASK(EXT_MASK  ),
-.EXT_BASE(EXT_BASE  ),
-.EXT_SIZE(EXT_SIZE  )
+.AW       (AW        ),    // Address width
+.DW       (DW        ),    // Data width
+.ROM_MASK (ROM_MASK  ),
+.ROM_BASE (ROM_BASE  ),
+.ROM_SIZE (ROM_SIZE  ),
+.RAM_MASK (RAM_MASK  ),
+.RAM_BASE (RAM_BASE  ),
+.RAM_SIZE (RAM_SIZE  ),
+.EXT_MASK (EXT_MASK  ),
+.EXT_BASE (EXT_BASE  ),
+.EXT_SIZE (EXT_SIZE  ),
+.MMIO_MASK(MMIO_MASK ),
+.MMIO_BASE(MMIO_BASE ),
+.MMIO_SIZE(MMIO_SIZE )
 ) i_ccx_ic_router_imem (
-.g_clk      (g_clk      ),
-.g_resetn   (g_resetn   ),
-.if_core    (if_imem    ), // CPU instruction memory
-.if_rom     (if_imem_rom),
-.if_ram     (if_imem_ram),
-.if_ext     (if_imem_ext) 
+.g_clk      (g_clk       ),
+.g_resetn   (g_resetn    ),
+.if_core    (if_imem     ), // CPU instruction memory
+.if_rom     (if_imem_rom ),
+.if_ram     (if_imem_ram ),
+.if_ext     (if_imem_ext ),
+.if_mmio    (if_imem_mmio) 
 );
 
 //
 // Core Data Memory router.
 ccx_ic_router #(
-.AW      (AW        ),    // Address width
-.DW      (DW        ),    // Data width
-.ROM_MASK(ROM_MASK  ),
-.ROM_BASE(ROM_BASE  ),
-.ROM_SIZE(ROM_SIZE  ),
-.RAM_MASK(RAM_MASK  ),
-.RAM_BASE(RAM_BASE  ),
-.RAM_SIZE(RAM_SIZE  ),
-.EXT_MASK(EXT_MASK  ),
-.EXT_BASE(EXT_BASE  ),
-.EXT_SIZE(EXT_SIZE  )
+.AW       (AW        ),    // Address width
+.DW       (DW        ),    // Data width
+.ROM_MASK (ROM_MASK  ),
+.ROM_BASE (ROM_BASE  ),
+.ROM_SIZE (ROM_SIZE  ),
+.RAM_MASK (RAM_MASK  ),
+.RAM_BASE (RAM_BASE  ),
+.RAM_SIZE (RAM_SIZE  ),
+.EXT_MASK (EXT_MASK  ),
+.EXT_BASE (EXT_BASE  ),
+.EXT_SIZE (EXT_SIZE  ),
+.MMIO_MASK(MMIO_MASK ),
+.MMIO_BASE(MMIO_BASE ),
+.MMIO_SIZE(MMIO_SIZE )
 ) i_ccx_ic_router_dmem (
-.g_clk      (g_clk      ),
-.g_resetn   (g_resetn   ),
-.if_core    (if_dmem    ), // CPU data memory
-.if_rom     (if_dmem_rom),
-.if_ram     (if_dmem_ram),
-.if_ext     (if_dmem_ext) 
+.g_clk      (g_clk       ),
+.g_resetn   (g_resetn    ),
+.if_core    (if_dmem     ), // CPU data memory
+.if_rom     (if_dmem_rom ),
+.if_ram     (if_dmem_ram ),
+.if_ext     (if_dmem_ext ),
+.if_mmio    (if_dmem_mmio) 
 );
 
 
@@ -132,6 +147,16 @@ ccx_ic_arbiter i_ccx_ic_arbiter_ext (
 .req_0      (if_dmem_ext),
 .req_1      (if_imem_ext),
 .rsp        (if_ext     )
+);
+
+//
+// ROM arbiter
+ccx_ic_arbiter i_ccx_ic_arbiter_mmio(
+.g_clk      (g_clk       ),
+.g_resetn   (g_resetn    ),
+.req_0      (if_dmem_mmio),
+.req_1      (if_imem_mmio),
+.rsp        (if_mmio     )
 );
 
 endmodule

@@ -1,0 +1,6 @@
+
+TEST_NAME = mtime-write
+TEST_SRC  = $(CCX_UNIT_ROOT)/mtime-write/test_mtime_write.c
+
+$(eval $(call add_ccx_unit_test,$(TEST_NAME),$(TEST_SRC)))
+

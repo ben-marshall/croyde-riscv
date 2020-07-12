@@ -17,7 +17,8 @@ core_mem_bus.RSP if_core    , // CPU instruction memory
 
 core_mem_bus.REQ if_rom     ,
 core_mem_bus.REQ if_ram     ,
-core_mem_bus.REQ if_ext
+core_mem_bus.REQ if_ext     ,
+core_mem_bus.REQ if_mmio
 
 );
 
@@ -36,6 +37,10 @@ parameter RAM_SIZE  = 39'h000000FFFF;
 parameter EXT_MASK  = 39'h7FE0000000;
 parameter EXT_BASE  = 39'h7F10000000;
 parameter EXT_SIZE  = 39'h000FFFFFFF;
+
+parameter MMIO_MASK = 0;
+parameter MMIO_BASE = 0;
+parameter MMIO_SIZE = 0;
 
 //
 // Utility functions
@@ -62,7 +67,12 @@ endfunction
 wire map_core_rom = address_match(if_core.addr, ROM_MASK, ROM_BASE, ROM_SIZE);
 wire map_core_ram = address_match(if_core.addr, RAM_MASK, RAM_BASE, RAM_SIZE);
 wire map_core_ext = address_match(if_core.addr, EXT_MASK, EXT_BASE, EXT_SIZE);
-wire map_core_none= !map_core_rom && !map_core_ram && !map_core_ext;
+wire map_core_mmio= address_match(if_core.addr,MMIO_MASK,MMIO_BASE,MMIO_SIZE);
+
+wire map_core_none= !map_core_rom   && 
+                    !map_core_ram   &&
+                    !map_core_ext   &&
+                    !map_core_mmio  ;
 
 
 // Check the mappings are sensible.
@@ -93,10 +103,16 @@ assign  if_ext.wen      = if_core.wen     ;
 assign  if_ext.strb     = if_core.strb    ;
 assign  if_ext.wdata    = if_core.wdata   ;
 
+assign  if_mmio.addr    = if_core.addr    ;
+assign  if_mmio.wen     = if_core.wen     ;
+assign  if_mmio.strb    = if_core.strb    ;
+assign  if_mmio.wdata   = if_core.wdata   ;
+
 // Request lines masked by mapping lines.
 assign  if_rom.req      = if_core.req && map_core_rom;
 assign  if_ram.req      = if_core.req && map_core_ram;
 assign  if_ext.req      = if_core.req && map_core_ext;
+assign  if_mmio.req     = if_core.req && map_core_mmio;
 
 //
 // Request/Response Tracking.
@@ -105,11 +121,13 @@ assign  if_ext.req      = if_core.req && map_core_ext;
 reg    rsp_route_rom       ;
 reg    rsp_route_ram       ;
 reg    rsp_route_ext       ;
+reg    rsp_route_mmio      ;
 reg    rsp_route_none      ;
 
 wire n_rsp_route_rom = if_rom.req    && if_core.gnt;
 wire n_rsp_route_ram = if_ram.req    && if_core.gnt;
 wire n_rsp_route_ext = if_ext.req    && if_core.gnt;
+wire n_rsp_route_mmio= if_mmio.req   && if_core.gnt;
 wire n_rsp_route_none= map_core_none && if_core.gnt;
 
 always @(posedge g_clk) begin
@@ -117,11 +135,13 @@ always @(posedge g_clk) begin
         rsp_route_rom   <= 1'b0;
         rsp_route_ram   <= 1'b0;
         rsp_route_ext   <= 1'b0;
+        rsp_route_mmio  <= 1'b0;
         rsp_route_none  <= 1'b0;
     end else begin
         rsp_route_rom   <= n_rsp_route_rom ;
         rsp_route_ram   <= n_rsp_route_ram ;
         rsp_route_ext   <= n_rsp_route_ext ;
+        rsp_route_mmio  <= n_rsp_route_mmio;
         rsp_route_none  <= n_rsp_route_none;
     end
 end
@@ -133,16 +153,19 @@ end
 assign if_core.gnt  = map_core_rom   ? if_rom.gnt   :
                       map_core_ram   ? if_ram.gnt   :
                       map_core_ext   ? if_ext.gnt   :
+                      map_core_mmio  ? if_mmio.gnt  :
                                        1'b1         ;
 
 assign if_core.err  = rsp_route_rom  ? if_rom.err   :
                       rsp_route_ram  ? if_ram.err   :
                       rsp_route_ext  ? if_ext.err   :
+                      rsp_route_mmio ? if_mmio.err  :
                                        1'b1         ;
 
 assign if_core.rdata= rsp_route_rom  ? if_rom.rdata :
                       rsp_route_ram  ? if_ram.rdata :
                       rsp_route_ext  ? if_ext.rdata :
+                      rsp_route_mmio ? if_mmio.rdata:
                                        64'b0        ;
 
 endmodule

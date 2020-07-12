@@ -1,6 +1,0 @@
-
-TEST_NAME = counters
-TEST_SRC  = $(CORE_UNIT_ROOT)/counters/test_counters.c
-
-$(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
-

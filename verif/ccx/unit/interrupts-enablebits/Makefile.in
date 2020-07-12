@@ -1,0 +1,7 @@
+
+TEST_NAME = interrupts-enablebits
+TEST_SRC  = $(CCX_UNIT_ROOT)/$(TEST_NAME)/test_interrupts.c \
+            $(CCX_UNIT_ROOT)/$(TEST_NAME)/test_interrupts.S
+
+$(eval $(call add_ccx_unit_test,$(TEST_NAME),$(TEST_SRC)))
+

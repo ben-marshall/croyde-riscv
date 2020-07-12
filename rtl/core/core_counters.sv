@@ -34,14 +34,15 @@ output reg                 mmio_error         // MMIO error
 `include "core_common.svh"
 
 // Base address of the memory mapped IO region.
-parameter   MMIO_BASE_ADDR        = 'h0000_0000_0001_0000;
-parameter   MMIO_BASE_MASK        = 'h0000_0000_0001_FFFF;
+parameter MMIO_MASK = 0;
+parameter MMIO_BASE = 0;
+parameter MMIO_SIZE = 0;
 
 // Base address of the MTIME memory mapped register.
-localparam  MMIO_MTIME_ADDR       = MMIO_BASE_ADDR;
+localparam  MMIO_MTIME_ADDR       = MMIO_BASE;
 
 // Base address of the MTIMECMP memory mapped register.
-localparam  MMIO_MTIMECMP_ADDR    = MMIO_BASE_ADDR + 8;
+localparam  MMIO_MTIMECMP_ADDR    = MMIO_BASE+ 8;
 
 // Reset value of the MTIMECMP register.
 parameter   MMIO_MTIMECMP_RESET   = -1;
@@ -49,10 +50,10 @@ parameter   MMIO_MTIMECMP_RESET   = -1;
 // ---------------------- Memory mapped registers -----------------------
 
 wire    addr_mtime_lo    =
-    (mmio_addr& MMIO_BASE_MASK)==(MMIO_MTIME_ADDR    & MMIO_BASE_MASK);
+    (mmio_addr& MMIO_SIZE)==(MMIO_MTIME_ADDR    & MMIO_SIZE);
 
 wire    addr_mtimecmp_lo =
-    (mmio_addr& MMIO_BASE_MASK)==(MMIO_MTIMECMP_ADDR & MMIO_BASE_MASK);
+    (mmio_addr& MMIO_SIZE)==(MMIO_MTIMECMP_ADDR & MMIO_SIZE);
 
 reg  [63:0] mapped_mtime;
 reg  [63:0] mapped_mtimecmp;

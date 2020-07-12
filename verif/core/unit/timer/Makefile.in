@@ -1,7 +1,0 @@
-
-TEST_NAME = timer
-TEST_SRC  = $(CORE_UNIT_ROOT)/timer/test_timer.c \
-            $(CORE_UNIT_ROOT)/timer/test_timer.S
-
-$(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
-

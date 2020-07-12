@@ -63,7 +63,7 @@ ccx-unit-fsbl : $(CCX_UNIT_ROM_ELF) $(CCX_UNIT_ROM_OBJDUMP) $(CCX_UNIT_ROM_HEX)
 #
 # 1. CCX unit test name
 # 2. CCX unit test sources.
-define add_cxx_unit_test
+define add_ccx_unit_test
 
 $(call build_unit_test,ccx,${1},${CCX_UNIT_CFLAGS},${CCX_UNIT_SRCS} ${2}, $(CCX_UNIT_OBJCOPY_FLAGS))
 
@@ -83,4 +83,11 @@ endef
 
 include $(CCX_UNIT_ROOT)/example/Makefile.in
 include $(CCX_UNIT_ROOT)/access-traps/Makefile.in
-
+include $(CCX_UNIT_ROOT)/wfi/Makefile.in
+include $(CCX_UNIT_ROOT)/mtime-read/Makefile.in
+include $(CCX_UNIT_ROOT)/mtime-write/Makefile.in
+include $(CCX_UNIT_ROOT)/counters/Makefile.in
+include $(CCX_UNIT_ROOT)/timer/Makefile.in
+include $(CCX_UNIT_ROOT)/interrupts-enablebits/Makefile.in
+include $(CCX_UNIT_ROOT)/interrupts-timer-direct/Makefile.in
+include $(CCX_UNIT_ROOT)/interrupts-timer-vectored/Makefile.in

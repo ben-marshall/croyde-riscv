@@ -12,6 +12,7 @@ input  wire                 g_clk_test_en, // Clock test enable.
 
 input  wire                 int_sw       , // software interrupt
 input  wire                 int_ext      , // hardware interrupt
+input  wire                 int_ti       , // A timer interrupt has fired.
               
 output wire                 imem_req     , // Memory request
 output wire [ MEM_ADDR_R:0] imem_addr    , // Memory request address
@@ -37,6 +38,16 @@ input  wire [ MEM_DATA_R:0] dmem_rdata   , // Memory response read data
 
 output wire                 wfi_sleep    , // Core is asleep due to WFI.
 
+output wire                 instr_ret    , // Instruction retired;
+               
+input  wire [         63:0] ctr_time     , // The time counter value.
+input  wire [         63:0] ctr_cycle    , // The cycle counter value.
+input  wire [         63:0] ctr_instret  , // The instret counter value.
+               
+output wire                 inhibit_cy   , // Stop cycle counter incrementing.
+output wire                 inhibit_tm   , // Stop time counter incrementing.
+output wire                 inhibit_ir   , // Stop instret incrementing.
+
 output wire                 trs_valid    , // Instruction trace valid
 output wire [         31:0] trs_instr    , // Instruction trace data
 output wire [         XL:0] trs_pc         // Instruction trace PC
@@ -49,10 +60,6 @@ output wire [         XL:0] trs_pc         // Instruction trace PC
 
 // Inital address of the program counter post reset.
 parameter   PC_RESET_ADDRESS= 'h10000000;
-
-// Base address of the memory mapped IO region.
-parameter   MMIO_BASE_ADDR  = 'h0000_0000_0002_0000;
-parameter   MMIO_BASE_MASK  = 'h0000_0000_0002_FFFF;
 
 //
 // Clock request and delivery wires.
@@ -243,42 +250,12 @@ wire                 mie_msie    ; // Software interrupt enable.
 wire                 mip_meip    ; // External interrupt pending
 wire                 mip_mtip    ; // Timer interrupt pending
 wire                 mip_msip    ; // Software interrupt pending
-
-wire                 instr_ret   ; // Instruction retired;
-wire                 int_ti      ; // A timer interrupt has fired.
-               
-wire [         63:0] ctr_time    ; // The time counter value.
-wire [         63:0] ctr_cycle   ; // The cycle counter value.
-wire [         63:0] ctr_instret ; // The instret counter value.
-               
-wire                 inhibit_cy  ; // Stop cycle counter incrementing.
-wire                 inhibit_tm  ; // Stop time counter incrementing.
-wire                 inhibit_ir  ; // Stop instret incrementing.
                
 wire                 trap_cpu    ; // A trap occured due to CPU
 wire                 trap_int    ; // A trap occured due to interrupt
 wire [ CF_CAUSE_R:0] trap_cause  ; // A trap occured due to interrupt
 wire [         XL:0] trap_mtval  ; // Value associated with the trap.
 wire [         XL:0] trap_pc     ; // PC value associated with the trap.
-
-//
-// Internal memory request, prior to external/MMIO filtering.
-wire                 int_dmem_req  ; // Memory request
-wire [ MEM_ADDR_R:0] int_dmem_addr ; // Memory request address
-wire                 int_dmem_wen  ; // Memory request write enable
-wire [ MEM_STRB_R:0] int_dmem_strb ; // Memory request write strobe
-wire [ MEM_DATA_R:0] int_dmem_wdata; // Memory write data.
-wire                 int_dmem_gnt  ; // Memory response valid
-wire                 int_dmem_err  ; // Memory response error
-wire [ MEM_DATA_R:0] int_dmem_rdata; // Memory response read data
-
-wire                 mmio_req    ; // MMIO enable
-wire                 mmio_wen    ; // MMIO write enable
-wire [ MEM_ADDR_R:0] mmio_addr   ; // MMIO address
-wire [ MEM_DATA_R:0] mmio_wdata  ; // MMIO write data
-wire                 mmio_gnt    ; // MMIO grant
-wire [ MEM_DATA_R:0] mmio_rdata  ; // MMIO read data
-wire                 mmio_error  ; // MMIO error
 
 //
 // Pipeline forwarding
@@ -543,14 +520,14 @@ core_pipe_exec #(
 .s3_dmem_strb    (s3_dmem_strb    ),
 .s3_dmem_wdata   (s3_dmem_wdata   ),
 `endif
-.dmem_req        (int_dmem_req    ), // Memory request
-.dmem_addr       (int_dmem_addr   ), // Memory request address
-.dmem_wen        (int_dmem_wen    ), // Memory request write enable
-.dmem_strb       (int_dmem_strb   ), // Memory request write strobe
-.dmem_wdata      (int_dmem_wdata  ), // Memory write data.
-.dmem_gnt        (int_dmem_gnt    ), // Memory response valid
-.dmem_err        (int_dmem_err    ), // Memory response error
-.dmem_rdata      (int_dmem_rdata  )  // Memory response read data
+.dmem_req        (dmem_req        ), // Memory request
+.dmem_addr       (dmem_addr       ), // Memory request address
+.dmem_wen        (dmem_wen        ), // Memory request write enable
+.dmem_strb       (dmem_strb       ), // Memory request write strobe
+.dmem_wdata      (dmem_wdata      ), // Memory write data.
+.dmem_gnt        (dmem_gnt        ), // Memory response valid
+.dmem_err        (dmem_err        ), // Memory response error
+.dmem_rdata      (dmem_rdata      )  // Memory response read data
 );
 
 
@@ -608,14 +585,14 @@ core_pipe_wb #(
 .trap_pc         (trap_pc         ), // PC value associated with the trap.
 .exec_mret       (exec_mret       ), // MRET instruction executed.
 .instr_ret       (instr_ret       ), // INstruction retired
-.dmem_req        (int_dmem_req    ), // Memory request
-.dmem_addr       (int_dmem_addr   ), // Memory request address
-.dmem_wen        (int_dmem_wen    ), // Memory request write enable
-.dmem_strb       (int_dmem_strb   ), // Memory request write strobe
-.dmem_wdata      (int_dmem_wdata  ), // Memory write data.
-.dmem_gnt        (int_dmem_gnt    ), // Memory response valid
-.dmem_err        (int_dmem_err    ), // Memory response error
-.dmem_rdata      (int_dmem_rdata  ), // Memory response read data
+.dmem_req        (dmem_req        ), // Memory request
+.dmem_addr       (dmem_addr       ), // Memory request address
+.dmem_wen        (dmem_wen        ), // Memory request write enable
+.dmem_strb       (dmem_strb       ), // Memory request write strobe
+.dmem_wdata      (dmem_wdata      ), // Memory write data.
+.dmem_gnt        (dmem_gnt        ), // Memory response valid
+.dmem_err        (dmem_err        ), // Memory response error
+.dmem_rdata      (dmem_rdata      ), // Memory response read data
 `ifdef RVFI
 .s3_rs1_addr     (s3_rs1_addr     ),
 .s3_rs2_addr     (s3_rs2_addr     ),
@@ -720,75 +697,6 @@ core_interrupts i_core_interrupts (
 .int_cause    (int_cause        ), // Cause code for the interrupt.
 .int_tvec     (int_tvec         ), // Interrupt trap vector
 .int_ack      (int_ack          )  // Interrupt taken acknowledge
-);
-
-
-//
-// module: core_counters
-//
-//  Responsible for all performance counters and timers.
-//
-core_counters #(
-.MMIO_BASE_ADDR(MMIO_BASE_ADDR),
-.MMIO_BASE_MASK(MMIO_BASE_MASK),
-.MEM_ADDR_W    (MEM_ADDR_W    )
-) i_core_counters (
-.g_clk           (g_clk           ), // global clock
-.g_resetn        (g_resetn        ), // synchronous reset
-.instr_ret       (instr_ret       ), // Instruction retired.
-.timer_interrupt (int_ti          ), // Raise a timer interrupt
-.ctr_time        (ctr_time        ), // The time counter value.
-.ctr_cycle       (ctr_cycle       ), // The cycle counter value.
-.ctr_instret     (ctr_instret     ), // The instret counter value.
-.inhibit_cy      (inhibit_cy      ), // Stop cycle counter incrementing.
-.inhibit_tm      (inhibit_tm      ), // Stop time counter incrementing.
-.inhibit_ir      (inhibit_ir      ), // Stop instret incrementing.
-.mmio_req        (mmio_req        ), // MMIO enable
-.mmio_wen        (mmio_wen        ), // MMIO write enable
-.mmio_addr       (mmio_addr       ), // MMIO address
-.mmio_wdata      (mmio_wdata      ), // MMIO write data
-.mmio_gnt        (mmio_gnt        ), // MMIO grant
-.mmio_rdata      (mmio_rdata      ), // MMIO read data
-.mmio_error      (mmio_error      )  // MMIO error
-);
-
-
-//
-// module: core_mmio_mux
-//
-// Responsible for muxing the data memory bus between core internal
-// and external accesses.
-//
-core_mmio_mux #(
-.MMIO_BASE_ADDR(MMIO_BASE_ADDR),
-.MMIO_BASE_MASK(MMIO_BASE_MASK),
-.MEM_ADDR_W    (MEM_ADDR_W    )
-) i_core_mmio_mux (
-.g_clk           (g_clk           ), // Global clock
-.g_resetn        (g_resetn        ), // Synchronous active low reset.
-.int_dmem_req    (int_dmem_req    ), // Memory request
-.int_dmem_addr   (int_dmem_addr   ), // Memory request address
-.int_dmem_wen    (int_dmem_wen    ), // Memory request write enable
-.int_dmem_strb   (int_dmem_strb   ), // Memory request write strobe
-.int_dmem_wdata  (int_dmem_wdata  ), // Memory write data.
-.int_dmem_gnt    (int_dmem_gnt    ), // Memory response valid
-.int_dmem_err    (int_dmem_err    ), // Memory response error
-.int_dmem_rdata  (int_dmem_rdata  ), // Memory response read data
-.ext_dmem_req    (    dmem_req    ), // Memory request
-.ext_dmem_addr   (    dmem_addr   ), // Memory request address
-.ext_dmem_wen    (    dmem_wen    ), // Memory request write enable
-.ext_dmem_strb   (    dmem_strb   ), // Memory request write strobe
-.ext_dmem_wdata  (    dmem_wdata  ), // Memory write data.
-.ext_dmem_gnt    (    dmem_gnt    ), // Memory response valid
-.ext_dmem_err    (    dmem_err    ), // Memory response error
-.ext_dmem_rdata  (    dmem_rdata  ), // Memory response read data
-.mmio_req        (mmio_req        ), // MMIO enable
-.mmio_wen        (mmio_wen        ), // MMIO write enable
-.mmio_addr       (mmio_addr       ), // MMIO address
-.mmio_wdata      (mmio_wdata      ), // MMIO write data
-.mmio_gnt        (mmio_gnt        ), // Request grant.
-.mmio_rdata      (mmio_rdata      ), // MMIO read data
-.mmio_error      (mmio_error      )  // MMIO error
 );
 
 

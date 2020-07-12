@@ -59,14 +59,9 @@ input  wire [XL:0] trap_pc            // PC value associated with the trap.
 localparam ADDR_CYCLE       = 12'hC00;
 localparam ADDR_TIME        = 12'hC01;
 localparam ADDR_INSTRET     = 12'hC02;
-localparam ADDR_CYCLEH      = 12'hC80;
-localparam ADDR_TIMEH       = 12'hC81;
-localparam ADDR_INSTRETH    = 12'hC82;
 
 localparam ADDR_MCYCLE      = 12'hB00;
 localparam ADDR_MINSTRET    = 12'hB02;
-localparam ADDR_MCYCLEH     = 12'hB80;
-localparam ADDR_MINSTRETH   = 12'hB82;
 
 localparam ADDR_MCOUNTIN    = 12'h320;
 
@@ -496,13 +491,8 @@ wire   read_mhartid   = csr_en && csr_addr == ADDR_MHARTID  ;
 wire   read_cycle     = csr_en && csr_addr == ADDR_CYCLE    ;
 wire   read_time      = csr_en && csr_addr == ADDR_TIME     ;
 wire   read_instret   = csr_en && csr_addr == ADDR_INSTRET  ;
-wire   read_cycleh    = csr_en && csr_addr == ADDR_CYCLEH   ;
-wire   read_timeh     = csr_en && csr_addr == ADDR_TIMEH    ;
-wire   read_instreth  = csr_en && csr_addr == ADDR_INSTRETH ;
 wire   read_mcycle    = csr_en && csr_addr == ADDR_MCYCLE   ;
 wire   read_minstret  = csr_en && csr_addr == ADDR_MINSTRET ;
-wire   read_mcycleh   = csr_en && csr_addr == ADDR_MCYCLEH  ;
-wire   read_minstreth = csr_en && csr_addr == ADDR_MINSTRETH;
 wire   read_mcountin  = csr_en && csr_addr == ADDR_MCOUNTIN ;
 
 wire   valid_addr     = 
@@ -524,13 +514,8 @@ wire   valid_addr     =
     read_cycle     ||
     read_time      ||
     read_instret   ||
-    read_cycleh    ||
-    read_timeh     ||
-    read_instreth  ||
     read_mcycle    ||
     read_minstret  ||
-    read_mcycleh   ||
-    read_minstreth ||
     read_mcountin   ;
 
 wire invalid_addr = !valid_addr;
@@ -557,13 +542,8 @@ assign csr_rdata =
     {64{read_cycle    }} & ctr_cycle            |
     {64{read_time     }} & ctr_time             |
     {64{read_instret  }} & ctr_instret          |
-    {64{read_cycleh   }} & ctr_cycle            |
-    {64{read_timeh    }} & ctr_time             |
-    {64{read_instreth }} & ctr_instret          |
     {64{read_mcycle   }} & ctr_cycle            |
     {64{read_minstret }} & ctr_instret          |
-    {64{read_mcycleh  }} & ctr_cycle            |
-    {64{read_minstreth}} & ctr_instret          |
     {64{read_mcountin }} & reg_mcountin         ;
 
 endmodule

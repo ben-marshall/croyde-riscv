@@ -29,8 +29,9 @@ output wire [ 63:0] trs_pc         // Instruction trace PC
 parameter   PC_RESET_ADDRESS= 'h00000000;
 
 // Base address of the memory mapped IO region.
-parameter   MMIO_BASE_ADDR  = 'h0000_0000_0002_0000;
-parameter   MMIO_BASE_MASK  = 'h0000_0000_0002_FFFF;
+parameter   MMIO_BASE = 39'h0000_0000_0002_0000;
+parameter   MMIO_SIZE = 39'h0000_0000_0000_00FF;
+parameter   MMIO_MASK = ~MMIO_SIZE           ;
 
 localparam  AW = 39;    // Address width
 localparam  DW = 64;    // Data width
@@ -90,6 +91,20 @@ core_mem_bus #(.AW(AW),.DW(DW)) core_dmem;
 // RAM and ROM interfaces
 core_mem_bus #(.AW(AW),.DW(DW)) if_ram;
 core_mem_bus #(.AW(AW),.DW(DW)) if_rom;
+core_mem_bus #(.AW(AW),.DW(DW)) if_mmio;
+
+//
+// Core timer & counter related wires.
+wire                 core_int_ti       ; // Timer interrupt.
+wire                 core_instr_ret    ; // Instruction retired;
+        
+wire [         63:0] core_ctr_time     ; // The time counter value.
+wire [         63:0] core_ctr_cycle    ; // The cycle counter value.
+wire [         63:0] core_ctr_instret  ; // The instret counter value.
+        
+wire                 core_inhibit_cy   ; // Stop cycle counter incrementing.
+wire                 core_inhibit_tm   ; // Stop time counter incrementing.
+wire                 core_inhibit_ir   ; // Stop instret incrementing.
 
                                
 //
@@ -103,8 +118,6 @@ core_mem_bus #(.AW(AW),.DW(DW)) if_rom;
 //
 core_top #(
 .PC_RESET_ADDRESS   (PC_RESET_ADDRESS),
-.MMIO_BASE_ADDR     (MMIO_BASE_ADDR  ),
-.MMIO_BASE_MASK     (MMIO_BASE_MASK  ),
 .CLK_GATE_EN        (CLK_GATE_EN     )
 ) i_core_top (
 .f_clk        (f_clk             ), // global free running clock
@@ -112,6 +125,7 @@ core_top #(
 .g_resetn     (g_resetn          ), // global active low sync reset.
 .int_sw       (int_sw            ), // software interrupt
 .int_ext      (int_ext           ), // hardware interrupt
+.int_ti       (core_int_ti       ), // Timer interrupt
 .imem_req     (core_imem.req     ), // Memory request
 .imem_addr    (core_imem.addr    ), // Memory request address
 .imem_wen     (core_imem.wen     ), // Memory request write enable
@@ -129,6 +143,13 @@ core_top #(
 .dmem_err     (core_dmem.err     ), // Memory response error
 .dmem_rdata   (core_dmem.rdata   ), // Memory response read data
 .wfi_sleep    (wfi_sleep         ), // Core asleep due to WFI
+.instr_ret    (core_instr_ret    ), // Instruction retired;
+.ctr_time     (core_ctr_time     ), // The time counter value.
+.ctr_cycle    (core_ctr_cycle    ), // The cycle counter value.
+.ctr_instret  (core_ctr_instret  ), // The instret counter value.
+.inhibit_cy   (core_inhibit_cy   ), // Stop cycle counter incrementing.
+.inhibit_tm   (core_inhibit_tm   ), // Stop time counter incrementing.
+.inhibit_ir   (core_inhibit_ir   ), // Stop instret incrementing.
 .trs_valid    (trs_valid         ), // Instruction trace valid
 .trs_instr    (trs_instr         ), // Instruction trace data
 .trs_pc       (trs_pc            )  // Instruction trace PC
@@ -141,17 +162,20 @@ core_top #(
 //  Core complex memory interconnect.
 //
 ccx_ic_top #(
-.AW      (AW        ),    // Address width
-.DW      (DW        ),    // Data width
-.ROM_MASK(ROM_MASK  ),
-.ROM_BASE(ROM_BASE  ),
-.ROM_SIZE(ROM_SIZE  ),
-.RAM_MASK(RAM_MASK  ),
-.RAM_BASE(RAM_BASE  ),
-.RAM_SIZE(RAM_SIZE  ),
-.EXT_MASK(EXT_MASK  ),
-.EXT_BASE(EXT_BASE  ),
-.EXT_SIZE(EXT_SIZE  )
+.AW       (AW        ),    // Address width
+.DW       (DW        ),    // Data width
+.ROM_MASK (ROM_MASK  ),
+.ROM_BASE (ROM_BASE  ),
+.ROM_SIZE (ROM_SIZE  ),
+.RAM_MASK (RAM_MASK  ),
+.RAM_BASE (RAM_BASE  ),
+.RAM_SIZE (RAM_SIZE  ),
+.EXT_MASK (EXT_MASK  ),
+.EXT_BASE (EXT_BASE  ),
+.EXT_SIZE (EXT_SIZE  ),
+.MMIO_MASK(MMIO_MASK ),
+.MMIO_BASE(MMIO_BASE ),
+.MMIO_SIZE(MMIO_SIZE )
 ) i_ccx_ic_top (
 .g_clk     (g_clk           ),
 .g_resetn  (g_resetn        ),
@@ -159,7 +183,42 @@ ccx_ic_top #(
 .if_dmem   (core_dmem       ), // cpu data        memory
 .if_rom    (if_rom          ),
 .if_ram    (if_ram          ),
-.if_ext    (if_ext          )
+.if_ext    (if_ext          ),
+.if_mmio   (if_mmio         )
+);
+
+//
+// Core memory mapped peripherals.
+// ------------------------------------------------------------
+
+//
+// module: core_counters
+//
+//  Responsible for all performance counters and timers.
+//
+core_counters #(
+.MMIO_MASK (MMIO_MASK   ),
+.MMIO_BASE (MMIO_BASE   ),
+.MMIO_SIZE (MMIO_SIZE   ),
+.MEM_ADDR_W(AW          )
+) i_core_counters (
+.g_clk           (g_clk           ), // global clock
+.g_resetn        (g_resetn        ), // synchronous reset
+.timer_interrupt (core_int_ti     ), // Timer interrupt
+.instr_ret       (core_instr_ret  ), // Instruction retired;
+.ctr_time        (core_ctr_time   ), // The time counter value.
+.ctr_cycle       (core_ctr_cycle  ), // The cycle counter value.
+.ctr_instret     (core_ctr_instret), // The instret counter value.
+.inhibit_cy      (core_inhibit_cy ), // Stop cycle counter incrementing.
+.inhibit_tm      (core_inhibit_tm ), // Stop time counter incrementing.
+.inhibit_ir      (core_inhibit_ir ), // Stop instret incrementing.
+.mmio_req        (if_mmio.req     ), // MMIO enable
+.mmio_wen        (if_mmio.wen     ), // MMIO write enable
+.mmio_addr       (if_mmio.addr    ), // MMIO address
+.mmio_wdata      (if_mmio.wdata   ), // MMIO write data
+.mmio_gnt        (if_mmio.gnt     ), // MMIO grant
+.mmio_rdata      (if_mmio.rdata   ), // MMIO read data
+.mmio_error      (if_mmio.err     )  // MMIO error
 );
 
 //

@@ -1,6 +1,0 @@
-
-TEST_NAME = mtime-read
-TEST_SRC  = $(CORE_UNIT_ROOT)/mtime-read/test_mtime_read.c
-
-$(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
-

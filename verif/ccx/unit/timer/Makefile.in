@@ -1,0 +1,7 @@
+
+TEST_NAME = timer
+TEST_SRC  = $(CCX_UNIT_ROOT)/timer/test_timer.c \
+            $(CCX_UNIT_ROOT)/timer/test_timer.S
+
+$(eval $(call add_ccx_unit_test,$(TEST_NAME),$(TEST_SRC)))
+

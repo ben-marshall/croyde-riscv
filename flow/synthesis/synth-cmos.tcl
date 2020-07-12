@@ -5,7 +5,6 @@ yosys -import
 read_verilog -sv $::env(REPO_HOME)/rtl/prim/prim_clock_gate.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_clock_ctrl.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_counters.sv
-read_verilog -sv $::env(REPO_HOME)/rtl/core/core_mmio_mux.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_fetch_buffer.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_fetch.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_decode_immediates.sv

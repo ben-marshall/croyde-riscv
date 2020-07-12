@@ -36,16 +36,8 @@ UNIT_TEST_RUN_TARGETS += run-unit-core-${1}
 endef
 
 include $(CORE_UNIT_ROOT)/example/Makefile.in
-include $(CORE_UNIT_ROOT)/wfi/Makefile.in
 include $(CORE_UNIT_ROOT)/branch-tgt-trap/Makefile.in
 include $(CORE_UNIT_ROOT)/imem-access-trap/Makefile.in
 include $(CORE_UNIT_ROOT)/mul/Makefile.in
 include $(CORE_UNIT_ROOT)/div/Makefile.in
-include $(CORE_UNIT_ROOT)/mtime-read/Makefile.in
-include $(CORE_UNIT_ROOT)/mtime-write/Makefile.in
-include $(CORE_UNIT_ROOT)/counters/Makefile.in
-include $(CORE_UNIT_ROOT)/timer/Makefile.in
-include $(CORE_UNIT_ROOT)/interrupts-enablebits/Makefile.in
-include $(CORE_UNIT_ROOT)/interrupts-timer-direct/Makefile.in
-include $(CORE_UNIT_ROOT)/interrupts-timer-vectored/Makefile.in
 
