@@ -35,6 +35,18 @@
 
 - [ ] User mode
 
+  - [ ] Internal reg bits to store current operating mode.
+
+  - [ ] `MPP` bit updating on a trap.
+
+  - [ ] `UXL` bits of `mstatus`
+
+  - [ ] `MPRV` bits of `mstatus`.
+    
+    - [ ] Routing to load/store unit and eventually to PMP.
+
+  - [ ] `TW` bit of mstatus functionality. Timeout wait.
+
 ## Verif
 
 - [ ] csrw mcycle

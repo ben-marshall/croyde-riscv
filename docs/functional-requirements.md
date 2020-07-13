@@ -31,19 +31,22 @@ implement.
 - `mhartid`     CSR - Read-only, hard-wired to zero.
 - `mstatus`     CSR
     - `SD`   -        Hard wired to zero. `XS` and `FS` both zero.
+    - `MBE`  - WARL - Hard wired to zero.
+    - `SBE`  - WARL - Hard wired to  ero.
     - `SXL`  - WARL - Hard wired to zero. Only M-Mode implemented.
-    - `UXL`  - WARL - Hard wired to zero. Only M-Mode implemented.
+    - `UXL`  - WARL - Hard wired to `2`. User mode implemented. RV64 Only
     - `TSR`  -        Hard wired to zero. S-Mode not supported.
-    - `TW`   -        Hard wired to zero. Only M-Mode implemented.
+    - `TW`   - WARL - Read/Write.
     - `TVM`  -        Hard wired to zero. S-Mode not supported.
     - `MXR`  - WARL - Hard wired to zero. No virtual memory implemented.
     - `SUM`  - WARL - Hard wired to zero. S-Mode not supported.
-    - `MPRV` - WARL - Hard wired to zero. No memory protection implemented.
+    - `MPRV` - WARL - Read/Write.
     - `XS`   - WARL - Hard wired to zero. No extra architectural state.
     - `FS`   - WARL - Hard wired to zero. Floating point not supported.
-    - `MPP`  - WARL - Hard wired to zero.
+    - `MPP`  - WARL - Read/Write.
     - `SPP`  - WARL - Hard wired to zero.
     - `MPIE` - WARL - Read/Write.
+    - `UBE`  - WARL - Hard wired to zero.
     - `SPIE` - WARL - Hard wired to zero.
     - `UPIE` - WARL - Hard wired to zero.
     - `MIE`  - WARL - Read/Write.
