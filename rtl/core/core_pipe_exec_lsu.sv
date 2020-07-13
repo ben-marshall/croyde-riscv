@@ -25,6 +25,7 @@ output  wire                ready       , // Request processed
 output  wire                trap_addr   , // Address alignment error
 
 output wire                 dmem_req    , // Memory request
+output wire                 dmem_rtype  , // Request type. 0=instr,1=data.
 output wire [ MEM_ADDR_R:0] dmem_addr   , // Memory request address
 output wire                 dmem_wen    , // Memory request write enable
 output wire [ MEM_STRB_R:0] dmem_strb   , // Memory request write strobe
@@ -80,11 +81,14 @@ assign  dmem_wen     = store;
 
 assign  dmem_req     = valid && txn_okay && !finished;
 
+assign  dmem_rtype   = 1'b0; // Only request data from here.
+
 assign  dmem_addr    = {addr[MEM_ADDR_R:3], 3'b000};
 
 assign  dmem_wdata   = wdata    << data_shift           ;
 
 assign  dmem_strb    = valid ? strb : 8'b0              ;
+
 
 wire    [7:0] strb   ;
 

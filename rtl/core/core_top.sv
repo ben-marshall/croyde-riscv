@@ -15,6 +15,7 @@ input  wire                 int_ext      , // hardware interrupt
 input  wire                 int_ti       , // A timer interrupt has fired.
               
 output wire                 imem_req     , // Memory request
+output wire                 imem_rtype   , // Request type. 0=data,1=instrs
 output wire [ MEM_ADDR_R:0] imem_addr    , // Memory request address
 output wire                 imem_wen     , // Memory request write enable
 output wire [ MEM_STRB_R:0] imem_strb    , // Memory request write strobe
@@ -24,6 +25,7 @@ input  wire                 imem_err     , // Memory response error
 input  wire [ MEM_DATA_R:0] imem_rdata   , // Memory response read data
 
 output wire                 dmem_req     , // Memory request
+output wire                 dmem_rtype   , // Request type. 0=data,1=instrs
 output wire [ MEM_ADDR_R:0] dmem_addr    , // Memory request address
 output wire                 dmem_wen     , // Memory request write enable
 output wire [ MEM_STRB_R:0] dmem_strb    , // Memory request write strobe
@@ -297,6 +299,7 @@ core_pipe_fetch #(
 .cf_ack       (cf_ack       ), // Control flow change acknwoledged
 .cf_target    (cf_target    ), // Control flow change destination
 .imem_req     (imem_req     ), // Memory request
+.imem_rtype   (imem_rtype   ), // Memory request type.
 .imem_addr    (imem_addr    ), // Memory request address
 .imem_wen     (imem_wen     ), // Memory request write enable
 .imem_strb    (imem_strb    ), // Memory request write strobe
@@ -521,6 +524,7 @@ core_pipe_exec #(
 .s3_dmem_wdata   (s3_dmem_wdata   ),
 `endif
 .dmem_req        (dmem_req        ), // Memory request
+.dmem_rtype      (dmem_rtype      ), // Memory request type.
 .dmem_addr       (dmem_addr       ), // Memory request address
 .dmem_wen        (dmem_wen        ), // Memory request write enable
 .dmem_strb       (dmem_strb       ), // Memory request write strobe

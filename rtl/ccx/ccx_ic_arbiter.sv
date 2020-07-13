@@ -44,6 +44,7 @@ always @(posedge g_clk) begin
 end
 
 assign rsp.req      = route_req_r0 ? req_0.req   : req_1.req   ;
+assign rsp.rtype    = route_req_r0 ? req_0.rtype : req_1.rtype ;
 assign rsp.addr     = route_req_r0 ? req_0.addr  : req_1.addr  ;
 assign rsp.wen      = route_req_r0 ? req_0.wen   : req_1.wen   ;
 assign rsp.strb     = route_req_r0 ? req_0.strb  : req_1.strb  ;

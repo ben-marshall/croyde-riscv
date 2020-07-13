@@ -127,6 +127,7 @@ core_top #(
 .int_ext      (int_ext           ), // hardware interrupt
 .int_ti       (core_int_ti       ), // Timer interrupt
 .imem_req     (core_imem.req     ), // Memory request
+.imem_rtype   (core_imem.rtype   ), // Memory request Type
 .imem_addr    (core_imem.addr    ), // Memory request address
 .imem_wen     (core_imem.wen     ), // Memory request write enable
 .imem_strb    (core_imem.strb    ), // Memory request write strobe
@@ -135,6 +136,7 @@ core_top #(
 .imem_err     (core_imem.err     ), // Memory response error
 .imem_rdata   (core_imem.rdata   ), // Memory response read data
 .dmem_req     (core_dmem.req     ), // Memory request
+.dmem_rtype   (core_dmem.rtype   ), // Memory request Type
 .dmem_addr    (core_dmem.addr    ), // Memory request address
 .dmem_wen     (core_dmem.wen     ), // Memory request write enable
 .dmem_strb    (core_dmem.strb    ), // Memory request write strobe

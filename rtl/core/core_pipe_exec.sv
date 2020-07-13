@@ -122,6 +122,7 @@ output reg  [ MEM_DATA_R:0] s3_dmem_wdata   ,
 `endif
 
 output wire                 dmem_req        , // Memory request
+output wire                 dmem_rtype      , // Memory request type.
 output wire [ MEM_ADDR_R:0] dmem_addr       , // Memory request address
 output wire                 dmem_wen        , // Memory request write enable
 output wire [ MEM_STRB_R:0] dmem_strb       , // Memory request write strobe
@@ -421,6 +422,7 @@ core_pipe_exec_lsu #(
 .ready      (lsu_ready      ), // Read data ready
 .trap_addr  (lsu_trap_addr  ), // Address alignment error
 .dmem_req   (dmem_req       ), // Memory request
+.dmem_rtype (dmem_rtype     ), // Memory request type.
 .dmem_addr  (dmem_addr      ), // Memory request address
 .dmem_wen   (dmem_wen       ), // Memory request write enable
 .dmem_strb  (dmem_strb      ), // Memory request write strobe

@@ -92,21 +92,25 @@ assign  if_rom.addr     = if_core.addr    ;
 assign  if_rom.wen      = if_core.wen     ;
 assign  if_rom.strb     = if_core.strb    ;
 assign  if_rom.wdata    = if_core.wdata   ;
+assign  if_rom.rtype    = if_core.rtype   ;
 
 assign  if_ram.addr     = if_core.addr    ;
 assign  if_ram.wen      = if_core.wen     ;
 assign  if_ram.strb     = if_core.strb    ;
 assign  if_ram.wdata    = if_core.wdata   ;
+assign  if_ram.rtype    = if_core.rtype   ;
 
 assign  if_ext.addr     = if_core.addr    ;
 assign  if_ext.wen      = if_core.wen     ;
 assign  if_ext.strb     = if_core.strb    ;
 assign  if_ext.wdata    = if_core.wdata   ;
+assign  if_ext.rtype    = if_core.rtype   ;
 
 assign  if_mmio.addr    = if_core.addr    ;
 assign  if_mmio.wen     = if_core.wen     ;
 assign  if_mmio.strb    = if_core.strb    ;
 assign  if_mmio.wdata   = if_core.wdata   ;
+assign  if_mmio.rtype   = if_core.rtype   ;
 
 // Request lines masked by mapping lines.
 assign  if_rom.req      = if_core.req && map_core_rom;
