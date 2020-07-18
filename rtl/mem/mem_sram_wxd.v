@@ -1,6 +1,6 @@
 
 //
-// module: mem_sram_n64
+// module: mem_sram_wxd
 //
 //  A simple simulation memory model
 //  - W bit wide word
