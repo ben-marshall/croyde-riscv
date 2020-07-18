@@ -20,8 +20,6 @@ output wire [W:0]   rdata       ,
 output wire         err
 );
 
-localparam[255*8:0] MEMFILE = MEMH=="" ? "none" : MEMH;
-
 localparam W      = WIDTH-1;
 localparam D      = DEPTH-1;
 localparam S      = WIDTH/8-1;
@@ -30,6 +28,8 @@ localparam A      = $clog2(DEPTH)-1;
 localparam AX     = A + 1; 
 
 localparam SIZE_BITS= WIDTH*DEPTH;
+
+initial $display("Loading file: %s",MEMH);
 
 assign err = 1'b0;
 
@@ -279,10 +279,10 @@ assign err = 1'b0;
       .BYTE_WRITE_WIDTH_A(8),       // DECIMAL
       .CASCADE_HEIGHT(0),            // DECIMAL
       .ECC_MODE("no_ecc"),           // String
-      .MEMORY_INIT_FILE(MEMFILE),     // String
-      .MEMORY_INIT_PARAM("0"),       // String
+      .MEMORY_INIT_FILE(MEMH),     // String
+      .MEMORY_INIT_PARAM(""),       // String
       .MEMORY_OPTIMIZATION("true"),  // String
-      .MEMORY_PRIMITIVE("auto"),     // String
+      .MEMORY_PRIMITIVE("block"),     // String
       .MEMORY_SIZE(SIZE_BITS),       // DECIMAL
       .MESSAGE_CONTROL(0),           // DECIMAL
       .READ_DATA_WIDTH_A(WIDTH),        // DECIMAL

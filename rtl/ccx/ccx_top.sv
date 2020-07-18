@@ -1,7 +1,30 @@
 
 `include "ccx_if.svh"
 
-module ccx_top (
+module ccx_top #(
+
+// Inital address of the program counter post reset.
+parameter PC_RESET_ADDRESS  = 39'h00000000,
+
+// Use a FPGA-inference-friendly implementation of the register file.
+parameter FPGA_REGFILE      = 0,
+
+// Base address of the memory mapped IO region.
+parameter MMIO_BASE         = 39'h0000_0000_0002_0000,
+parameter MMIO_SIZE         = 39'h0000_0000_0000_00FF,
+
+parameter ROM_MEMH          = "none",
+parameter RAM_MEMH          = "none",
+
+parameter ROM_BASE          = 39'h00000000,
+parameter ROM_SIZE          = 39'h000003FF,
+parameter RAM_BASE          = 39'h00010000,
+parameter RAM_SIZE          = 39'h0000FFFF,
+parameter EXT_BASE          = 39'h10000000,
+parameter EXT_SIZE          = 39'h0FFFFFFF,
+parameter CLK_GATE_EN       = 1'b1  // Enable core-level clock gating
+
+)(
 
 input  wire         f_clk        , // Global free-running clock.
 input  wire         g_resetn     , // Synchronous negative level reset.
@@ -28,16 +51,6 @@ output wire [ 63:0] trs_pc         // Instruction trace PC
 
 );
 
-// Inital address of the program counter post reset.
-parameter   PC_RESET_ADDRESS= 39'h00000000;
-
-// Use a FPGA-inference-friendly implementation of the register file.
-parameter FPGA_REGFILE = 0;
-
-// Base address of the memory mapped IO region.
-parameter   MMIO_BASE = 39'h0000_0000_0002_0000;
-parameter   MMIO_SIZE = 39'h0000_0000_0000_00FF;
-
 localparam  AW = 39;    // Address width
 localparam  DW = 64;    // Data width
 
@@ -45,26 +58,15 @@ localparam  DW = 64;    // Data width
 // Internal address mapping.
 // ------------------------------------------------------------
 
-parameter   ROM_MEMH  = ""        ;
-parameter   ROM_BASE  = 39'h00000000;
-parameter   ROM_SIZE  = 39'h000003FF;
 localparam  ROM_WIDTH = 64        ;
 localparam  ROM_DEPTH = 16        ;
 
-parameter   RAM_MEMH  = ""          ;
-parameter   RAM_BASE  = 39'h00010000;
-parameter   RAM_SIZE  = 39'h0000FFFF;
 localparam  RAM_WIDTH = 64        ;
 localparam  RAM_DEPTH = 1024;
-
-parameter   EXT_BASE  = 39'h10000000;
-parameter   EXT_SIZE  = 39'h0FFFFFFF;
 
 //
 // Clock control
 // ------------------------------------------------------------
-
-parameter CLK_GATE_EN      = 1'b1; // Enable core-level clock gating
 
 // CCX level gated clock
 wire g_clk = f_clk;
