@@ -36,6 +36,7 @@ input  wire [          6:0] s2_trap_cause   , // Trap cause
 
 input  wire [         XL:0] s2_alu_lhs      , // ALU left  operand
 input  wire [         XL:0] s2_alu_rhs      , // ALU right operand
+input  wire [          5:0] s2_alu_shamt    , // ALU Shift amount
 input  wire                 s2_alu_add      , // ALU Operation to perform.
 input  wire                 s2_alu_and      , // 
 input  wire                 s2_alu_or       , // 
@@ -358,6 +359,7 @@ end
 core_pipe_exec_alu i_core_pipe_exec_alu (
 .opr_a      (s2_alu_lhs     ), // Input operand A
 .opr_b      (s2_alu_rhs     ), // Input operand B
+.shamt      (s2_alu_shamt   ), // Shift amount.
 .word       (s2_alu_word    ), // Operate on low 32-bits of XL.
 .op_add     (s2_alu_add     ), // Select output of adder
 .op_sub     (s2_alu_sub     ), // Subtract opr_a from opr_b else add

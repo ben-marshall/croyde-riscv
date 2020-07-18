@@ -142,6 +142,7 @@ wire [          6:0] s2_trap_cause  ; // Cause of trap being raised.
 
 wire [         XL:0] s2_alu_lhs     ; // ALU left  operand
 wire [         XL:0] s2_alu_rhs     ; // ALU right operand
+wire [          5:0] s2_alu_shamt   ; // ALU shift amount
 wire                 s2_alu_add     ; // ALU Operation to perform.
 wire                 s2_alu_and     ; // 
 wire                 s2_alu_or      ; // 
@@ -359,6 +360,7 @@ core_pipe_decode #(
 .s2_trap_cause   (s2_trap_cause   ), // Cause of trap being raised.
 .s2_alu_lhs      (s2_alu_lhs      ), // ALU left  operand
 .s2_alu_rhs      (s2_alu_rhs      ), // ALU right operand
+.s2_alu_shamt    (s2_alu_shamt    ), // ALU Shift amount
 .s2_alu_add      (s2_alu_add      ), // ALU Operation to perform.
 .s2_alu_and      (s2_alu_and      ), // 
 .s2_alu_or       (s2_alu_or       ), // 
@@ -449,6 +451,7 @@ core_pipe_exec #(
 .s2_trap_cause   (s2_trap_cause   ), // Cause of trap being raised.
 .s2_alu_lhs      (s2_alu_lhs      ), // ALU left  operand
 .s2_alu_rhs      (s2_alu_rhs      ), // ALU right operand
+.s2_alu_shamt    (s2_alu_shamt    ), // ALU Shift amount
 .s2_alu_add      (s2_alu_add      ), // ALU Operation to perform.
 .s2_alu_and      (s2_alu_and      ), // 
 .s2_alu_or       (s2_alu_or       ), // 
