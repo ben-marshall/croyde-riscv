@@ -6,7 +6,9 @@ FSBL_SRC_CCX    = $(FSBL_ROOT)/fsbl_boot.S \
 
 FSBL_LD         = $(FSBL_ROOT)/fsbl.ld
 
-FSBL_FLAGS      = -Wall -march=rv64imc -mabi=lp64 -O3 -nostdlib
+FSBL_FLAGS      = -Wall -march=rv64imc -mabi=lp64 -O3 -nostdlib 
+FSBL_FLAGS     += -fdata-sections -ffunction-sections
+FSBL_FLAGS     += -Wl,--gc-sections
 
 #
 # 1. FSBL unique name
@@ -42,23 +44,26 @@ endef
 # 1. FSBL unique name
 # 2. FSBL source code
 # 3. FSBL linker script
+# 4. Extra CFLAGS
 define add_tgt_fsbl
 
 $(call map_fsbl_elf,${1}) : ${2} ${3}
 	@mkdir -p $(call map_fsbl_dir,${1})
-	$(CC) -T${3} $(FSBL_FLAGS) -o $${@} ${2}
+	$(CC) -T${3} $(FSBL_FLAGS) ${4} -o $${@} ${2}
 
 $(call map_fsbl_dis,${1}) : $(call map_fsbl_elf,${1})
 	$(OBJDUMP) -D $${<} > $${@}
 
 $(call map_fsbl_hex,${1}) : $(call map_fsbl_elf,${1})
-	$(OBJCOPY) -O verilog $${<} $${@}
+	$(OBJCOPY) --gap-fill 0 -O verilog $${<} $${@}
 
 $(call map_fsbl_mem,${1}) : $(call map_fsbl_hex,${1})
 	cp $${<} $${@}
 	sed -i 's/\(..\) \(..\)/\2\1/g' $${@}
 	sed -i 's/\(....\) \(....\)/\2\1/g' $${@}
 	sed -i 's/\(........\) \(........\)/\2\1/g' $${@}
+	sed -i 's/@.*\r//' $${@}
+	sed -i '/^$$$$/d' $${@}
 
 fsbl-${1} : $(call map_fsbl_elf,${1}) \
             $(call map_fsbl_dis,${1}) \
