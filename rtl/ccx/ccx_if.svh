@@ -1,10 +1,13 @@
 
+`ifndef CORE_MEM_BUS_SVH
+`define CORE_MEM_BUS_SVH
+
 //
 // Core memory bus interface
 interface core_mem_bus();
 
-parameter   AW = 39;    // Address width
-parameter   DW = 64;    // Data width
+localparam  AW = 39;    // Address width
+localparam  DW = 64;    // Data width
 
 localparam  MEM_ADDR_R =  AW      - 1;
 localparam  MEM_DATA_R =  DW      - 1;
@@ -47,3 +50,5 @@ output rdata     // Memory response read data
 );
 
 endinterface
+
+`endif

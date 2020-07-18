@@ -1,4 +1,6 @@
 
+`include "ccx_if.svh"
+
 //
 // module: ccx_ic_top
 //
@@ -26,37 +28,37 @@ core_mem_bus.REQ  if_mmio
 // Parameters
 // ------------------------------------------------------------
 
-parameter ROM_MASK  = 'hFFFFFE00;
-parameter ROM_BASE  = 'h00000000;
-parameter ROM_SIZE  = 'h000003FF;
+parameter ROM_MASK  = 39'hFFFFFE00;
+parameter ROM_BASE  = 39'h00000000;
+parameter ROM_SIZE  = 39'h000003FF;
 
-parameter RAM_MASK  = 'hFFFE0000;
-parameter RAM_BASE  = 'h00010000;
-parameter RAM_SIZE  = 'h0000FFFF;
+parameter RAM_MASK  = 39'hFFFE0000;
+parameter RAM_BASE  = 39'h00010000;
+parameter RAM_SIZE  = 39'h0000FFFF;
 
-parameter EXT_MASK  = 'hE0000000;
-parameter EXT_BASE  = 'h10000000;
-parameter EXT_SIZE  = 'h0FFFFFFF;
+parameter EXT_MASK  = 39'hE0000000;
+parameter EXT_BASE  = 39'h10000000;
+parameter EXT_SIZE  = 39'h0FFFFFFF;
 
-parameter MMIO_MASK ;
-parameter MMIO_BASE ;
-parameter MMIO_SIZE ;
+parameter MMIO_BASE = 39'h00020000;
+parameter MMIO_SIZE = 39'h000000FF;
+parameter MMIO_MASK = ~MMIO_SIZE  ;
 
 //
 // Internal busses
 // ------------------------------------------------------------
 
 // Instruction memory busses.
-core_mem_bus if_imem_rom;
-core_mem_bus if_imem_ram;
-core_mem_bus if_imem_ext;
-core_mem_bus if_imem_mmio;
+core_mem_bus #() if_imem_rom  ();
+core_mem_bus #() if_imem_ram  ();
+core_mem_bus #() if_imem_ext  ();
+core_mem_bus #() if_imem_mmio ();
 
 // Data memory busses.
-core_mem_bus if_dmem_rom;
-core_mem_bus if_dmem_ram;
-core_mem_bus if_dmem_ext;
-core_mem_bus if_dmem_mmio;
+core_mem_bus #() if_dmem_rom  ();
+core_mem_bus #() if_dmem_ram  ();
+core_mem_bus #() if_dmem_ext  ();
+core_mem_bus #() if_dmem_mmio ();
 
 //
 // Submodule instances

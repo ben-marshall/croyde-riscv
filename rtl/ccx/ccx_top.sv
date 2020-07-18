@@ -1,4 +1,6 @@
 
+`include "ccx_if.svh"
+
 module ccx_top (
 
 input  wire         f_clk        , // Global free-running clock.
@@ -9,6 +11,7 @@ input  wire         int_sw       , // External interrupt
 input  wire         int_ext      , // Software interrupt
 
 output wire         emem_req     , // Memory request
+output wire         emem_rtype   , // Memory request type.
 output wire [ 38:0] emem_addr    , // Memory request address
 output wire         emem_wen     , // Memory request write enable
 output wire [  7:0] emem_strb    , // Memory request write strobe
@@ -26,12 +29,15 @@ output wire [ 63:0] trs_pc         // Instruction trace PC
 );
 
 // Inital address of the program counter post reset.
-parameter   PC_RESET_ADDRESS= 'h00000000;
+parameter   PC_RESET_ADDRESS= 39'h00000000;
+
+// Use a FPGA-inference-friendly implementation of the register file.
+parameter FPGA_REGFILE = 0;
 
 // Base address of the memory mapped IO region.
 parameter   MMIO_BASE = 39'h0000_0000_0002_0000;
 parameter   MMIO_SIZE = 39'h0000_0000_0000_00FF;
-parameter   MMIO_MASK = ~MMIO_SIZE           ;
+localparam  MMIO_MASK = ~MMIO_SIZE           ;
 
 localparam  AW = 39;    // Address width
 localparam  DW = 64;    // Data width
@@ -71,9 +77,10 @@ wire g_clk = f_clk;
 // Internal interfaces / buses / wires
 // ------------------------------------------------------------
 
-core_mem_bus        if_ext       ;
+core_mem_bus #() if_ext () ;
 
 assign emem_req     = if_ext.req   ;
+assign emem_rtype   = if_ext.rtype ;
 assign emem_addr    = if_ext.addr  ;
 assign emem_wen     = if_ext.wen   ;
 assign emem_strb    = if_ext.strb  ;
@@ -84,14 +91,14 @@ assign if_ext.rdata = emem_rdata   ;
 
 //
 // Core instruction and data memory interfaces.
-core_mem_bus #(.AW(AW),.DW(DW)) core_imem;
-core_mem_bus #(.AW(AW),.DW(DW)) core_dmem;
+core_mem_bus #() core_imem ();
+core_mem_bus #() core_dmem ();
 
 //
 // RAM and ROM interfaces
-core_mem_bus #(.AW(AW),.DW(DW)) if_ram;
-core_mem_bus #(.AW(AW),.DW(DW)) if_rom;
-core_mem_bus #(.AW(AW),.DW(DW)) if_mmio;
+core_mem_bus #() if_ram    ();
+core_mem_bus #() if_rom    ();
+core_mem_bus #() if_mmio   ();
 
 //
 // Core timer & counter related wires.
@@ -118,6 +125,7 @@ wire                 core_inhibit_ir   ; // Stop instret incrementing.
 //
 core_top #(
 .PC_RESET_ADDRESS   (PC_RESET_ADDRESS),
+.FPGA_REGFILE       (FPGA_REGFILE    ),
 .CLK_GATE_EN        (CLK_GATE_EN     )
 ) i_core_top (
 .f_clk        (f_clk             ), // global free running clock

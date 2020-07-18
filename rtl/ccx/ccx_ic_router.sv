@@ -1,4 +1,6 @@
 
+`include "ccx_if.svh"
+
 //
 // module: ccx_ic_router
 //
