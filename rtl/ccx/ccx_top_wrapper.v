@@ -20,12 +20,12 @@ parameter MMIO_SIZE         = 39'h0000_0000_0000_00FF,
 parameter ROM_MEMH          = "none",
 parameter RAM_MEMH          = "none",
 
-parameter ROM_BASE          = 39'h00000000,
-parameter ROM_SIZE          = 39'h000003FF,
-parameter RAM_BASE          = 39'h00010000,
-parameter RAM_SIZE          = 39'h0000FFFF,
-parameter EXT_BASE          = 39'h10000000,
-parameter EXT_SIZE          = 39'h0FFFFFFF,
+parameter ROM_BASE          = 39'h0000_0000,
+parameter ROM_SIZE          = 39'h0000_03FF,
+parameter RAM_BASE          = 39'h0001_0000,
+parameter RAM_SIZE          = 39'h0000_FFFF,
+parameter EXT_BASE          = 39'h0010_0000,
+parameter EXT_SIZE          = 39'h000F_FFFF,
 parameter CLK_GATE_EN       = 1'b1  // Enable core-level clock gating
 ) (
 

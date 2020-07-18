@@ -19,6 +19,8 @@ input  wire                 s2_flush        , // Flush pipestage contents
 input  wire                 s2_cancel       , // Stop S2 instrs doing stuff.
 input  wire [         XL:0] csr_mepc        , // return address for mret
 
+input  wire                 wfi_sleep       , // Core asleep due to WFI?
+
 output wire                 s2_ready        , // EX ready for new instruction
 input  wire                 s2_valid        , // Decode -> EX instr valid.
 
@@ -213,6 +215,7 @@ wire                 cfu_finished    ; // CFU instruction finished.
 // ------------------------------------------------------------
 
 wire        lsu_valid       =  s2_valid && !s3_trap && !s2_cancel&&
+                               !wfi_sleep &&
                               (s2_lsu_load || s2_lsu_store);
 wire        lsu_ready       ;
 wire        lsu_trap_addr   ;

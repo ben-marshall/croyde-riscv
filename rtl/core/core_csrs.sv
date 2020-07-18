@@ -449,6 +449,7 @@ reg mcountin_cy;
 
 assign inhibit_ir = mcountin_ir;
 assign inhibit_cy = mcountin_cy;
+assign inhibit_tm = mcountin_tm;
 
 wire wen_mcountin = csr_wr && csr_addr == ADDR_MCOUNTIN;
 

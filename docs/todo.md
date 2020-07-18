@@ -48,3 +48,5 @@
   - [ ] Single point of origin for `__mtime*` addresses.
 
   - [ ] Stop re-defining macros.
+
+- Unit tests for load/store/jump right after WFI

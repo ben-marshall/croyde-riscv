@@ -436,6 +436,7 @@ core_pipe_exec #(
 .s2_flush        (s2_flush        ), // Flush stage contents.
 .s2_cancel       (s2_cancel       ), // Stage 1 flush
 .csr_mepc        (csr_mepc        ), // MRET return address
+.wfi_sleep       (wfi_sleep       ), // Core asleep due to WFI.
 .s2_ready        (s2_ready        ), // EX ready for new instruction
 .s2_valid        (s2_valid        ), // Decode -> EX instr valid.
 .s2_rs1_addr     (s2_rs1_addr     ), // RS1 address.

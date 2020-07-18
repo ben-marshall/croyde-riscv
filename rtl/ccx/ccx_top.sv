@@ -59,7 +59,7 @@ localparam  DW = 64;    // Data width
 // ------------------------------------------------------------
 
 localparam  ROM_WIDTH = 64        ;
-localparam  ROM_DEPTH = 16        ;
+localparam  ROM_DEPTH = 32        ;
 
 localparam  RAM_WIDTH = 64        ;
 localparam  RAM_DEPTH = 1024;
@@ -238,7 +238,7 @@ mem_sram_wxd #(
 .g_resetn    (g_resetn          ),
 .cen         (if_rom.req        ),
 .wstrb       (rom_wstrb         ),
-.addr        (if_rom.addr[ 9:3] ),
+.addr        (if_rom.addr[10:3] ),
 .wdata       (if_rom.wdata      ),
 .rdata       (if_rom.rdata      ), 
 .err         (if_rom.err        )
