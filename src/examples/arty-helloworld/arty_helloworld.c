@@ -13,13 +13,21 @@ __fsbl_main() {
 
     char * msg = "Hello, World!\n";
     
-    while(1) {
-        for(int i = 0; msg[i]; i++) {
-            uc64_bsp_putc_b(msg[i]);
-            uint64_t mtime = uc64_csp_rd_mtime();
-            uc64_csp_wr_mtimecmp(mtime + 10000);
-            uc64_csp_wfi();
-        }
-    }
+    char * msg2= "Hello, Again!\n";
+   
+
+   for(int i = 0; msg[i]; i++) {
+       uc64_bsp_putc_b(msg[i]);
+   }
+       
+   uc64_csp_wr_mtimecmp(uc64_csp_rd_mtime() + 100000);
+   uc64_csp_wfi();
+   
+   for(int i = 0; msg2[i]; i++) {
+       uc64_bsp_putc_b(msg2[i]);
+   }
+       
+   uc64_csp_wr_mtimecmp(-1);
+   uc64_csp_wfi();
     
 }
