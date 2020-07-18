@@ -1,5 +1,4 @@
 $REPO_HOME/rtl/ccx/ccx_ic_arbiter.sv
 $REPO_HOME/rtl/ccx/ccx_ic_router.sv
 $REPO_HOME/rtl/ccx/ccx_ic_top.sv
-$REPO_HOME/rtl/ccx/ccx_if.sv
 $REPO_HOME/rtl/ccx/ccx_top.sv
