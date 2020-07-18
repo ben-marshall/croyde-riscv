@@ -112,9 +112,9 @@ always @(posedge axi_aclk) begin
         req_wa_out <= 1'b0;
         req_wr_out <= 1'b0;
     end else begin
-        req_rd_out <= req_rd_out;
-        req_wa_out <= req_wa_out;
-        req_wr_out <= req_wr_out;
+        req_rd_out <= n_req_rd_out;
+        req_wa_out <= n_req_wa_out;
+        req_wr_out <= n_req_wr_out;
     end
 end
 
