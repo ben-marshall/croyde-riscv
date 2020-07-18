@@ -8,8 +8,16 @@
 //  - Routes requests from the CPU to the RAM/ROM/EXT memory ports.
 //
 module ccx_ic_router #(
-parameter   AW = 39,    // Address width
-parameter   DW = 64     // Data width
+parameter   AW          = 39,    // Address width
+parameter   DW          = 64,    // Data width
+parameter   ROM_BASE    = 39'h0000000000,
+parameter   ROM_SIZE    = 39'h00000003FF,
+parameter   RAM_BASE    = 39'h0000010000,
+parameter   RAM_SIZE    = 39'h000000FFFF,
+parameter   EXT_BASE    = 39'h7F10000000,
+parameter   EXT_SIZE    = 39'h000FFFFFFF,
+parameter   MMIO_BASE   = 39'h00020000  ,
+parameter   MMIO_SIZE   = 39'h000000FF
 )(
 
 input  wire      g_clk      ,
@@ -28,21 +36,13 @@ core_mem_bus.REQ if_mmio
 // Parameters
 // ------------------------------------------------------------
 
-parameter ROM_MASK  = 39'h7FFFFFFE00;
-parameter ROM_BASE  = 39'h0000000000;
-parameter ROM_SIZE  = 39'h00000003FF;
+localparam  ROM_MASK  = ~ROM_SIZE;
 
-parameter RAM_MASK  = 39'h7FFFFE0000;
-parameter RAM_BASE  = 39'h0000010000;
-parameter RAM_SIZE  = 39'h000000FFFF;
+localparam  RAM_MASK  = ~RAM_SIZE;
 
-parameter EXT_MASK  = 39'h7FE0000000;
-parameter EXT_BASE  = 39'h7F10000000;
-parameter EXT_SIZE  = 39'h000FFFFFFF;
+localparam  EXT_MASK  = ~EXT_SIZE;
 
-parameter MMIO_MASK = 0;
-parameter MMIO_BASE = 0;
-parameter MMIO_SIZE = 0;
+localparam  MMIO_MASK = ~MMIO_SIZE;
 
 //
 // Utility functions

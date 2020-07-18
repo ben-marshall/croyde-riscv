@@ -34,9 +34,9 @@ output reg                 mmio_error         // MMIO error
 `include "core_common.svh"
 
 // Base address of the memory mapped IO region.
-parameter MMIO_MASK = 0;
-parameter MMIO_BASE = 0;
-parameter MMIO_SIZE = 0;
+parameter  MMIO_BASE = 39'd0;
+parameter  MMIO_SIZE = 39'd256;
+localparam MMIO_MASK  = 39'd0;
 
 // Base address of the MTIME memory mapped register.
 localparam  MMIO_MTIME_ADDR       = MMIO_BASE;

@@ -12,7 +12,10 @@
 module mem_sram_wxd  #(
 parameter           WIDTH =  64,  // Width of each memory word.
 parameter           ROM   =   0,  // Is this a read only memory?
-parameter           DEPTH =1024   // Number of 64-bit wordsin the memory.
+parameter           DEPTH =1024,  // Number of 64-bit wordsin the memory.
+/* verilator lint_off WIDTH */
+parameter [255*8:0] MEMH  = ""    // Memory file to read.
+/* verilator lint_on  WIDTH */
 )(
 input  wire         g_clk       ,
 input  wire         g_resetn    ,
@@ -24,18 +27,17 @@ output reg  [W:0]   rdata       ,
 output reg          err
 );
 
-/* verilator lint_off WIDTH */
-parameter [255*8:0] MEMH  = "";   // Memory file to read.
-/* verilator lint_on  WIDTH */
 
 localparam W      = WIDTH-1;
 localparam D      = DEPTH-1;
 localparam S      = WIDTH/8-1;
 localparam B      = (WIDTH/8 * DEPTH)-1;
-localparam A      = $clog2(DEPTH)-1; 
+localparam A      = $clog2(B+1)-1; 
 
 // Byte array of memory.
 reg [7:0] mem [B:0];
+
+wire [A+$clog2(WIDTH/8):0] addrin = {addr, {$clog2(WIDTH/8){1'b0}}};
 
 initial begin
     if(MEMH != "") begin
@@ -64,7 +66,7 @@ generate for (i = 0; i < WIDTH / 8; i = i + 1) begin
     // Reads
     always @(posedge g_clk) begin
         if(cen) begin
-            rdata[8*i+:8] <= mem[addr | i];
+            rdata[8*i+:8] <= mem[addrin | i];
         end
     end
 
@@ -74,7 +76,7 @@ generate for (i = 0; i < WIDTH / 8; i = i + 1) begin
     
         always @(posedge g_clk) begin
             if(cen && wstrb[i]) begin
-                mem[addr | i] <= wdata[8*i+:8];
+                mem[addrin | i] <= wdata[8*i+:8];
             end
         end
 

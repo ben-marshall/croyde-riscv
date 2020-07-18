@@ -37,7 +37,6 @@ parameter FPGA_REGFILE = 0;
 // Base address of the memory mapped IO region.
 parameter   MMIO_BASE = 39'h0000_0000_0002_0000;
 parameter   MMIO_SIZE = 39'h0000_0000_0000_00FF;
-localparam  MMIO_MASK = ~MMIO_SIZE           ;
 
 localparam  AW = 39;    // Address width
 localparam  DW = 64;    // Data width
@@ -49,20 +48,17 @@ localparam  DW = 64;    // Data width
 parameter   ROM_MEMH  = ""        ;
 parameter   ROM_BASE  = 39'h00000000;
 parameter   ROM_SIZE  = 39'h000003FF;
-localparam  ROM_MASK  = ~ROM_SIZE ;
 localparam  ROM_WIDTH = 64        ;
-localparam  ROM_DEPTH = ROM_SIZE+1;
+localparam  ROM_DEPTH = 16        ;
 
 parameter   RAM_MEMH  = ""          ;
 parameter   RAM_BASE  = 39'h00010000;
 parameter   RAM_SIZE  = 39'h0000FFFF;
-localparam  RAM_MASK  =  ~RAM_SIZE;
 localparam  RAM_WIDTH = 64        ;
-localparam  RAM_DEPTH = RAM_SIZE+1;
+localparam  RAM_DEPTH = 1024;
 
 parameter   EXT_BASE  = 39'h10000000;
 parameter   EXT_SIZE  = 39'h0FFFFFFF;
-localparam  EXT_MASK  = ~EXT_SIZE ;
 
 //
 // Clock control
@@ -174,16 +170,12 @@ core_top #(
 ccx_ic_top #(
 .AW       (AW        ),    // Address width
 .DW       (DW        ),    // Data width
-.ROM_MASK (ROM_MASK  ),
 .ROM_BASE (ROM_BASE  ),
 .ROM_SIZE (ROM_SIZE  ),
-.RAM_MASK (RAM_MASK  ),
 .RAM_BASE (RAM_BASE  ),
 .RAM_SIZE (RAM_SIZE  ),
-.EXT_MASK (EXT_MASK  ),
 .EXT_BASE (EXT_BASE  ),
 .EXT_SIZE (EXT_SIZE  ),
-.MMIO_MASK(MMIO_MASK ),
 .MMIO_BASE(MMIO_BASE ),
 .MMIO_SIZE(MMIO_SIZE )
 ) i_ccx_ic_top (
@@ -207,7 +199,6 @@ ccx_ic_top #(
 //  Responsible for all performance counters and timers.
 //
 core_counters #(
-.MMIO_MASK (MMIO_MASK   ),
 .MMIO_BASE (MMIO_BASE   ),
 .MMIO_SIZE (MMIO_SIZE   ),
 .MEM_ADDR_W(AW          )
@@ -245,7 +236,7 @@ mem_sram_wxd #(
 .g_resetn    (g_resetn          ),
 .cen         (if_rom.req        ),
 .wstrb       (rom_wstrb         ),
-.addr        (if_rom.addr[ 9:0] ),
+.addr        (if_rom.addr[ 9:3] ),
 .wdata       (if_rom.wdata      ),
 .rdata       (if_rom.rdata      ), 
 .err         (if_rom.err        )
@@ -265,7 +256,7 @@ mem_sram_wxd #(
 .g_resetn    (g_resetn          ),
 .cen         (if_ram.req        ),
 .wstrb       (ram_wstrb         ),
-.addr        (if_ram.addr[15:0] ),
+.addr        (if_ram.addr[15:3] ),
 .wdata       (if_ram.wdata      ),
 .rdata       (if_ram.rdata      ),
 .err         (if_ram.err        )
