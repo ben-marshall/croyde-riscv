@@ -34,6 +34,12 @@ endef
 
 #
 # 1. FSBL unique name
+define map_fsbl_mem
+$(call map_fsbl_dir,${1})/fsbl-$(strip ${1}).mem
+endef
+
+#
+# 1. FSBL unique name
 # 2. FSBL source code
 # 3. FSBL linker script
 define add_tgt_fsbl
@@ -48,9 +54,16 @@ $(call map_fsbl_dis,${1}) : $(call map_fsbl_elf,${1})
 $(call map_fsbl_hex,${1}) : $(call map_fsbl_elf,${1})
 	$(OBJCOPY) -O verilog $${<} $${@}
 
+$(call map_fsbl_mem,${1}) : $(call map_fsbl_hex,${1})
+	cp $${<} $${@}
+	sed -i 's/\(..\) \(..\)/\2\1/g' $${@}
+	sed -i 's/\(....\) \(....\)/\2\1/g' $${@}
+	sed -i 's/\(........\) \(........\)/\2\1/g' $${@}
+
 fsbl-${1} : $(call map_fsbl_elf,${1}) \
             $(call map_fsbl_dis,${1}) \
-            $(call map_fsbl_hex,${1})
+            $(call map_fsbl_hex,${1}) \
+            $(call map_fsbl_mem,${1})
 
 
 endef
