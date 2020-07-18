@@ -63,6 +63,9 @@ output wire [         XL:0] trs_pc         // Instruction trace PC
 // Inital address of the program counter post reset.
 parameter   PC_RESET_ADDRESS= 'h10000000;
 
+// Use a FPGA-inference-friendly implementation of the register file.
+parameter FPGA_REGFILE = 0;
+
 //
 // Clock request and delivery wires.
 // ------------------------------------------------------------
@@ -621,7 +624,9 @@ core_pipe_wb #(
 //
 //  Core register file. 2 read, 1 write.
 //
-core_regfile i_core_regfile (
+core_regfile #(
+.FPGA_REGFILE   (FPGA_REGFILE   )
+) i_core_regfile (
 .g_clk    (g_clk_rf    ),
 .g_clk_req(g_clk_rf_req),
 .g_resetn (g_resetn    ),
