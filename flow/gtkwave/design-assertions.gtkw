@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sat Jun  6 10:20:23 2020
+[*] Sun Jul 19 09:38:37 2020
 [*]
-[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/design-assertions/control_flow_bus_task_prove/engine_0/trace.vcd"
-[dumpfile_mtime] "Sat Jun  6 10:17:54 2020"
-[dumpfile_size] 252409
+[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/design-assertions/memory_interface_task_prove_dmem/engine_0/trace.vcd"
+[dumpfile_mtime] "Sun Jul 19 09:37:42 2020"
+[dumpfile_size] 230868
 [savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/design-assertions.gtkw"
 [timestart] 0
 [size] 1920 1025
 [pos] -1 -1
-*-3.722141 58 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-4.183164 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] design_assertions_wrapper.
 [treeopen] design_assertions_wrapper.i_dut.
 [treeopen] design_assertions_wrapper.i_dut.i_core_pipe_decode.
@@ -22,8 +22,7 @@
 @28
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.g_clk
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.g_resetn
-@c02022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
+@c00022
 design_assertions_wrapper.i_dut.trs_instr[31:0]
 @28
 (0)design_assertions_wrapper.i_dut.trs_instr[31:0]
@@ -68,7 +67,7 @@ design_assertions_wrapper.i_dut.trap_cpu
 design_assertions_wrapper.i_dut.trap_int
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.e_cf_change
 @2024
-^2 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
+^1 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
 design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_rd_addr[4:0]
 @22
 design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_rd_wdata[63:0]
@@ -97,21 +96,21 @@ design_assertions_wrapper.i_dut.i_core_pipe_fetch.first_req_post_cf
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.n_first_req_post_cf
 @1401200
 -Memory Bus - Instructions
-@c00200
+@800200
 -Memory Bus - Data
 @28
-design_assertions_wrapper.i_dut.dmem_err
+design_assertions_wrapper.i_dut.dmem_req
+@29
 design_assertions_wrapper.i_dut.dmem_gnt
+@28
+design_assertions_wrapper.i_dut.dmem_err
 @22
 design_assertions_wrapper.i_dut.dmem_rdata[63:0]
-@28
-design_assertions_wrapper.i_dut.dmem_req
-@22
 design_assertions_wrapper.i_dut.dmem_strb[7:0]
 design_assertions_wrapper.i_dut.dmem_wdata[63:0]
 @28
 design_assertions_wrapper.i_dut.dmem_wen
-@1401200
+@1000200
 -Memory Bus - Data
 @c00200
 -Buffer
@@ -155,7 +154,7 @@ design_assertions_wrapper.i_dut.i_core_pipe_fetch.i_core_pipe_fetch_buffer.flush
 @1401200
 -Buffer
 -Buffer
-@800200
+@c00200
 -Control Flow
 @28
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.cf_valid
@@ -165,14 +164,9 @@ design_assertions_wrapper.i_dut.i_core_pipe_fetch.cf_target[63:0]
 @28
 design_assertions_wrapper.i_dut.s2_cf_valid
 design_assertions_wrapper.i_dut.s2_cf_ack
-@22
-design_assertions_wrapper.i_dut.s2_cf_target[63:0]
-@28
 design_assertions_wrapper.i_dut.s3_cf_valid
 design_assertions_wrapper.i_dut.s3_cf_ack
-@22
-design_assertions_wrapper.i_dut.s3_cf_target[63:0]
-@1000200
+@1401200
 -Control Flow
 @c00200
 -Events
@@ -188,8 +182,7 @@ design_assertions_wrapper.i_dut.i_core_pipe_fetch.e_eat_4
 -Fetch -> Decode
 @22
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.s1_instr[31:0]
-@2022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
+@22
 design_assertions_wrapper.i_dut.i_core_pipe_fetch.s1_instr[31:0]
 @1401200
 -Fetch -> Decode
@@ -352,7 +345,6 @@ design_assertions_wrapper.i_dut.i_core_pipe_decode.s1_i16bit
 design_assertions_wrapper.i_dut.i_core_pipe_decode.s1_i32bit
 @22
 design_assertions_wrapper.i_dut.i_core_pipe_decode.s1_instr[31:0]
-design_assertions_wrapper.i_dut.i_core_pipe_decode.s1_rs1_data[63:0]
 design_assertions_wrapper.i_dut.i_core_pipe_decode.s1_rs2_addr[4:0]
 design_assertions_wrapper.i_dut.i_core_pipe_decode.s1_rs2_data[63:0]
 @1401200
@@ -364,13 +356,10 @@ design_assertions_wrapper.i_dut.i_core_pipe_decode.s2_valid
 design_assertions_wrapper.i_dut.i_core_pipe_decode.s2_ready
 @22
 design_assertions_wrapper.i_dut.i_core_pipe_decode.s2_imm[63:0]
-@2022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
-design_assertions_wrapper.i_dut.i_core_pipe_decode.s2_instr[31:0]
 @22
+design_assertions_wrapper.i_dut.i_core_pipe_decode.s2_instr[31:0]
 design_assertions_wrapper.i_dut.i_core_pipe_decode.s2_pc[63:0]
 design_assertions_wrapper.i_dut.i_core_pipe_decode.s2_rd[4:0]
-design_assertions_wrapper.i_dut.i_core_pipe_decode.s2_rs1_data[63:0]
 design_assertions_wrapper.i_dut.i_core_pipe_decode.s2_rs2_addr[4:0]
 design_assertions_wrapper.i_dut.i_core_pipe_decode.s2_rs2_data[63:0]
 @c00200
@@ -473,10 +462,8 @@ design_assertions_wrapper.i_dut.i_core_pipe_exec.e_new_instr
 design_assertions_wrapper.i_dut.i_core_pipe_exec.s2_trap
 @22
 design_assertions_wrapper.i_dut.i_core_pipe_exec.s2_imm[63:0]
-@2022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
-design_assertions_wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
 @22
+design_assertions_wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
 design_assertions_wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
 design_assertions_wrapper.i_dut.i_core_pipe_exec.s2_pc[63:0]
 design_assertions_wrapper.i_dut.i_core_pipe_exec.s2_rd[4:0]
@@ -486,7 +473,7 @@ design_assertions_wrapper.i_dut.i_core_pipe_exec.s2_valid
 @22
 design_assertions_wrapper.i_dut.i_core_pipe_exec.s2_rs1_data[63:0]
 @2024
-^2 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
+^1 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
 design_assertions_wrapper.i_dut.i_core_pipe_exec.s2_rs2_addr[4:0]
 @22
 design_assertions_wrapper.i_dut.i_core_pipe_exec.s2_rs2_data[63:0]
@@ -528,9 +515,6 @@ design_assertions_wrapper.i_dut.i_core_pipe_exec.s2_alu_xor
 -CFU
 @28
 design_assertions_wrapper.i_dut.i_core_pipe_exec.s2_cf_valid
-@22
-design_assertions_wrapper.i_dut.i_core_pipe_exec.s2_cf_target[63:0]
-@28
 design_assertions_wrapper.i_dut.i_core_pipe_exec.s2_cf_ack
 design_assertions_wrapper.i_dut.i_core_pipe_exec.cfu_finished
 design_assertions_wrapper.i_dut.i_core_pipe_exec.cfu_new_instr
@@ -539,7 +523,6 @@ design_assertions_wrapper.i_dut.i_core_pipe_exec.cfu_op_any
 design_assertions_wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_cfu.offset[63:0]
 design_assertions_wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_cfu.pc[63:0]
 design_assertions_wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_cfu.target_addr[63:0]
-design_assertions_wrapper.i_dut.i_core_pipe_exec.i_core_pipe_exec_cfu.target_lhs[63:0]
 @28
 design_assertions_wrapper.i_dut.i_core_pipe_exec.cfu_trap_raise
 design_assertions_wrapper.i_dut.i_core_pipe_exec.s2_cfu_beq
@@ -649,7 +632,7 @@ design_assertions_wrapper.i_dut.i_core_pipe_exec.n_s3_trap
 -Next Stage
 @1401200
 -Pipeline  - Execute
-@800200
+@c00200
 -Pipeline - Writeback
 @28
 design_assertions_wrapper.i_dut.i_core_pipe_wb.g_clk
@@ -666,36 +649,34 @@ design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_csr_addr[11:0]
 design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_csr_op[3:0]
 @28
 design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_full
-@2022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
-design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_instr[31:0]
 @22
+design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_instr[31:0]
 design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_pc[63:0]
 design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_wdata[63:0]
 @28
 design_assertions_wrapper.i_dut.i_core_pipe_wb.wb_csr
 design_assertions_wrapper.i_dut.i_core_pipe_wb.wb_lsu
 design_assertions_wrapper.i_dut.i_core_pipe_wb.wb_wdata
-@800201
+@800200
 -Traps
-@29
+@28
 design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_trap
-@23
+@22
 design_assertions_wrapper.i_dut.i_core_pipe_wb.trap_cause[6:0]
-@29
+@28
 design_assertions_wrapper.i_dut.i_core_pipe_wb.trap_cfu
 design_assertions_wrapper.i_dut.i_core_pipe_wb.trap_cpu
 design_assertions_wrapper.i_dut.i_core_pipe_wb.trap_csr
 design_assertions_wrapper.i_dut.i_core_pipe_wb.trap_int
 design_assertions_wrapper.i_dut.i_core_pipe_wb.trapped
-@1000201
+@1000200
 -Traps
 @800200
 -GPR Write
 @28
 design_assertions_wrapper.i_dut.i_core_pipe_wb.rd_wen_enable
 @2024
-^2 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
+^1 /home/ben/projects/riscv/cores/vanilla-riscv/flow/gtkwave/filter-gprs.txt
 design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_rd[4:0]
 @22
 design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_rd_addr[4:0]
@@ -708,9 +689,6 @@ design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_rd_wen
 -Control Flow
 @28
 design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_cf_ack
-@22
-design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_cf_target[63:0]
-@28
 design_assertions_wrapper.i_dut.i_core_pipe_wb.s3_cf_valid
 @1000200
 -Control Flow
@@ -745,6 +723,7 @@ design_assertions_wrapper.i_dut.i_core_pipe_wb.csr_wr_clr
 design_assertions_wrapper.i_dut.i_core_pipe_wb.csr_wr_set
 @1000200
 -CSR
+@1401200
 -Pipeline - Writeback
 @c00200
 -GPRs
@@ -796,7 +775,6 @@ design_assertions_wrapper.i_dut.i_core_csrs.reg_mstatus_wpri4
 design_assertions_wrapper.i_dut.i_core_csrs.reg_mstatus_xs[1:0]
 @22
 design_assertions_wrapper.i_dut.i_core_csrs.reg_mtval[63:0]
-design_assertions_wrapper.i_dut.i_core_csrs.reg_mtvec[63:0]
 @1401200
 -CSRs
 @c00200
@@ -826,43 +804,6 @@ design_assertions_wrapper.i_dut.i_core_interrupts.mtvec_mode[1:0]
 -Interrupts
 @c00200
 -Counters
-@28
-design_assertions_wrapper.i_dut.i_core_counters.addr_mtime_lo
-design_assertions_wrapper.i_dut.i_core_counters.addr_mtimecmp_lo
-@22
-design_assertions_wrapper.i_dut.i_core_counters.ctr_cycle[63:0]
-design_assertions_wrapper.i_dut.i_core_counters.ctr_instret[63:0]
-design_assertions_wrapper.i_dut.i_core_counters.ctr_time[63:0]
-@28
-design_assertions_wrapper.i_dut.i_core_counters.g_clk
-design_assertions_wrapper.i_dut.i_core_counters.g_resetn
-design_assertions_wrapper.i_dut.i_core_counters.inhibit_cy
-design_assertions_wrapper.i_dut.i_core_counters.inhibit_ir
-design_assertions_wrapper.i_dut.i_core_counters.inhibit_tm
-design_assertions_wrapper.i_dut.i_core_counters.instr_ret
-@22
-design_assertions_wrapper.i_dut.i_core_counters.mapped_mtime[63:0]
-design_assertions_wrapper.i_dut.i_core_counters.mapped_mtimecmp[63:0]
-@28
-design_assertions_wrapper.i_dut.i_core_counters.mmio_gnt
-@22
-design_assertions_wrapper.i_dut.i_core_counters.mmio_rdata[63:0]
-@28
-design_assertions_wrapper.i_dut.i_core_counters.mmio_req
-@22
-design_assertions_wrapper.i_dut.i_core_counters.mmio_wdata[63:0]
-@28
-design_assertions_wrapper.i_dut.i_core_counters.mmio_wen
-@22
-design_assertions_wrapper.i_dut.i_core_counters.n_ctr_cycle[63:0]
-design_assertions_wrapper.i_dut.i_core_counters.n_ctr_instret[63:0]
-design_assertions_wrapper.i_dut.i_core_counters.n_mapped_mtime[63:0]
-design_assertions_wrapper.i_dut.i_core_counters.n_mmio_rdata[63:0]
-@28
-design_assertions_wrapper.i_dut.i_core_counters.n_timer_interrupt
-design_assertions_wrapper.i_dut.i_core_counters.timer_interrupt
-design_assertions_wrapper.i_dut.i_core_counters.wr_mtime_lo
-design_assertions_wrapper.i_dut.i_core_counters.wr_mtimecmp_lo
 @1401200
 -Counters
 [pattern_trace] 1
