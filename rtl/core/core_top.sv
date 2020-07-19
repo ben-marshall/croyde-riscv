@@ -589,6 +589,7 @@ core_pipe_wb #(
 .csr_rdata       (csr_rdata       ), // CSR read data
 .csr_error       (csr_error       ), // CSR access error.
 .mtvec_base      (mtvec_base      ), // Current MTVEC base address.
+.csr_mepc        (csr_mepc        ), // Current EPC.
 .trap_cpu        (trap_cpu        ), // A trap occured due to CPU
 .trap_int        (trap_int        ), // A trap occured due to interrupt
 .trap_cause      (trap_cause      ), // A trap occured due to interrupt

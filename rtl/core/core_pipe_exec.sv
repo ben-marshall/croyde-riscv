@@ -198,7 +198,9 @@ wire        mdu_flush   = e_new_instr && mdu_valid;
 wire                 cfu_op_any      =
     s2_cfu_beq  || s2_cfu_bge  || s2_cfu_bgeu || s2_cfu_blt  || s2_cfu_bltu ||
     s2_cfu_bne  || s2_cfu_ebrk || s2_cfu_ecall|| s2_cfu_j    || s2_cfu_jal  ||
-    s2_cfu_jalr || s2_cfu_mret || s2_cfu_wfi  ;
+    s2_cfu_jalr || s2_cfu_mret || s2_cfu_wfi ;
+
+wire                 cfu_valid       = !wfi_sleep && s2_valid;
 
 wire                 cfu_new_instr   = e_new_instr;
 wire [         XL:0] cfu_new_pc      ; // New program counter
@@ -451,7 +453,7 @@ core_pipe_exec_cfu #(
 .cmp_eq     (alu_cmp_eq     ),
 .cmp_lt     (alu_cmp_lt     ),
 .cmp_ltu    (alu_cmp_ltu    ),
-.valid      (s2_valid       ),
+.valid      (cfu_valid      ),
 .pc         (s2_pc          ), // Current program counter
 .npc        (s2_npc         ), // Next natural program counter
 .rs1        (s2_alu_lhs     ), // Source register 1
