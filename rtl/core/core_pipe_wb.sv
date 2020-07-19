@@ -267,7 +267,19 @@ wire        cfu_wfi      = s3_cfu_op == CFU_OP_WFI  && s3_full;
 wire        cfu_mret     = s3_cfu_op == CFU_OP_MRET && s3_full;
 
 // Wait for interrupt instruction.
-assign      wfi_sleep    = cfu_wfi && !int_pending;
+
+reg         wfi_woken    ;
+wire      n_wfi_woken    = wfi_woken ? !e_new_instr : wfi_wakeup && !e_new_instr;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        wfi_woken <= 1'b0;
+    end else begin
+        wfi_woken <= n_wfi_woken;
+    end
+end
+
+assign      wfi_sleep    = cfu_wfi && !int_pending && !wfi_woken;
 wire        wfi_wakeup   = cfu_wfi &&  int_pending;
 
 wire        cfu_wait     = s3_cf_valid && !s3_cf_ack    ||
