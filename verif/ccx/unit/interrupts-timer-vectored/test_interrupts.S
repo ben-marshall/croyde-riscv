@@ -26,10 +26,6 @@ mtvec_trap_handler_aligned:
     li t1, 1
     sb t1, 0(t0)
 
-    csrr t0, mepc       // Increment mepc by 4.
-    addi t0, t0, 4
-    csrw mepc, t0
-    
     la t3, 0x20008      // Set mtime cmp to something enormous.
     li t4, -1
     sd t4, 0(t3)

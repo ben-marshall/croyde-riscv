@@ -1,0 +1,7 @@
+
+TEST_NAME = wfi-st
+TEST_SRC  = $(CCX_UNIT_ROOT)/wfi-st/test_wfi_st.c \
+            $(CCX_UNIT_ROOT)/wfi-st/test_wfi_st.S
+
+$(eval $(call add_ccx_unit_test,$(TEST_NAME),$(TEST_SRC)))
+

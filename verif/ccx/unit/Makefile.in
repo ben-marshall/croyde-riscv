@@ -84,6 +84,10 @@ endef
 include $(CCX_UNIT_ROOT)/example/Makefile.in
 include $(CCX_UNIT_ROOT)/access-traps/Makefile.in
 include $(CCX_UNIT_ROOT)/wfi/Makefile.in
+include $(CCX_UNIT_ROOT)/wfi-ld/Makefile.in
+include $(CCX_UNIT_ROOT)/wfi-st/Makefile.in
+include $(CCX_UNIT_ROOT)/wfi-br/Makefile.in
+include $(CCX_UNIT_ROOT)/wfi-jal/Makefile.in
 include $(CCX_UNIT_ROOT)/mtime-read/Makefile.in
 include $(CCX_UNIT_ROOT)/mtime-write/Makefile.in
 include $(CCX_UNIT_ROOT)/counters/Makefile.in
