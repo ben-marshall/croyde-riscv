@@ -1,5 +1,5 @@
 
-
+#include "uc64_csp.h"
 #include "unit_test.h"
 
 #include "test_timer.h"
@@ -15,17 +15,17 @@ const           int interrupt_period    = 400;
 //! Called when a machine timer interrupt occurs.
 void handler_machine_timer() {
 
-    uint64_t mtime      = __rd_mtime()      ;
-    uint64_t mtime_cmp  = __rd_mtimecmp()   ;
+    uint64_t mtime      = uc64_csp_rd_mtime()      ;
+    uint64_t mtime_cmp  = uc64_csp_rd_mtimecmp()   ;
 
     interrupt_count ++;
 
      __puthex64(mtime);
      __putchar(' '); __puthex64(mtime_cmp); __putchar('\n');
     
-    uint64_t mtime_cmpn = __rd_mtime() + interrupt_period;
+    uint64_t mtime_cmpn = uc64_csp_rd_mtime() + interrupt_period;
 
-    __wr_mtimecmp(mtime_cmpn);
+    uc64_csp_wr_mtimecmp(mtime_cmpn);
 
     // Disable the machine timer interrupt.
     if(interrupt_count >= max_interrupt_count) {
@@ -40,10 +40,10 @@ void start_machine_timer() {
 
     mtvec(&vector_interrupt_table, 1);
 
-    uint64_t mtime      = __rd_mtime();
+    uint64_t mtime      = uc64_csp_rd_mtime();
     uint64_t mtime_cmpn = mtime + interrupt_period;
 
-    __wr_mtimecmp(mtime_cmpn);
+    uc64_csp_wr_mtimecmp(mtime_cmpn);
 
     __set_mie(MIE_MTIE);
     __set_mstatus(MSTATUS_MIE);

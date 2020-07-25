@@ -1,5 +1,5 @@
 
-
+#include "uc64_csp.h"
 #include "unit_test.h"
 
 //! Place we go when any traps occur.
@@ -35,7 +35,7 @@ void c_trap_handler() {
 
     trap_handler_seen = expect_code;
     
-    __wr_mtimecmp(-1);
+    uc64_csp_wr_mtimecmp(-1);
 
     if(disable_mtie) {
         clr_mie(MIE_MTIE);
@@ -79,12 +79,12 @@ int test_wfi_interrupts_enabled() {
     
     // Setup timer interrupt for a short time in the future.
     uint64_t  delay     = 500;
-    uint64_t  mtime     = __rd_mtime();
-    __wr_mtimecmp(mtime + delay);
+    uint64_t  mtime     = uc64_csp_rd_mtime();
+    uc64_csp_wr_mtimecmp(mtime + delay);
 
     // Read number of instructions retired.
-    uint64_t iret_pre   = __rdinstret();
-    uint64_t time_pre   = __rdtime   ();
+    uint64_t iret_pre   = uc64_csp_rdinstret();
+    uint64_t time_pre   = uc64_csp_rdtime   ();
 
     store_target = 0;
     
@@ -92,8 +92,8 @@ int test_wfi_interrupts_enabled() {
     do_wfi_store(&store_target, val_to_store);
 
     // Wake up again and check instructions retired.
-    uint64_t iret_post  = __rdinstret();
-    uint64_t time_post  = __rdtime   ();
+    uint64_t iret_post  = uc64_csp_rdinstret();
+    uint64_t time_post  = uc64_csp_rdtime   ();
     uint64_t mepc_post  = rd_mepc();
 
     uint64_t iret_total = iret_post - iret_pre;
@@ -112,7 +112,7 @@ int test_wfi_interrupts_enabled() {
     }
 
     // Clean up - put mtimecmp back to something enormous.
-    __wr_mtimecmp(-1);
+    uc64_csp_wr_mtimecmp(-1);
     
     // Set old mtvec value again
     wr_mtvec(mtvec_pre);

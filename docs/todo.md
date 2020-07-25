@@ -39,14 +39,6 @@
 
 - [ ] csrw mcycle
 - [ ] csrw minstret
+- [ ] Re-enable `pc_fwd` riscv-formal check
+- [ ] Re-enable `liveness` riscv-formal check
 
-- [ ] Re-enable pc_fwd riscv-formal check
-- [ ] Re-enable liveness riscv-formal check
-
-- [ ] Clean up the unit tests.
-
-  - [ ] Single point of origin for `__mtime*` addresses.
-
-  - [ ] Stop re-defining macros.
-
-- Unit tests for load/store/jump right after WFI

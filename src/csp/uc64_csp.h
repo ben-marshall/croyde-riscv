@@ -27,5 +27,23 @@ inline          void     uc64_csp_wfi() {
     asm volatile("wfi");
 }
 
+inline uint64_t uc64_csp_rdtime() {
+    uint64_t rd;
+    asm volatile("rdtime %0":"=r"(rd):);
+    return rd;
+}
+
+inline uint64_t uc64_csp_rdcycle() {
+    uint64_t rd;
+    asm volatile("rdcycle %0":"=r"(rd):);
+    return rd;
+}
+
+inline uint64_t uc64_csp_rdinstret() {
+    uint64_t rd;
+    asm volatile("rdinstret %0":"=r"(rd):);
+    return rd;
+}
+
 #endif
 

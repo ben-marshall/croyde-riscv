@@ -60,32 +60,6 @@ void test_pass();
 
 // ----------- Defined in util.S -------------------
 
-// Base address of the memory mapped IO region
-volatile uint64_t * __mmio_base;
-
-//! Direct access to mtime
-volatile uint64_t * __mtime    ;
-
-//! Direct access to mtimecmp
-volatile uint64_t * __mtimecmp ;
-
-//! Read the memory mapped mtime register
-volatile uint64_t __rd_mtime();
-
-//! Read the memory mapped mtimecmp register
-volatile uint64_t __rd_mtimecmp();
-
-//! Read the memory mapped mtimecmp register
-volatile void     __wr_mtimecmp(uint64_t mtc);
-
-//! Intrisic for the `rdcycle` assembly instruction
-volatile uint64_t __rdcycle();
-
-//! Intrisic for the `rdtime` assembly instruction
-volatile uint64_t __rdtime();
-
-//! Intrisic for the `rdinstret` assembly instruction
-volatile uint64_t __rdinstret();
 
 //! Get the mcountinhibit CSR value
 volatile uint32_t __rdmcountinhibit();

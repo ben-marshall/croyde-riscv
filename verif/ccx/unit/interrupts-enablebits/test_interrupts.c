@@ -1,5 +1,5 @@
 
-
+#include "uc64_csp.h"
 #include "unit_test.h"
 
 #include "test_interrupts.h"
@@ -10,7 +10,7 @@ volatile int interrupt_seen = 0;
 int test_global_interrupt_enable() {
 
     // Make sure mtimecmp is at it's maximum value.
-    __mtimecmp[0] = 0xFFFFFFFFFFFFFFFF;
+    uc64_csp_mtimecmp[0] = 0xFFFFFFFFFFFFFFFF;
     
     uint64_t mstatus    = __rd_mstatus();
 

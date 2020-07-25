@@ -1,5 +1,5 @@
 
-
+#include "uc64_csp.h"
 #include "unit_test.h"
 
 #include "test_interrupts.h"
@@ -21,7 +21,7 @@ extern void mtvec_trap_handler_unaligned;
 int trigger_timer_interrupt(volatile int * interrupt_seen, int delay) {
 
     // Add a big value to mtime and set mtimecmp to this.
-    __mtimecmp[0] = __mtime[0] + delay;
+    uc64_csp_mtimecmp[0] = uc64_csp_mtime[0] + delay;
 
     // Re-enable interrupts.
     __set_mstatus(MSTATUS_MIE);
