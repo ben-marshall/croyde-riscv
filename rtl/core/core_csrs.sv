@@ -24,7 +24,13 @@ output wire [ 1:0] mtvec_mode       , // Current MTVEC vector mode.
 
 input  wire        exec_mret        , // MRET instruction executed.
 
+output reg         mode_m           , // Currently in Machine mode.
+output reg         mode_u           , // Currently in User    mode.
+
+output wire        mstatus_tw       , // Timeout wait for WFI.
 output wire        mstatus_mie      , // Global interrupt enable.
+output wire        mstatus_mprv_m   , // Memory access like machine mode.
+output wire        mstatus_mprv_u   , // Memory access like user    mode.
 output reg         mie_meie         , // External interrupt enable.
 output reg         mie_mtie         , // Timer interrupt enable.
 output reg         mie_msie         , // Software interrupt enable.
@@ -146,33 +152,49 @@ end
 // CSR: MSTATUS
 // -------------------------------------------------------------------------
 
+localparam  MPP_M   = 2'b11;
+localparam  MPP_U   = 2'b00;
+
 wire        reg_mstatus_sd      = 0; // FS,XS always zero.
+wire [ 1:0] reg_mstatus_uxl     = 2'b10; // UXL - UXLEN = 64 = MXLEN
 reg  [ 7:0] reg_mstatus_wpri1      ;
 wire        reg_mstatus_tsr     = 0; // Supervisor mode not implemented.
-wire        reg_mstatus_tw      = 0; // WFI instruction not implemented.
+reg         reg_mstatus_tw      = 0; // WFI instruction not implemented.
 wire        reg_mstatus_tvm     = 0; // Supervisor mode not implemented.
 wire        reg_mstatus_mxr     = 0; // Supervisor mode not implemented.
-wire        reg_mstatus_sum     = 0; // User/supervisor mode not implemnted.
-wire        reg_mstatus_mprv    = 0; // User/supervisor mode not implemented.
+wire        reg_mstatus_sum     = 0; // Supervisor mode not implemnted.
+reg         reg_mstatus_mprv       ;
 wire [ 1:0] reg_mstatus_xs      = 0; // No non-standard extensions.
 wire [ 1:0] reg_mstatus_fs      = 0; // Floating point not implemented.
-wire [ 1:0] reg_mstatus_mpp     = 0; // User/supervisor mode not implemented.
+reg  [ 1:0] reg_mstatus_mpp        ; 
 reg  [ 1:0] reg_mstatus_wpri2      ;
-wire        reg_mstatus_spp     = 0; // User mode not implemented
+wire        reg_mstatus_spp     = 0; // N Ext not implemented
 reg         reg_mstatus_mpie       ;
 reg         reg_mstatus_wpri3      ;
 wire        reg_mstatus_spie    = 0; // Supervisor mode not implemented
-wire        reg_mstatus_upie    = 0; // User mode not implemented
+wire        reg_mstatus_upie    = 0; // N Ext not implemented
 reg         reg_mstatus_mie        ;
 reg         reg_mstatus_wpri4      ;
 wire        reg_mstatus_sie     = 0; // Supervisor mode not implemented
-wire        reg_mstatus_uie     = 0; // User mode not implemented
+wire        reg_mstatus_uie     = 0; // N Ext not implemented
 
-assign        mstatus_mie = reg_mstatus_mie;
+// Machine level global interrupt enable.
+assign      mstatus_mie     = reg_mstatus_mie;
+
+// Timeout wait for WFI.
+assign      mstatus_tw      = reg_mstatus_tw;
+
+// Access memory as though in machine mode.
+assign      mstatus_mprv_m  = !reg_mstatus_mprv || 
+                               reg_mstatus_mprv && mstatus_mpp_m;
+
+// Access memory as though in user mode.
+assign      mstatus_mprv_u  =  reg_mstatus_mprv && mstatus_mpp_u;
 
 wire [XL:0] reg_mstatus         = {
-    32'b0             ,
     reg_mstatus_sd    ,
+    30'b0             ,
+    reg_mstatus_uxl   ,
     reg_mstatus_wpri1 ,
     reg_mstatus_tsr   ,
     reg_mstatus_tw    ,
@@ -215,11 +237,28 @@ wire        n_mstatus_mpie      =
     csr_wr_clr    ? reg_mstatus_mie & ~csr_wdata[7] :
                     csr_wdata[7]                    ;
 
+wire        n_mstatus_tw        =
+    csr_wr_set    ? reg_mstatus_mie |  csr_wdata[21]:
+    csr_wr_clr    ? reg_mstatus_mie & ~csr_wdata[21]:
+                    csr_wdata[21]                   ;
 
 wire        n_mstatus_wpri4     = csr_wdata[ 2: 2];
 wire        n_mstatus_wpri3     = csr_wdata[ 6: 6];
 wire [ 1:0] n_mstatus_wpri2     = csr_wdata[10: 9];
 wire [ 7:0] n_mstatus_wpri1     = csr_wdata[30:23];
+
+
+wire [ 1:0] n_mstatus_mpp = {n_mode_m, n_mode_m};
+wire        mstatus_mpp_m = reg_mstatus_mpp == MPP_M;
+wire        mstatus_mpp_u = reg_mstatus_mpp == MPP_U;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        reg_mstatus_mpp <= MPP_M;
+    end else if(update_mode) begin
+        reg_mstatus_mpp <= n_mstatus_mpp;
+    end
+end
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
@@ -243,13 +282,56 @@ always @(posedge g_clk) begin
         reg_mstatus_wpri2 <= 0;
         reg_mstatus_wpri3 <= 0;
         reg_mstatus_wpri4 <= 0;
+        reg_mstatus_tw    <= 1'b0;
     end else if (wen_mstatus) begin
         reg_mstatus_wpri1 <= n_mstatus_wpri1;
         reg_mstatus_wpri2 <= n_mstatus_wpri2;
         reg_mstatus_wpri3 <= n_mstatus_wpri3;
         reg_mstatus_wpri4 <= n_mstatus_wpri4;
+        reg_mstatus_tw    <= n_mstatus_tw   ;
     end
 end
+
+//
+// Current mode tracking.
+// -------------------------------------------------------------------------
+
+wire    n_mode_m = trap_cpu                         || 
+                   trap_int                         ||
+                   exec_mret    && mstatus_mpp_m    ;
+
+wire    n_mode_u = !trap_cpu                        &&
+                   !trap_int                        &&
+                   exec_mret    && mstatus_mpp_u    ;
+
+wire    update_mode = exec_mret || trap_cpu || trap_int;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        mode_m <= 1'b1;
+        mode_u <= 1'b0;
+    end else if(update_mode) begin
+        mode_m <= n_mode_m;
+        mode_u <= n_mode_u;
+    end
+end
+
+`ifdef DESIGNER_ASSERTION_CSR_MODE
+
+always @(posedge g_clk) if(g_resetn) begin
+
+    // We must always be in either Machine mode or User mode.
+    assert(mode_m ^ mode_u);
+    
+    // Always access memory either as M mode or U Mode.
+    assert(mstatus_mprv_m ^ mstatus_mprv_u);
+
+    // mstats.MPP field must always have a valid value.
+    assert(mstatus_mpp_m ^ mstatus_mpp_u);
+
+end
+
+`endif
 
 
 //
@@ -469,6 +551,7 @@ wire [XL:0] reg_mcountin = {
     mcountin_tm,
     mcountin_cy
 };
+
 
 //
 // CSR read responses.

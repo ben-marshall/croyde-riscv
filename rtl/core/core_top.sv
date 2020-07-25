@@ -248,7 +248,13 @@ wire [          1:0] mtvec_mode  ; // Current MTVEC direct/vector mode
                
 wire                 exec_mret   ; // MRET instruction executed.
                
+wire                 mode_m      ; // Currently in Machine mode.
+wire                 mode_u      ; // Currently in User    mode.
+
+wire                 mstatus_tw  ; // Timeout wait for WFI.
 wire                 mstatus_mie ; // Global interrupt enable.
+wire                mstatus_mprv_m;// Memory access like machine mode.
+wire                mstatus_mprv_u;// Memory access like user    mode.
 wire                 mie_meie    ; // External interrupt enable.
 wire                 mie_mtie    ; // Timer interrupt enable.
 wire                 mie_msie    ; // Software interrupt enable.
@@ -665,7 +671,12 @@ core_csrs i_core_csrs (
 .mtvec_base       (mtvec_base       ), // Current MTVEC base address.
 .mtvec_mode       (mtvec_mode       ), // Current MTVEC vector mode.
 .exec_mret        (exec_mret        ), // MRET instruction executed.
+.mode_m           (mode_m           ), // Currently in Machine mode.
+.mode_u           (mode_u           ), // Currently in User    mode.
+.mstatus_tw       (mstatus_tw       ), // Timeout wait for WFI.
 .mstatus_mie      (mstatus_mie      ), // Global interrupt enable.
+.mstatus_mprv_m   (mstatus_mprv_m   ), // Memory access like machine mode.
+.mstatus_mprv_u   (mstatus_mprv_u   ), // Memory access like user    mode.
 .mie_meie         (mie_meie         ), // External interrupt enable.
 .mie_mtie         (mie_mtie         ), // Timer interrupt enable.
 .mie_msie         (mie_msie         ), // Software interrupt enable.

@@ -1,0 +1,32 @@
+[tasks]
+task_cover      cover
+task_bmc        bmc   
+task_prove      prove
+
+[options]
+depth   20
+
+cover: mode cover
+bmc: mode bmc
+prove: mode prove
+
+[engines]
+smtbmc  boolector
+
+[script]
+echo on
+verilog_defaults -add -IREPO_HOME/rtl/core/
+read_verilog -formal REPO_HOME/verif/core/design-assertions/wrapper.sv
+read_verilog -formal REPO_HOME/verif/core/design-assertions/fairness.sv
+read_verilog -formal REPO_HOME/rtl/core/*.sv
+read_verilog -formal REPO_HOME/rtl/prim/*.sv
+prep -flatten -nordff -top design_assertions_wrapper 
+chformal -early
+
+[files]
+REPO_HOME/extern/riscv-formal/checks/rvfi_macros.vh
+
+[file defines.svh]
+`define DESIGNER_ASSERTION_CSR_MODE 1
+`define CLOCK_GATE_NO_LATCH 1
+

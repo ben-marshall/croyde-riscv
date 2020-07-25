@@ -35,13 +35,13 @@
 
 - [ ] User mode
 
-  - [ ] Internal reg bits to store current operating mode.
+  - [X] Internal reg bits to store current operating mode.
 
-  - [ ] `MPP` bit updating on a trap.
+  - [X] `MPP` bit updating on a trap.
 
-  - [ ] `UXL` bits of `mstatus`
+  - [X] `UXL` bits of `mstatus`
 
-  - [ ] `MPRV` bits of `mstatus`.
+  - [X] `MPRV` bits of `mstatus`.
     
     - [ ] Routing to load/store unit and eventually to PMP.
 
