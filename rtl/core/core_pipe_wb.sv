@@ -52,6 +52,10 @@ input  wire                 csr_error       , // CSR access error
 input  wire [         XL:0] mtvec_base      , // Current trap vector addr
 input  wire [         XL:0] csr_mepc        , // Current mepc
 
+input  wire                 mode_m          , // Currently in Machine mode.
+input  wire                 mode_u          , // Currently in User    mode.
+input  wire                 mstatus_tw      , // Timeout wait for WFI.
+
 output wire                 trap_cpu        , // trap occured due to CPU
 output wire                 trap_int        , // trap occured due to interrupt
 output wire [ CF_CAUSE_R:0] trap_cause      , // 
@@ -360,6 +364,8 @@ assign trs_instr = s3_instr     ;
 reg  r_int_on_this_instr ;
 wire   int_on_this_instr = trap_int || r_int_on_this_instr;
 
+wire [1:0] s3_mode         = mode_m ? 2'b11 : 2'b00;
+
 reg    int_on_prev_instr ;
 
 always @(posedge g_clk) begin
@@ -409,6 +415,7 @@ core_rvfi i_core_rvfi (
 .n_cf_target        (s3_cf_target           ),
 .n_pc_rdata         (s3_pc                  ),
 .n_pc_wdata         (s3_n_pc                ),
+.n_mode             (s3_mode                ),
 .n_mem_req_valid    (n_rvfi_mem_req_valid   ),
 .n_mem_rsp_valid    (n_rvfi_mem_rsp_valid   ),
 .n_mem_addr         (s3_dmem_addr           ),

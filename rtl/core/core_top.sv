@@ -596,6 +596,9 @@ core_pipe_wb #(
 .csr_error       (csr_error       ), // CSR access error.
 .mtvec_base      (mtvec_base      ), // Current MTVEC base address.
 .csr_mepc        (csr_mepc        ), // Current EPC.
+.mode_m          (mode_m          ), // Currently in Machine mode.
+.mode_u          (mode_u          ), // Currently in User    mode.
+.mstatus_tw      (mstatus_tw      ), // Timeout wait for WFI.
 .trap_cpu        (trap_cpu        ), // A trap occured due to CPU
 .trap_int        (trap_int        ), // A trap occured due to interrupt
 .trap_cause      (trap_cause      ), // A trap occured due to interrupt

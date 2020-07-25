@@ -29,6 +29,8 @@ input wire [NRET * XLEN   - 1 : 0] n_cf_target      ,
 input wire [NRET * XLEN   - 1 : 0] n_pc_rdata       ,
 input wire [NRET * XLEN   - 1 : 0] n_pc_wdata       ,
 
+input wire [NRET *    2   - 1 : 0] n_mode           ,
+
 input wire                         n_mem_req_valid  ,
 input wire                         n_mem_rsp_valid  ,
 input wire [NRET * XLEN   - 1 : 0] n_mem_addr       ,
@@ -60,6 +62,7 @@ reg rvfi_mem_rmask;
 reg rvfi_mem_wmask;
 reg rvfi_mem_rdata;
 reg rvfi_mem_wdata;
+reg rvfi_mode     ;
 
 assign rvfi_halt = 1'b0;
 
@@ -109,6 +112,8 @@ always @(posedge g_clk) begin
         rvfi_rs2_addr    <= n_rs2_addr    ;
         rvfi_rs1_rdata   <= n_rs1_rdata   ;
         rvfi_rs2_rdata   <= n_rs2_rdata   ;
+
+        rvfi_mode        <= n_mode        ;
     end
 end
 
