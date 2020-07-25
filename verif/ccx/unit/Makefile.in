@@ -18,6 +18,7 @@ CCX_UNIT_PASS       = 0x00010090
 CCX_UNIT_RAM_LD     = $(CCX_UNIT_ROOT)/share/link-ram.ld
 
 CCX_UNIT_CFLAGS     = -I$(CCX_UNIT_ROOT)/share
+CCX_UNIT_CFLAGS     = -I$(REPO_HOME)/src/csp
 CCX_UNIT_CFLAGS    += -I$(REPO_HOME)/verif/share/unit
 CCX_UNIT_CFLAGS    += -nostartfiles -O1
 CCX_UNIT_CFLAGS    += -march=rv64imc -mabi=lp64
@@ -29,7 +30,8 @@ CCX_ROM_UNIT_CFLAGS+= -T $(FSBL_LD)
 
 CCX_UNIT_SRCS       = $(REPO_HOME)/verif/share/unit/boot.S \
                       $(REPO_HOME)/verif/share/unit/util.S \
-                      $(REPO_HOME)/verif/share/unit/unit_test.c
+                      $(REPO_HOME)/verif/share/unit/unit_test.c \
+                      $(REPO_HOME)/src/csp/uc64_csp.c
 
 define cxx_model
 $(call unit_test_build_dir,ccx)/${1}/verilated_cxx
@@ -84,6 +86,10 @@ endef
 include $(CCX_UNIT_ROOT)/example/Makefile.in
 include $(CCX_UNIT_ROOT)/access-traps/Makefile.in
 include $(CCX_UNIT_ROOT)/wfi/Makefile.in
+include $(CCX_UNIT_ROOT)/wfi-ld/Makefile.in
+include $(CCX_UNIT_ROOT)/wfi-st/Makefile.in
+include $(CCX_UNIT_ROOT)/wfi-br/Makefile.in
+include $(CCX_UNIT_ROOT)/wfi-jal/Makefile.in
 include $(CCX_UNIT_ROOT)/mtime-read/Makefile.in
 include $(CCX_UNIT_ROOT)/mtime-write/Makefile.in
 include $(CCX_UNIT_ROOT)/counters/Makefile.in

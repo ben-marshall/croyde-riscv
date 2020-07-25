@@ -15,6 +15,7 @@ input  wire                 int_ext      , // hardware interrupt
 input  wire                 int_ti       , // A timer interrupt has fired.
               
 output wire                 imem_req     , // Memory request
+output wire                 imem_rtype   , // Request type. 0=data,1=instrs
 output wire [ MEM_ADDR_R:0] imem_addr    , // Memory request address
 output wire                 imem_wen     , // Memory request write enable
 output wire [ MEM_STRB_R:0] imem_strb    , // Memory request write strobe
@@ -24,6 +25,7 @@ input  wire                 imem_err     , // Memory response error
 input  wire [ MEM_DATA_R:0] imem_rdata   , // Memory response read data
 
 output wire                 dmem_req     , // Memory request
+output wire                 dmem_rtype   , // Request type. 0=data,1=instrs
 output wire [ MEM_ADDR_R:0] dmem_addr    , // Memory request address
 output wire                 dmem_wen     , // Memory request write enable
 output wire [ MEM_STRB_R:0] dmem_strb    , // Memory request write strobe
@@ -60,6 +62,9 @@ output wire [         XL:0] trs_pc         // Instruction trace PC
 
 // Inital address of the program counter post reset.
 parameter   PC_RESET_ADDRESS= 'h10000000;
+
+// Use a FPGA-inference-friendly implementation of the register file.
+parameter FPGA_REGFILE = 0;
 
 //
 // Clock request and delivery wires.
@@ -137,6 +142,7 @@ wire [          6:0] s2_trap_cause  ; // Cause of trap being raised.
 
 wire [         XL:0] s2_alu_lhs     ; // ALU left  operand
 wire [         XL:0] s2_alu_rhs     ; // ALU right operand
+wire [          5:0] s2_alu_shamt   ; // ALU shift amount
 wire                 s2_alu_add     ; // ALU Operation to perform.
 wire                 s2_alu_and     ; // 
 wire                 s2_alu_or      ; // 
@@ -297,6 +303,7 @@ core_pipe_fetch #(
 .cf_ack       (cf_ack       ), // Control flow change acknwoledged
 .cf_target    (cf_target    ), // Control flow change destination
 .imem_req     (imem_req     ), // Memory request
+.imem_rtype   (imem_rtype   ), // Memory request type.
 .imem_addr    (imem_addr    ), // Memory request address
 .imem_wen     (imem_wen     ), // Memory request write enable
 .imem_strb    (imem_strb    ), // Memory request write strobe
@@ -353,6 +360,7 @@ core_pipe_decode #(
 .s2_trap_cause   (s2_trap_cause   ), // Cause of trap being raised.
 .s2_alu_lhs      (s2_alu_lhs      ), // ALU left  operand
 .s2_alu_rhs      (s2_alu_rhs      ), // ALU right operand
+.s2_alu_shamt    (s2_alu_shamt    ), // ALU Shift amount
 .s2_alu_add      (s2_alu_add      ), // ALU Operation to perform.
 .s2_alu_and      (s2_alu_and      ), // 
 .s2_alu_or       (s2_alu_or       ), // 
@@ -428,6 +436,7 @@ core_pipe_exec #(
 .s2_flush        (s2_flush        ), // Flush stage contents.
 .s2_cancel       (s2_cancel       ), // Stage 1 flush
 .csr_mepc        (csr_mepc        ), // MRET return address
+.wfi_sleep       (wfi_sleep       ), // Core asleep due to WFI.
 .s2_ready        (s2_ready        ), // EX ready for new instruction
 .s2_valid        (s2_valid        ), // Decode -> EX instr valid.
 .s2_rs1_addr     (s2_rs1_addr     ), // RS1 address.
@@ -443,6 +452,7 @@ core_pipe_exec #(
 .s2_trap_cause   (s2_trap_cause   ), // Cause of trap being raised.
 .s2_alu_lhs      (s2_alu_lhs      ), // ALU left  operand
 .s2_alu_rhs      (s2_alu_rhs      ), // ALU right operand
+.s2_alu_shamt    (s2_alu_shamt    ), // ALU Shift amount
 .s2_alu_add      (s2_alu_add      ), // ALU Operation to perform.
 .s2_alu_and      (s2_alu_and      ), // 
 .s2_alu_or       (s2_alu_or       ), // 
@@ -521,6 +531,7 @@ core_pipe_exec #(
 .s3_dmem_wdata   (s3_dmem_wdata   ),
 `endif
 .dmem_req        (dmem_req        ), // Memory request
+.dmem_rtype      (dmem_rtype      ), // Memory request type.
 .dmem_addr       (dmem_addr       ), // Memory request address
 .dmem_wen        (dmem_wen        ), // Memory request write enable
 .dmem_strb       (dmem_strb       ), // Memory request write strobe
@@ -578,6 +589,7 @@ core_pipe_wb #(
 .csr_rdata       (csr_rdata       ), // CSR read data
 .csr_error       (csr_error       ), // CSR access error.
 .mtvec_base      (mtvec_base      ), // Current MTVEC base address.
+.csr_mepc        (csr_mepc        ), // Current EPC.
 .trap_cpu        (trap_cpu        ), // A trap occured due to CPU
 .trap_int        (trap_int        ), // A trap occured due to interrupt
 .trap_cause      (trap_cause      ), // A trap occured due to interrupt
@@ -617,7 +629,9 @@ core_pipe_wb #(
 //
 //  Core register file. 2 read, 1 write.
 //
-core_regfile i_core_regfile (
+core_regfile #(
+.FPGA_REGFILE   (FPGA_REGFILE   )
+) i_core_regfile (
 .g_clk    (g_clk_rf    ),
 .g_clk_req(g_clk_rf_req),
 .g_resetn (g_resetn    ),

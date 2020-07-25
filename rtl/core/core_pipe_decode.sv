@@ -44,6 +44,7 @@ output wire [          6:0] s2_trap_cause   , // Trap cause
 
 output wire [         XL:0] s2_alu_lhs      , // ALU left  operand
 output wire [         XL:0] s2_alu_rhs      , // ALU right operand
+output wire [          5:0] s2_alu_shamt    , // ALU Shift amount
 output wire                 s2_alu_add      , // ALU Operation to perform.
 output wire                 s2_alu_and      , // 
 output wire                 s2_alu_or       , // 
@@ -216,7 +217,7 @@ wire    use_imm_c_lsd       = dec_c_ld      || dec_c_sd         ;
 wire    use_imm_c_j         = dec_c_j                           ;
 
 wire    [ 5:0] imm_c_shamt  = {s1_instr[12],s1_instr[6:2]};
-wire    [XL:0] imm_shamt    = {58'b0, s1_i16bit ? imm_c_shamt : {1'b0,dec_shamtw}};
+wire    [ 5:0] imm_shamt    = s1_i16bit ? imm_c_shamt : dec_shamt;
 
 assign s2_imm =
     cf_offset_cbeq_imm      ? {{32{imm_c_bz[31]}}, imm_c_bz    } :
@@ -224,7 +225,6 @@ assign s2_imm =
     use_imm_sext_imm32_u    ? sext_imm32_u  :
     use_imm_sext_imm32_i    ? sext_imm32_i  :
     major_op_store          ? sext_imm32_s  :
-    use_imm_shamt           ? imm_shamt     :
     dec_c_lui               ? {{32{imm_c_lui[31]}}, imm_c_lui      } :
     dec_c_addi4spn          ? {{32{imm_addi4spn[31]}}, imm_addi4spn} :
     dec_c_addi16sp          ? {{32{imm_addi16sp[31]}}, imm_addi16sp} :
@@ -261,23 +261,27 @@ wire [4:0] dec_rs1_16 =
     {5{rs1_16_5bit   }} & {s1_instr[11:7]      } |
     {5{rs1_16_sp     }} & {REG_SP              } |
     {5{rs1_16_prime  }} & {2'b01, s1_instr[9:7]} ;
-    
+
+// For c.add, c.mv, c.swsp, c.sdsp.
+wire rs2_16_6_2 = s1_instr[1:0] == 2'b10;
+
+// For c.and, c.or, c.sub, c.addw, c.subw, c.xor, c.sw, c.sd
+wire rs2_16_4_2 = 
+    s1_instr[ 1: 0] ==  2'b01 && s1_instr[11:10] == 2'b11 &&
+    s1_instr[15:13] == 3'b100
+||  s1_instr[ 1: 0] ==  2'b00 && s1_instr[15]             ;
+
+wire rs2_test   = dec_c_and || dec_c_or || dec_c_sub || dec_c_addw ||
+                  dec_c_subw || dec_c_xor|| dec_c_sw || dec_c_sd;
+
+wire rs2_bad = rs2_16_4_2 != rs2_test;
+
 // Source register 2, given a 16-bit instruction
 wire [4:0] dec_rs2_16 = 
     {5{dec_c_beqz    }} & {       REG_ZERO   } |
     {5{dec_c_bnez    }} & {       REG_ZERO   } |
-    {5{dec_c_add     }} & {       s1_instr[6:2]} |
-    {5{dec_c_mv      }} & {       s1_instr[6:2]} |
-    {5{dec_c_swsp    }} & {       s1_instr[6:2]} |
-    {5{dec_c_sdsp    }} & {       s1_instr[6:2]} |
-    {5{dec_c_and     }} & {2'b01, s1_instr[4:2]} |
-    {5{dec_c_or      }} & {2'b01, s1_instr[4:2]} |
-    {5{dec_c_sub     }} & {2'b01, s1_instr[4:2]} |
-    {5{dec_c_addw    }} & {2'b01, s1_instr[4:2]} |
-    {5{dec_c_subw    }} & {2'b01, s1_instr[4:2]} |
-    {5{dec_c_sw      }} & {2'b01, s1_instr[4:2]} |
-    {5{dec_c_sd      }} & {2'b01, s1_instr[4:2]} |
-    {5{dec_c_xor     }} & {2'b01, s1_instr[4:2]} ;
+    {5{rs2_16_6_2    }} & {       s1_instr[6:2]} |
+    {5{rs2_16_4_2    }} & {2'b01, s1_instr[4:2]} ;
 
 // Destination register, given a 16-bit instruction
 wire [4:0] dec_rd_16 = 
@@ -329,16 +333,12 @@ assign s2_rs2_data  = s1_rs2_data   ;
 // ALU
 
 wire    alu_rhs_imm = dec_addi          || dec_addiw        ||
-                      dec_slli          || dec_slliw        ||
-                      dec_srli          || dec_srliw        ||
-                      dec_srai          || dec_sraiw        ||
                       dec_andi          || dec_ori          ||
                       dec_xori          || dec_lui          ||
                       dec_auipc         || dec_c_addi       ||
                       dec_c_addi4spn    || dec_c_addiw      ||
                       dec_c_addi16sp    || dec_c_andi       ||
-                      dec_c_slli        || dec_c_srli       ||
-                      dec_c_srai        || dec_c_li         ||
+                      dec_c_li          ||
                       dec_c_lui         || dec_slti         ||
                       dec_sltiu         || major_op_load    ||
                       major_op_store    || dec_c_lw         ||
@@ -351,7 +351,9 @@ assign  s2_alu_lhs  = dec_auipc     ? s2_pc         :
                       dec_lui       ? {XLEN{1'b0}}  :
                                       s2_rs1_data   ;
 
-assign  s2_alu_rhs  = alu_rhs_imm   ? s2_imm : s2_rs2_data  ;
+assign  s2_alu_rhs  = alu_rhs_imm   ? s2_imm    : s2_rs2_data  ;
+
+assign  s2_alu_shamt= use_imm_shamt ? imm_shamt : s2_rs2_data[5:0];
 
 assign  s2_alu_add  = dec_add           || dec_addi          ||
                       dec_addiw         || dec_addw          ||

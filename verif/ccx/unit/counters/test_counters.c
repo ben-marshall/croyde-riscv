@@ -1,4 +1,5 @@
 
+#include "uc64_csp.h"
 #include "unit_test.h"
 
 /*!
@@ -16,13 +17,13 @@ int test_main() {
     }
 
 
-    uint64_t a_cycle      = __rdcycle();
-    uint64_t a_time       = __rdtime();
-    uint64_t a_instret    = __rdinstret();
+    uint64_t a_cycle      = uc64_csp_rdcycle();
+    uint64_t a_time       = uc64_csp_rdtime();
+    uint64_t a_instret    = uc64_csp_rdinstret();
 
-    uint64_t b_cycle      = __rdcycle();
-    uint64_t b_time       = __rdtime();
-    uint64_t b_instret    = __rdinstret();
+    uint64_t b_cycle      = uc64_csp_rdcycle();
+    uint64_t b_time       = uc64_csp_rdtime();
+    uint64_t b_instret    = uc64_csp_rdinstret();
 
 
     if(a_cycle >= b_cycle) {
@@ -44,13 +45,13 @@ int test_main() {
     __wrmcountinhibit(0x1);
     
     
-    a_cycle      = __rdcycle();
-    a_time       = __rdtime();
-    a_instret    = __rdinstret();
+    a_cycle      = uc64_csp_rdcycle();
+    a_time       = uc64_csp_rdtime();
+    a_instret    = uc64_csp_rdinstret();
 
-    b_cycle      = __rdcycle();
-    b_time       = __rdtime();
-    b_instret    = __rdinstret();
+    b_cycle      = uc64_csp_rdcycle();
+    b_time       = uc64_csp_rdtime();
+    b_instret    = uc64_csp_rdinstret();
 
 
     if(a_cycle != b_cycle) {
@@ -71,13 +72,13 @@ int test_main() {
     // re-enable the cycle register.
     __wrmcountinhibit(0x0);
     
-    a_cycle      = __rdcycle();
-    a_time       = __rdtime();
-    a_instret    = __rdinstret();
+    a_cycle      = uc64_csp_rdcycle();
+    a_time       = uc64_csp_rdtime();
+    a_instret    = uc64_csp_rdinstret();
 
-    b_cycle      = __rdcycle();
-    b_time       = __rdtime();
-    b_instret    = __rdinstret();
+    b_cycle      = uc64_csp_rdcycle();
+    b_time       = uc64_csp_rdtime();
+    b_instret    = uc64_csp_rdinstret();
 
     if(a_cycle >= b_cycle) {
         __putstr("Cycle enabled, first reading should be smaller.\n");
@@ -92,13 +93,13 @@ int test_main() {
     // Disable the instr ret register, re-enable the time register.
     __wrmcountinhibit(0x4);
     
-    a_cycle      = __rdcycle();
-    a_time       = __rdtime();
-    a_instret    = __rdinstret();
+    a_cycle      = uc64_csp_rdcycle();
+    a_time       = uc64_csp_rdtime();
+    a_instret    = uc64_csp_rdinstret();
 
-    b_cycle      = __rdcycle();
-    b_time       = __rdtime();
-    b_instret    = __rdinstret();
+    b_cycle      = uc64_csp_rdcycle();
+    b_time       = uc64_csp_rdtime();
+    b_instret    = uc64_csp_rdinstret();
 
     if(a_cycle >= b_cycle) {
         __putstr("Cycle enabled, first reading should be smaller.\n");

@@ -63,7 +63,7 @@ wire    branch_conditional  = cfu_beq   || cfu_bge  || cfu_bgeu ||
                               cfu_blt   || cfu_bltu || cfu_bne  ;
 
 wire    branch_always       = cfu_j     || cfu_jal  || cfu_jalr ||
-                              cfu_mret  || cfu_ebrk || cfu_ecall;
+                              cfu_ebrk || cfu_ecall;
 
 //
 // Compute branch target address
@@ -153,9 +153,10 @@ assign  rd_wdata            = npc                           ;
 reg       cf_change_done;
 wire    n_cf_change_done = (cf_valid && cf_ack) || cf_change_done;
 
-assign  finished    = n_cf_change_done || trap_raise || branch_ignore;
+assign  finished    = n_cf_change_done || trap_raise || branch_ignore ||
+                      cfu_mret         ;
 
-assign  cf_target   = cfu_mret ? csr_mepc : target_addr;
+assign  cf_target   = target_addr;
 
 assign  cf_valid    = branch_taken && !cf_change_done && valid;
 

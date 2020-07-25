@@ -1,5 +1,30 @@
 
-module ccx_top (
+`include "ccx_if.svh"
+
+module ccx_top #(
+
+// Inital address of the program counter post reset.
+parameter PC_RESET_ADDRESS  = 39'h00000000,
+
+// Use a FPGA-inference-friendly implementation of the register file.
+parameter FPGA_REGFILE      = 0,
+
+// Base address of the memory mapped IO region.
+parameter MMIO_BASE         = 39'h0000_0000_0002_0000,
+parameter MMIO_SIZE         = 39'h0000_0000_0000_00FF,
+
+parameter ROM_MEMH          = "none",
+parameter RAM_MEMH          = "none",
+
+parameter ROM_BASE          = 39'h00000000,
+parameter ROM_SIZE          = 39'h000003FF,
+parameter RAM_BASE          = 39'h00010000,
+parameter RAM_SIZE          = 39'h0000FFFF,
+parameter EXT_BASE          = 39'h10000000,
+parameter EXT_SIZE          = 39'h0FFFFFFF,
+parameter CLK_GATE_EN       = 1'b1  // Enable core-level clock gating
+
+)(
 
 input  wire         f_clk        , // Global free-running clock.
 input  wire         g_resetn     , // Synchronous negative level reset.
@@ -9,6 +34,7 @@ input  wire         int_sw       , // External interrupt
 input  wire         int_ext      , // Software interrupt
 
 output wire         emem_req     , // Memory request
+output wire         emem_rtype   , // Memory request type.
 output wire [ 38:0] emem_addr    , // Memory request address
 output wire         emem_wen     , // Memory request write enable
 output wire [  7:0] emem_strb    , // Memory request write strobe
@@ -25,14 +51,6 @@ output wire [ 63:0] trs_pc         // Instruction trace PC
 
 );
 
-// Inital address of the program counter post reset.
-parameter   PC_RESET_ADDRESS= 'h00000000;
-
-// Base address of the memory mapped IO region.
-parameter   MMIO_BASE = 39'h0000_0000_0002_0000;
-parameter   MMIO_SIZE = 39'h0000_0000_0000_00FF;
-parameter   MMIO_MASK = ~MMIO_SIZE           ;
-
 localparam  AW = 39;    // Address width
 localparam  DW = 64;    // Data width
 
@@ -40,29 +58,15 @@ localparam  DW = 64;    // Data width
 // Internal address mapping.
 // ------------------------------------------------------------
 
-parameter   ROM_MEMH  = ""        ;
-parameter   ROM_BASE  = 39'h00000000;
-parameter   ROM_SIZE  = 39'h000003FF;
-localparam  ROM_MASK  = ~ROM_SIZE ;
 localparam  ROM_WIDTH = 64        ;
-localparam  ROM_DEPTH = ROM_SIZE+1;
+localparam  ROM_DEPTH = 32        ;
 
-parameter   RAM_MEMH  = ""          ;
-parameter   RAM_BASE  = 39'h00010000;
-parameter   RAM_SIZE  = 39'h0000FFFF;
-localparam  RAM_MASK  =  ~RAM_SIZE;
 localparam  RAM_WIDTH = 64        ;
-localparam  RAM_DEPTH = RAM_SIZE+1;
-
-parameter   EXT_BASE  = 39'h10000000;
-parameter   EXT_SIZE  = 39'h0FFFFFFF;
-localparam  EXT_MASK  = ~EXT_SIZE ;
+localparam  RAM_DEPTH = 1024;
 
 //
 // Clock control
 // ------------------------------------------------------------
-
-parameter CLK_GATE_EN      = 1'b1; // Enable core-level clock gating
 
 // CCX level gated clock
 wire g_clk = f_clk;
@@ -71,9 +75,10 @@ wire g_clk = f_clk;
 // Internal interfaces / buses / wires
 // ------------------------------------------------------------
 
-core_mem_bus        if_ext       ;
+core_mem_bus #() if_ext () ;
 
 assign emem_req     = if_ext.req   ;
+assign emem_rtype   = if_ext.rtype ;
 assign emem_addr    = if_ext.addr  ;
 assign emem_wen     = if_ext.wen   ;
 assign emem_strb    = if_ext.strb  ;
@@ -84,14 +89,14 @@ assign if_ext.rdata = emem_rdata   ;
 
 //
 // Core instruction and data memory interfaces.
-core_mem_bus #(.AW(AW),.DW(DW)) core_imem;
-core_mem_bus #(.AW(AW),.DW(DW)) core_dmem;
+core_mem_bus #() core_imem ();
+core_mem_bus #() core_dmem ();
 
 //
 // RAM and ROM interfaces
-core_mem_bus #(.AW(AW),.DW(DW)) if_ram;
-core_mem_bus #(.AW(AW),.DW(DW)) if_rom;
-core_mem_bus #(.AW(AW),.DW(DW)) if_mmio;
+core_mem_bus #() if_ram    ();
+core_mem_bus #() if_rom    ();
+core_mem_bus #() if_mmio   ();
 
 //
 // Core timer & counter related wires.
@@ -118,6 +123,7 @@ wire                 core_inhibit_ir   ; // Stop instret incrementing.
 //
 core_top #(
 .PC_RESET_ADDRESS   (PC_RESET_ADDRESS),
+.FPGA_REGFILE       (FPGA_REGFILE    ),
 .CLK_GATE_EN        (CLK_GATE_EN     )
 ) i_core_top (
 .f_clk        (f_clk             ), // global free running clock
@@ -127,6 +133,7 @@ core_top #(
 .int_ext      (int_ext           ), // hardware interrupt
 .int_ti       (core_int_ti       ), // Timer interrupt
 .imem_req     (core_imem.req     ), // Memory request
+.imem_rtype   (core_imem.rtype   ), // Memory request Type
 .imem_addr    (core_imem.addr    ), // Memory request address
 .imem_wen     (core_imem.wen     ), // Memory request write enable
 .imem_strb    (core_imem.strb    ), // Memory request write strobe
@@ -135,6 +142,7 @@ core_top #(
 .imem_err     (core_imem.err     ), // Memory response error
 .imem_rdata   (core_imem.rdata   ), // Memory response read data
 .dmem_req     (core_dmem.req     ), // Memory request
+.dmem_rtype   (core_dmem.rtype   ), // Memory request Type
 .dmem_addr    (core_dmem.addr    ), // Memory request address
 .dmem_wen     (core_dmem.wen     ), // Memory request write enable
 .dmem_strb    (core_dmem.strb    ), // Memory request write strobe
@@ -164,16 +172,12 @@ core_top #(
 ccx_ic_top #(
 .AW       (AW        ),    // Address width
 .DW       (DW        ),    // Data width
-.ROM_MASK (ROM_MASK  ),
 .ROM_BASE (ROM_BASE  ),
 .ROM_SIZE (ROM_SIZE  ),
-.RAM_MASK (RAM_MASK  ),
 .RAM_BASE (RAM_BASE  ),
 .RAM_SIZE (RAM_SIZE  ),
-.EXT_MASK (EXT_MASK  ),
 .EXT_BASE (EXT_BASE  ),
 .EXT_SIZE (EXT_SIZE  ),
-.MMIO_MASK(MMIO_MASK ),
 .MMIO_BASE(MMIO_BASE ),
 .MMIO_SIZE(MMIO_SIZE )
 ) i_ccx_ic_top (
@@ -197,7 +201,6 @@ ccx_ic_top #(
 //  Responsible for all performance counters and timers.
 //
 core_counters #(
-.MMIO_MASK (MMIO_MASK   ),
 .MMIO_BASE (MMIO_BASE   ),
 .MMIO_SIZE (MMIO_SIZE   ),
 .MEM_ADDR_W(AW          )
@@ -235,7 +238,7 @@ mem_sram_wxd #(
 .g_resetn    (g_resetn          ),
 .cen         (if_rom.req        ),
 .wstrb       (rom_wstrb         ),
-.addr        (if_rom.addr[ 9:0] ),
+.addr        (if_rom.addr[10:3] ),
 .wdata       (if_rom.wdata      ),
 .rdata       (if_rom.rdata      ), 
 .err         (if_rom.err        )
@@ -255,7 +258,7 @@ mem_sram_wxd #(
 .g_resetn    (g_resetn          ),
 .cen         (if_ram.req        ),
 .wstrb       (ram_wstrb         ),
-.addr        (if_ram.addr[15:0] ),
+.addr        (if_ram.addr[15:3] ),
 .wdata       (if_ram.wdata      ),
 .rdata       (if_ram.rdata      ),
 .err         (if_ram.err        )

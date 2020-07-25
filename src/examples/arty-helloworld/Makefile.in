@@ -1,0 +1,15 @@
+
+NAME        = arty-helloworld
+
+SRCS        = $(FSBL_ROOT)/fsbl_boot.S \
+              $(REPO_HOME)/src/csp/uc64_csp.c \
+              $(REPO_HOME)/src/examples/arty-helloworld/arty_helloworld.c \
+              $(REPO_HOME)/src/bsp/uc64_bsp_arty.c
+
+LDSCRIPT    = $(FSBL_LD)
+
+FLAGS       = -I$(REPO_HOME)/src/bsp
+FLAGS      += -I$(REPO_HOME)/src/csp
+
+$(eval $(call add_tgt_fsbl,$(NAME),$(SRCS),$(LDSCRIPT),$(FLAGS)))
+

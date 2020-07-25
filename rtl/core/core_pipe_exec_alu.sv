@@ -8,6 +8,7 @@ module core_pipe_exec_alu (
 
 input  wire [   XL:0]   opr_a   , // Input operand A
 input  wire [   XL:0]   opr_b   , // Input operand B
+input  wire [    5:0]   shamt   , // Shift amount.
 input  wire             word    , // Operate on low 32-bits of XL.
 
 input  wire             op_add  , // Select output of adder
@@ -99,7 +100,7 @@ wire [XL:0] shift_in_l  ;
 
 wire [XL:0] shift_in    = op_sll ? shift_in_l : shift_in_r;
 
-wire [ 5:0] shift_amnt  = {!word && opr_b[5] , opr_b[4:0]};
+wire [ 5:0] shift_amnt  = {!word && shamt[5] , shamt[4:0]};
 
 wire [XL:0] shift_out_r = shift_in    >> shift_amnt     ;
 wire [XL:0] shift_out_l ;

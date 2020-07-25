@@ -26,26 +26,48 @@ input  wire [        XL:0] rd_wdata
 // Common parameters and width definitions.
 `include "core_common.svh"
 
-wire [XL:0] regs[31:0];
+// Use a FPGA-inference-friendly implementation of the register file.
+parameter FPGA_REGFILE = 0;
 
-assign  rs1_data    = regs[rs1_addr];
-assign  rs2_data    = regs[rs2_addr];
+generate if (FPGA_REGFILE) begin : fpga_regfile // Use DMEM based regfile.
 
-assign  g_clk_req   = rd_wen;
+    reg  [XL:0] regs  [31:0];
 
-assign regs[0]      = 0;
+    assign  rs1_data    = |rs1_addr ? regs[rs1_addr] : {XLEN{1'b0}};
+    assign  rs2_data    = |rs2_addr ? regs[rs2_addr] : {XLEN{1'b0}};
 
-genvar i;
-generate for(i = 1; i < 32; i = i + 1) begin
-
-    reg [XL:0] r;
-
-    assign regs[i] = r;
+    assign  g_clk_req   = rd_wen;
 
     always @(posedge g_clk) begin
-        if(rd_wen && (rd_addr == i)) begin
-            r <= rd_wdata;
+        if(rd_wen && |rd_addr) begin
+            regs[rd_addr] <= rd_wdata;
         end
+    end
+
+end else begin : ff_regfile                     // Use FF based regfile
+
+    wire [XL:0] regs[31:0];
+
+    assign  rs1_data    = regs[rs1_addr];
+    assign  rs2_data    = regs[rs2_addr];
+    
+    assign  g_clk_req   = rd_wen;
+
+    assign regs[0]      = 0;
+
+    genvar i;
+    for(i = 1; i < 32; i = i + 1) begin
+
+        reg [XL:0] r;
+
+        assign regs[i] = r;
+
+        always @(posedge g_clk) begin
+            if(rd_wen && (rd_addr == i)) begin
+                r <= rd_wdata;
+            end
+        end
+
     end
 
 end endgenerate

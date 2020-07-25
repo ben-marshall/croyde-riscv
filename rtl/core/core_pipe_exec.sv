@@ -19,6 +19,8 @@ input  wire                 s2_flush        , // Flush pipestage contents
 input  wire                 s2_cancel       , // Stop S2 instrs doing stuff.
 input  wire [         XL:0] csr_mepc        , // return address for mret
 
+input  wire                 wfi_sleep       , // Core asleep due to WFI?
+
 output wire                 s2_ready        , // EX ready for new instruction
 input  wire                 s2_valid        , // Decode -> EX instr valid.
 
@@ -36,6 +38,7 @@ input  wire [          6:0] s2_trap_cause   , // Trap cause
 
 input  wire [         XL:0] s2_alu_lhs      , // ALU left  operand
 input  wire [         XL:0] s2_alu_rhs      , // ALU right operand
+input  wire [          5:0] s2_alu_shamt    , // ALU Shift amount
 input  wire                 s2_alu_add      , // ALU Operation to perform.
 input  wire                 s2_alu_and      , // 
 input  wire                 s2_alu_or       , // 
@@ -122,6 +125,7 @@ output reg  [ MEM_DATA_R:0] s3_dmem_wdata   ,
 `endif
 
 output wire                 dmem_req        , // Memory request
+output wire                 dmem_rtype      , // Memory request type.
 output wire [ MEM_ADDR_R:0] dmem_addr       , // Memory request address
 output wire                 dmem_wen        , // Memory request write enable
 output wire [ MEM_STRB_R:0] dmem_strb       , // Memory request write strobe
@@ -194,7 +198,9 @@ wire        mdu_flush   = e_new_instr && mdu_valid;
 wire                 cfu_op_any      =
     s2_cfu_beq  || s2_cfu_bge  || s2_cfu_bgeu || s2_cfu_blt  || s2_cfu_bltu ||
     s2_cfu_bne  || s2_cfu_ebrk || s2_cfu_ecall|| s2_cfu_j    || s2_cfu_jal  ||
-    s2_cfu_jalr || s2_cfu_mret || s2_cfu_wfi  ;
+    s2_cfu_jalr || s2_cfu_mret || s2_cfu_wfi ;
+
+wire                 cfu_valid       = !wfi_sleep && s2_valid;
 
 wire                 cfu_new_instr   = e_new_instr;
 wire [         XL:0] cfu_new_pc      ; // New program counter
@@ -211,6 +217,7 @@ wire                 cfu_finished    ; // CFU instruction finished.
 // ------------------------------------------------------------
 
 wire        lsu_valid       =  s2_valid && !s3_trap && !s2_cancel&&
+                               !wfi_sleep &&
                               (s2_lsu_load || s2_lsu_store);
 wire        lsu_ready       ;
 wire        lsu_trap_addr   ;
@@ -357,6 +364,7 @@ end
 core_pipe_exec_alu i_core_pipe_exec_alu (
 .opr_a      (s2_alu_lhs     ), // Input operand A
 .opr_b      (s2_alu_rhs     ), // Input operand B
+.shamt      (s2_alu_shamt   ), // Shift amount.
 .word       (s2_alu_word    ), // Operate on low 32-bits of XL.
 .op_add     (s2_alu_add     ), // Select output of adder
 .op_sub     (s2_alu_sub     ), // Subtract opr_a from opr_b else add
@@ -421,6 +429,7 @@ core_pipe_exec_lsu #(
 .ready      (lsu_ready      ), // Read data ready
 .trap_addr  (lsu_trap_addr  ), // Address alignment error
 .dmem_req   (dmem_req       ), // Memory request
+.dmem_rtype (dmem_rtype     ), // Memory request type.
 .dmem_addr  (dmem_addr      ), // Memory request address
 .dmem_wen   (dmem_wen       ), // Memory request write enable
 .dmem_strb  (dmem_strb      ), // Memory request write strobe
@@ -444,7 +453,7 @@ core_pipe_exec_cfu #(
 .cmp_eq     (alu_cmp_eq     ),
 .cmp_lt     (alu_cmp_lt     ),
 .cmp_ltu    (alu_cmp_ltu    ),
-.valid      (s2_valid       ),
+.valid      (cfu_valid      ),
 .pc         (s2_pc          ), // Current program counter
 .npc        (s2_npc         ), // Next natural program counter
 .rs1        (s2_alu_lhs     ), // Source register 1

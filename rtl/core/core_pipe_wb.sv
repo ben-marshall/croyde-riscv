@@ -50,6 +50,7 @@ input  wire [         XL:0] csr_rdata       , // CSR read data
 input  wire                 csr_error       , // CSR access error
 
 input  wire [         XL:0] mtvec_base      , // Current trap vector addr
+input  wire [         XL:0] csr_mepc        , // Current mepc
 
 output wire                 trap_cpu        , // trap occured due to CPU
 output wire                 trap_int        , // trap occured due to interrupt
@@ -262,17 +263,37 @@ always @(posedge g_clk) begin
     end
 end
 
+wire        cfu_wfi      = s3_cfu_op == CFU_OP_WFI  && s3_full;
+wire        cfu_mret     = s3_cfu_op == CFU_OP_MRET && s3_full;
+
 // Wait for interrupt instruction.
-assign      wfi_sleep    = s3_cfu_op == CFU_OP_WFI && !int_pending;
-wire        wfi_wakeup   = s3_cfu_op == CFU_OP_WFI &&  int_pending;
+
+reg         wfi_woken    ;
+wire      n_wfi_woken    = wfi_woken ? !e_new_instr : wfi_wakeup && !e_new_instr;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        wfi_woken <= 1'b0;
+    end else begin
+        wfi_woken <= n_wfi_woken;
+    end
+end
+
+assign      wfi_sleep    = cfu_wfi && !int_pending && !wfi_woken;
+wire        wfi_wakeup   = cfu_wfi &&  int_pending;
 
 wire        cfu_wait     = s3_cf_valid && !s3_cf_ack    ||
                            wfi_sleep                    ;
 
-assign      s3_cf_target = raise_int ? int_tvec : mtvec_base;
-assign      s3_cf_valid  = !cf_done && (r_trapped || trap_cpu || raise_int);
+assign      s3_cf_target = cfu_mret     ?   csr_mepc    :
+                           raise_int    ?   int_tvec    :
+                                            mtvec_base  ;
 
-assign      exec_mret    = s3_cfu_op == CFU_OP_MRET && e_instr_ret;
+assign      s3_cf_valid  = !cf_done && (
+    r_trapped || trap_cpu || raise_int || cfu_mret
+);
+
+assign      exec_mret    = cfu_mret && e_instr_ret;
 
 //
 // Traps and interrupts.
@@ -315,11 +336,11 @@ assign trap_cause     = raise_int       ? int_cause             :
 
 assign trap_mtval     = 0 ;
 
-// FIXME: Bug with trap epc on an interrupt.
 // - should be n_s3_pc iff we are trapping due to an interrupt.
 // - Note that if the interrupted instruction is a control flow
-//   change, then we must select the target of the control flow change.
-assign trap_pc        = s3_pc ;
+//   change, then we must still select the next *natural* PC, not the
+//   target of the contrl flow change.
+assign trap_pc        = trap_int ? s3_n_pc : s3_pc;
 
 //
 // Trace

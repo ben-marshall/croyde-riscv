@@ -1,12 +1,22 @@
 
+`include "ccx_if.svh"
+
 //
 // module: ccx_ic_top
 //
 //  Core complex interconnect top.
 //
 module ccx_ic_top #(
-parameter   AW = 39,    // Address width
-parameter   DW = 64     // Data width
+parameter        AW = 39,    // Address width
+parameter        DW = 64,    // Data width
+parameter ROM_BASE  = 39'h00000000,
+parameter ROM_SIZE  = 39'h000003FF,
+parameter RAM_BASE  = 39'h00010000,
+parameter RAM_SIZE  = 39'h0000FFFF,
+parameter EXT_BASE  = 39'h10000000,
+parameter EXT_SIZE  = 39'h0FFFFFFF,
+parameter MMIO_BASE = 39'h00020000,
+parameter MMIO_SIZE = 39'h000000FF
 )(
 
 input  wire       g_clk     ,
@@ -23,40 +33,20 @@ core_mem_bus.REQ  if_mmio
 );
 
 //
-// Parameters
-// ------------------------------------------------------------
-
-parameter ROM_MASK  = 'hFFFFFE00;
-parameter ROM_BASE  = 'h00000000;
-parameter ROM_SIZE  = 'h000003FF;
-
-parameter RAM_MASK  = 'hFFFE0000;
-parameter RAM_BASE  = 'h00010000;
-parameter RAM_SIZE  = 'h0000FFFF;
-
-parameter EXT_MASK  = 'hE0000000;
-parameter EXT_BASE  = 'h10000000;
-parameter EXT_SIZE  = 'h0FFFFFFF;
-
-parameter MMIO_MASK ;
-parameter MMIO_BASE ;
-parameter MMIO_SIZE ;
-
-//
 // Internal busses
 // ------------------------------------------------------------
 
 // Instruction memory busses.
-core_mem_bus if_imem_rom;
-core_mem_bus if_imem_ram;
-core_mem_bus if_imem_ext;
-core_mem_bus if_imem_mmio;
+core_mem_bus #() if_imem_rom  ();
+core_mem_bus #() if_imem_ram  ();
+core_mem_bus #() if_imem_ext  ();
+core_mem_bus #() if_imem_mmio ();
 
 // Data memory busses.
-core_mem_bus if_dmem_rom;
-core_mem_bus if_dmem_ram;
-core_mem_bus if_dmem_ext;
-core_mem_bus if_dmem_mmio;
+core_mem_bus #() if_dmem_rom  ();
+core_mem_bus #() if_dmem_ram  ();
+core_mem_bus #() if_dmem_ext  ();
+core_mem_bus #() if_dmem_mmio ();
 
 //
 // Submodule instances
@@ -67,16 +57,12 @@ core_mem_bus if_dmem_mmio;
 ccx_ic_router #(
 .AW       (AW        ),    // Address width
 .DW       (DW        ),    // Data width
-.ROM_MASK (ROM_MASK  ),
 .ROM_BASE (ROM_BASE  ),
 .ROM_SIZE (ROM_SIZE  ),
-.RAM_MASK (RAM_MASK  ),
 .RAM_BASE (RAM_BASE  ),
 .RAM_SIZE (RAM_SIZE  ),
-.EXT_MASK (EXT_MASK  ),
 .EXT_BASE (EXT_BASE  ),
 .EXT_SIZE (EXT_SIZE  ),
-.MMIO_MASK(MMIO_MASK ),
 .MMIO_BASE(MMIO_BASE ),
 .MMIO_SIZE(MMIO_SIZE )
 ) i_ccx_ic_router_imem (
@@ -94,16 +80,12 @@ ccx_ic_router #(
 ccx_ic_router #(
 .AW       (AW        ),    // Address width
 .DW       (DW        ),    // Data width
-.ROM_MASK (ROM_MASK  ),
 .ROM_BASE (ROM_BASE  ),
 .ROM_SIZE (ROM_SIZE  ),
-.RAM_MASK (RAM_MASK  ),
 .RAM_BASE (RAM_BASE  ),
 .RAM_SIZE (RAM_SIZE  ),
-.EXT_MASK (EXT_MASK  ),
 .EXT_BASE (EXT_BASE  ),
 .EXT_SIZE (EXT_SIZE  ),
-.MMIO_MASK(MMIO_MASK ),
 .MMIO_BASE(MMIO_BASE ),
 .MMIO_SIZE(MMIO_SIZE )
 ) i_ccx_ic_router_dmem (

@@ -1,5 +1,5 @@
 
-
+#include "uc64_csp.h"
 #include "unit_test.h"
 
 //! Place we go when any traps occur.
@@ -24,9 +24,9 @@ void c_trap_handler() {
     int64_t cause          = mcause & 0x7FFFFFFFFFFFFFFFL;
     trap_handler_seen  = -1;
 
-    if(was_interrupt && !expect_interrupt) {test_fail();}
-    if(was_exception && !expect_exception) {test_fail();}
-    if(cause         !=  expect_cause    ) {test_fail();}
+    if(was_interrupt && !expect_interrupt) {__putstr("A\n"); test_fail();}
+    if(was_exception && !expect_exception) {__putstr("B\n"); test_fail();}
+    if(cause         !=  expect_cause    ) {__putstr("C\n"); test_fail();}
 
     trap_handler_seen = expect_code;
 
@@ -65,38 +65,50 @@ int test_wfi_interrupts_disabled() {
     
     // Setup timer interrupt for a short time in the future.
     uint64_t  delay     = 500;
-    uint64_t  mtime     = __rd_mtime();
-    __wr_mtimecmp(mtime + delay);
+    uint64_t  mtime     = uc64_csp_rd_mtime();
+    uc64_csp_wr_mtimecmp(mtime + delay);
 
     // Read number of instructions retired.
-    uint64_t iret_pre   = __rdinstret();
-    uint64_t time_pre   = __rdtime   ();
+    uint64_t iret_pre   = uc64_csp_rdinstret();
+    uint64_t time_pre   = uc64_csp_rdtime   ();
     
     // Go to sleep here waiting for an interrupt.
     __wfi();
 
     // Wake up again and check instructions retired.
-    uint64_t iret_post  = __rdinstret();
-    uint64_t time_post  = __rdtime   ();
+    uint64_t iret_post  = uc64_csp_rdinstret();
+    uint64_t time_post  = uc64_csp_rdtime   ();
     uint64_t mepc_post  = rd_mepc();
 
     uint64_t iret_total = iret_post - iret_pre;
     uint64_t time_total = time_post - time_pre;
 
     // Check we didn't trap.
-    if(trap_handler_seen == expect_code){test_fail();}
+    if(trap_handler_seen == expect_code){
+        __putstr("D\n");
+        test_fail();
+    }
 
     // Check mepc did not change.
-    if(mepc_pre != mepc_post) {test_fail();}
+    if(mepc_pre != mepc_post) {
+        __putstr("E\n");
+        test_fail();
+    }
 
     // Check very few instructions were retired.
-    if(iret_total        >   20) {test_fail();}
+    if(iret_total        >   5) {
+        __putstr("F\n");
+        test_fail();
+    }
 
     // Check elapsed cycles is about what we expect.
-    if(time_total        <  delay) {test_fail();}
+    if(time_total        >  delay) {
+        __putstr("G\n");
+        test_fail();
+    }
 
     // Clean up - put mtimecmp back to something enormous.
-    __wr_mtimecmp(-1);
+    uc64_csp_wr_mtimecmp(-1);
 
     return 0;
 }
@@ -139,19 +151,19 @@ int test_wfi_interrupts_enabled() {
     
     // Setup timer interrupt for a short time in the future.
     uint64_t  delay     = 500;
-    uint64_t  mtime     = __rd_mtime();
-    __wr_mtimecmp(mtime + delay);
+    uint64_t  mtime     = uc64_csp_rd_mtime();
+    uc64_csp_wr_mtimecmp(mtime + delay);
 
     // Read number of instructions retired.
-    uint64_t iret_pre   = __rdinstret();
-    uint64_t time_pre   = __rdtime   ();
+    uint64_t iret_pre   = uc64_csp_rdinstret();
+    uint64_t time_pre   = uc64_csp_rdtime   ();
     
     // Go to sleep here waiting for an interrupt.
     __wfi();
 
     // Wake up again and check instructions retired.
-    uint64_t iret_post  = __rdinstret();
-    uint64_t time_post  = __rdtime   ();
+    uint64_t iret_post  = uc64_csp_rdinstret();
+    uint64_t time_post  = uc64_csp_rdtime   ();
     uint64_t mepc_post  = rd_mepc();
 
     uint64_t iret_total = iret_post - iret_pre;
@@ -164,13 +176,13 @@ int test_wfi_interrupts_enabled() {
     if(mepc_pre == mepc_post) {test_fail();}
 
     // Check very few instructions were retired.
-    if(iret_total        >   60) {test_fail();}
+    if(iret_total        >  100) {__putstr("X\n");test_fail();}
 
     // Check elapsed cycles is about what we expect.
-    if(time_total        <  100) {test_fail();}
+    if(time_total        <  100) {__putstr("Y\n");test_fail();}
 
     // Clean up - put mtimecmp back to something enormous.
-    __wr_mtimecmp(-1);
+    uc64_csp_wr_mtimecmp(-1);
     
     // Disable interrupts.
     clr_mstatus (MSTATUS_MIE);
