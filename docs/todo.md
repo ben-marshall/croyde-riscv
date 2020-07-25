@@ -45,7 +45,7 @@
     
     - [ ] Routing to load/store unit and eventually to PMP.
 
-  - [ ] `TW` bit of mstatus functionality. Timeout wait.
+  - [X] `TW` bit of mstatus functionality. Timeout wait.
 
   - [ ] Distinguish user mode accesses to CSRs
 

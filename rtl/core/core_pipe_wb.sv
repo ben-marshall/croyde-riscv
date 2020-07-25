@@ -249,9 +249,6 @@ wire        lsu_trap_load  = lsu_load   && dmem_err && p_lsu_req;
 wire        lsu_trap_store = lsu_store  && dmem_err && p_lsu_req;
 wire        trap_lsu       = lsu_trap_load || lsu_trap_store;
 
-//
-// Control flow changes
-// ------------------------------------------------------------
 
 //
 // Control flow changes
@@ -268,6 +265,14 @@ always @(posedge g_clk) begin
 end
 
 wire        cfu_wfi      = s3_cfu_op == CFU_OP_WFI  && s3_full;
+
+// Trap the WFI as in user mode and mstatus.tw=1
+wire        cfu_wfi_trap = cfu_wfi && !mode_m && mstatus_tw;
+
+// Execute the WFI - wait for the interrupt.
+wire        cfu_wfi_ex   = cfu_wfi && (mode_m || !mstatus_tw);
+
+// Execute an MRET instruction.
 wire        cfu_mret     = s3_cfu_op == CFU_OP_MRET && s3_full;
 
 // Wait for interrupt instruction.
@@ -283,8 +288,8 @@ always @(posedge g_clk) begin
     end
 end
 
-assign      wfi_sleep    = cfu_wfi && !int_pending && !wfi_woken;
-wire        wfi_wakeup   = cfu_wfi &&  int_pending;
+assign      wfi_sleep    = cfu_wfi_ex && !int_pending && !wfi_woken;
+wire        wfi_wakeup   = cfu_wfi_ex &&  int_pending;
 
 wire        cfu_wait     = s3_cf_valid && !s3_cf_ack    ||
                            wfi_sleep                    ;
@@ -326,16 +331,19 @@ assign trap_cpu       = s3_full && !raise_int && (
     s3_trap     ||
     trap_cfu    ||
     trap_csr    ||
-    trap_lsu
+    trap_lsu    ||
+    cfu_wfi_trap
 );
 
 assign trap_int       = int_ack; // trap occured due to interrupt
+
+wire   cause_iopcode  = csr_error || cfu_wfi_trap;
 
 assign trap_cause     = raise_int       ? int_cause             :
                         s3_trap         ? {2'b00, s3_rd       } :
                         lsu_trap_load   ? TRAP_LDACCESS         :
                         lsu_trap_store  ? TRAP_STACCESS         :
-                        csr_error       ? TRAP_IOPCODE          :
+                        cause_iopcode   ? TRAP_IOPCODE          :
                                         'b0                     ;
 
 assign trap_mtval     = 0 ;
