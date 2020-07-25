@@ -126,7 +126,7 @@ wire [XL:0] reg_mideleg         = 64'b0;
 
 wire [XL:0] reg_mip = {52'b0,mip_meip,3'b0,mip_mtip,3'b0,mip_msip,3'b0};
 
-wire wen_mie = csr_en && csr_wr  && csr_addr == ADDR_MIE;
+wire wen_mie = mode_m && csr_en && csr_wr  && csr_addr == ADDR_MIE;
 
 wire [XL:0] reg_mie = {52'b0,mie_meie,3'b0,mie_mtie,3'b0,mie_msie,3'b0};
 
@@ -217,7 +217,7 @@ wire [XL:0] reg_mstatus         = {
     reg_mstatus_uie    
 };
 
-wire        wen_mstatus     = csr_wr && csr_addr == ADDR_MSTATUS;
+wire        wen_mstatus     = mode_m && csr_wr && csr_addr == ADDR_MSTATUS;
 wire        wen_mstatus_mie = wen_mstatus || trap_cpu || trap_int || exec_mret;
 wire        wen_mstatus_mpie= wen_mstatus || trap_cpu || trap_int || exec_mret;
 
@@ -248,6 +248,7 @@ wire [ 1:0] n_mstatus_wpri2     = csr_wdata[10: 9];
 wire [ 7:0] n_mstatus_wpri1     = csr_wdata[30:23];
 
 
+// TODO: csr instruction writes of mpp.
 wire [ 1:0] n_mstatus_mpp = {n_mode_m, n_mode_m};
 wire        mstatus_mpp_m = reg_mstatus_mpp == MPP_M;
 wire        mstatus_mpp_u = reg_mstatus_mpp == MPP_U;
@@ -362,7 +363,7 @@ wire [XL:0] reg_mtvec       = {
 assign        mtvec_base    = {reg_mtvec_base, 2'b00}   ;
 assign        mtvec_mode    =  reg_mtvec_mode           ;
 
-wire          wen_mtvec     = csr_wr && csr_addr == ADDR_MTVEC;
+wire          wen_mtvec     = mode_m && csr_wr && csr_addr == ADDR_MTVEC;
 
 
 wire [XL-2:0] n_mtvec_base  = {
@@ -407,7 +408,7 @@ wire[XL:0] n_reg_mscratch =
     csr_wr_clr ? reg_mscratch & ~csr_wdata :
                  csr_wdata                 ;
 
-wire       wen_mscratch = csr_wr && csr_addr == ADDR_MSCRATCH;
+wire       wen_mscratch = mode_m && csr_wr && csr_addr == ADDR_MSCRATCH;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
@@ -429,7 +430,7 @@ wire [XL:0] n_reg_mtval =
     csr_wr_clr ? reg_mtval & ~csr_wdata:
                  csr_wdata             ;
 
-wire wen_mtval = csr_wr && csr_addr == ADDR_MTVAL;
+wire wen_mtval = mode_m && csr_wr && csr_addr == ADDR_MTVAL;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
@@ -457,9 +458,9 @@ wire [XL:0] reg_mepc = {
 // to mepc.
 assign      csr_mepc = wen_mepc ? {n_mepc,1'b0} : {reg_mepc_mepc, 1'b0};
 
-wire        wen_mepc = csr_wr  && csr_addr == ADDR_MEPC ||
-                       trap_cpu                             ||
-                       trap_int                             ;
+wire        wen_mepc = mode_m && csr_wr  && csr_addr == ADDR_MEPC   ||
+                       trap_cpu                                     ||
+                       trap_int                                     ;
 
 wire [XL-1:0] n_mepc   =
     trap_int || trap_cpu? trap_pc[XL:1]                     :
@@ -488,9 +489,9 @@ wire [XL:0] reg_mcause = {
     reg_mcause_cause
 };
 
-wire        wen_mcause = csr_wr  && csr_addr == ADDR_MCAUSE ||
-                         trap_cpu                               ||
-                         trap_int                               ;
+wire        wen_mcause = mode_m && csr_wr  && csr_addr == ADDR_MCAUSE   ||
+                         trap_cpu                                       ||
+                         trap_int                                       ;
 
 wire [XL-1:0] n_mcause_cause =
     trap_int || trap_cpu ? {32'b0,24'b0, trap_cause   }            :
@@ -533,7 +534,7 @@ assign inhibit_ir = mcountin_ir;
 assign inhibit_cy = mcountin_cy;
 assign inhibit_tm = mcountin_tm;
 
-wire wen_mcountin = csr_wr && csr_addr == ADDR_MCOUNTIN;
+wire wen_mcountin = mode_m && csr_wr && csr_addr == ADDR_MCOUNTIN;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
@@ -557,27 +558,27 @@ wire [XL:0] reg_mcountin = {
 // CSR read responses.
 // -------------------------------------------------------------------------
 
-wire   read_mstatus   = csr_en && csr_addr == ADDR_MSTATUS  ;
-wire   read_misa      = csr_en && csr_addr == ADDR_MISA     ;
-wire   read_medeleg   = csr_en && csr_addr == ADDR_MEDELEG  ;
-wire   read_mideleg   = csr_en && csr_addr == ADDR_MIDELEG  ;
-wire   read_mie       = csr_en && csr_addr == ADDR_MIE      ;
-wire   read_mtvec     = csr_en && csr_addr == ADDR_MTVEC    ;
-wire   read_mscratch  = csr_en && csr_addr == ADDR_MSCRATCH ;
-wire   read_mepc      = csr_en && csr_addr == ADDR_MEPC     ;
-wire   read_mcause    = csr_en && csr_addr == ADDR_MCAUSE   ;
-wire   read_mtval     = csr_en && csr_addr == ADDR_MTVAL    ;
-wire   read_mip       = csr_en && csr_addr == ADDR_MIP      ;
-wire   read_mvendorid = csr_en && csr_addr == ADDR_MVENDORID;
-wire   read_marchid   = csr_en && csr_addr == ADDR_MARCHID  ;
-wire   read_mimpid    = csr_en && csr_addr == ADDR_MIMPID   ;
-wire   read_mhartid   = csr_en && csr_addr == ADDR_MHARTID  ;
-wire   read_cycle     = csr_en && csr_addr == ADDR_CYCLE    ;
-wire   read_time      = csr_en && csr_addr == ADDR_TIME     ;
-wire   read_instret   = csr_en && csr_addr == ADDR_INSTRET  ;
-wire   read_mcycle    = csr_en && csr_addr == ADDR_MCYCLE   ;
-wire   read_minstret  = csr_en && csr_addr == ADDR_MINSTRET ;
-wire   read_mcountin  = csr_en && csr_addr == ADDR_MCOUNTIN ;
+wire   read_mstatus   = mode_m && csr_en && csr_addr == ADDR_MSTATUS  ;
+wire   read_misa      = mode_m && csr_en && csr_addr == ADDR_MISA     ;
+wire   read_medeleg   = mode_m && csr_en && csr_addr == ADDR_MEDELEG  ;
+wire   read_mideleg   = mode_m && csr_en && csr_addr == ADDR_MIDELEG  ;
+wire   read_mie       = mode_m && csr_en && csr_addr == ADDR_MIE      ;
+wire   read_mtvec     = mode_m && csr_en && csr_addr == ADDR_MTVEC    ;
+wire   read_mscratch  = mode_m && csr_en && csr_addr == ADDR_MSCRATCH ;
+wire   read_mepc      = mode_m && csr_en && csr_addr == ADDR_MEPC     ;
+wire   read_mcause    = mode_m && csr_en && csr_addr == ADDR_MCAUSE   ;
+wire   read_mtval     = mode_m && csr_en && csr_addr == ADDR_MTVAL    ;
+wire   read_mip       = mode_m && csr_en && csr_addr == ADDR_MIP      ;
+wire   read_mvendorid = mode_m && csr_en && csr_addr == ADDR_MVENDORID;
+wire   read_marchid   = mode_m && csr_en && csr_addr == ADDR_MARCHID  ;
+wire   read_mimpid    = mode_m && csr_en && csr_addr == ADDR_MIMPID   ;
+wire   read_mhartid   = mode_m && csr_en && csr_addr == ADDR_MHARTID  ;
+wire   read_cycle     = mode_m && csr_en && csr_addr == ADDR_CYCLE    ;
+wire   read_time      = mode_m && csr_en && csr_addr == ADDR_TIME     ;
+wire   read_instret   = mode_m && csr_en && csr_addr == ADDR_INSTRET  ;
+wire   read_mcycle    = mode_m && csr_en && csr_addr == ADDR_MCYCLE   ;
+wire   read_minstret  = mode_m && csr_en && csr_addr == ADDR_MINSTRET ;
+wire   read_mcountin  = mode_m && csr_en && csr_addr == ADDR_MCOUNTIN ;
 
 wire   valid_addr     = 
     read_mstatus   ||

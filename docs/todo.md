@@ -47,6 +47,8 @@
 
   - [ ] `TW` bit of mstatus functionality. Timeout wait.
 
+  - [ ] Distinguish user mode accesses to CSRs
+
 ## Verif
 
 - [ ] csrw mcycle
