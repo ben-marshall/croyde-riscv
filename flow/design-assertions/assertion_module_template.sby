@@ -14,7 +14,9 @@ smtbmc  boolector
 [script]
 echo on
 verilog_defaults -add -IREPO_HOME/rtl/core/
-verilog_defaults -add -DUC64_TRACE_CSRS=1
+verilog_defaults -add -DRISCV_FORMAL_NRET=1
+verilog_defaults -add -DRISCV_FORMAL_ILEN=32
+verilog_defaults -add -DRISCV_FORMAL_XLEN=64
 read_verilog -sv -formal REPO_HOME/verif/core/design-assertions/wrapper.sv
 read_verilog -sv -formal REPO_HOME/verif/core/design-assertions/fairness.sv
 read_verilog -sv -formal REPO_HOME/rtl/core/*.sv
@@ -27,6 +29,6 @@ chformal -early
 REPO_HOME/extern/riscv-formal/checks/rvfi_macros.vh
 
 [file defines.svh]
-`define UC64_TRACE_CSRS 1
 `define DESIGNER_ASSERTION_MODULE assertion_module_template
 `define CLOCK_GATE_NO_LATCH 1
+`define RVFI
