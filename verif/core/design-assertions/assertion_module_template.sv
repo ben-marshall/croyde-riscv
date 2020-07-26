@@ -11,7 +11,7 @@
 module assertion_module_template (
 input wire                 clock        ,
 input wire                 clock_test   , // Gated clock test
-input wire                 g_resetn     
+input wire                 g_resetn     ,
 
       `ifdef RVFI
       `RVFI_INPUTS                      ,

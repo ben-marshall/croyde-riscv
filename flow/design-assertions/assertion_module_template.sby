@@ -1,0 +1,32 @@
+[tasks]
+task_cover cover
+task_prove prove
+
+[options]
+depth   20
+
+prove: mode bmc
+cover: mode cover
+
+[engines]
+smtbmc  boolector
+
+[script]
+echo on
+verilog_defaults -add -IREPO_HOME/rtl/core/
+verilog_defaults -add -DUC64_TRACE_CSRS=1
+read_verilog -sv -formal REPO_HOME/verif/core/design-assertions/wrapper.sv
+read_verilog -sv -formal REPO_HOME/verif/core/design-assertions/fairness.sv
+read_verilog -sv -formal REPO_HOME/rtl/core/*.sv
+read_verilog -sv -formal REPO_HOME/rtl/prim/*.sv
+read_verilog -sv -formal REPO_HOME/verif/core/design-assertions/assertion_module_template.sv
+prep -flatten -nordff -top design_assertions_wrapper 
+chformal -early
+
+[files]
+REPO_HOME/extern/riscv-formal/checks/rvfi_macros.vh
+
+[file defines.svh]
+`define UC64_TRACE_CSRS 1
+`define DESIGNER_ASSERTION_MODULE assertion_module_template
+`define CLOCK_GATE_NO_LATCH 1

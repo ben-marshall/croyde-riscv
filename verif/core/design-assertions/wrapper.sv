@@ -61,7 +61,7 @@ module design_assertions_wrapper (
 `endif
 
 `ifdef DESIGNER_ASSERTION_MODULE
-`DESIGNER_ASSERTION_MODULE (
+`DESIGNER_ASSERTION_MODULE i_checker (
 .clock        (clock        ), // Global clock
 .clock_test   (clock_test   ), // Global clock test
 .g_resetn     (g_resetn     ), // Global active low sync reset.
