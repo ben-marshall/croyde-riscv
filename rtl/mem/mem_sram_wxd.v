@@ -44,11 +44,11 @@ reg [7:0] mem [SIZE_BYTES-1:0];
 wire [BAW:0] addrin = {addr, {$clog2(BYTE_LANES){1'b0}}};
 
 initial begin
-    $display("Memory Width: %d Bits / %d Bytes" , WIDTH, BYTE_LANES);
-    $display("Memory Depth: %d Words", DEPTH);
-    $display("Memory Size : %d Bytes", SIZE_BYTES);
-    $display("Word addr w : %d Bits", WORD_ADDR_W);
-    $display("Byte addr w : %d Bits", BYTE_ADDR_W);
+    //$display("Memory Width: %d Bits / %d Bytes" , WIDTH, BYTE_LANES);
+    //$display("Memory Depth: %d Words", DEPTH);
+    //$display("Memory Size : %d Bytes", SIZE_BYTES);
+    //$display("Word addr w : %d Bits", WORD_ADDR_W);
+    //$display("Byte addr w : %d Bits", BYTE_ADDR_W);
     if(MEMH != "") begin
         $display("Loading file: %s",MEMH);
         $readmemh(MEMH, mem);
