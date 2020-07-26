@@ -20,26 +20,35 @@ parameter [255*8:0] MEMH  = ""    // Memory file to read.
 input  wire         g_clk       ,
 input  wire         g_resetn    ,
 input  wire         cen         ,
-input  wire [S:0]   wstrb       ,
-input  wire [A:0]   addr        ,
-input  wire [W:0]   wdata       ,
-output reg  [W:0]   rdata       ,
+input  wire [BLW:0] wstrb       ,
+input  wire [WAW:0] addr        ,
+input  wire [DW :0] wdata       ,
+output reg  [DW :0] rdata       ,
 output reg          err
 );
 
+localparam BYTE_LANES   = WIDTH / 8;
+localparam SIZE_BYTES   = BYTE_LANES * DEPTH;
+localparam WORD_ADDR_W  = $clog2(DEPTH);
+localparam BYTE_ADDR_W  = WORD_ADDR_W + $clog2(BYTE_LANES);
 
-localparam W      = WIDTH-1;
-localparam D      = DEPTH-1;
-localparam S      = WIDTH/8-1;
-localparam B      = (WIDTH/8 * DEPTH)-1;
-localparam A      = $clog2(B+1)-1; 
+localparam DW           = WIDTH       - 1   ;
+localparam BLW          = BYTE_LANES  - 1   ;
+localparam WAW          = WORD_ADDR_W - 1   ;
+localparam BAW          = BYTE_ADDR_W - 1   ;
 
 // Byte array of memory.
-reg [7:0] mem [B:0];
+reg [7:0] mem [SIZE_BYTES-1:0];
 
-wire [A+$clog2(WIDTH/8):0] addrin = {addr, {$clog2(WIDTH/8){1'b0}}};
+// Byte aligned address.
+wire [BAW:0] addrin = {addr, {$clog2(BYTE_LANES){1'b0}}};
 
 initial begin
+    $display("Memory Width: %d Bits / %d Bytes" , WIDTH, BYTE_LANES);
+    $display("Memory Depth: %d Words", DEPTH);
+    $display("Memory Size : %d Bytes", SIZE_BYTES);
+    $display("Word addr w : %d Bits", WORD_ADDR_W);
+    $display("Byte addr w : %d Bits", BYTE_ADDR_W);
     if(MEMH != "") begin
         $display("Loading file: %s",MEMH);
         $readmemh(MEMH, mem);
@@ -60,13 +69,15 @@ end endgenerate
 
 genvar i;
 
-generate for (i = 0; i < WIDTH / 8; i = i + 1) begin
+generate for (i = 0; i < BYTE_LANES; i = i + 1) begin
+
+    wire [BAW:0] idx = i;
 
     //
     // Reads
     always @(posedge g_clk) begin
         if(cen) begin
-            rdata[8*i+:8] <= mem[addrin | i];
+            rdata[8*i+:8] <= mem[addrin | idx];
         end
     end
 
@@ -76,7 +87,7 @@ generate for (i = 0; i < WIDTH / 8; i = i + 1) begin
     
         always @(posedge g_clk) begin
             if(cen && wstrb[i]) begin
-                mem[addrin | i] <= wdata[8*i+:8];
+                mem[addrin | idx] <= wdata[8*i+:8];
             end
         end
 
