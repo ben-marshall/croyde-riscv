@@ -58,11 +58,16 @@ localparam  DW = 64;    // Data width
 // Internal address mapping.
 // ------------------------------------------------------------
 
-localparam  ROM_WIDTH = 64        ;
-localparam  ROM_DEPTH = 32        ;
+localparam  ROM_WIDTH = 64      ;
+localparam  ROM_DEPTH = ROM_SIZE / (ROM_WIDTH / 8) + 1;
 
-localparam  RAM_WIDTH = 64        ;
-localparam  RAM_DEPTH = 1024;
+localparam  RAM_WIDTH = 64      ;
+localparam  RAM_DEPTH = RAM_SIZE / (RAM_WIDTH / 8) + 1;
+
+// Address widths for rom/ram.
+localparam  ROMAW     = $clog2(ROM_DEPTH)-1;
+localparam  RAMAW     = $clog2(RAM_DEPTH)-1;
+
 
 //
 // Clock control
@@ -238,7 +243,7 @@ mem_sram_wxd #(
 .g_resetn    (g_resetn          ),
 .cen         (if_rom.req        ),
 .wstrb       (rom_wstrb         ),
-.addr        (if_rom.addr[10:3] ),
+.addr        (if_rom.addr[3+:1+ROMAW] ),
 .wdata       (if_rom.wdata      ),
 .rdata       (if_rom.rdata      ), 
 .err         (if_rom.err        )
@@ -258,7 +263,7 @@ mem_sram_wxd #(
 .g_resetn    (g_resetn          ),
 .cen         (if_ram.req        ),
 .wstrb       (ram_wstrb         ),
-.addr        (if_ram.addr[15:3] ),
+.addr        (if_ram.addr[3+:1+RAMAW] ),
 .wdata       (if_ram.wdata      ),
 .rdata       (if_ram.rdata      ),
 .err         (if_ram.err        )
