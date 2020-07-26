@@ -56,6 +56,50 @@ module design_assertions_wrapper (
 (*keep*) wire                      inhibit_tm   ; // Stop time counter.
 (*keep*) wire                      inhibit_ir   ; // Stop instret incrementing.
 
+`ifdef RVFI
+`RVFI_WIRES
+`endif
+
+`ifdef DESIGNER_ASSERTION_MODULE
+`DESIGNER_ASSERTION_MODULE (
+.clock        (clock        ), // Global clock
+.clock_test   (clock_test   ), // Global clock test
+.g_resetn     (g_resetn     ), // Global active low sync reset.
+.int_sw       (int_sw       ), // Software interrupt
+.int_ext      (int_ext      ), // External interrupt
+.int_ti       (int_ti       ), // Timer    interrupt
+.imem_req     (imem_req     ), // Memory request
+.imem_addr    (imem_addr    ), // Memory request address
+.imem_wen     (imem_wen     ), // Memory request write enable
+.imem_strb    (imem_strb    ), // Memory request write strobe
+.imem_wdata   (imem_wdata   ), // Memory write data.
+.imem_gnt     (imem_gnt     ), // Memory response valid
+.imem_err     (imem_err     ), // Memory response error
+.imem_rdata   (imem_rdata   ), // Memory response read data
+.dmem_req     (dmem_req     ), // Memory request
+.dmem_addr    (dmem_addr    ), // Memory request address
+.dmem_wen     (dmem_wen     ), // Memory request write enable
+.dmem_strb    (dmem_strb    ), // Memory request write strobe
+.dmem_wdata   (dmem_wdata   ), // Memory write data.
+.dmem_gnt     (dmem_gnt     ), // Memory response valid
+.dmem_err     (dmem_err     ), // Memory response error
+.dmem_rdata   (dmem_rdata   ), // Memory response read data
+`ifdef RVFI
+`RVFI_CONN                   , // Formal checker interface.
+`endif
+.instr_ret    (instr_ret    ), // Instruction retired;
+.ctr_time     (ctr_time     ), // The time counter value.
+.ctr_cycle    (ctr_cycle    ), // The cycle counter value.
+.ctr_instret  (ctr_instret  ), // The instret counter value.
+.inhibit_cy   (inhibit_cy   ), // Stop cycle counter incrementing.
+.inhibit_tm   (inhibit_tm   ), // Stop time counter incrementing.
+.inhibit_ir   (inhibit_ir   ), // Stop instret incrementing.
+.trs_valid    (trs_valid    ), // Instruction trace valid
+.trs_instr    (trs_instr    ), // Instruction trace data
+.trs_pc       (trs_pc       )  // Instruction trace PC
+);
+`endif
+
 
 //
 // Fairness and assumptions
@@ -150,6 +194,9 @@ core_top #() i_dut (
 .dmem_gnt     (dmem_gnt     ), // Memory response valid
 .dmem_err     (dmem_err     ), // Memory response error
 .dmem_rdata   (dmem_rdata   ), // Memory response read data
+`ifdef RVFI
+`RVFI_CONN                   , // Formal checker interface.
+`endif
 .instr_ret    (instr_ret    ), // Instruction retired;
 .ctr_time     (ctr_time     ), // The time counter value.
 .ctr_cycle    (ctr_cycle    ), // The cycle counter value.
