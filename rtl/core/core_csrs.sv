@@ -27,6 +27,10 @@ input  wire        exec_mret        , // MRET instruction executed.
 output reg         mode_m           , // Currently in Machine mode.
 output reg         mode_u           , // Currently in User    mode.
 
+`ifdef RVFI
+`DA_CSR_OUTPUTS(wire,)              , // CSR Value tracing.
+`endif
+
 output wire        mstatus_tw       , // Timeout wait for WFI.
 output wire        mstatus_mie      , // Global interrupt enable.
 output wire        mstatus_mprv_m   , // Memory access like machine mode.
@@ -630,6 +634,30 @@ assign csr_rdata =
     {64{read_mcycle   }} & ctr_cycle            |
     {64{read_minstret }} & ctr_instret          |
     {64{read_mcountin }} & reg_mcountin         ;
+
+`ifdef RVFI
+assign da_mstatus    = reg_mstatus   ;
+assign da_misa       = reg_misa      ;
+assign da_medeleg    = reg_medeleg   ;
+assign da_mideleg    = reg_mideleg   ;
+assign da_mie        = reg_mie       ;
+assign da_mtvec      = reg_mtvec     ;
+assign da_mscratch   = reg_mscratch  ;
+assign da_mepc       = reg_mepc      ;
+assign da_mcause     = reg_mcause    ;
+assign da_mtval      = reg_mtval     ;
+assign da_mip        = reg_mip       ;
+assign da_mvendorid  = reg_mvendorid ;
+assign da_marchid    = reg_marchid   ;
+assign da_mimpid     = reg_mimpid    ;
+assign da_mhartid    = reg_mhartid   ;
+assign da_cycle      = ctr_cycle     ;
+assign da_mtime      = ctr_time      ;
+assign da_instret    = ctr_instret   ;
+assign da_cycle      = ctr_cycle     ;
+assign da_instret    = ctr_instret   ;
+assign da_mcountin   = reg_mcountin  ;
+`endif
 
 endmodule
 

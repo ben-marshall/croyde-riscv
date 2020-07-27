@@ -1,5 +1,6 @@
 
 `include "rvfi_macros.vh"
+`include "da_macros.svh"
 
 //
 // module: assertion_module_template
@@ -15,6 +16,7 @@ input wire                 g_resetn     ,
 
       `ifdef RVFI
       `RVFI_INPUTS                      ,
+      `DA_CSR_INPUTS()                  ,
       `endif
 
 input wire                 imem_req     , // Mem request

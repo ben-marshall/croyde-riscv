@@ -1,4 +1,6 @@
 
+`include "da_macros.svh"
+
 //
 // module: rvfi_wrapper
 //

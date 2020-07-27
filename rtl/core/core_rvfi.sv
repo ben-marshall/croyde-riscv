@@ -6,6 +6,8 @@ input g_clk     ,
 input g_resetn  ,
 
 `RVFI_OUTPUTS   ,
+`DA_CSR_INPUTS(_s3)                         ,
+`DA_CSR_OUTPUTS(reg,_out)                   ,
 
 //
 // Inputs which the core uses to drive the RVFI interface.
@@ -114,6 +116,26 @@ always @(posedge g_clk) begin
         rvfi_rs2_rdata   <= n_rs2_rdata   ;
 
         rvfi_mode        <= n_mode        ;
+
+        da_out_mstatus   <= da_s3_mstatus  ;
+        da_out_misa      <= da_s3_misa     ;
+        da_out_medeleg   <= da_s3_medeleg  ;
+        da_out_mideleg   <= da_s3_mideleg  ;
+        da_out_mie       <= da_s3_mie      ;
+        da_out_mtvec     <= da_s3_mtvec    ;
+        da_out_mscratch  <= da_s3_mscratch ;
+        da_out_mepc      <= da_s3_mepc     ;
+        da_out_mcause    <= da_s3_mcause   ;
+        da_out_mtval     <= da_s3_mtval    ;
+        da_out_mip       <= da_s3_mip      ;
+        da_out_mvendorid <= da_s3_mvendorid;
+        da_out_marchid   <= da_s3_marchid  ;
+        da_out_mimpid    <= da_s3_mimpid   ;
+        da_out_mhartid   <= da_s3_mhartid  ;
+        da_out_cycle     <= da_s3_cycle    ;
+        da_out_mtime     <= da_s3_mtime    ;
+        da_out_instret   <= da_s3_instret  ;
+        da_out_mcountin  <= da_s3_mcountin ;
     end
 end
 

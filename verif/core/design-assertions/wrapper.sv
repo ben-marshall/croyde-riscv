@@ -1,6 +1,7 @@
 
 `include "defines.svh"
 `include "rvfi_macros.vh"
+`include "da_macros.svh"
 
 //
 // module: design_assertions_wrapper
@@ -58,6 +59,7 @@ module design_assertions_wrapper (
 
 `ifdef RVFI
 `RVFI_WIRES
+`DA_CSR_WIRES()
 `endif
 
 `ifdef DESIGNER_ASSERTION_MODULE
@@ -86,6 +88,7 @@ module design_assertions_wrapper (
 .dmem_rdata   (dmem_rdata   ), // Memory response read data
 `ifdef RVFI
 `RVFI_CONN                   , // Formal checker interface.
+`DA_CSR_CONN(,)              ,
 `endif
 .instr_ret    (instr_ret    ), // Instruction retired;
 .ctr_time     (ctr_time     ), // The time counter value.
@@ -196,6 +199,7 @@ core_top #() i_dut (
 .dmem_rdata   (dmem_rdata   ), // Memory response read data
 `ifdef RVFI
 `RVFI_CONN                   , // Formal checker interface.
+`DA_CSR_CONN(,)              ,
 `endif
 .instr_ret    (instr_ret    ), // Instruction retired;
 .ctr_time     (ctr_time     ), // The time counter value.

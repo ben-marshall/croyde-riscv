@@ -36,6 +36,7 @@ input  wire [ MEM_DATA_R:0] dmem_rdata   , // Memory response read data
 
 `ifdef RVFI
 `RVFI_OUTPUTS                            , // Formal checker interface.
+`DA_CSR_OUTPUTS(wire,)                   , // CSR Value tracing.
 `endif
 
 output wire                 wfi_sleep    , // Core is asleep due to WFI.
@@ -226,6 +227,7 @@ wire                 s3_dmem_valid  ;
 wire [ MEM_ADDR_R:0] s3_dmem_addr   ;
 wire [ MEM_STRB_R:0] s3_dmem_strb   ;
 wire [ MEM_DATA_R:0] s3_dmem_wdata  ;
+`DA_CSR_WIRES(_s3)
 `endif
 
 wire                 s3_rd_wen      ; // Destination register write enable
@@ -623,6 +625,8 @@ core_pipe_wb #(
 .s3_dmem_addr    (s3_dmem_addr    ),
 .s3_dmem_strb    (s3_dmem_strb    ),
 .s3_dmem_wdata   (s3_dmem_wdata   ),
+`DA_CSR_CONN(_s3,_s3)              ,
+`DA_CSR_CONN(_out,)                ,
 `RVFI_CONN                         ,
 `endif
 .wfi_sleep       (wfi_sleep       ), // Core asleep due to WFI.
@@ -676,6 +680,9 @@ core_csrs i_core_csrs (
 .exec_mret        (exec_mret        ), // MRET instruction executed.
 .mode_m           (mode_m           ), // Currently in Machine mode.
 .mode_u           (mode_u           ), // Currently in User    mode.
+`ifdef RVFI
+`DA_CSR_CONN(,_s3)                   ,
+`endif
 .mstatus_tw       (mstatus_tw       ), // Timeout wait for WFI.
 .mstatus_mie      (mstatus_mie      ), // Global interrupt enable.
 .mstatus_mprv_m   (mstatus_mprv_m   ), // Memory access like machine mode.

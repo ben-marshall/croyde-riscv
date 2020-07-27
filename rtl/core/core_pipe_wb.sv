@@ -83,6 +83,8 @@ input  wire                 s3_dmem_valid   ,
 input  wire [ MEM_ADDR_R:0] s3_dmem_addr    ,
 input  wire [ MEM_STRB_R:0] s3_dmem_strb    ,
 input  wire [ MEM_DATA_R:0] s3_dmem_wdata   ,
+`DA_CSR_INPUTS(_s3)                         ,
+`DA_CSR_OUTPUTS(wire,_out)                  ,
 `RVFI_OUTPUTS                               ,
 `endif
 
@@ -408,6 +410,8 @@ core_rvfi i_core_rvfi (
 .g_clk              (g_clk                  ),
 .g_resetn           (g_resetn               ),
 `RVFI_CONN                                   ,
+`DA_CSR_CONN(_s3,_s3)                        ,
+`DA_CSR_CONN(_out,_out)                      ,
 .n_valid            (e_instr_ret            ),
 .n_insn             (s3_instr               ),
 .n_intr             (int_on_this_instr      ),
