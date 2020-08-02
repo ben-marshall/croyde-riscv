@@ -251,11 +251,25 @@ wire        n_mstatus_wpri3     = csr_wdata[ 6: 6];
 wire [ 1:0] n_mstatus_wpri2     = csr_wdata[10: 9];
 wire [ 7:0] n_mstatus_wpri1     = csr_wdata[30:23];
 
+wire        n_mstatus_mprv      = 
+    exec_mret && !n_mode_m  ? 1'b0                              :
+    csr_wr_set              ? reg_mstatus_mie |  csr_wdata[17]  :
+    csr_wr_clr              ? reg_mstatus_mie & ~csr_wdata[17]  :
+                              csr_wdata[17]                     ;
+
 
 // TODO: csr instruction writes of mpp.
 wire [ 1:0] n_mstatus_mpp = {n_mode_m, n_mode_m};
 wire        mstatus_mpp_m = reg_mstatus_mpp == MPP_M;
 wire        mstatus_mpp_u = reg_mstatus_mpp == MPP_U;
+
+always @(posedge g_clk) begin
+    if(!g_resetn) begin
+        reg_mstatus_mprv <= 1'b0;
+    end else begin
+        reg_mstatus_mprv <= n_mstatus_mprv;
+    end
+end
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
