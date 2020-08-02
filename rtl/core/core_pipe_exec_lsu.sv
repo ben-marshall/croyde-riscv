@@ -32,7 +32,7 @@ output wire [ MEM_ADDR_R:0] dmem_addr   , // Memory request address
 output wire                 dmem_wen    , // Memory request write enable
 output wire [ MEM_STRB_R:0] dmem_strb   , // Memory request write strobe
 output wire [ MEM_DATA_R:0] dmem_wdata  , // Memory write data.
-output wire [  MEM_PRV_R:0] dmem_prv    , // Memory privilidge level.
+output reg  [  MEM_PRV_R:0] dmem_prv    , // Memory privilidge level.
 input  wire                 dmem_gnt    , // Memory response valid
 input  wire                 dmem_err    , // Memory response error
 input  wire [ MEM_DATA_R:0] dmem_rdata    // Memory response read data
@@ -92,7 +92,11 @@ assign  dmem_wdata   = wdata    << data_shift           ;
 
 assign  dmem_strb    = valid ? strb : 8'b0              ;
 
-assign  dmem_prv     = {mprv_m, mprv_u}                 ;
+always @(posedge g_clk) if(!g_resetn) begin
+    dmem_prv  <= {1'b1  , 1'b0  }  ;
+end else if(!dmem_req || req_sent) begin
+    dmem_prv <= {mprv_m, mprv_u}  ;
+end
 
 
 wire    [7:0] strb   ;

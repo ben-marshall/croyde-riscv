@@ -5,7 +5,7 @@ task_bmc_dmem    bmc   dmem
 task_bmc_imem    bmc   imem
 
 [options]
-depth   6
+depth   10
 
 cover: mode cover
 bmc: mode bmc
@@ -31,4 +31,5 @@ REPO_HOME/extern/riscv-formal/checks/rvfi_macros.vh
 imem: `define DESIGNER_ASSERTION_INSTRUCTION_MEMORY_INTERFACE 1
 dmem: `define DESIGNER_ASSERTION_DATA_MEMORY_INTERFACE        1
 `define CLOCK_GATE_NO_LATCH 1
+`define DESIGNER_ASSUMPTION_CORE_FETCH_BUFFER
 

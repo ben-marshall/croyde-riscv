@@ -324,7 +324,14 @@ always @(posedge g_clk) begin
     end
 end
 
-wire   raise_int      = int_request;
+reg    delay_int_request  ;
+always @(posedge g_clk) if(!g_resetn) begin
+    delay_int_request <= 1'b0;
+end else begin
+    delay_int_request <= dmem_req && !dmem_gnt;
+end
+
+wire   raise_int      = int_request && !delay_int_request;
 
 assign int_ack        = raise_int && e_cf_change;
 

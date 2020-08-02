@@ -22,7 +22,7 @@ output reg  [ MEM_ADDR_R:0] imem_addr   , // Memory request address
 output wire                 imem_wen    , // Memory request write enable
 output wire [ MEM_STRB_R:0] imem_strb   , // Memory request write strobe
 output wire [ MEM_DATA_R:0] imem_wdata  , // Memory write data.
-output wire [  MEM_PRV_R:0] imem_prv    , // Memory privilidge level.
+output reg  [  MEM_PRV_R:0] imem_prv    , // Memory privilidge level.
 input  wire                 imem_gnt    , // Memory response valid
 input  wire                 imem_err    , // Memory response error
 input  wire [ MEM_DATA_R:0] imem_rdata  , // Memory response read data
@@ -51,7 +51,12 @@ assign imem_rtype   = 1'b1; // Only request instructions.
 assign imem_wen     = 1'b0;
 assign imem_strb    = {MEM_STRB_W{1'b0}};
 assign imem_wdata   = {MEM_DATA_W{1'b0}};
-assign imem_prv     = {mode_m, mode_u}  ;
+
+always @(posedge g_clk) if(!g_resetn) begin
+    imem_prv  <= {1'b1  , 1'b0  }  ;
+end else if(n_imem_req && !imem_req || e_imem_req) begin
+    imem_prv <= {mode_m, mode_u}  ;
+end
 
 //
 // Event tracking

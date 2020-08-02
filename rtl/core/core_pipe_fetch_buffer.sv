@@ -34,6 +34,7 @@ input  wire         drain_4       // Drain 4 bytes of data.
 localparam BUFFER_DEPTH_BITS    = 128;
 localparam BR                   = BUFFER_DEPTH_BITS - 1;
 localparam ER                   = (BUFFER_DEPTH_BITS / 16) - 1;
+localparam MAX_DEPTH            = BUFFER_DEPTH_BITS / 8;
 
 reg [BR:0]  d_buffer;   // Data bits storage.
 reg [ER:0]  e_buffer;   // Error buts storage.
@@ -139,10 +140,19 @@ end
 always @(posedge g_clk) if(g_resetn) begin
 
     // Fetch buffer can store a maximum of 16 bytes.
-    assert(depth <= 16);
+    assert(depth <= MAX_DEPTH);
 
 end
 
+`endif
+
+`ifdef DESIGNER_ASSUMPTION_CORE_FETCH_BUFFER
+always @(posedge g_clk) if(g_resetn) begin
+    // This assumption is used for proofs by induction to make sure that
+    // the fetch buffer starts in a valid state.
+    // Fetch buffer can store a maximum of 16 bytes.
+    assume(depth <= MAX_DEPTH);
+end
 `endif
 
 endmodule
