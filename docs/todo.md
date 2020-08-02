@@ -43,11 +43,11 @@
 
   - [X] `MPRV` bits of `mstatus`.
     
-    - [ ] Routing to load/store unit and eventually to PMP.
+    - [X] Routing to load/store unit and eventually to PMP.
 
   - [X] `TW` bit of mstatus functionality. Timeout wait.
 
-  - [ ] Distinguish user mode accesses to CSRs
+  - [X] Distinguish user mode accesses to CSRs
 
 ## Verif
 

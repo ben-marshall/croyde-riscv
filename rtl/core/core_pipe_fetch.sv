@@ -13,12 +13,16 @@ input  wire                 cf_valid    , // Control flow change?
 output wire                 cf_ack      , // Control flow change acknwoledged
 input  wire [         XL:0] cf_target   , // Control flow change destination
 
+input  wire                 mode_m      , // Currently in Machine mode.
+input  wire                 mode_u      , // Currently in User    mode.
+
 output wire                 imem_req    , // Memory request
 output wire                 imem_rtype  , // Request type. 0=data,1=instrs
 output reg  [ MEM_ADDR_R:0] imem_addr   , // Memory request address
 output wire                 imem_wen    , // Memory request write enable
 output wire [ MEM_STRB_R:0] imem_strb   , // Memory request write strobe
 output wire [ MEM_DATA_R:0] imem_wdata  , // Memory write data.
+output wire [  MEM_PRV_R:0] imem_prv    , // Memory privilidge level.
 input  wire                 imem_gnt    , // Memory response valid
 input  wire                 imem_err    , // Memory response error
 input  wire [ MEM_DATA_R:0] imem_rdata  , // Memory response read data
@@ -47,6 +51,7 @@ assign imem_rtype   = 1'b1; // Only request instructions.
 assign imem_wen     = 1'b0;
 assign imem_strb    = {MEM_STRB_W{1'b0}};
 assign imem_wdata   = {MEM_DATA_W{1'b0}};
+assign imem_prv     = {mode_m, mode_u}  ;
 
 //
 // Event tracking

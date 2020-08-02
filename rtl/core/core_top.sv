@@ -20,6 +20,7 @@ output wire [ MEM_ADDR_R:0] imem_addr    , // Memory request address
 output wire                 imem_wen     , // Memory request write enable
 output wire [ MEM_STRB_R:0] imem_strb    , // Memory request write strobe
 output wire [ MEM_DATA_R:0] imem_wdata   , // Memory write data.
+output wire [  MEM_PRV_R:0] imem_prv     , // Memory privilidge level.
 input  wire                 imem_gnt     , // Memory response valid
 input  wire                 imem_err     , // Memory response error
 input  wire [ MEM_DATA_R:0] imem_rdata   , // Memory response read data
@@ -30,6 +31,7 @@ output wire [ MEM_ADDR_R:0] dmem_addr    , // Memory request address
 output wire                 dmem_wen     , // Memory request write enable
 output wire [ MEM_STRB_R:0] dmem_strb    , // Memory request write strobe
 output wire [ MEM_DATA_R:0] dmem_wdata   , // Memory write data.
+output wire [  MEM_PRV_R:0] dmem_prv     , // Memory privilidge level.
 input  wire                 dmem_gnt     , // Memory response valid
 input  wire                 dmem_err     , // Memory response error
 input  wire [ MEM_DATA_R:0] dmem_rdata   , // Memory response read data
@@ -310,12 +312,15 @@ core_pipe_fetch #(
 .cf_valid     (cf_valid     ), // Control flow change?
 .cf_ack       (cf_ack       ), // Control flow change acknwoledged
 .cf_target    (cf_target    ), // Control flow change destination
+.mode_m       (mode_m       ), // Currently in Machine mode.
+.mode_u       (mode_u       ), // Currently in User    mode.
 .imem_req     (imem_req     ), // Memory request
 .imem_rtype   (imem_rtype   ), // Memory request type.
 .imem_addr    (imem_addr    ), // Memory request address
 .imem_wen     (imem_wen     ), // Memory request write enable
 .imem_strb    (imem_strb    ), // Memory request write strobe
 .imem_wdata   (imem_wdata   ), // Memory write data.
+.imem_prv     (imem_prv     ), // Memory privilidge level.
 .imem_gnt     (imem_gnt     ), // Memory response valid
 .imem_err     (imem_err     ), // Memory response error
 .imem_rdata   (imem_rdata   ), // Memory response read data
@@ -444,6 +449,8 @@ core_pipe_exec #(
 .s2_flush        (s2_flush        ), // Flush stage contents.
 .s2_cancel       (s2_cancel       ), // Stage 1 flush
 .csr_mepc        (csr_mepc        ), // MRET return address
+.mprv_m          (mstatus_mprv_m  ), // Currently in Machine mode.
+.mprv_u          (mstatus_mprv_u  ), // Currently in User    mode.
 .wfi_sleep       (wfi_sleep       ), // Core asleep due to WFI.
 .s2_ready        (s2_ready        ), // EX ready for new instruction
 .s2_valid        (s2_valid        ), // Decode -> EX instr valid.
@@ -544,6 +551,7 @@ core_pipe_exec #(
 .dmem_wen        (dmem_wen        ), // Memory request write enable
 .dmem_strb       (dmem_strb       ), // Memory request write strobe
 .dmem_wdata      (dmem_wdata      ), // Memory write data.
+.dmem_prv        (dmem_prv        ), // Memory privilidge level.
 .dmem_gnt        (dmem_gnt        ), // Memory response valid
 .dmem_err        (dmem_err        ), // Memory response error
 .dmem_rdata      (dmem_rdata      )  // Memory response read data

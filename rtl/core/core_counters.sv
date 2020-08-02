@@ -25,6 +25,7 @@ input  wire                mmio_req         , // MMIO enable
 input  wire                mmio_wen         , // MMIO write enable
 input  wire [MEM_ADDR_R:0] mmio_addr        , // MMIO address
 input  wire [MEM_DATA_R:0] mmio_wdata       , // MMIO write data
+input  wire [ MEM_PRV_R:0] mmio_prv         , // MMIO privilidge level
 output wire                mmio_gnt         , // Request grant.
 output reg  [MEM_DATA_R:0] mmio_rdata       , // MMIO read data
 output reg                 mmio_error         // MMIO error
@@ -47,6 +48,11 @@ localparam  MMIO_MTIMECMP_ADDR    = MMIO_BASE+ 8;
 // Reset value of the MTIMECMP register.
 parameter   MMIO_MTIMECMP_RESET   = -1;
 
+// ---------------------- Core access privilidge level ------------------
+
+wire core_mode_m = mmio_prv[1];
+wire core_mode_u = mmio_prv[0];
+
 // ---------------------- Memory mapped registers -----------------------
 
 wire    addr_mtime_lo    =
@@ -62,7 +68,7 @@ wire [63:0] n_mapped_mtime = mapped_mtime + 1;
 
 wire n_timer_interrupt = mapped_mtime >= mapped_mtimecmp;
 
-wire wr_mtime_lo = addr_mtime_lo && mmio_wen && mmio_req;
+wire wr_mtime_lo = core_mode_m && addr_mtime_lo && mmio_wen && mmio_req;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
@@ -82,7 +88,7 @@ always @(posedge g_clk) begin
     end
 end
 
-wire wr_mtimecmp_lo = addr_mtimecmp_lo && mmio_wen && mmio_req;
+wire wr_mtimecmp_lo = core_mode_m && addr_mtimecmp_lo && mmio_wen && mmio_req;
 
 always @(posedge g_clk) begin
     if(!g_resetn) begin
@@ -103,10 +109,9 @@ wire [XL:0] n_mmio_rdata =
     {64{addr_mtime_lo   }} & mapped_mtime    |
     {64{addr_mtimecmp_lo}} & mapped_mtimecmp ;
 
-wire        n_mmio_error = mmio_req && !(
-    addr_mtime_lo       ||
-    addr_mtimecmp_lo
-);
+wire        mmio_bad_addr= !(addr_mtime_lo || addr_mtimecmp_lo);
+
+wire        n_mmio_error = mmio_req && (mmio_bad_addr || core_mode_u);
 
 assign mmio_gnt = 1'b1;
 
@@ -116,7 +121,7 @@ always @(posedge g_clk) begin
         mmio_rdata <= 64'b0;
     end else if(mmio_req) begin
         mmio_error <= n_mmio_error;
-        if(!mmio_wen) begin
+        if(!mmio_wen && !n_mmio_error) begin
             mmio_rdata <= n_mmio_rdata;
         end
     end

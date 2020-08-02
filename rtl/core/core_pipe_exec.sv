@@ -19,6 +19,9 @@ input  wire                 s2_flush        , // Flush pipestage contents
 input  wire                 s2_cancel       , // Stop S2 instrs doing stuff.
 input  wire [         XL:0] csr_mepc        , // return address for mret
 
+input  wire                 mprv_m          , // access mem as if Machine mode.
+input  wire                 mprv_u          , // access mem as if User    mode.
+
 input  wire                 wfi_sleep       , // Core asleep due to WFI?
 
 output wire                 s2_ready        , // EX ready for new instruction
@@ -130,6 +133,7 @@ output wire [ MEM_ADDR_R:0] dmem_addr       , // Memory request address
 output wire                 dmem_wen        , // Memory request write enable
 output wire [ MEM_STRB_R:0] dmem_strb       , // Memory request write strobe
 output wire [ MEM_DATA_R:0] dmem_wdata      , // Memory write data.
+output wire [  MEM_PRV_R:0] dmem_prv        , // Memory privilidge level.
 input  wire                 dmem_gnt        , // Memory response valid
 input  wire                 dmem_err        , // Memory response error
 input  wire [ MEM_DATA_R:0] dmem_rdata        // Memory response read data
@@ -426,6 +430,8 @@ core_pipe_exec_lsu #(
 .d_half     (s2_lsu_half    ), //
 .d_byte     (s2_lsu_byte    ), //
 .sext       (s2_lsu_sext    ), // Sign extend read data
+.mprv_m     (mprv_m         ), // Access memory as if in Machine mode.
+.mprv_u     (mprv_u         ), // Access memory as if in User    mode.
 .ready      (lsu_ready      ), // Read data ready
 .trap_addr  (lsu_trap_addr  ), // Address alignment error
 .dmem_req   (dmem_req       ), // Memory request
@@ -434,6 +440,7 @@ core_pipe_exec_lsu #(
 .dmem_wen   (dmem_wen       ), // Memory request write enable
 .dmem_strb  (dmem_strb      ), // Memory request write strobe
 .dmem_wdata (dmem_wdata     ), // Memory write data.
+.dmem_prv   (dmem_prv       ), // Memory privilidge level.
 .dmem_gnt   (dmem_gnt       ), // Memory response valid
 .dmem_err   (dmem_err       ), // Memory response error
 .dmem_rdata (dmem_rdata     )  // Memory response read data

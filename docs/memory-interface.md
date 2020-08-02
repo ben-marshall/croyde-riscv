@@ -17,10 +17,12 @@
 Bits  | Driver | Name            | Description
 ------|--------|-----------------|----------------------------------------
   1   | Core   | `mem_req`       | Memory request
+  1   | Core   | `mem_rtype`     | Request type: instruction / data.
  32   | Core   | `mem_addr`      | Memory request address
   1   | Core   | `mem_wen`       | Memory request write enable
   8   | Core   | `mem_strb`      | Memory request write strobe
  64   | Core   | `mem_wdata`     | Memory write data.
+  2   | Core   | `mem_prv`       | Privilidge level: 2=MMode,1=UMode.
   1   | Memory | `mem_gnt`       | Memory response valid
   1   | Memory | `mem_err`       | Memory response error
  64   | Memory | `mem_rdata`     | Memory response read data

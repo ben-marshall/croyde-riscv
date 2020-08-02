@@ -15,10 +15,12 @@ localparam  NRET        = 1     ;
 parameter   MEM_ADDR_W  = 39;       // Memory address bus width
 parameter   MEM_STRB_W  =  8;       // Memory strobe bits width
 parameter   MEM_DATA_W  = 64;       // Memory data bits width
+parameter   MEM_PRV_W   =  2;       // Memory privilidge bits width
 
 localparam  MEM_ADDR_R  = MEM_ADDR_W - 1; // Memory address bus width
 localparam  MEM_STRB_R  = MEM_STRB_W - 1; // Memory strobe bits width
 localparam  MEM_DATA_R  = MEM_DATA_W - 1; // Memory data bits width
+localparam  MEM_PRV_R   = MEM_PRV_W  - 1; // Memory privilidge bits width
 
 localparam  CF_CAUSE_W  =  7;               // Control flow change cause width
 localparam  CF_CAUSE_R  =  CF_CAUSE_W - 1;

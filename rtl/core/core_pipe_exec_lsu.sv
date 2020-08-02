@@ -20,6 +20,8 @@ input   wire                d_word      , //
 input   wire                d_half      , //
 input   wire                d_byte      , //
 input   wire                sext        , // Sign extend read data
+input  wire                 mprv_m      , // Currently in Machine mode.
+input  wire                 mprv_u      , // Currently in User    mode.
 
 output  wire                ready       , // Request processed
 output  wire                trap_addr   , // Address alignment error
@@ -30,6 +32,7 @@ output wire [ MEM_ADDR_R:0] dmem_addr   , // Memory request address
 output wire                 dmem_wen    , // Memory request write enable
 output wire [ MEM_STRB_R:0] dmem_strb   , // Memory request write strobe
 output wire [ MEM_DATA_R:0] dmem_wdata  , // Memory write data.
+output wire [  MEM_PRV_R:0] dmem_prv    , // Memory privilidge level.
 input  wire                 dmem_gnt    , // Memory response valid
 input  wire                 dmem_err    , // Memory response error
 input  wire [ MEM_DATA_R:0] dmem_rdata    // Memory response read data
@@ -88,6 +91,8 @@ assign  dmem_addr    = {addr[MEM_ADDR_R:3], 3'b000};
 assign  dmem_wdata   = wdata    << data_shift           ;
 
 assign  dmem_strb    = valid ? strb : 8'b0              ;
+
+assign  dmem_prv     = {mprv_m, mprv_u}                 ;
 
 
 wire    [7:0] strb   ;
