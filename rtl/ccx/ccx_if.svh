@@ -12,6 +12,7 @@ localparam  DW = 64;    // Data width
 localparam  MEM_ADDR_R =  AW      - 1;
 localparam  MEM_DATA_R =  DW      - 1;
 localparam  MEM_STRB_R = (DW / 8) - 1;
+localparam  MEM_PRV_R  =            1;
 
 logic                 req     ; // Memory request
 logic                 rtype   ; // Request type: 0 = instruction, 1 = data.
@@ -19,6 +20,7 @@ logic [ MEM_ADDR_R:0] addr    ; // Memory request address
 logic                 wen     ; // Memory request write enable
 logic [ MEM_STRB_R:0] strb    ; // Memory request write strobe
 logic [ MEM_DATA_R:0] wdata   ; // Memory write data.
+logic [  MEM_PRV_R:0] prv     ; // Memory privilidge level.
 logic                 gnt     ; // Memory response valid
 logic                 err     ; // Memory response error
 logic [ MEM_DATA_R:0] rdata   ; // Memory response read data
@@ -31,6 +33,7 @@ output addr    , // Memory request address
 output wen     , // Memory request write enable
 output strb    , // Memory request write strobe
 output wdata   , // Memory write data.
+output prv     , // Memory Privilidge level.
 input  gnt     , // Memory response valid
 input  err     , // Memory response error
 input  rdata     // Memory response read data
@@ -44,6 +47,7 @@ input  addr    , // Memory request address
 input  wen     , // Memory request write enable
 input  strb    , // Memory request write strobe
 input  wdata   , // Memory write data.
+input  prv     , // Memory Privilidge level.
 output gnt     , // Memory response valid
 output err     , // Memory response error
 output rdata     // Memory response read data

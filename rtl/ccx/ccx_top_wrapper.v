@@ -42,6 +42,7 @@ output wire [ 38:0] emem_addr    , // Memory request address
 output wire         emem_wen     , // Memory request write enable
 output wire [  7:0] emem_strb    , // Memory request write strobe
 output wire [ 63:0] emem_wdata   , // Memory write data.
+output wire [  1:0] emem_prv     , // Memory Privilidge level.
 input  wire         emem_gnt     , // Memory response valid
 input  wire         emem_err     , // Memory response error
 input  wire [ 63:0] emem_rdata   , // Memory response read data
@@ -80,6 +81,7 @@ ccx_top #(
 .emem_wen     (emem_wen     ), // Memory request write enable
 .emem_strb    (emem_strb    ), // Memory request write strobe
 .emem_wdata   (emem_wdata   ), // Memory write data.
+.emem_prv     (emem_prv     ), // Memory privilidge level.
 .emem_gnt     (emem_gnt     ), // Memory response valid
 .emem_err     (emem_err     ), // Memory response error
 .emem_rdata   (emem_rdata   ), // Memory response read data

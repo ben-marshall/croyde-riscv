@@ -39,6 +39,7 @@ output wire [ 38:0] emem_addr    , // Memory request address
 output wire         emem_wen     , // Memory request write enable
 output wire [  7:0] emem_strb    , // Memory request write strobe
 output wire [ 63:0] emem_wdata   , // Memory write data.
+output wire [  1:0] emem_prv     , // Memory Privilidge level.
 input  wire         emem_gnt     , // Memory response valid
 input  wire         emem_err     , // Memory response error
 input  wire [ 63:0] emem_rdata   , // Memory response read data
@@ -143,6 +144,7 @@ core_top #(
 .imem_wen     (core_imem.wen     ), // Memory request write enable
 .imem_strb    (core_imem.strb    ), // Memory request write strobe
 .imem_wdata   (core_imem.wdata   ), // Memory write data.
+.imem_prv     (core_imem.prv     ), // Memory privilidge level.
 .imem_gnt     (core_imem.gnt     ), // Memory response valid
 .imem_err     (core_imem.err     ), // Memory response error
 .imem_rdata   (core_imem.rdata   ), // Memory response read data
@@ -152,6 +154,7 @@ core_top #(
 .dmem_wen     (core_dmem.wen     ), // Memory request write enable
 .dmem_strb    (core_dmem.strb    ), // Memory request write strobe
 .dmem_wdata   (core_dmem.wdata   ), // Memory write data.
+.dmem_prv     (core_dmem.prv     ), // Memory privilidge level.
 .dmem_gnt     (core_dmem.gnt     ), // Memory response valid
 .dmem_err     (core_dmem.err     ), // Memory response error
 .dmem_rdata   (core_dmem.rdata   ), // Memory response read data
@@ -224,6 +227,7 @@ core_counters #(
 .mmio_wen        (if_mmio.wen     ), // MMIO write enable
 .mmio_addr       (if_mmio.addr    ), // MMIO address
 .mmio_wdata      (if_mmio.wdata   ), // MMIO write data
+.mmio_prv        (if_mmio.prv     ), // MMIO access privilidge level.
 .mmio_gnt        (if_mmio.gnt     ), // MMIO grant
 .mmio_rdata      (if_mmio.rdata   ), // MMIO read data
 .mmio_error      (if_mmio.err     )  // MMIO error

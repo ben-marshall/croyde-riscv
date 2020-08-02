@@ -51,6 +51,7 @@ assign rsp.addr     = route_req_r0 ? req_0.addr  : req_1.addr  ;
 assign rsp.wen      = route_req_r0 ? req_0.wen   : req_1.wen   ;
 assign rsp.strb     = route_req_r0 ? req_0.strb  : req_1.strb  ;
 assign rsp.wdata    = route_req_r0 ? req_0.wdata : req_1.wdata ;
+assign rsp.prv      = route_req_r0 ? req_0.prv   : req_1.prv   ;
 
 assign req_0.gnt    = route_req_r0 && rsp.gnt;
 assign req_1.gnt    = route_req_r1 && rsp.gnt;
