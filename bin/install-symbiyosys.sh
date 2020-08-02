@@ -34,6 +34,8 @@ if [ ! -e  $SYMBIYOSYS_BIN ]; then
 
     cd $SYMBIYOSYS_ROOT
 
+    git checkout b6dc1c9da3b697da72fd13f6c0d59ac021fd49de
+
     sudo make install DESTDIR=$SYMBIYOSYS_ROOT
     
     echo
