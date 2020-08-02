@@ -51,9 +51,6 @@
 
   - [ ] Verif designer assertions.
 
-- [ ] Fix interrupt taken cancelling an in-flight data load. Triggered
-      by extending memory interface designer assertion depth to 10.
-
 ## Verif
 
 - [ ] csrw mcycle
