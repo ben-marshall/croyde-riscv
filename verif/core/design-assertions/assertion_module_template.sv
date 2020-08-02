@@ -20,19 +20,23 @@ input wire                 g_resetn     ,
       `endif
 
 input wire                 imem_req     , // Mem request
+input wire                 imem_rtype   , // Memory request type: I/D
 input wire [ MEM_ADDR_R:0] imem_addr    , // Mem request address
 input wire                 imem_wen     , // Mem request write enable
 input wire [ MEM_STRB_R:0] imem_strb    , // Mem request write strobe
 input wire [ MEM_DATA_R:0] imem_wdata   , // Mem write data.
+input wire [  MEM_PRV_R:0] imem_prv     , // Memory Privilidge level.
 input wire                 imem_gnt     , // Mem response valid
 input wire                 imem_err     , // Mem response error
 input wire [ MEM_DATA_R:0] imem_rdata   , // Mem response read data
 
 input wire                 dmem_req     , // Mem request
+input wire                 dmem_rtype   , // Memory request type: I/D
 input wire [ MEM_ADDR_R:0] dmem_addr    , // Mem request address
 input wire                 dmem_wen     , // Mem request write enable
 input wire [ MEM_STRB_R:0] dmem_strb    , // Mem request write strobe
 input wire [ MEM_DATA_R:0] dmem_wdata   , // Mem write data.
+input wire [  MEM_PRV_R:0] dmem_prv     , // Memory Privilidge level.
 input wire                 dmem_gnt     , // Mem response valid
 input wire                 dmem_err     , // Mem response error
 input wire [ MEM_DATA_R:0] dmem_rdata   , // Mem response read data

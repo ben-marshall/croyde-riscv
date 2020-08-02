@@ -1,14 +1,14 @@
 [tasks]
-task_cover_imem  cover imem
-task_prove_imem  prove imem
 task_cover_dmem  cover dmem
-task_prove_dmem  prove dmem
+task_cover_imem  cover imem
+task_bmc_dmem    bmc   dmem
+task_bmc_imem    bmc   imem
 
 [options]
 depth   6
 
-prove: mode bmc
 cover: mode cover
+bmc: mode bmc
 
 [engines]
 smtbmc  boolector

@@ -204,7 +204,7 @@ wire                 cfu_op_any      =
     s2_cfu_bne  || s2_cfu_ebrk || s2_cfu_ecall|| s2_cfu_j    || s2_cfu_jal  ||
     s2_cfu_jalr || s2_cfu_mret || s2_cfu_wfi ;
 
-wire                 cfu_valid       = !wfi_sleep && s2_valid;
+wire                 cfu_valid       = !wfi_sleep && s2_valid && cfu_op_any;
 
 wire                 cfu_new_instr   = e_new_instr;
 wire [         XL:0] cfu_new_pc      ; // New program counter

@@ -22,19 +22,23 @@ module design_assertions_wrapper (
 (*keep*)      wire                 g_resetn     = !reset;
 (*keep*)      
 (*keep*)      wire                 imem_req     ; // Mem request
+(*keep*)      wire                 imem_rtype   ; // Mem request type.
 (*keep*)      wire [ MEM_ADDR_R:0] imem_addr    ; // Mem request address
 (*keep*)      wire                 imem_wen     ; // Mem request write enable
 (*keep*)      wire [ MEM_STRB_R:0] imem_strb    ; // Mem request write strobe
 (*keep*)      wire [ MEM_DATA_R:0] imem_wdata   ; // Mem write data.
+(*keep*)      wire [  MEM_PRV_R:0] imem_prv     ; // Mem privilidge level.
 (*keep*) rand reg                  imem_gnt     ; // Mem response valid
 (*keep*) rand reg                  imem_err     ; // Mem response error
 (*keep*) rand reg  [ MEM_DATA_R:0] imem_rdata   ; // Mem response read data
 
 (*keep*)      wire                 dmem_req     ; // Mem request
+(*keep*)      wire                 dmem_rtype   ; // Mem request type.
 (*keep*)      wire [ MEM_ADDR_R:0] dmem_addr    ; // Mem request address
 (*keep*)      wire                 dmem_wen     ; // Mem request write enable
 (*keep*)      wire [ MEM_STRB_R:0] dmem_strb    ; // Mem request write strobe
 (*keep*)      wire [ MEM_DATA_R:0] dmem_wdata   ; // Mem write data.
+(*keep*)      wire [  MEM_PRV_R:0] dmem_prv     ; // Mem privilidge level.
 (*keep*) rand reg                  dmem_gnt     ; // Mem response valid
 (*keep*) rand reg                  dmem_err     ; // Mem response error
 (*keep*) rand reg  [ MEM_DATA_R:0] dmem_rdata   ; // Mem response read data
@@ -71,18 +75,22 @@ module design_assertions_wrapper (
 .int_ext      (int_ext      ), // External interrupt
 .int_ti       (int_ti       ), // Timer    interrupt
 .imem_req     (imem_req     ), // Memory request
+.imem_rtype   (imem_rtype   ), // Request type: instrs/data
 .imem_addr    (imem_addr    ), // Memory request address
 .imem_wen     (imem_wen     ), // Memory request write enable
 .imem_strb    (imem_strb    ), // Memory request write strobe
 .imem_wdata   (imem_wdata   ), // Memory write data.
+.imem_prv     (imem_prv     ), // Memory access privilidge level.
 .imem_gnt     (imem_gnt     ), // Memory response valid
 .imem_err     (imem_err     ), // Memory response error
 .imem_rdata   (imem_rdata   ), // Memory response read data
 .dmem_req     (dmem_req     ), // Memory request
+.dmem_rtype   (dmem_rtype   ), // Request type: instrs/data
 .dmem_addr    (dmem_addr    ), // Memory request address
 .dmem_wen     (dmem_wen     ), // Memory request write enable
 .dmem_strb    (dmem_strb    ), // Memory request write strobe
 .dmem_wdata   (dmem_wdata   ), // Memory write data.
+.dmem_prv     (dmem_prv     ), // Memory access privilidge level.
 .dmem_gnt     (dmem_gnt     ), // Memory response valid
 .dmem_err     (dmem_err     ), // Memory response error
 .dmem_rdata   (dmem_rdata   ), // Memory response read data
@@ -114,18 +122,22 @@ design_assertions_fairness i_design_assertions_fairness (
 .int_sw       (int_sw       ), // Software interrupt
 .int_ext      (int_ext      ), // External interrupt
 .imem_req     (imem_req     ), // Memory request
+.imem_rtype   (imem_rtype   ), // Request type: instrs/data
 .imem_addr    (imem_addr    ), // Memory request address
 .imem_wen     (imem_wen     ), // Memory request write enable
 .imem_strb    (imem_strb    ), // Memory request write strobe
 .imem_wdata   (imem_wdata   ), // Memory write data.
+.imem_prv     (imem_prv     ), // Memory access privilidge level.
 .imem_gnt     (imem_gnt     ), // Memory response valid
 .imem_err     (imem_err     ), // Memory response error
 .imem_rdata   (imem_rdata   ), // Memory response read data
 .dmem_req     (dmem_req     ), // Memory request
+.dmem_rtype   (dmem_rtype   ), // Memory request tye: I/D
 .dmem_addr    (dmem_addr    ), // Memory request address
 .dmem_wen     (dmem_wen     ), // Memory request write enable
 .dmem_strb    (dmem_strb    ), // Memory request write strobe
 .dmem_wdata   (dmem_wdata   ), // Memory write data.
+.dmem_prv     (dmem_prv     ), // Memory access privilidge level.
 .dmem_gnt     (dmem_gnt     ), // Memory response valid
 .dmem_err     (dmem_err     ), // Memory response error
 .dmem_rdata   (dmem_rdata   ), // Memory response read data
@@ -143,10 +155,12 @@ assert_memory_if i_assert_memory_if(
 .f_clk        (clock        ), // Global clock
 .g_resetn     (g_resetn     ), // Global active low sync reset.
 .mem_req      (imem_req     ), // Memory request
+.mem_rtype    (imem_rtype   ), // Request type: instrs/data
 .mem_addr     (imem_addr    ), // Memory request address
 .mem_wen      (imem_wen     ), // Memory request write enable
 .mem_strb     (imem_strb    ), // Memory request write strobe
 .mem_wdata    (imem_wdata   ), // Memory write data.
+.mem_prv      (imem_prv     ), // Memory access privilidge level.
 .mem_gnt      (imem_gnt     ), // Memory response valid
 .mem_err      (imem_err     ), // Memory response error
 .mem_rdata    (imem_rdata   )  // Memory response read data
@@ -158,10 +172,12 @@ assert_memory_if i_assert_memory_if(
 .f_clk        (clock        ), // Global clock
 .g_resetn     (g_resetn     ), // Global active low sync reset.
 .mem_req      (dmem_req     ), // Memory request
+.mem_rtype    (dmem_rtype   ), // Request type: instrs/data
 .mem_addr     (dmem_addr    ), // Memory request address
 .mem_wen      (dmem_wen     ), // Memory request write enable
 .mem_strb     (dmem_strb    ), // Memory request write strobe
 .mem_wdata    (dmem_wdata   ), // Memory write data.
+.mem_prv      (dmem_prv     ), // Memory access privilidge level.
 .mem_gnt      (dmem_gnt     ), // Memory response valid
 .mem_err      (dmem_err     ), // Memory response error
 .mem_rdata    (dmem_rdata   )  // Memory response read data
@@ -182,18 +198,22 @@ core_top #() i_dut (
 .int_ext      (int_ext      ), // External interrupt
 .int_ti       (int_ti       ), // Timer    interrupt
 .imem_req     (imem_req     ), // Memory request
+.imem_rtype   (imem_rtype   ), // Request type: instrs/data
 .imem_addr    (imem_addr    ), // Memory request address
 .imem_wen     (imem_wen     ), // Memory request write enable
 .imem_strb    (imem_strb    ), // Memory request write strobe
 .imem_wdata   (imem_wdata   ), // Memory write data.
+.imem_prv     (imem_prv     ), // Memory access privilidge level.
 .imem_gnt     (imem_gnt     ), // Memory response valid
 .imem_err     (imem_err     ), // Memory response error
 .imem_rdata   (imem_rdata   ), // Memory response read data
 .dmem_req     (dmem_req     ), // Memory request
+.dmem_rtype   (dmem_rtype   ), // Request type: instrs/data
 .dmem_addr    (dmem_addr    ), // Memory request address
 .dmem_wen     (dmem_wen     ), // Memory request write enable
 .dmem_strb    (dmem_strb    ), // Memory request write strobe
 .dmem_wdata   (dmem_wdata   ), // Memory write data.
+.dmem_prv     (dmem_prv     ), // Memory access privilidge level.
 .dmem_gnt     (dmem_gnt     ), // Memory response valid
 .dmem_err     (dmem_err     ), // Memory response error
 .dmem_rdata   (dmem_rdata   ), // Memory response read data

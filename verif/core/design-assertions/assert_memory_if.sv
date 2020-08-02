@@ -10,10 +10,12 @@ input  wire                 f_clk        , // Global clock
 input  wire                 g_resetn     , // Global active low sync reset.
               
 input  wire                 mem_req      , // Memory request
+input  wire                 mem_rtype    , // Memory request type: I/D
 input  wire [ MEM_ADDR_R:0] mem_addr     , // Memory request address
 input  wire                 mem_wen      , // Memory request write enable
 input  wire [ MEM_STRB_R:0] mem_strb     , // Memory request write strobe
 input  wire [ MEM_DATA_R:0] mem_wdata    , // Memory write data.
+input  wire [  MEM_PRV_R:0] mem_prv      , // Memory Privilidge level.
 input  wire                 mem_gnt      , // Memory response valid
 input  wire                 mem_err      , // Memory response error
 input  wire [ MEM_DATA_R:0] mem_rdata      // Memory response read data
@@ -49,6 +51,10 @@ always @(posedge f_clk) if(g_resetn && $stable(g_resetn)) begin
         assert($stable(mem_strb     ));
 
         assert($stable(mem_wdata    ));
+        
+        assert($stable(mem_rtype    ));
+        
+        assert($stable(mem_prv      ));
 
     end
 

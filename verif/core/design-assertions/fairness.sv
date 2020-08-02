@@ -14,23 +14,27 @@ input  wire                 g_resetn     , // Global active low sync reset.
 input  wire                 int_sw       , // software interrupt
 input  wire                 int_ext      , // hardware interrupt
               
-input  wire                 imem_req     , // Memory request
-input  wire [ MEM_ADDR_R:0] imem_addr    , // Memory request address
-input  wire                 imem_wen     , // Memory request write enable
-input  wire [ MEM_STRB_R:0] imem_strb    , // Memory request write strobe
-input  wire [ MEM_DATA_R:0] imem_wdata   , // Memory write data.
-input  wire                 imem_gnt     , // Memory response valid
-input  wire                 imem_err     , // Memory response error
-input  wire [ MEM_DATA_R:0] imem_rdata   , // Memory response read data
+input wire                 imem_req     , // Mem request
+input wire                 imem_rtype   , // Memory request type: I/D
+input wire [ MEM_ADDR_R:0] imem_addr    , // Mem request address
+input wire                 imem_wen     , // Mem request write enable
+input wire [ MEM_STRB_R:0] imem_strb    , // Mem request write strobe
+input wire [ MEM_DATA_R:0] imem_wdata   , // Mem write data.
+input wire [  MEM_PRV_R:0] imem_prv     , // Memory Privilidge level.
+input wire                 imem_gnt     , // Mem response valid
+input wire                 imem_err     , // Mem response error
+input wire [ MEM_DATA_R:0] imem_rdata   , // Mem response read data
 
-input  wire                 dmem_req     , // Memory request
-input  wire [ MEM_ADDR_R:0] dmem_addr    , // Memory request address
-input  wire                 dmem_wen     , // Memory request write enable
-input  wire [ MEM_STRB_R:0] dmem_strb    , // Memory request write strobe
-input  wire [ MEM_DATA_R:0] dmem_wdata   , // Memory write data.
-input  wire                 dmem_gnt     , // Memory response valid
-input  wire                 dmem_err     , // Memory response error
-input  wire [ MEM_DATA_R:0] dmem_rdata   , // Memory response read data
+input wire                 dmem_req     , // Mem request
+input wire                 dmem_rtype   , // Memory request type: I/D
+input wire [ MEM_ADDR_R:0] dmem_addr    , // Mem request address
+input wire                 dmem_wen     , // Mem request write enable
+input wire [ MEM_STRB_R:0] dmem_strb    , // Mem request write strobe
+input wire [ MEM_DATA_R:0] dmem_wdata   , // Mem write data.
+input wire [  MEM_PRV_R:0] dmem_prv     , // Memory Privilidge level.
+input wire                 dmem_gnt     , // Mem response valid
+input wire                 dmem_err     , // Mem response error
+input wire [ MEM_DATA_R:0] dmem_rdata   , // Mem response read data
 
 input  wire                 trs_valid    , // Instruction trace valid
 input  wire [         31:0] trs_instr    , // Instruction trace data
