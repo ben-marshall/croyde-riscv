@@ -1,5 +1,6 @@
 $REPO_HOME/rtl/prim/prim_clock_gate.sv
 $REPO_HOME/rtl/core/core_clock_ctrl.sv
+$REPO_HOME/rtl/core/core_csrs_if.sv
 $REPO_HOME/rtl/core/core_pipe_fetch_buffer.sv
 $REPO_HOME/rtl/core/core_pipe_fetch.sv
 $REPO_HOME/rtl/core/core_pipe_decode_immediates.sv

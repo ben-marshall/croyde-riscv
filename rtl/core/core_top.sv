@@ -247,14 +247,7 @@ wire [         XL:0] s3_rd_wdata    ; // Destination register write data.
 
 //
 // Wires between WB <-> CSRs
-wire                 csr_en      ; // CSR Access Enable
-wire                 csr_wr      ; // CSR Write Enable
-wire                 csr_wr_set  ; // CSR Write - Set
-wire                 csr_wr_clr  ; // CSR Write - Clear
-wire [         11:0] csr_addr    ; // Address of the CSR to access.
-wire [         XL:0] csr_wdata   ; // Data to be written to a CSR
-wire [         XL:0] csr_rdata   ; // CSR read data
-wire                 csr_error   ; // CSR access error
+core_csrs_if #()     csr    ()   ; // CSR Access Enable
                
 wire [         XL:0] csr_mepc    ; // Current EPC.
 wire [         XL:0] mtvec_base  ; // Current MTVEC base address.
@@ -285,14 +278,7 @@ wire [         XL:0] trap_pc     ; // PC value associated with the trap.
 
 //
 // Physical Memory Protection (PMP) access
-wire                 pmp_csr_en      ; // CSR Access Enable
-wire                 pmp_csr_wr      ; // CSR Write Enable
-wire                 pmp_csr_wr_set  ; // CSR Write - Set
-wire                 pmp_csr_wr_clr  ; // CSR Write - Clear
-wire [         11:0] pmp_csr_addr    ; // Address of the CSR to access.
-wire [         XL:0] pmp_csr_wdata   ; // Data to be written to a CSR
-wire [         XL:0] pmp_csr_rdata   ; // CSR read data
-wire                 pmp_csr_error   ; // CSR access error
+core_csrs_if #()     pmp_csr    ()   ; // CSR Access for PMPs
 
 wire                 pmp_imem_trap   ; // Current imem access will trap
 wire                 pmp_imem_error  ; // OR with imem_error to trigger trap.
@@ -622,14 +608,7 @@ core_pipe_wb #(
 .s3_rd_wen       (s3_rd_wen       ), // RD write enable
 .s3_rd_addr      (s3_rd_addr      ), // RD write addr
 .s3_rd_wdata     (s3_rd_wdata     ), // RD write data.
-.csr_en          (csr_en          ), // CSR Access Enable
-.csr_wr          (csr_wr          ), // CSR Write Enable
-.csr_wr_set      (csr_wr_set      ), // CSR Write - Set
-.csr_wr_clr      (csr_wr_clr      ), // CSR Write - Clear
-.csr_addr        (csr_addr        ), // Address of the CSR to access.
-.csr_wdata       (csr_wdata       ), // Data to be written to a CSR
-.csr_rdata       (csr_rdata       ), // CSR read data
-.csr_error       (csr_error       ), // CSR access error.
+.csr             (csr             ), // CSR Bus
 .mtvec_base      (mtvec_base      ), // Current MTVEC base address.
 .csr_mepc        (csr_mepc        ), // Current EPC.
 .mode_m          (mode_m          ), // Currently in Machine mode.
@@ -700,14 +679,7 @@ core_regfile #(
 core_csrs i_core_csrs (
 .g_clk            (g_clk            ), // global clock
 .g_resetn         (g_resetn         ), // synchronous reset
-.csr_en           (csr_en           ), // CSR Access Enable
-.csr_wr           (csr_wr           ), // CSR Write Enable
-.csr_wr_set       (csr_wr_set       ), // CSR Write - Set
-.csr_wr_clr       (csr_wr_clr       ), // CSR Write - Clear
-.csr_addr         (csr_addr         ), // Address of the CSR to access.
-.csr_wdata        (csr_wdata        ), // Data to be written to a CSR
-.csr_rdata        (csr_rdata        ), // CSR read data
-.csr_error        (csr_error        ), // CSR access error.
+.csr              (csr              ), // CSR Bus
 .csr_mepc         (csr_mepc         ), // Current EPC.
 .mtvec_base       (mtvec_base       ), // Current MTVEC base address.
 .mtvec_mode       (mtvec_mode       ), // Current MTVEC vector mode.
@@ -760,14 +732,7 @@ core_pmp #(
 .dmem_req   (dmem_req       ), // Data Port check enable.
 .dmem_trap  (pmp_dmem_trap  ), // Data Port trap access.
 .dmem_error (pmp_dmem_error ), // Data port error response.
-.csr_en     (pmp_csr_en     ), // CSR Access Enable
-.csr_wr     (pmp_csr_wr     ), // CSR Write Enable
-.csr_wr_set (pmp_csr_wr_set ), // CSR Write - Set
-.csr_wr_clr (pmp_csr_wr_clr ), // CSR Write - Clear
-.csr_addr   (pmp_csr_addr   ), // Address of the CSR to access.
-.csr_wdata  (pmp_csr_wdata  ), // Data to be written to a CSR
-.csr_rdata  (pmp_csr_rdata  ), // CSR read data
-.csr_error  (pmp_csr_error  )  // Bad CSR access
+.csr        (pmp_csr        )  // PMP CSR Access
 );
 
 
