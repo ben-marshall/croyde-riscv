@@ -5,7 +5,7 @@
 //  Physical memory protection registers.
 //
 module core_pmp #(
-parameter ADDR_WIDTH = 32, // Width of the physical memory addresses.
+parameter ADDR_WIDTH = 56, // Width of the physical memory addresses.
 parameter NUM_REGIONS=  8, // Number of protection regions to implement.
 parameter EN_TOR     =  1  // Enable top of range matching mode?
 )(
@@ -28,8 +28,8 @@ input               csr_wr          , // CSR Write Enable
 input               csr_wr_set      , // CSR Write - Set
 input               csr_wr_clr      , // CSR Write - Clear
 input       [11: 0] csr_addr        , // Address of the CSR to access.
-input       [XL: 0] csr_wdata       , // Data to be written to a CSR
-output wire [XL: 0] csr_rdata       , // CSR read data
+input       [63: 0] csr_wdata       , // Data to be written to a CSR
+output wire [63: 0] csr_rdata       , // CSR read data
 output wire         csr_error         // Bad CSR access
 
 );
@@ -42,10 +42,10 @@ localparam CSR_ADDR_REGS_BASE = 12'h3AE;
 localparam AW       = ADDR_WIDTH - 1;
 localparam NR       = NUM_REGIONS- 1;
 
-localparam A_OFF    = 2'b00;
-localparam A_TOR    = 2'b01;
-localparam A_NA4    = 2'b10;
-localparam A_NAPOT  = 2'b11;
+localparam [1:0] A_OFF    = 2'b00;
+localparam [1:0] A_TOR    = 2'b01;
+localparam [1:0] A_NA4    = 2'b10;
+localparam [1:0] A_NAPOT  = 2'b11;
 
 assign g_clk_req = csr_en && csr_wr;
 
@@ -53,11 +53,14 @@ reg  [AW:0] addr_regs [63:0]; // Storage for the addresses
 reg  [ 7:0] cfg_regs  [63:0]; // Storage for cfgs
 
                               // Control bits pulled from cfg_regs[i].
-wire        cfg_l     [63:0]; // Lock bit
-wire [ 1:0] cfg_a     [63:0]; // Address matching
+wire        cfg_l     [64:0]; // Lock bit
+wire [ 1:0] cfg_a     [64:0]; // Address matching
 wire        cfg_x     [63:0]; // Executable?
 wire        cfg_w     [63:0]; // Writable?
 wire        cfg_r     [63:0]; // Readable?
+
+assign      cfg_l[64] = 1'b0;
+assign      cfg_a[64] = 2'b0;
 
 wire [63:0] match_d         ; // Does region I match on data  access?
 wire [63:0] match_i         ; // Does region I match on instr access?
@@ -68,8 +71,8 @@ assign data_trap  = |trap_d && data_check ;
 assign instr_trap = |trap_i && instr_check;
 
 // Portion of CSR write data used in setting/clearing/writing reg values.
-wire [AW:0] csr_wd_sel    =  csr_wdata[AW:0];
-wire [AW:0] csr_wd_seln   = ~csr_wdata[AW:0];
+wire [63:0] csr_wd_sel    =  csr_wdata[AW:0];
+wire [63:0] csr_wd_seln   = ~csr_wdata[AW:0];
 
 //
 // Matching function for the NaturallyAlignedPowerOfTwo range specificaiton.
@@ -101,18 +104,18 @@ endfunction
 // ------------------------------------------------------------
 
 genvar i;
-generate for(i = 0; i < 64; i =i + 1) if(i < NUM_REGIONS) begin:
+generate for(i = 0; i < 64; i =i + 1) if(i < NUM_REGIONS) begin : gen_a
 
 
-    wire tor_lock= i<63 ? cfg_a[i+1] == A_TOR && cfg_l[i+1] : 1'b0;
+    wire tor_lock= (cfg_a[i+1] == A_TOR) && cfg_l[i+1];
 
     wire csr_wen = csr_en && csr_wr && !cfg_l[i] && !tor_lock &&
                    csr_addr == (CSR_ADDR_REGS_BASE+i);
 
     wire [AW:0] csr_write_val =
-        csr_wr_set ? addr_regs[i] |  csr_wd_sel  :
-        csr_wr_clr ? addr_regs[i] &  csr_wd_seln :
-                                     csr_wd_sel  ;
+        csr_wr_set ? addr_regs[i] |  csr_wd_sel [AW:0] :
+        csr_wr_clr ? addr_regs[i] &  csr_wd_seln[AW:0] :
+                                     csr_wd_sel [AW:0] ;
 
     always @(posedge g_clk) if(!g_resetn) begin
         addr_regs[i] <= {ADDR_WIDTH{1'b0}};
@@ -131,7 +134,7 @@ end endgenerate
 // ------------------------------------------------------------
 
 genvar j;
-generate for(j = 0; j < 64; j = j + 1) if(j < NUM_REGIONS) begin
+generate for(j = 0; j < 64; j = j + 1) if(j < NUM_REGIONS) begin : gen_c
 
     localparam REGI = j % 8;
     localparam CSRI = j / 8;
@@ -163,34 +166,34 @@ generate for(j = 0; j < 64; j = j + 1) if(j < NUM_REGIONS) begin
 
     wire [AW:0] tor_base = j == 0 ? {AW{1'b0}} : addr_regs[j-1];
     
-    assign match_d[i] = 
+    assign match_d[j] = 
         mode_tor    && match_tor    (tor_base, addr_regs[j], data_addr) ||
         mode_na4    && match_na4    (          addr_regs[j], data_addr) ||
         mode_napot  && match_napot  (          addr_regs[j], data_addr) ;
     
-    assign match_i[i] = 
+    assign match_i[j] = 
         mode_tor    && match_tor    (tor_base, addr_regs[j], instr_addr) ||
         mode_na4    && match_na4    (          addr_regs[j], instr_addr) ||
         mode_napot  && match_napot  (          addr_regs[j], instr_addr) ;
 
-    assign trap_d[i] = match_d[i] && (
+    assign trap_d[j] = match_d[j] && (
         ( data_read && !cfg_r[j]) ||
         (!data_read && !cfg_w[j])
     );
 
-    assign trap_i[i] = match_i[i] && !cfg_x[i]; 
+    assign trap_i[j] = match_i[j] && !cfg_x[j]; 
 
 end else begin
 
-    always @(*) cfg_regs[i] = 8'b0;
+    always @(*) cfg_regs[j] = 8'b0;
     assign cfg_l[j] = 1'b0;
     assign cfg_a[j] = 2'b0;
     assign cfg_x[j] = 1'b0;
     assign cfg_w[j] = 1'b0;
     assign cfg_r[j] = 1'b0;
 
-    assign match_d[i] = 1'b0;
-    assign match_i[i] = 1'b0;
+    assign match_d[j] = 1'b0;
+    assign match_i[j] = 1'b0;
 
 end endgenerate
 
