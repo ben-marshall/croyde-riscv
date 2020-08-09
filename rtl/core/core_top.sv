@@ -69,17 +69,25 @@ parameter   PC_RESET_ADDRESS= 'h10000000;
 // Use a FPGA-inference-friendly implementation of the register file.
 parameter FPGA_REGFILE = 0;
 
+//! Number of physical memory protection regions.
+parameter PMP_NUM_REGIONS = 16;
+
+//! Enable Top-Of-Range matching for PMP regions?
+parameter PMP_ENABLE_TOR  = 1;
+
 //
 // Clock request and delivery wires.
 // ------------------------------------------------------------
 
 parameter CLK_GATE_EN      = 1'b1; // Enable core-level clock gating
 
-wire g_clk                  ;       // Core level gated clock.
-wire g_clk_rf               ;       // Register file gated clock
-wire g_clk_rf_req           ;       // Register file clock request
-wire g_clk_mul              ;       // Multiplier gated clock
-wire g_clk_mul_req          ;       // Multiplier clock request
+wire g_clk                  ; // Core level gated clock.
+wire g_clk_rf               ; // Register file gated clock
+wire g_clk_rf_req           ; // Register file clock request
+wire g_clk_pmp_req          ; // Physical memory protection clock request
+wire g_clk_pmp              ; // Physical memory protection gated clock
+wire g_clk_mul              ; // Multiplier gated clock
+wire g_clk_mul_req          ; // Multiplier clock request
 
 wire g_clk_req      = 1'b1  ;       // Gore level clock request.
 
@@ -237,6 +245,8 @@ wire [ REG_ADDR_R:0] s3_rd_addr     ; // Destination register write addr
 wire [         XL:0] s3_rd_wdata    ; // Destination register write data.
 
 
+//
+// Wires between WB <-> CSRs
 wire                 csr_en      ; // CSR Access Enable
 wire                 csr_wr      ; // CSR Write Enable
 wire                 csr_wr_set  ; // CSR Write - Set
@@ -272,6 +282,22 @@ wire                 trap_int    ; // A trap occured due to interrupt
 wire [ CF_CAUSE_R:0] trap_cause  ; // A trap occured due to interrupt
 wire [         XL:0] trap_mtval  ; // Value associated with the trap.
 wire [         XL:0] trap_pc     ; // PC value associated with the trap.
+
+//
+// Physical Memory Protection (PMP) access
+wire                 pmp_csr_en      ; // CSR Access Enable
+wire                 pmp_csr_wr      ; // CSR Write Enable
+wire                 pmp_csr_wr_set  ; // CSR Write - Set
+wire                 pmp_csr_wr_clr  ; // CSR Write - Clear
+wire [         11:0] pmp_csr_addr    ; // Address of the CSR to access.
+wire [         XL:0] pmp_csr_wdata   ; // Data to be written to a CSR
+wire [         XL:0] pmp_csr_rdata   ; // CSR read data
+wire                 pmp_csr_error   ; // CSR access error
+
+wire                 pmp_imem_trap   ; // Current imem access will trap
+wire                 pmp_imem_error  ; // OR with imem_error to trigger trap.
+wire                 pmp_dmem_trap   ; // Current dmem access will trap
+wire                 pmp_dmem_error  ; // OR with dmem_error to trigger trap.
 
 //
 // Pipeline forwarding
@@ -714,6 +740,36 @@ core_csrs i_core_csrs (
 .trap_pc          (trap_pc          )  // PC value associated with the trap.
 );
 
+core_pmp #(
+.ADDR_WIDTH (MEM_ADDR_W     ), // Width of the physical memory addresses.
+.NUM_REGIONS(PMP_NUM_REGIONS), // Number of protection regions to implement.
+.EN_TOR     (PMP_ENABLE_TOR )  // Enable top of range matching mode?
+) i_pmp (
+.f_clk      (f_clk          ), // Free-running clock.
+.g_clk      (g_clk_pmp      ), // Gated clock for CSR regs.
+.g_clk_req  (g_clk_pmp_req  ), // Gated clock request
+.g_resetn   (g_resetn       ), // Synchronous active low reset
+.imem_addr  (imem_addr      ), // Instruction Port address.
+.imem_prv   (imem_prv       ), // 0 = M-mode, 1 = U-mode
+.imem_req   (imem_req       ), // Instruction Port check enable.
+.imem_trap  (pmp_imem_trap  ), // Instruction Port trap access.
+.imem_error (pmp_imem_error ), // Instruction port error response.
+.dmem_addr  (dmem_addr      ), // Data Port address.
+.dmem_prv   (dmem_prv       ), // 0 = M-mode, 1 = U-mode
+.dmem_wen   (dmem_wen       ), // Data read if 0, write if 1.
+.dmem_req   (dmem_req       ), // Data Port check enable.
+.dmem_trap  (pmp_dmem_trap  ), // Data Port trap access.
+.dmem_error (pmp_dmem_error ), // Data port error response.
+.csr_en     (pmp_csr_en     ), // CSR Access Enable
+.csr_wr     (pmp_csr_wr     ), // CSR Write Enable
+.csr_wr_set (pmp_csr_wr_set ), // CSR Write - Set
+.csr_wr_clr (pmp_csr_wr_clr ), // CSR Write - Clear
+.csr_addr   (pmp_csr_addr   ), // Address of the CSR to access.
+.csr_wdata  (pmp_csr_wdata  ), // Data to be written to a CSR
+.csr_rdata  (pmp_csr_rdata  ), // CSR read data
+.csr_error  (pmp_csr_error  )  // Bad CSR access
+);
+
 
 //
 // module: core_interrupts
@@ -758,6 +814,8 @@ core_clock_ctrl #(
 .g_clk        (g_clk        ), // Core level gated clock
 .g_clk_rf_req (g_clk_rf_req ), // Register file gated clock request
 .g_clk_rf     (g_clk_rf     ), // Register file gated clock
+.g_clk_pmp_req(g_clk_pmp_req), // Physical memory protection clock request
+.g_clk_pmp    (g_clk_pmp    ), // Physical memory protection gated clock
 .g_clk_mul_req(g_clk_mul_req), // Multiplier gated clock request
 .g_clk_mul    (g_clk_mul    )  // Multiplier gated clock
 );

@@ -10,18 +10,23 @@ parameter NUM_REGIONS=  8, // Number of protection regions to implement.
 parameter EN_TOR     =  1  // Enable top of range matching mode?
 )(
 
-input  wire         g_clk           , // Gated clock
-input  wire         g_clk_req       , // Gated clock request
+input  wire         f_clk           , // Free-running clock.
+input  wire         g_clk           , // Gated clock for CSR regs.
+output wire         g_clk_req       , // Gated clock request
 input  wire         g_resetn        , // Synchronous active low reset
 
-input  wire [AW: 0] instr_addr      , // Instruction Port address.
-input  wire         instr_check     , // Instruction Port check enable.
-output wire         instr_trap      , // Instruction Port trap access.
+input  wire [AW: 0] imem_addr       , // Instruction Port address.
+input  wire [ 1: 0] imem_prv        , // 10 = M-mode, 01 = U-mode
+input  wire         imem_req        , // Instruction Port check enable.
+output wire         imem_trap       , // Instruction Port trap access.
+output reg          imem_error      , // Instruction port error response.
 
-input  wire [AW: 0] data_addr       , // Data Port address.
-input  wire         data_read       , // Data read if 1, write if 0.
-input  wire         data_check      , // Data Port check enable.
-output wire         data_trap       , // Data Port trap access.
+input  wire [AW: 0] dmem_addr       , // Data Port address.
+input  wire [ 1: 0] dmem_prv        , // 01 = M-mode, 10 = U-mode
+input  wire         dmem_wen        , // Data read if 0, write if 1.
+input  wire         dmem_req        , // Data Port check enable.
+output wire         dmem_trap       , // Data Port trap access.
+output reg          dmem_error      , // Data port error response.
 
 input               csr_en          , // CSR Access Enable
 input               csr_wr          , // CSR Write Enable
@@ -47,7 +52,7 @@ localparam [1:0] A_TOR    = 2'b01;
 localparam [1:0] A_NA4    = 2'b10;
 localparam [1:0] A_NAPOT  = 2'b11;
 
-assign g_clk_req = csr_en && csr_wr;
+assign g_clk_req = (NUM_REGIONS > 0) && csr_en && csr_wr;
 
 reg  [AW:0] addr_regs [63:0]; // Storage for the addresses
 reg  [ 7:0] cfg_regs  [63:0]; // Storage for cfgs
@@ -67,12 +72,25 @@ wire [63:0] match_i         ; // Does region I match on instr access?
 wire [63:0] trap_d          ; // Trap data  access
 wire [63:0] trap_i          ; // Trap instr access
 
-assign data_trap  = |trap_d && data_check ;
-assign instr_trap = |trap_i && instr_check;
+assign dmem_trap  = |trap_d && dmem_req ;
+assign imem_trap  = |trap_i && imem_req;
+
+wire        imem_mmode = imem_prv[1];
+wire        dmem_mmode = dmem_prv[1];
+wire        imem_umode = imem_prv[0];
+wire        dmem_umode = dmem_prv[0];
+
+always @(posedge f_clk) if(!g_resetn) begin
+    imem_error <= 1'b0;
+    dmem_error <= 1'b0;
+end else begin
+    imem_error <= imem_trap;
+    dmem_error <= dmem_trap;
+end
 
 // Portion of CSR write data used in setting/clearing/writing reg values.
-wire [63:0] csr_wd_sel    =  csr_wdata[AW:0];
-wire [63:0] csr_wd_seln   = ~csr_wdata[AW:0];
+wire [63:0] csr_wd_sel    =  csr_wdata[63:0];
+wire [63:0] csr_wd_seln   = ~csr_wdata[63:0];
 
 //
 // Matching function for the NaturallyAlignedPowerOfTwo range specificaiton.
@@ -104,9 +122,10 @@ endfunction
 // ------------------------------------------------------------
 
 genvar i;
-generate for(i = 0; i < 64; i =i + 1) if(i < NUM_REGIONS) begin : gen_a
+generate for(i = 0; i < 64; i =i + 1) if(i < NUM_REGIONS) begin : gen_region_a
 
-
+    // If cfg[i+1] is in TOR mode and locked, then don't allow
+    // writes to this register.
     wire tor_lock= (cfg_a[i+1] == A_TOR) && cfg_l[i+1];
 
     wire csr_wen = csr_en && csr_wr && !cfg_l[i] && !tor_lock &&
@@ -123,7 +142,7 @@ generate for(i = 0; i < 64; i =i + 1) if(i < NUM_REGIONS) begin : gen_a
         addr_regs[i] <= csr_write_val;
     end
 
-end else begin
+end else begin: no_region_a
 
     always @(*) addr_regs[i] = {ADDR_WIDTH{1'b0}};
 
@@ -134,18 +153,18 @@ end endgenerate
 // ------------------------------------------------------------
 
 genvar j;
-generate for(j = 0; j < 64; j = j + 1) if(j < NUM_REGIONS) begin : gen_c
+generate for(j = 0; j < 64; j = j + 1) if(j < NUM_REGIONS) begin:gen_region_c
 
     localparam REGI = j % 8;
-    localparam CSRI = j / 8;
+    localparam CSRI = (j / 4) & -2;
 
     wire csr_wen = csr_en && csr_wr && !cfg_l[j] &&
                    csr_addr == (CSR_ADDR_REGS_BASE+CSRI);
 
-    wire [ 8:0] csr_write_val =
-        csr_wr_set ? addr_regs[i] |  csr_wd_sel [8*REGI+:8] :
-        csr_wr_clr ? addr_regs[i] &  csr_wd_seln[8*REGI+:8] :
-                                     csr_wd_sel [8*REGI+:8] ;
+    wire [ 7:0] csr_write_val =
+        csr_wr_set ? cfg_regs[j] |  csr_wd_sel [8*REGI+:8] :
+        csr_wr_clr ? cfg_regs[j] &  csr_wd_seln[8*REGI+:8] :
+                                    csr_wd_sel [8*REGI+:8] ;
 
     assign cfg_l[j] = cfg_regs[j][  7];
     assign cfg_a[j] = cfg_regs[j][4:3];
@@ -154,36 +173,43 @@ generate for(j = 0; j < 64; j = j + 1) if(j < NUM_REGIONS) begin : gen_c
     assign cfg_r[j] = cfg_regs[j][  0];
 
     always @(posedge g_clk) if(!g_resetn) begin
-        cfg_regs[i] <= 8'b0;
+        cfg_regs[j] <= 8'b0;
     end else if(csr_wen) begin
-        cfg_regs[i] <= csr_write_val;
+        cfg_regs[j] <= csr_write_val;
     end
 
+    // What mode is this pmp region currently in?
     wire   mode_off     = cfg_a[j] == A_OFF  ;
     wire   mode_tor     = cfg_a[j] == A_TOR   && EN_TOR;
     wire   mode_na4     = cfg_a[j] == A_NA4  ;
     wire   mode_napot   = cfg_a[j] == A_NAPOT;
 
-    wire [AW:0] tor_base = j == 0 ? {AW{1'b0}} : addr_regs[j-1];
+    wire [AW:0] tor_base = j == 0 ? {ADDR_WIDTH{1'b0}} : addr_regs[j-1];
     
+    // Does this region match the data access address?
     assign match_d[j] = 
-        mode_tor    && match_tor    (tor_base, addr_regs[j], data_addr) ||
-        mode_na4    && match_na4    (          addr_regs[j], data_addr) ||
-        mode_napot  && match_napot  (          addr_regs[j], data_addr) ;
+        mode_tor    && match_tor    (tor_base, addr_regs[j], dmem_addr) ||
+        mode_na4    && match_na4    (          addr_regs[j], dmem_addr) ||
+        mode_napot  && match_napot  (          addr_regs[j], dmem_addr) ;
     
+    // Does this region match the instruction access address?
     assign match_i[j] = 
-        mode_tor    && match_tor    (tor_base, addr_regs[j], instr_addr) ||
-        mode_na4    && match_na4    (          addr_regs[j], instr_addr) ||
-        mode_napot  && match_napot  (          addr_regs[j], instr_addr) ;
+        mode_tor    && match_tor    (tor_base, addr_regs[j], imem_addr) ||
+        mode_na4    && match_na4    (          addr_regs[j], imem_addr) ||
+        mode_napot  && match_napot  (          addr_regs[j], imem_addr) ;
 
-    assign trap_d[j] = match_d[j] && (
-        ( data_read && !cfg_r[j]) ||
-        (!data_read && !cfg_w[j])
+    // Should this region cause a data access trap?
+    assign trap_d[j] = match_d[j] && (dmem_mmode && cfg_l[j]) && (
+        (!dmem_wen  && !cfg_r[j]) ||
+        ( dmem_wen  && !cfg_w[j])
     );
 
-    assign trap_i[j] = match_i[j] && !cfg_x[j]; 
+    // Should this region cause an instruction access trap?
+    assign trap_i[j] = match_i[j] && !cfg_x[j] && (imem_mmode && cfg_l[j]); 
 
-end else begin
+end else begin : no_region_c
+
+    // Assign everything to 0.
 
     always @(*) cfg_regs[j] = 8'b0;
     assign cfg_l[j] = 1'b0;

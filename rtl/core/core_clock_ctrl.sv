@@ -16,6 +16,9 @@ output wire g_clk           , // Core level gated clock
 input  wire g_clk_rf_req    , // Register file gated clock request
 output wire g_clk_rf        , // Register file gated clock
 
+input  wire g_clk_pmp_req   , // Physical memory protection gated clock request
+output wire g_clk_pmp       , // Physical memory protection gated clock
+
 input  wire g_clk_mul_req   , // Multiplier gated clock request
 output wire g_clk_mul         // Multiplier gated clock
 
@@ -47,6 +50,15 @@ prim_clock_gate i_core_clock_rf (
 .clk_req(g_clk_rf_req   ),   // Clock request
 .tst_en (g_clk_test_en  ),   // Test enable.
 .clk_out(g_clk_rf       )    // Output clock
+);
+
+//
+// PMP clock gating
+prim_clock_gate i_core_clock_pmp (
+.clk_in (f_clk          ),   // Free-running clock input
+.clk_req(g_clk_pmp_req  ),   // Clock request
+.tst_en (g_clk_test_en  ),   // Test enable.
+.clk_out(g_clk_pmp      )    // Output clock
 );
 
 //
