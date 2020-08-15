@@ -65,6 +65,52 @@ wire [63:0] match_i         ; // Does region I match on instr access?
 wire [63:0] trap_d          ; // Trap data  access
 wire [63:0] trap_i          ; // Trap instr access
 
+//
+// CSR Read logic
+// ------------------------------------------------------------
+
+wire [63:0] cfg_csr_regs [15:0];
+
+genvar k;
+generate for(k = 0; k < 16; k = k + 2) begin
+
+    assign cfg_csr_regs[k+0] = {
+        cfg_regs[k+7],
+        cfg_regs[k+6],
+        cfg_regs[k+5],
+        cfg_regs[k+4],
+        cfg_regs[k+3],
+        cfg_regs[k+2],
+        cfg_regs[k+1],
+        cfg_regs[k+0]
+    };
+
+    assign cfg_csr_regs[k+1] = 64'b0;
+
+end endgenerate
+
+wire access_cfg_reg = csr.addr[11:4] == 8'h3a && !csr.addr[0];
+    
+wire access_addr_reg=
+    csr.addr[11:8] == 4'h3 && (
+        csr.addr[7:4] == 4'hB   ||
+        csr.addr[7:4] == 4'hC   ||
+        csr.addr[7:4] == 4'hD   ||
+        csr.addr[7:4] == 4'hE
+    );
+
+wire [63-ADDR_WIDTH:0] apad = {63-AW{1'b0}};
+
+assign csr.rdata = access_cfg_reg  ? cfg_csr_regs[csr.addr[3:0]]    :
+                   access_addr_reg ? {apad,addr_regs[csr.addr[5:0]]}:
+                                     64'b0                          ;
+
+assign csr.error = !access_cfg_reg || !access_addr_reg;
+
+//
+// Trap raising
+// ------------------------------------------------------------
+
 assign dmem_trap  = |trap_d && dmem_req ;
 assign imem_trap  = |trap_i && imem_req;
 
@@ -84,6 +130,10 @@ end
 // Portion of CSR write data used in setting/clearing/writing reg values.
 wire [63:0] csr_wd_sel    =  csr.wdata[63:0];
 wire [63:0] csr_wd_seln   = ~csr.wdata[63:0];
+
+//
+// Address Matching functions.
+// ------------------------------------------------------------
 
 //
 // Matching function for the NaturallyAlignedPowerOfTwo range specificaiton.

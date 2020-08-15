@@ -278,12 +278,25 @@ wire [         XL:0] trap_pc     ; // PC value associated with the trap.
 
 //
 // Physical Memory Protection (PMP) access
-core_csrs_if #()     pmp_csr    ()   ; // CSR Access for PMPs
+// ------------------------------------------------------------
 
-wire                 pmp_imem_trap   ; // Current imem access will trap
-wire                 pmp_imem_error  ; // OR with imem_error to trigger trap.
-wire                 pmp_dmem_trap   ; // Current dmem access will trap
-wire                 pmp_dmem_error  ; // OR with dmem_error to trigger trap.
+core_csrs_if #()     pmp_csr    ()  ; // CSR Access for PMPs
+
+wire                 pmp_imem_trap  ; // Current imem access will trap
+wire                 pmp_imem_error ; // OR with imem_error to trigger trap.
+wire                 pmp_dmem_trap  ; // Current dmem access will trap
+wire                 pmp_dmem_error ; // OR with dmem_error to trigger trap.
+
+wire                 dmem_err_pmp   ; // Gated data memory error
+wire                 g_dmem_req     ; // Data memory request gated by pmps
+wire                 imem_err_pmp   ;
+wire                 g_imem_req     ; // Instr memory request gated by pmps
+
+assign               dmem_err_pmp   = dmem_err || pmp_dmem_error;
+assign               imem_err_pmp   = imem_err || pmp_imem_error;
+
+assign               imem_req       = g_imem_req && !pmp_imem_trap;
+assign               dmem_req       = g_dmem_req && !pmp_dmem_trap;
 
 //
 // Pipeline forwarding
@@ -326,7 +339,7 @@ core_pipe_fetch #(
 .cf_target    (cf_target    ), // Control flow change destination
 .mode_m       (mode_m       ), // Currently in Machine mode.
 .mode_u       (mode_u       ), // Currently in User    mode.
-.imem_req     (imem_req     ), // Memory request
+.imem_req     (g_imem_req   ), // Memory request
 .imem_rtype   (imem_rtype   ), // Memory request type.
 .imem_addr    (imem_addr    ), // Memory request address
 .imem_wen     (imem_wen     ), // Memory request write enable
@@ -334,7 +347,7 @@ core_pipe_fetch #(
 .imem_wdata   (imem_wdata   ), // Memory write data.
 .imem_prv     (imem_prv     ), // Memory privilidge level.
 .imem_gnt     (imem_gnt     ), // Memory response valid
-.imem_err     (imem_err     ), // Memory response error
+.imem_err     (imem_err_pmp ), // Memory response error
 .imem_rdata   (imem_rdata   ), // Memory response read data
 .s1_i16bit    (s1_i16bit    ), // 16 bit instruction?
 .s1_i32bit    (s1_i32bit    ), // 32 bit instruction?
@@ -557,7 +570,7 @@ core_pipe_exec #(
 .s3_dmem_strb    (s3_dmem_strb    ),
 .s3_dmem_wdata   (s3_dmem_wdata   ),
 `endif
-.dmem_req        (dmem_req        ), // Memory request
+.dmem_req        (g_dmem_req      ), // Memory request
 .dmem_rtype      (dmem_rtype      ), // Memory request type.
 .dmem_addr       (dmem_addr       ), // Memory request address
 .dmem_wen        (dmem_wen        ), // Memory request write enable
@@ -565,7 +578,7 @@ core_pipe_exec #(
 .dmem_wdata      (dmem_wdata      ), // Memory write data.
 .dmem_prv        (dmem_prv        ), // Memory privilidge level.
 .dmem_gnt        (dmem_gnt        ), // Memory response valid
-.dmem_err        (dmem_err        ), // Memory response error
+.dmem_err        (dmem_err_pmp    ), // Memory response error
 .dmem_rdata      (dmem_rdata      )  // Memory response read data
 );
 
@@ -680,6 +693,7 @@ core_csrs i_core_csrs (
 .g_clk            (g_clk            ), // global clock
 .g_resetn         (g_resetn         ), // synchronous reset
 .csr              (csr              ), // CSR Bus
+.pmp_csr          (pmp_csr          ), // CSR Bus to PMP registers
 .csr_mepc         (csr_mepc         ), // Current EPC.
 .mtvec_base       (mtvec_base       ), // Current MTVEC base address.
 .mtvec_mode       (mtvec_mode       ), // Current MTVEC vector mode.
@@ -723,13 +737,13 @@ core_pmp #(
 .g_resetn   (g_resetn       ), // Synchronous active low reset
 .imem_addr  (imem_addr      ), // Instruction Port address.
 .imem_prv   (imem_prv       ), // 0 = M-mode, 1 = U-mode
-.imem_req   (imem_req       ), // Instruction Port check enable.
+.imem_req   (g_imem_req     ), // Instruction Port check enable.
 .imem_trap  (pmp_imem_trap  ), // Instruction Port trap access.
 .imem_error (pmp_imem_error ), // Instruction port error response.
 .dmem_addr  (dmem_addr      ), // Data Port address.
 .dmem_prv   (dmem_prv       ), // 0 = M-mode, 1 = U-mode
 .dmem_wen   (dmem_wen       ), // Data read if 0, write if 1.
-.dmem_req   (dmem_req       ), // Data Port check enable.
+.dmem_req   (g_dmem_req     ), // Data Port check enable.
 .dmem_trap  (pmp_dmem_trap  ), // Data Port trap access.
 .dmem_error (pmp_dmem_error ), // Data port error response.
 .csr        (pmp_csr        )  // PMP CSR Access

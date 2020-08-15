@@ -10,6 +10,7 @@ input              g_clk            , // global clock
 input              g_resetn         , // synchronous reset
 
 core_csrs_if.RSP   csr              , // CSR interface
+core_csrs_if.REQ   pmp_csr          , // CSR interface for PMPs
 
 output wire [XL:0] csr_mepc         , // Current EPC.
 output wire [XL:0] mtvec_base       , // Current MTVEC base address.
@@ -564,6 +565,26 @@ wire [XL:0] reg_mcountin = {
     mcountin_cy
 };
 
+//
+// PMP Access
+// -------------------------------------------------------------------------
+
+wire   pmp_csr_addr    =
+    csr.addr[11:4] == 8'h3A    ||
+    csr.addr[11:8] == 4'h3 && (
+        csr.addr[7:4] == 4'hB   ||
+        csr.addr[7:4] == 4'hC   ||
+        csr.addr[7:4] == 4'hD   ||
+        csr.addr[7:4] == 4'hE
+    );
+
+assign pmp_csr.en      = csr.en    && pmp_csr_addr;
+assign pmp_csr.wr      = csr.wr    ;
+assign pmp_csr.wr_set  = csr.wr_set;
+assign pmp_csr.wr_clr  = csr.wr_clr;
+assign pmp_csr.addr    = csr.addr  ;
+assign pmp_csr.wdata   = csr.wdata ;
+
 
 //
 // CSR read responses.
@@ -590,6 +611,7 @@ wire   read_instret   =           csr.en && csr.addr == ADDR_INSTRET  ;
 wire   read_mcycle    = mode_m && csr.en && csr.addr == ADDR_MCYCLE   ;
 wire   read_minstret  = mode_m && csr.en && csr.addr == ADDR_MINSTRET ;
 wire   read_mcountin  = mode_m && csr.en && csr.addr == ADDR_MCOUNTIN ;
+wire   read_pmp       = mode_m && csr.en && pmp_csr_addr              ;
 
 wire   valid_addr     = 
     read_mstatus   ||
@@ -612,12 +634,14 @@ wire   valid_addr     =
     read_instret   ||
     read_mcycle    ||
     read_minstret  ||
-    read_mcountin   ;
+    read_mcountin  ||
+    read_pmp        ; // If bad PMP addr, pmp module sets csr.error.
 
 wire invalid_addr = !valid_addr;
 
-assign csr.error = invalid_addr && csr.wr   ||
-                   csr_error_mtvec          ;
+assign csr.error = invalid_addr && csr.wr           ||
+                   csr_error_mtvec                  ||
+                   read_pmp     && pmp_csr.error    ;
 
 assign csr.rdata =
     {64{read_mstatus  }} & reg_mstatus          |
@@ -640,7 +664,8 @@ assign csr.rdata =
     {64{read_instret  }} & ctr_instret          |
     {64{read_mcycle   }} & ctr_cycle            |
     {64{read_minstret }} & ctr_instret          |
-    {64{read_mcountin }} & reg_mcountin         ;
+    {64{read_mcountin }} & reg_mcountin         |
+    {64{read_pmp      }} & pmp_csr.rdata        ;
 
 `ifdef RVFI
 assign da_mstatus    = reg_mstatus   ;
