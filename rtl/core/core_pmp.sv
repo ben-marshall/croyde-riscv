@@ -263,6 +263,8 @@ end else begin : no_region_c
 
     assign match_d[j] = 1'b0;
     assign match_i[j] = 1'b0;
+    assign trap_i[j]  = 1'b0;
+    assign trap_d[j]  = 1'b0;
 
 end endgenerate
 
