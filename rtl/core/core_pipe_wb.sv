@@ -40,7 +40,14 @@ output wire                 s3_rd_wen       , // RD write enable
 output wire [ REG_ADDR_R:0] s3_rd_addr      , // RD write addr
 output wire [         XL:0] s3_rd_wdata     , // RD write data.
 
-core_csrs_if.REQ            csr             , // CSR interface
+output wire                 csr_en          , // CSR Access Enable
+output wire                 csr_wr          , // CSR Write Enable
+output wire                 csr_wr_set      , // CSR Write - Set
+output wire                 csr_wr_clr      , // CSR Write - Clear
+output wire [         11:0] csr_addr        , // Address of the CSR to access.
+output wire [         XL:0] csr_wdata       , // Data to be written to a CSR
+input  wire [         XL:0] csr_rdata       , // CSR read data
+input  wire                 csr_error       , // Bad CSR access
 
 input  wire [         XL:0] mtvec_base      , // Current trap vector addr
 input  wire [         XL:0] csr_mepc        , // Current mepc
@@ -147,7 +154,7 @@ assign  s3_rd_wen  =  s3_fwd_rd_wen     &&
 assign  s3_rd_wdata=
     {XLEN{wb_wdata  }}  & s3_wdata  |
     {XLEN{wb_lsu    }}  & lsu_rdata |
-    {XLEN{wb_csr    }}  & csr.rdata ;
+    {XLEN{wb_csr    }}  & csr_rdata ;
 
 assign  s3_rd_addr = s3_rd          ;
 
@@ -165,13 +172,13 @@ always @(posedge g_clk) begin
     end else if(e_new_instr) begin
         csr_op_done <= 1'b0;
         csr_op_error<= 1'b0;
-    end else if(csr.en) begin
+    end else if(csr_en) begin
         csr_op_done <= 1'b1;
-        csr_op_error<= csr.error;
+        csr_op_error<= csr_error;
     end
 end
 
-wire    trap_csr    = csr.en      && csr.error      ||
+wire    trap_csr    = csr_en      && csr_error      ||
                       csr_op_done && csr_op_error   ;
 
 wire    csr_op_rd   = s3_full && s3_csr_op[CSR_OP_RD ];
@@ -181,13 +188,13 @@ wire    csr_op_clr  = s3_full && s3_csr_op[CSR_OP_CLR];
         
 wire    csr_op_any  = csr_op_rd || csr_op_wr || csr_op_set || csr_op_clr;
 
-assign  csr.en      = !csr_op_done && csr_op_any;
+assign  csr_en      = !csr_op_done && csr_op_any;
 
-assign  csr.wr      = csr_op_wr     ;
-assign  csr.wr_set  = csr_op_set    ;
-assign  csr.wr_clr  = csr_op_clr    ;
-assign  csr.addr    = s3_csr_addr   ;
-assign  csr.wdata   = s3_wdata      ;
+assign  csr_wr      = csr_op_wr     ;
+assign  csr_wr_set  = csr_op_set    ;
+assign  csr_wr_clr  = csr_op_clr    ;
+assign  csr_addr    = s3_csr_addr   ;
+assign  csr_wdata   = s3_wdata      ;
 
 
 //
@@ -339,7 +346,7 @@ assign trap_cpu       = s3_full && !raise_int && (
 
 assign trap_int       = int_ack; // trap occured due to interrupt
 
-wire   cause_iopcode  = csr.error || cfu_wfi_trap;
+wire   cause_iopcode  = csr_error || cfu_wfi_trap;
 
 assign trap_cause     = raise_int       ? int_cause             :
                         s3_trap         ? {2'b00, s3_rd       } :

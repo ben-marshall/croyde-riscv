@@ -28,7 +28,14 @@ input  wire         dmem_req        , // Data Port check enable.
 output wire         dmem_trap       , // Data Port trap access.
 output reg          dmem_error      , // Data port error response.
 
-core_csrs_if.RSP    csr               // CSR interface
+input  wire         csr_en          , // CSR Access Enable
+input  wire         csr_wr          , // CSR Write Enable
+input  wire         csr_wr_set      , // CSR Write - Set
+input  wire         csr_wr_clr      , // CSR Write - Clear
+input  wire [11:0]  csr_addr        , // Address of the CSR to access.
+input  wire [63:0]  csr_wdata       , // Data to be written to a CSR
+output wire [63:0]  csr_rdata       , // CSR read data
+output wire         csr_error         // Bad CSR access
 
 );
 
@@ -45,7 +52,7 @@ localparam [1:0] A_TOR    = 2'b01;
 localparam [1:0] A_NA4    = 2'b10;
 localparam [1:0] A_NAPOT  = 2'b11;
 
-assign g_clk_req = (NUM_REGIONS > 0) && csr.en && csr.wr;
+assign g_clk_req = (NUM_REGIONS > 0) && csr_en && csr_wr;
 
 reg  [AW:0] addr_regs [63:0]; // Storage for the addresses
 reg  [ 7:0] cfg_regs  [63:0]; // Storage for cfgs
@@ -89,23 +96,23 @@ generate for(k = 0; k < 16; k = k + 2) begin
 
 end endgenerate
 
-wire access_cfg_reg = csr.addr[11:4] == 8'h3a && !csr.addr[0];
+wire access_cfg_reg = csr_addr[11:4] == 8'h3a && !csr_addr[0];
     
 wire access_addr_reg=
-    csr.addr[11:8] == 4'h3 && (
-        csr.addr[7:4] == 4'hB   ||
-        csr.addr[7:4] == 4'hC   ||
-        csr.addr[7:4] == 4'hD   ||
-        csr.addr[7:4] == 4'hE
+    csr_addr[11:8] == 4'h3 && (
+        csr_addr[7:4] == 4'hB   ||
+        csr_addr[7:4] == 4'hC   ||
+        csr_addr[7:4] == 4'hD   ||
+        csr_addr[7:4] == 4'hE
     );
 
 wire [63-ADDR_WIDTH:0] apad = {63-AW{1'b0}};
 
-assign csr.rdata = access_cfg_reg  ? cfg_csr_regs[csr.addr[3:0]]    :
-                   access_addr_reg ? {apad,addr_regs[csr.addr[5:0]]}:
+assign csr_rdata = access_cfg_reg  ? cfg_csr_regs[csr_addr[3:0]]    :
+                   access_addr_reg ? {apad,addr_regs[csr_addr[5:0]]}:
                                      64'b0                          ;
 
-assign csr.error = !access_cfg_reg || !access_addr_reg;
+assign csr_error = !access_cfg_reg || !access_addr_reg;
 
 //
 // Trap raising
@@ -128,8 +135,8 @@ end else begin
 end
 
 // Portion of CSR write data used in setting/clearing/writing reg values.
-wire [63:0] csr_wd_sel    =  csr.wdata[63:0];
-wire [63:0] csr_wd_seln   = ~csr.wdata[63:0];
+wire [63:0] csr_wd_sel    =  csr_wdata[63:0];
+wire [63:0] csr_wd_seln   = ~csr_wdata[63:0];
 
 //
 // Address Matching functions.
@@ -171,12 +178,12 @@ generate for(i = 0; i < 64; i =i + 1) if(i < NUM_REGIONS) begin : gen_region_a
     // writes to this register.
     wire tor_lock= (cfg_a[i+1] == A_TOR) && cfg_l[i+1];
 
-    wire csr_wen = csr.en && csr.wr && !cfg_l[i] && !tor_lock &&
-                   csr.addr == (CSR_ADDR_REGS_BASE+i);
+    wire csr_wen = csr_en && csr_wr && !cfg_l[i] && !tor_lock &&
+                   csr_addr == (CSR_ADDR_REGS_BASE+i);
 
     wire [AW:0] csr_write_val =
-        csr.wr_set ? addr_regs[i] |  csr_wd_sel [AW:0] :
-        csr.wr_clr ? addr_regs[i] &  csr_wd_seln[AW:0] :
+        csr_wr_set ? addr_regs[i] |  csr_wd_sel [AW:0] :
+        csr_wr_clr ? addr_regs[i] &  csr_wd_seln[AW:0] :
                                      csr_wd_sel [AW:0] ;
 
     always @(posedge g_clk) if(!g_resetn) begin
@@ -201,12 +208,12 @@ generate for(j = 0; j < 64; j = j + 1) if(j < NUM_REGIONS) begin:gen_region_c
     localparam REGI = j % 8;
     localparam CSRI = (j / 4) & -2;
 
-    wire csr_wen = csr.en && csr.wr && !cfg_l[j] &&
-                   csr.addr == (CSR_ADDR_REGS_BASE+CSRI);
+    wire csr_wen = csr_en && csr_wr && !cfg_l[j] &&
+                   csr_addr == (CSR_ADDR_REGS_BASE+CSRI);
 
     wire [ 7:0] csr_write_val =
-        csr.wr_set ? cfg_regs[j] |  csr_wd_sel [8*REGI+:8] :
-        csr.wr_clr ? cfg_regs[j] &  csr_wd_seln[8*REGI+:8] :
+        csr_wr_set ? cfg_regs[j] |  csr_wd_sel [8*REGI+:8] :
+        csr_wr_clr ? cfg_regs[j] &  csr_wd_seln[8*REGI+:8] :
                                     csr_wd_sel [8*REGI+:8] ;
 
     assign cfg_l[j] = cfg_regs[j][  7];
