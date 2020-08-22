@@ -247,7 +247,7 @@ assign  lsu_new_op[LSU_OP_SEXT  ] = s2_lsu_sext ;
 wire [CSR_OP_R:0] csr_new_op;
 
 assign  csr_new_op[CSR_OP_RD    ] = s2_csr_rd   ;
-assign  csr_new_op[CSR_OP_WR    ] = s2_csr_wr   || s2_csr_set || s2_csr_clr;
+assign  csr_new_op[CSR_OP_WR    ] = s2_csr_wr   ;
 assign  csr_new_op[CSR_OP_SET   ] = s2_csr_set  ;
 assign  csr_new_op[CSR_OP_CLR   ] = s2_csr_clr  ;
 

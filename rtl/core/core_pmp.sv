@@ -41,7 +41,7 @@ output wire         csr_error         // Bad CSR access
 
 // Base addresses for CSR registers.
 localparam CSR_CFG_REGS_BASE  = 12'h3A0;
-localparam CSR_ADDR_REGS_BASE = 12'h3AE;
+localparam CSR_ADDR_REGS_BASE = 12'h3B0;
 
 // Signal widths
 localparam AW       = ADDR_WIDTH - 1;
@@ -54,7 +54,7 @@ localparam [1:0] A_NAPOT  = 2'b11;
 
 assign g_clk_req = (NUM_REGIONS > 0) && csr_en && csr_wr;
 
-reg  [AW:0] addr_regs [63:0]; // Storage for the addresses
+wire [AW:0] addr_regs [63:0]; // Storage for the addresses
 reg  [ 7:0] cfg_regs  [63:0]; // Storage for cfgs
 
                               // Control bits pulled from cfg_regs[i].
@@ -79,7 +79,7 @@ wire [63:0] trap_i          ; // Trap instr access
 wire [63:0] cfg_csr_regs [15:0];
 
 genvar k;
-generate for(k = 0; k < 16; k = k + 2) begin
+generate for(k = 0; k < 16; k = k + 2) begin : cfg_regs_array
 
     assign cfg_csr_regs[k+0] = {
         cfg_regs[k+7],
@@ -108,11 +108,17 @@ wire access_addr_reg=
 
 wire [63-ADDR_WIDTH:0] apad = {63-AW{1'b0}};
 
-assign csr_rdata = access_cfg_reg  ? cfg_csr_regs[csr_addr[3:0]]    :
-                   access_addr_reg ? {apad,addr_regs[csr_addr[5:0]]}:
-                                     64'b0                          ;
+wire   [ 3:0] idx_cfg       = csr_addr[3:0];
+wire   [ 5:0] idx_addr      = csr_addr[5:0] - 6'h30;
 
-assign csr_error = !access_cfg_reg || !access_addr_reg;
+wire   [63:0] read_cfg_reg  = cfg_csr_regs[idx_cfg];
+
+wire   [63:0] read_addr_reg = {apad,addr_regs[idx_addr]};
+
+assign csr_rdata = ({64{access_cfg_reg }} & read_cfg_reg ) |
+                   ({64{access_addr_reg}} & read_addr_reg) ;
+
+assign csr_error = !(access_cfg_reg || access_addr_reg);
 
 //
 // Trap raising
@@ -137,6 +143,9 @@ end
 // Portion of CSR write data used in setting/clearing/writing reg values.
 wire [63:0] csr_wd_sel    =  csr_wdata[63:0];
 wire [63:0] csr_wd_seln   = ~csr_wdata[63:0];
+
+// Address register write enable.
+wire [63:0] addr_wen      ;
 
 //
 // Address Matching functions.
@@ -172,13 +181,16 @@ endfunction
 // ------------------------------------------------------------
 
 genvar i;
-generate for(i = 0; i < 64; i =i + 1) if(i < NUM_REGIONS) begin : gen_region_a
+generate for(i = 0; i < 64; i =i + 1) begin : gen_addrs
+if(i < NUM_REGIONS) begin : gen_region_a
+
+    reg [AW:0] areg;
 
     // If cfg[i+1] is in TOR mode and locked, then don't allow
     // writes to this register.
     wire tor_lock= (cfg_a[i+1] == A_TOR) && cfg_l[i+1];
 
-    wire csr_wen = csr_en && csr_wr && !cfg_l[i] && !tor_lock &&
+    assign addr_wen[i] = csr_en && csr_wr && !cfg_l[i] && !tor_lock &&
                    csr_addr == (CSR_ADDR_REGS_BASE+i);
 
     wire [AW:0] csr_write_val =
@@ -187,29 +199,33 @@ generate for(i = 0; i < 64; i =i + 1) if(i < NUM_REGIONS) begin : gen_region_a
                                      csr_wd_sel [AW:0] ;
 
     always @(posedge g_clk) if(!g_resetn) begin
-        addr_regs[i] <= {ADDR_WIDTH{1'b0}};
-    end else if(csr_wen) begin
-        addr_regs[i] <= csr_write_val;
+        areg <= {ADDR_WIDTH{1'b0}};
+    end else if(addr_wen[i]) begin
+        areg <= csr_write_val;
     end
+
+    assign addr_regs[i] = areg;
 
 end else begin: no_region_a
 
-    always @(*) addr_regs[i] = {ADDR_WIDTH{1'b0}};
+    assign addr_regs[i] = {ADDR_WIDTH{1'b0}};
+    assign addr_wen[i] = 1'b0;
 
-end endgenerate
+end end endgenerate
 
 //
 // Generate Config Registers
 // ------------------------------------------------------------
 
 genvar j;
-generate for(j = 0; j < 64; j = j + 1) if(j < NUM_REGIONS) begin:gen_region_c
+generate for(j = 0; j < 64; j = j + 1) begin : gen_cfgs
+if(j < NUM_REGIONS) begin:gen_region_c
 
     localparam REGI = j % 8;
     localparam CSRI = (j / 4) & -2;
 
     wire csr_wen = csr_en && csr_wr && !cfg_l[j] &&
-                   csr_addr == (CSR_ADDR_REGS_BASE+CSRI);
+                   csr_addr == (CSR_CFG_REGS_BASE+CSRI);
 
     wire [ 7:0] csr_write_val =
         csr_wr_set ? cfg_regs[j] |  csr_wd_sel [8*REGI+:8] :
@@ -273,6 +289,6 @@ end else begin : no_region_c
     assign trap_i[j]  = 1'b0;
     assign trap_d[j]  = 1'b0;
 
-end endgenerate
+end end endgenerate
 
 endmodule

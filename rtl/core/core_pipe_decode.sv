@@ -239,7 +239,7 @@ assign s2_imm =
     dec_jal                 ? sext_imm32_j  :
                               0             ;
 
-assign s2_csr_addr          = s1_instr[31:20];
+assign s2_csr_addr          = imm_csr_addr   ;
 
 //
 // Register Address Decoding
@@ -467,10 +467,23 @@ assign  s2_mdu_remuw  = dec_remuw ;
 //
 // CSRs
 
-assign  s2_csr_set    = dec_csrrsi || dec_csrrs ;
-assign  s2_csr_clr    = dec_csrrci || dec_csrrc ;
-assign  s2_csr_rd     = dec_csrrsi || dec_csrrs || dec_csrrw || dec_csrrwi;
-assign  s2_csr_wr     = dec_csrrsi || dec_csrrs || dec_csrrw || dec_csrrwi;
+assign  s2_csr_set    = dec_csrrsi || 
+                        dec_csrrs  ;
+
+assign  s2_csr_clr    = dec_csrrci ||
+                        dec_csrrc  ;
+
+assign  s2_csr_rd     = dec_csrrsi ||
+                        dec_csrrs  ||
+                        dec_csrrw  && |dec_rd ||
+                        dec_csrrwi && |dec_rd ;
+
+assign  s2_csr_wr     = dec_csrrsi ||
+                        dec_csrrs  && |dec_rs1 ||
+                        dec_csrrci ||
+                        dec_csrrc  && |dec_rs1 ||
+                        dec_csrrw  && |dec_rs1 ||
+                        dec_csrrwi ;
 
 //
 // Writeback data selection
