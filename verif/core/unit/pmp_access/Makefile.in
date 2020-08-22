@@ -1,0 +1,7 @@
+
+
+TEST_NAME = pmp_access
+TEST_SRC  = $(CORE_UNIT_ROOT)/$(TEST_NAME)/$(TEST_NAME).c
+
+$(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
+
