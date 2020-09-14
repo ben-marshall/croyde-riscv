@@ -7,11 +7,11 @@ if [[ -z "$RISCV" ]]; then
 fi
 
 if [[ -z "$VERILATOR_ROOT" ]]; then
-    export VERILATOR_ROOT=/home/ben/tools/verilator
+    export VERILATOR_ROOT=/opt/eda/verilator
 fi
 
 if [[ -z "$YOSYS_ROOT" ]]; then
-    export YOSYS_ROOT=/home/ben/tools/yosys
+    export YOSYS_ROOT=/opt/eda/Yosys
 fi
 
 export PATH=$RISCV:$PATH
