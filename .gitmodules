@@ -4,3 +4,6 @@
 [submodule "extern/embench-iot"]
 	path = extern/embench-iot
 	url = https://github.com/embench/embench-iot.git
+[submodule "extern/riscv-opcodes"]
+	path = extern/riscv-opcodes
+	url = https://github.com/riscv/riscv-opcodes.git

@@ -40,4 +40,11 @@ include $(CORE_UNIT_ROOT)/branch-tgt-trap/Makefile.in
 include $(CORE_UNIT_ROOT)/imem-access-trap/Makefile.in
 include $(CORE_UNIT_ROOT)/mul/Makefile.in
 include $(CORE_UNIT_ROOT)/div/Makefile.in
+include $(CORE_UNIT_ROOT)/b-pack/Makefile.in
+include $(CORE_UNIT_ROOT)/b-bitwise/Makefile.in
+include $(CORE_UNIT_ROOT)/b-rotate/Makefile.in
+include $(CORE_UNIT_ROOT)/b-grev/Makefile.in
+include $(CORE_UNIT_ROOT)/b-xperm/Makefile.in
+include $(CORE_UNIT_ROOT)/b-clmul/Makefile.in
+include $(CORE_UNIT_ROOT)/k-aes/Makefile.in
 

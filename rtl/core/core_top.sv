@@ -70,6 +70,33 @@ parameter   PC_RESET_ADDRESS= 'h10000000;
 parameter FPGA_REGFILE = 0;
 
 //
+// Feature Set Parameters
+//
+// Note:
+//  Turning on ZK automatically turns on ZK*
+//  Turning on ZKN automatically turns on ZKN* etc.
+// ------------------------------------------------------------
+
+parameter ARCH_ZK   = 1; // Turn on entire crypto extension
+parameter ARCH_ZKB  = 1; // Turn on Bitmanip-borrowed crypto instructions
+parameter ARCH_ZKG  = 1; // Turn on CLMUL/CLMULH
+parameter ARCH_ZKN  = 1; // Turn on NIST suite crypto instructions
+parameter ARCH_ZKNE = 1; // Turn on NIST AES encrypt
+parameter ARCH_ZKND = 1; // Turn on NIST AES decrypt
+parameter ARCH_ZKNH = 1; // Turn on NIST SHA2 instructions
+parameter ARCH_ZKS  = 1; // Turn on ShangMi suite crypto instructions
+parameter ARCH_ZKSED= 1; // Turn on ShangMi SM4 instructions
+parameter ARCH_ZKSH = 1; // Turn on ShangMi SM3 instructions
+
+localparam F_ZKB  = ARCH_ZK || ARCH_ZKB ;
+localparam F_ZKG  = ARCH_ZK || ARCH_ZKG ;
+localparam F_ZKNE = ARCH_ZK || ARCH_ZKN || ARCH_ZKNE;
+localparam F_ZKND = ARCH_ZK || ARCH_ZKN || ARCH_ZKND;
+localparam F_ZKNH = ARCH_ZK || ARCH_ZKN || ARCH_ZKNH;
+localparam F_ZKSED= ARCH_ZK || ARCH_ZKS || ARCH_ZKSED;
+localparam F_ZKSH = ARCH_ZK || ARCH_ZKS || ARCH_ZKSH;
+
+//
 // Clock request and delivery wires.
 // ------------------------------------------------------------
 
@@ -156,6 +183,18 @@ wire                 s2_alu_sltu    ; //
 wire                 s2_alu_sra     ; // 
 wire                 s2_alu_sub     ; // 
 wire                 s2_alu_xor     ; // 
+wire                 s2_alu_xorn    ; // 
+wire                 s2_alu_andn    ; // 
+wire                 s2_alu_orn     ; // 
+wire                 s2_alu_ror     ; //
+wire                 s2_alu_rol     ; //
+wire                 s2_alu_pack    ; //
+wire                 s2_alu_packh   ; //
+wire                 s2_alu_packu   ; //
+wire                 s2_alu_grev    ; //
+wire                 s2_alu_gorc    ; //
+wire                 s2_alu_xpermn  ; //
+wire                 s2_alu_xpermb  ; //
 wire                 s2_alu_word    ; // Word result only.
 
 wire                 s2_cfu_beq     ; // Control flow operation.
@@ -184,6 +223,8 @@ wire                 s2_mdu_mul     ; // MDU Operation
 wire                 s2_mdu_mulh    ; //
 wire                 s2_mdu_mulhsu  ; //
 wire                 s2_mdu_mulhu   ; //
+wire                 s2_mdu_clmul   ; //
+wire                 s2_mdu_clmulh  ; //
 wire                 s2_mdu_div     ; //
 wire                 s2_mdu_divu    ; //
 wire                 s2_mdu_rem     ; //
@@ -193,6 +234,26 @@ wire                 s2_mdu_divw    ; //
 wire                 s2_mdu_divuw   ; //
 wire                 s2_mdu_remw    ; //
 wire                 s2_mdu_remuw   ; //
+
+wire                 s2_cry_aeses    ;
+wire                 s2_cry_aesesm   ;
+wire                 s2_cry_aesds    ;
+wire                 s2_cry_aesdsm   ;
+wire                 s2_cry_aesks1   ;
+wire                 s2_cry_aesks2   ;
+wire                 s2_cry_aesimix  ;
+wire                 s2_cry_sha256sig0;
+wire                 s2_cry_sha256sig1;
+wire                 s2_cry_sha256sum0;
+wire                 s2_cry_sha256sum1;
+wire                 s2_cry_sha512sig0;
+wire                 s2_cry_sha512sig1;
+wire                 s2_cry_sha512sum0;
+wire                 s2_cry_sha512sum1;
+wire                 s2_cry_sm4_ed    ;
+wire                 s2_cry_sm4_ks    ;
+wire                 s2_cry_sm3_p0    ;
+wire                 s2_cry_sm3_p1    ;
 
 wire                 s2_csr_set     ; // CSR Operation
 wire                 s2_csr_clr     ; //
@@ -204,6 +265,7 @@ wire                 s2_wb_alu      ; // Writeback ALU result
 wire                 s2_wb_csr      ; // Writeback CSR result
 wire                 s2_wb_mdu      ; // Writeback MDU result
 wire                 s2_wb_lsu      ; // Writeback LSU Loaded data
+wire                 s2_wb_cry      ; // Writeback crypto result.
 wire                 s2_wb_npc      ; // Writeback next PC value
 
 wire                 s3_valid       ; // New instruction ready
@@ -340,7 +402,14 @@ core_pipe_fetch #(
 //
 core_pipe_decode #(
 .PC_RESET_ADDRESS(PC_RESET_ADDRESS),
-.MEM_ADDR_W      (MEM_ADDR_W      )
+.MEM_ADDR_W      (MEM_ADDR_W      ),
+.F_ZKB           (F_ZKB  ), // Turn on Bitmanip-borrowed crypto instructions
+.F_ZKG           (F_ZKG  ), // Turn on CLMUL/CLMULH
+.F_ZKNE          (F_ZKNE ), // Turn on NIST AES encrypt
+.F_ZKND          (F_ZKND ), // Turn on NIST AES decrypt
+.F_ZKNH          (F_ZKNH ), // Turn on NIST SHA2 instructions
+.F_ZKSED         (F_ZKSED), // Turn on ShangMi SM4 instructions
+.F_ZKSH          (F_ZKSH )  // Turn on ShangMi SM3 instructions
 ) i_core_pipe_decode (
 .g_clk           (g_clk           ), // Global clock
 .g_resetn        (g_resetn        ), // Global active low sync reset.
@@ -384,6 +453,18 @@ core_pipe_decode #(
 .s2_alu_sra      (s2_alu_sra      ), // 
 .s2_alu_sub      (s2_alu_sub      ), // 
 .s2_alu_xor      (s2_alu_xor      ), // 
+.s2_alu_xorn     (s2_alu_xorn     ), // 
+.s2_alu_andn     (s2_alu_andn     ), // 
+.s2_alu_orn      (s2_alu_orn      ), // 
+.s2_alu_ror      (s2_alu_ror      ), //
+.s2_alu_rol      (s2_alu_rol      ), //
+.s2_alu_pack     (s2_alu_pack     ), //
+.s2_alu_packh    (s2_alu_packh    ), //
+.s2_alu_packu    (s2_alu_packu    ), //
+.s2_alu_grev     (s2_alu_grev     ), //
+.s2_alu_gorc     (s2_alu_gorc     ), //
+.s2_alu_xpermn   (s2_alu_xpermn   ), //
+.s2_alu_xpermb   (s2_alu_xpermb   ), //
 .s2_alu_word     (s2_alu_word     ), // Word result only.
 .s2_cfu_beq      (s2_cfu_beq      ), // Control flow operation.
 .s2_cfu_bge      (s2_cfu_bge      ), //
@@ -409,6 +490,8 @@ core_pipe_decode #(
 .s2_mdu_mulh     (s2_mdu_mulh     ), //
 .s2_mdu_mulhsu   (s2_mdu_mulhsu   ), //
 .s2_mdu_mulhu    (s2_mdu_mulhu    ), //
+.s2_mdu_clmul    (s2_mdu_clmul    ), //
+.s2_mdu_clmulh   (s2_mdu_clmulh   ), //
 .s2_mdu_div      (s2_mdu_div      ), //
 .s2_mdu_divu     (s2_mdu_divu     ), //
 .s2_mdu_rem      (s2_mdu_rem      ), //
@@ -418,6 +501,25 @@ core_pipe_decode #(
 .s2_mdu_divuw    (s2_mdu_divuw    ), //
 .s2_mdu_remw     (s2_mdu_remw     ), //
 .s2_mdu_remuw    (s2_mdu_remuw    ), //
+.s2_cry_aeses     (s2_cry_aeses     ), // Crypto extension operations.
+.s2_cry_aesesm    (s2_cry_aesesm    ),
+.s2_cry_aesds     (s2_cry_aesds     ),
+.s2_cry_aesdsm    (s2_cry_aesdsm    ),
+.s2_cry_aesks1    (s2_cry_aesks1    ),
+.s2_cry_aesks2    (s2_cry_aesks2    ),
+.s2_cry_aesimix   (s2_cry_aesimix   ),
+.s2_cry_sha256sig0(s2_cry_sha256sig0),
+.s2_cry_sha256sig1(s2_cry_sha256sig1),
+.s2_cry_sha256sum0(s2_cry_sha256sum0),
+.s2_cry_sha256sum1(s2_cry_sha256sum1),
+.s2_cry_sha512sig0(s2_cry_sha512sig0),
+.s2_cry_sha512sig1(s2_cry_sha512sig1),
+.s2_cry_sha512sum0(s2_cry_sha512sum0),
+.s2_cry_sha512sum1(s2_cry_sha512sum1),
+.s2_cry_sm4_ed    (s2_cry_sm4_ed    ),
+.s2_cry_sm4_ks    (s2_cry_sm4_ks    ),
+.s2_cry_sm3_p0    (s2_cry_sm3_p0    ),
+.s2_cry_sm3_p1    (s2_cry_sm3_p1    ),
 .s2_csr_set      (s2_csr_set      ), // CSR Operation
 .s2_csr_clr      (s2_csr_clr      ), //
 .s2_csr_rd       (s2_csr_rd       ), //
@@ -427,6 +529,7 @@ core_pipe_decode #(
 .s2_wb_csr       (s2_wb_csr       ), // Writeback CSR result
 .s2_wb_mdu       (s2_wb_mdu       ), // Writeback MDU result
 .s2_wb_lsu       (s2_wb_lsu       ), // Writeback LSU Loaded data
+.s2_wb_cry       (s2_wb_cry       ), // Writeback Crypto result
 .s2_wb_npc       (s2_wb_npc       )  // Writeback next PC value
 );
 
@@ -437,7 +540,14 @@ core_pipe_decode #(
 //  Top level for the execute stage of the pipeline.
 //
 core_pipe_exec #(
-.MEM_ADDR_W     (MEM_ADDR_W     )
+.MEM_ADDR_W     (MEM_ADDR_W     ),
+.F_ZKB           (F_ZKB  ), // Turn on Bitmanip-borrowed crypto instructions
+.F_ZKG           (F_ZKG  ), // Turn on CLMUL/CLMULH
+.F_ZKNE          (F_ZKNE ), // Turn on NIST AES encrypt
+.F_ZKND          (F_ZKND ), // Turn on NIST AES decrypt
+.F_ZKNH          (F_ZKNH ), // Turn on NIST SHA2 instructions
+.F_ZKSED         (F_ZKSED), // Turn on ShangMi SM4 instructions
+.F_ZKSH          (F_ZKSH )  // Turn on ShangMi SM3 instructions
 ) i_core_pipe_exec(
 .g_clk           (g_clk           ), // Global clock
 .g_clk_mul       (g_clk_mul       ), // Gated multiplier clock
@@ -478,6 +588,18 @@ core_pipe_exec #(
 .s2_alu_sra      (s2_alu_sra      ), // 
 .s2_alu_sub      (s2_alu_sub      ), // 
 .s2_alu_xor      (s2_alu_xor      ), // 
+.s2_alu_xorn     (s2_alu_xorn     ), // 
+.s2_alu_andn     (s2_alu_andn     ), // 
+.s2_alu_orn      (s2_alu_orn      ), // 
+.s2_alu_ror      (s2_alu_ror      ), //
+.s2_alu_rol      (s2_alu_rol      ), //
+.s2_alu_pack     (s2_alu_pack     ), //
+.s2_alu_packh    (s2_alu_packh    ), //
+.s2_alu_packu    (s2_alu_packu    ), //
+.s2_alu_grev     (s2_alu_grev     ), //
+.s2_alu_gorc     (s2_alu_gorc     ), //
+.s2_alu_xpermn   (s2_alu_xpermn   ), //
+.s2_alu_xpermb   (s2_alu_xpermb   ), //
 .s2_alu_word     (s2_alu_word     ), // Word result only.
 .s2_cfu_beq      (s2_cfu_beq      ), // Control flow operation.
 .s2_cfu_bge      (s2_cfu_bge      ), //
@@ -503,6 +625,8 @@ core_pipe_exec #(
 .s2_mdu_mulh     (s2_mdu_mulh     ), //
 .s2_mdu_mulhsu   (s2_mdu_mulhsu   ), //
 .s2_mdu_mulhu    (s2_mdu_mulhu    ), //
+.s2_mdu_clmul    (s2_mdu_clmul    ), //
+.s2_mdu_clmulh   (s2_mdu_clmulh   ), //
 .s2_mdu_div      (s2_mdu_div      ), //
 .s2_mdu_divu     (s2_mdu_divu     ), //
 .s2_mdu_rem      (s2_mdu_rem      ), //
@@ -512,6 +636,25 @@ core_pipe_exec #(
 .s2_mdu_divuw    (s2_mdu_divuw    ), //
 .s2_mdu_remw     (s2_mdu_remw     ), //
 .s2_mdu_remuw    (s2_mdu_remuw    ), //
+.s2_cry_aeses     (s2_cry_aeses     ), // Crypto extension operations.
+.s2_cry_aesesm    (s2_cry_aesesm    ),
+.s2_cry_aesds     (s2_cry_aesds     ),
+.s2_cry_aesdsm    (s2_cry_aesdsm    ),
+.s2_cry_aesks1    (s2_cry_aesks1    ),
+.s2_cry_aesks2    (s2_cry_aesks2    ),
+.s2_cry_aesimix   (s2_cry_aesimix   ),
+.s2_cry_sha256sig0(s2_cry_sha256sig0),
+.s2_cry_sha256sig1(s2_cry_sha256sig1),
+.s2_cry_sha256sum0(s2_cry_sha256sum0),
+.s2_cry_sha256sum1(s2_cry_sha256sum1),
+.s2_cry_sha512sig0(s2_cry_sha512sig0),
+.s2_cry_sha512sig1(s2_cry_sha512sig1),
+.s2_cry_sha512sum0(s2_cry_sha512sum0),
+.s2_cry_sha512sum1(s2_cry_sha512sum1),
+.s2_cry_sm4_ed    (s2_cry_sm4_ed    ),
+.s2_cry_sm4_ks    (s2_cry_sm4_ks    ),
+.s2_cry_sm3_p0    (s2_cry_sm3_p0    ),
+.s2_cry_sm3_p1    (s2_cry_sm3_p1    ),
 .s2_csr_set      (s2_csr_set      ), // CSR Operation
 .s2_csr_clr      (s2_csr_clr      ), //
 .s2_csr_rd       (s2_csr_rd       ), //
@@ -521,6 +664,7 @@ core_pipe_exec #(
 .s2_wb_csr       (s2_wb_csr       ), // Writeback CSR result
 .s2_wb_mdu       (s2_wb_mdu       ), // Writeback MDU result
 .s2_wb_lsu       (s2_wb_lsu       ), // Writeback LSU Loaded data
+.s2_wb_cry       (s2_wb_cry       ), // Writeback Crypto result
 .s2_wb_npc       (s2_wb_npc       ), // Writeback next PC value
 .s3_valid        (s3_valid        ), // New instruction ready
 .s3_ready        (s3_ready        ), // WB ready for new instruciton.

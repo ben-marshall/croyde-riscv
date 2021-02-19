@@ -22,7 +22,18 @@ parameter RAM_BASE          = 39'h00010000,
 parameter RAM_SIZE          = 39'h0000FFFF,
 parameter EXT_BASE          = 39'h10000000,
 parameter EXT_SIZE          = 39'h0FFFFFFF,
-parameter CLK_GATE_EN       = 1'b1  // Enable core-level clock gating
+parameter CLK_GATE_EN       = 1'b1, // Enable core-level clock gating
+
+parameter CORE_ARCH_ZK      = 1, // Turn on entire crypto extension
+parameter CORE_ARCH_ZKB     = 1, // Turn on Bitmanip-borrowed crypto instructions
+parameter CORE_ARCH_ZKG     = 1, // Turn on CLMUL/CLMULH
+parameter CORE_ARCH_ZKN     = 1, // Turn on NIST suite crypto instructions
+parameter CORE_ARCH_ZKNE    = 1, // Turn on NIST AES encrypt
+parameter CORE_ARCH_ZKND    = 1, // Turn on NIST AES decrypt
+parameter CORE_ARCH_ZKNH    = 1, // Turn on NIST SHA2 instructions
+parameter CORE_ARCH_ZKS     = 1, // Turn on ShangMi suite crypto instructions
+parameter CORE_ARCH_ZKSED   = 1, // Turn on ShangMi SM4 instructions
+parameter CORE_ARCH_ZKSH    = 1  // Turn on ShangMi SM3 instructions
 
 )(
 
@@ -130,7 +141,17 @@ wire                 core_inhibit_ir   ; // Stop instret incrementing.
 core_top #(
 .PC_RESET_ADDRESS   (PC_RESET_ADDRESS),
 .FPGA_REGFILE       (FPGA_REGFILE    ),
-.CLK_GATE_EN        (CLK_GATE_EN     )
+.CLK_GATE_EN        (CLK_GATE_EN     ),
+.ARCH_ZK   (CORE_ARCH_ZK   ), // Turn on entire crypto extension
+.ARCH_ZKB  (CORE_ARCH_ZKB  ), // Turn on Bitmanip-borrowed crypto instructions
+.ARCH_ZKG  (CORE_ARCH_ZKG  ), // Turn on CLMUL/CLMULH
+.ARCH_ZKN  (CORE_ARCH_ZKN  ), // Turn on NIST suite crypto instructions
+.ARCH_ZKNE (CORE_ARCH_ZKNE ), // Turn on NIST AES encrypt
+.ARCH_ZKND (CORE_ARCH_ZKND ), // Turn on NIST AES decrypt
+.ARCH_ZKNH (CORE_ARCH_ZKNH ), // Turn on NIST SHA2 instructions
+.ARCH_ZKS  (CORE_ARCH_ZKS  ), // Turn on ShangMi suite crypto instructions
+.ARCH_ZKSED(CORE_ARCH_ZKSED), // Turn on ShangMi SM4 instructions
+.ARCH_ZKSH (CORE_ARCH_ZKSH )  // Turn on ShangMi SM3 instructions
 ) i_core_top (
 .f_clk        (f_clk             ), // global free running clock
 .g_clk_test_en(g_clk_test_en     ), // Gated clock test enable.

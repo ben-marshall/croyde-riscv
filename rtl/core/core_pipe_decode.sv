@@ -4,7 +4,15 @@
 //
 //  Pipeline decode / operand gather stage.
 //
-module core_pipe_decode (
+module core_pipe_decode #(
+parameter F_ZKB  = 1, // Turn on Bitmanip-borrowed crypto instructions
+parameter F_ZKG  = 1, // Turn on CLMUL/CLMULH
+parameter F_ZKNE = 1, // Turn on NIST AES encrypt
+parameter F_ZKND = 1, // Turn on NIST AES decrypt
+parameter F_ZKNH = 1, // Turn on NIST SHA2 instructions
+parameter F_ZKSED= 1, // Turn on ShangMi SM4 instructions
+parameter F_ZKSH = 1  // Turn on ShangMi SM3 instructions
+)(
 
 input  wire                 g_clk           , // Global clock
 input  wire                 g_resetn        , // Global active low sync reset.
@@ -55,6 +63,18 @@ output wire                 s2_alu_sltu     , //
 output wire                 s2_alu_sra      , // 
 output wire                 s2_alu_sub      , // 
 output wire                 s2_alu_xor      , // 
+output wire                 s2_alu_xorn     , // 
+output wire                 s2_alu_andn     , // 
+output wire                 s2_alu_orn      , // 
+output wire                 s2_alu_ror      , //
+output wire                 s2_alu_rol      , //
+output wire                 s2_alu_pack     , //
+output wire                 s2_alu_packh    , //
+output wire                 s2_alu_packu    , //
+output wire                 s2_alu_grev     , //
+output wire                 s2_alu_gorc     , //
+output wire                 s2_alu_xpermn   , //
+output wire                 s2_alu_xpermb   , //
 output wire                 s2_alu_word     , // Word result only.
 
 output wire                 s2_cfu_beq      , // Control flow operation.
@@ -83,6 +103,8 @@ output wire                 s2_mdu_mul      , // MDU Operation
 output wire                 s2_mdu_mulh     , //
 output wire                 s2_mdu_mulhsu   , //
 output wire                 s2_mdu_mulhu    , //
+output wire                 s2_mdu_clmul    , //
+output wire                 s2_mdu_clmulh   , //
 output wire                 s2_mdu_div      , //
 output wire                 s2_mdu_divu     , //
 output wire                 s2_mdu_rem      , //
@@ -92,6 +114,26 @@ output wire                 s2_mdu_divw     , //
 output wire                 s2_mdu_divuw    , //
 output wire                 s2_mdu_remw     , //
 output wire                 s2_mdu_remuw    , //
+
+output wire                 s2_cry_aeses    , // Crypto extension operations.
+output wire                 s2_cry_aesesm   ,
+output wire                 s2_cry_aesds    ,
+output wire                 s2_cry_aesdsm   ,
+output wire                 s2_cry_aesks1   ,
+output wire                 s2_cry_aesks2   ,
+output wire                 s2_cry_aesimix  ,
+output wire                 s2_cry_sha256sig0,
+output wire                 s2_cry_sha256sig1,
+output wire                 s2_cry_sha256sum0,
+output wire                 s2_cry_sha256sum1,
+output wire                 s2_cry_sha512sig0,
+output wire                 s2_cry_sha512sig1,
+output wire                 s2_cry_sha512sum0,
+output wire                 s2_cry_sha512sum1,
+output wire                 s2_cry_sm4_ed    ,
+output wire                 s2_cry_sm4_ks    ,
+output wire                 s2_cry_sm3_p0    ,
+output wire                 s2_cry_sm3_p1    ,
 
 output wire                 s2_csr_set      , // CSR Operation
 output wire                 s2_csr_clr      , //
@@ -103,6 +145,7 @@ output wire                 s2_wb_alu       , // Writeback ALU result
 output wire                 s2_wb_csr       , // Writeback CSR result
 output wire                 s2_wb_mdu       , // Writeback MDU result
 output wire                 s2_wb_lsu       , // Writeback LSU Loaded data
+output wire                 s2_wb_cry       , // Writeback Crypto result.
 output wire                 s2_wb_npc         // Writeback next PC value
 
 );
@@ -205,7 +248,9 @@ wire    use_imm_shamt        = dec_slli     || dec_srli         ||
                                dec_slliw    || dec_srliw        ||
                                dec_srai     || dec_sraiw        ||
                                dec_c_slli   || dec_c_srli       ||
-                               dec_c_srai   ;
+                               dec_c_srai   || dec_roriw        ||
+                               dec_rori     || dec_grevi        ||
+                               dec_gorci    ;
 
 wire    use_imm_c_addi      = dec_c_addi    || dec_c_addiw      ||
                               dec_c_li      || dec_c_andi       ;
@@ -373,6 +418,11 @@ assign  s2_alu_or   = dec_c_li          || dec_c_lui         ||
 assign  s2_alu_sll  = dec_c_slli        || dec_sll           ||
                       dec_slli          || dec_slliw         ||
                       dec_sllw          ;
+
+assign  s2_alu_ror  = dec_rorw          || dec_ror           ||
+                      dec_roriw         || dec_rori          ;
+
+assign  s2_alu_rol  = dec_rolw          || dec_rol           ;
                       
 assign  s2_alu_slt  = dec_slti          || dec_slt           ;
 
@@ -385,6 +435,23 @@ assign  s2_alu_sra  = dec_c_srai        || dec_sra           ||
 assign  s2_alu_srl  = dec_c_srli        || dec_srl           ||
                       dec_srli          || dec_srliw         ||
                       dec_srlw          ;
+
+assign  s2_alu_xorn = dec_xnor;
+assign  s2_alu_andn = dec_andn;
+assign  s2_alu_orn  = dec_orn ;
+
+assign  s2_alu_pack = dec_pack          || dec_packw         ;
+
+assign  s2_alu_packh= dec_packh         ;
+
+assign  s2_alu_packu= dec_packu         || dec_packuw        ;
+
+assign  s2_alu_grev = dec_grevi         ;
+
+assign  s2_alu_gorc = dec_gorci         ;
+
+assign  s2_alu_xpermn= dec_xperm_n      ;
+assign  s2_alu_xpermb= dec_xperm_b      ;
 
 assign  s2_alu_sub  = dec_beq           || dec_c_beqz        ||
                       dec_bge           || dec_c_bnez        ||
@@ -401,7 +468,10 @@ assign  s2_alu_word = dec_addiw         || dec_addw         ||
                       dec_srliw         || dec_srlw         ||
                       dec_sraiw         || dec_sraw         ||
                       dec_subw          || dec_c_subw       ||
-                      dec_c_addiw       || dec_c_addw       ;
+                      dec_c_addiw       || dec_c_addw       ||
+                      dec_rolw          || dec_rorw         ||
+                      dec_roriw         || dec_packw        ||
+                      dec_packuw        ;
 
 //
 // CFU
@@ -454,6 +524,8 @@ assign  s2_mdu_mul    = dec_mul   ;
 assign  s2_mdu_mulh   = dec_mulh  ;
 assign  s2_mdu_mulhsu = dec_mulhsu;
 assign  s2_mdu_mulhu  = dec_mulhu ;
+assign  s2_mdu_clmul  = dec_clmul ;
+assign  s2_mdu_clmulh = dec_clmulh;
 assign  s2_mdu_div    = dec_div   ;
 assign  s2_mdu_divu   = dec_divu  ;
 assign  s2_mdu_rem    = dec_rem   ;
@@ -463,6 +535,28 @@ assign  s2_mdu_divw   = dec_divw  ;
 assign  s2_mdu_divuw  = dec_divuw ;
 assign  s2_mdu_remw   = dec_remw  ;
 assign  s2_mdu_remuw  = dec_remuw ;
+
+//
+// Crypto
+assign  s2_cry_aeses        = dec_aes64es   ;
+assign  s2_cry_aesesm       = dec_aes64esm  ;
+assign  s2_cry_aesds        = dec_aes64ds   ;
+assign  s2_cry_aesdsm       = dec_aes64dsm  ;
+assign  s2_cry_aesks1       = dec_aes64ks1i ;
+assign  s2_cry_aesks2       = dec_aes64ks2  ;
+assign  s2_cry_aesimix      = dec_aes64im   ;
+assign  s2_cry_sha256sig0   = dec_sha256sig0;
+assign  s2_cry_sha256sig1   = dec_sha256sig1;
+assign  s2_cry_sha256sum0   = dec_sha256sum0;
+assign  s2_cry_sha256sum1   = dec_sha256sum1;
+assign  s2_cry_sha512sig0   = dec_sha512sig0;
+assign  s2_cry_sha512sig1   = dec_sha512sig1;
+assign  s2_cry_sha512sum0   = dec_sha512sum0;
+assign  s2_cry_sha512sum1   = dec_sha512sum1;
+assign  s2_cry_sm4_ed       = dec_sm4ed     ;
+assign  s2_cry_sm4_ks       = dec_sm4ks     ;
+assign  s2_cry_sm3_p0       = dec_sm3p0     ;
+assign  s2_cry_sm3_p1       = dec_sm3p1     ;
 
 //
 // CSRs
@@ -478,7 +572,10 @@ assign  s2_csr_wr     = dec_csrrsi || dec_csrrs || dec_csrrw || dec_csrrwi;
 assign  s2_wb_alu     = !s2_trap && !s2_wb_npc && !cfu_op_conditonal && (
     s2_alu_add      || s2_alu_and      || s2_alu_or       || s2_alu_sll ||
     s2_alu_srl      || s2_alu_slt      || s2_alu_sltu     || s2_alu_sra ||
-    s2_alu_sub      || s2_alu_xor      || s2_alu_word     );
+    s2_alu_sub      || s2_alu_xor      || s2_alu_word     || s2_alu_pack||
+    s2_alu_packh    || s2_alu_packu    || s2_alu_andn     || s2_alu_orn ||
+    s2_alu_xorn     || s2_alu_ror      || s2_alu_rol      || s2_alu_grev||
+    s2_alu_gorc     || s2_alu_xpermn   || s2_alu_xpermb   );
 
 assign  s2_wb_csr     = !s2_trap && s2_csr_rd   ;
 
@@ -486,11 +583,20 @@ assign  s2_wb_mdu     =!s2_trap && (
     s2_mdu_mul      || s2_mdu_mulh     || s2_mdu_mulhsu   || s2_mdu_mulhu ||
     s2_mdu_div      || s2_mdu_divu     || s2_mdu_rem      || s2_mdu_remu  ||
     s2_mdu_mulw     || s2_mdu_divw     || s2_mdu_divuw    || s2_mdu_remw  ||
-    s2_mdu_remuw    );
+    s2_mdu_remuw    || s2_mdu_clmul    || s2_mdu_clmulh   );
 
 assign  s2_wb_lsu     = !s2_trap && s2_lsu_load ;
 
 assign  s2_wb_npc     = !s2_trap && (s2_cfu_jal  || s2_cfu_jalr);
+
+assign  s2_wb_cry     = !s2_trap && (
+    s2_cry_aeses      || s2_cry_aesesm     || s2_cry_aesds      ||
+    s2_cry_aesdsm     || s2_cry_aesks1     || s2_cry_aesks2     ||
+    s2_cry_aesimix    || s2_cry_sha256sig0 || s2_cry_sha256sig1 ||
+    s2_cry_sha256sum0 || s2_cry_sha256sum1 || s2_cry_sha512sig0 ||
+    s2_cry_sha512sig1 || s2_cry_sha512sum0 || s2_cry_sha512sum1 ||
+    s2_cry_sm4_ed     || s2_cry_sm4_ks     || s2_cry_sm3_p0     ||
+    s2_cry_sm3_p1     );
 
 //
 // Traps

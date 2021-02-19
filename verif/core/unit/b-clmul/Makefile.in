@@ -1,0 +1,6 @@
+
+TEST_NAME = b-clmul
+TEST_SRC  = $(CORE_UNIT_ROOT)/$(TEST_NAME)/test.c
+
+$(eval $(call add_unit_test,$(TEST_NAME),$(TEST_SRC)))
+

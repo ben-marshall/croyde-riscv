@@ -63,6 +63,45 @@ wire dec_divw               = (s1_instr & 32'hfe00707f) == 32'h200403b;
 wire dec_divuw              = (s1_instr & 32'hfe00707f) == 32'h200503b;
 wire dec_remw               = (s1_instr & 32'hfe00707f) == 32'h200603b;
 wire dec_remuw              = (s1_instr & 32'hfe00707f) == 32'h200703b;
+wire dec_andn               = F_ZKB &&(s1_instr & 32'hfe00707f) == 32'h40007033;
+wire dec_orn                = F_ZKB &&(s1_instr & 32'hfe00707f) == 32'h40006033;
+wire dec_xnor               = F_ZKB &&(s1_instr & 32'hfe00707f) == 32'h40004033;
+wire dec_rol                = F_ZKB &&(s1_instr & 32'hfe00707f) == 32'h60001033;
+wire dec_ror                = F_ZKB &&(s1_instr & 32'hfe00707f) == 32'h60005033;
+wire dec_rori               = F_ZKB &&(s1_instr & 32'hfc00707f) == 32'h60005013;
+wire dec_gorci              = F_ZKB &&(s1_instr & 32'hfc00707f) == 32'h28005013;
+wire dec_grevi              = F_ZKB &&(s1_instr & 32'hfc00707f) == 32'h68005013;
+wire dec_clmul              = F_ZKG &&(s1_instr & 32'hfe00707f) == 32'ha001033;
+wire dec_clmulh             = F_ZKG &&(s1_instr & 32'hfe00707f) == 32'ha003033;
+wire dec_pack               = F_ZKB &&(s1_instr & 32'hfe00707f) == 32'h8004033;
+wire dec_packu              = F_ZKB &&(s1_instr & 32'hfe00707f) == 32'h48004033;
+wire dec_packh              = F_ZKB &&(s1_instr & 32'hfe00707f) == 32'h8007033;
+wire dec_xperm_n            = F_ZKB &&(s1_instr & 32'hfe00707f) == 32'h28002033;
+wire dec_xperm_b            = F_ZKB &&(s1_instr & 32'hfe00707f) == 32'h28004033;
+wire dec_rolw               = F_ZKB &&(s1_instr & 32'hfe00707f) == 32'h6000103b;
+wire dec_rorw               = F_ZKB &&(s1_instr & 32'hfe00707f) == 32'h6000503b;
+wire dec_roriw              = F_ZKB &&(s1_instr & 32'hfe00707f) == 32'h6000501b;
+wire dec_packw              = F_ZKB &&(s1_instr & 32'hfe00707f) == 32'h800403b;
+wire dec_packuw             = F_ZKB &&(s1_instr & 32'hfe00707f) == 32'h4800403b;
+wire dec_sm4ed              = F_ZKSED && (s1_instr & 32'h3e007fff) == 32'h30000033;
+wire dec_sm4ks              = F_ZKSED && (s1_instr & 32'h3e007fff) == 32'h34000033;
+wire dec_sm3p0              = F_ZKSH && (s1_instr & 32'hfff0707f) == 32'h10801013;
+wire dec_sm3p1              = F_ZKSH && (s1_instr & 32'hfff0707f) == 32'h10901013;
+wire dec_sha256sum0         = F_ZKNH && (s1_instr & 32'hfff0707f) == 32'h10001013;
+wire dec_sha256sum1         = F_ZKNH && (s1_instr & 32'hfff0707f) == 32'h10101013;
+wire dec_sha256sig0         = F_ZKNH && (s1_instr & 32'hfff0707f) == 32'h10201013;
+wire dec_sha256sig1         = F_ZKNH && (s1_instr & 32'hfff0707f) == 32'h10301013;
+wire dec_aes64ks1i          = F_ZKNE && (s1_instr & 32'hff00707f) == 32'h31001013;
+wire dec_aes64im            = F_ZKND && (s1_instr & 32'hfff0707f) == 32'h30001013;
+wire dec_aes64ks2           = F_ZKNE && (s1_instr & 32'hfe00707f) == 32'h7e000033;
+wire dec_aes64esm           = F_ZKNE && (s1_instr & 32'hfe00707f) == 32'h36000033;
+wire dec_aes64es            = F_ZKNE && (s1_instr & 32'hfe00707f) == 32'h32000033;
+wire dec_aes64dsm           = F_ZKND && (s1_instr & 32'hfe00707f) == 32'h3e000033;
+wire dec_aes64ds            = F_ZKND && (s1_instr & 32'hfe00707f) == 32'h3a000033;
+wire dec_sha512sum0         = F_ZKNH && (s1_instr & 32'hfff0707f) == 32'h10401013;
+wire dec_sha512sum1         = F_ZKNH && (s1_instr & 32'hfff0707f) == 32'h10501013;
+wire dec_sha512sig0         = F_ZKNH && (s1_instr & 32'hfff0707f) == 32'h10601013;
+wire dec_sha512sig1         = F_ZKNH && (s1_instr & 32'hfff0707f) == 32'h10701013;
 wire dec_ecall              = (s1_instr & 32'hffffffff) == 32'h73;
 wire dec_ebreak             = (s1_instr & 32'hffffffff) == 32'h100073;
 wire dec_mret               = (s1_instr & 32'hffffffff) == 32'h30200073;
@@ -135,8 +174,9 @@ dec_sub        || dec_sll        || dec_slt        || dec_sltu       ||
 dec_xor        || dec_srl        || dec_sra        || dec_or         ||
 dec_and        || dec_addiw      || dec_slliw      || dec_srliw      ||
 dec_sraiw      || dec_addw       || dec_subw       || dec_sllw       ||
-dec_srlw       || dec_sraw       || dec_lb         || dec_lh         || dec_lw
-|| dec_ld         || dec_lbu        || dec_lhu        || dec_lwu        ||
+dec_srlw       || dec_sraw       || dec_lb         || dec_lh         ||
+dec_lw         || dec_ld         || dec_lbu        || dec_lhu        ||
+dec_lwu        ||
 dec_sb         || dec_sh         || dec_sw         || dec_sd         ||
 dec_fence      || dec_fence_i    || dec_mul        || dec_mulh       ||
 dec_mulhsu     || dec_mulhu      || dec_div        || dec_divu       ||
@@ -151,5 +191,16 @@ dec_c_srli     || dec_c_srai     || dec_c_andi     || dec_c_sub      ||
 dec_c_xor      || dec_c_or       || dec_c_and      || dec_c_subw     ||
 dec_c_addw     || dec_c_j        || dec_c_jr       || dec_c_beqz     ||
 dec_c_bnez     || dec_c_slli     || dec_c_lwsp     || dec_c_ldsp     ||
-dec_c_mv       || dec_c_add      || dec_c_swsp     || dec_c_sdsp
+dec_c_mv       || dec_c_add      || dec_c_swsp     || dec_c_sdsp     ||
+dec_andn       || dec_orn        || dec_xnor       || dec_rol        ||
+dec_ror        || dec_rori       || dec_gorci      || dec_grevi      ||
+dec_clmul      || dec_clmulh     || dec_pack       || dec_packu      ||
+dec_packh      || dec_xperm_n    ||
+dec_xperm_b    || dec_rolw       || dec_rorw       || dec_roriw      ||
+dec_packw      || dec_packuw     || dec_sm4ed      || dec_sm4ks      ||
+dec_sm3p0      || dec_sm3p1      || dec_sha256sum0 || dec_sha256sum1 ||
+dec_sha256sig0 || dec_sha256sig1 || dec_aes64ks1i  || dec_aes64im    ||
+dec_aes64ks2   || dec_aes64esm   || dec_aes64es    || dec_aes64dsm   ||
+dec_aes64ds    || dec_sha512sum0 || dec_sha512sum1 || dec_sha512sig0 ||
+dec_sha512sig1 
 );

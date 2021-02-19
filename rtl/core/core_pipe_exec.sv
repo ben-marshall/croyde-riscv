@@ -4,7 +4,15 @@
 //
 //  Top level for the execute stage of the pipeline.
 //
-module core_pipe_exec (
+module core_pipe_exec #(
+parameter F_ZKB  = 1, // Turn on Bitmanip-borrowed crypto instructions
+parameter F_ZKG  = 1, // Turn on CLMUL/CLMULH
+parameter F_ZKNE = 1, // Turn on NIST AES encrypt
+parameter F_ZKND = 1, // Turn on NIST AES decrypt
+parameter F_ZKNH = 1, // Turn on NIST SHA2 instructions
+parameter F_ZKSED= 1, // Turn on ShangMi SM4 instructions
+parameter F_ZKSH = 1  // Turn on ShangMi SM3 instructions
+)(
 
 input  wire                 g_clk           , // Global clock
 input  wire                 g_clk_mul       , // Multiplier clock
@@ -52,6 +60,18 @@ input  wire                 s2_alu_sltu     , //
 input  wire                 s2_alu_sra      , // 
 input  wire                 s2_alu_sub      , // 
 input  wire                 s2_alu_xor      , // 
+input  wire                 s2_alu_xorn     , // 
+input  wire                 s2_alu_andn     , // 
+input  wire                 s2_alu_orn      , // 
+input  wire                 s2_alu_ror      , //
+input  wire                 s2_alu_rol      , //
+input  wire                 s2_alu_pack     , //
+input  wire                 s2_alu_packh    , //
+input  wire                 s2_alu_packu    , //
+input  wire                 s2_alu_grev     , //
+input  wire                 s2_alu_gorc     , //
+input  wire                 s2_alu_xpermn   , //
+input  wire                 s2_alu_xpermb   , //
 input  wire                 s2_alu_word     , // Word result only.
 
 input  wire                 s2_cfu_beq      , // Control flow operation.
@@ -80,6 +100,8 @@ input  wire                 s2_mdu_mul      , // MDU Operation
 input  wire                 s2_mdu_mulh     , //
 input  wire                 s2_mdu_mulhsu   , //
 input  wire                 s2_mdu_mulhu    , //
+input  wire                 s2_mdu_clmul    , //
+input  wire                 s2_mdu_clmulh   , //
 input  wire                 s2_mdu_div      , //
 input  wire                 s2_mdu_divu     , //
 input  wire                 s2_mdu_rem      , //
@@ -89,6 +111,26 @@ input  wire                 s2_mdu_divw     , //
 input  wire                 s2_mdu_divuw    , //
 input  wire                 s2_mdu_remw     , //
 input  wire                 s2_mdu_remuw    , //
+
+input  wire                 s2_cry_aeses    , // Crypto extension operations.
+input  wire                 s2_cry_aesesm   ,
+input  wire                 s2_cry_aesds    ,
+input  wire                 s2_cry_aesdsm   ,
+input  wire                 s2_cry_aesks1   ,
+input  wire                 s2_cry_aesks2   ,
+input  wire                 s2_cry_aesimix  ,
+input  wire                 s2_cry_sha256sig0,
+input  wire                 s2_cry_sha256sig1,
+input  wire                 s2_cry_sha256sum0,
+input  wire                 s2_cry_sha256sum1,
+input  wire                 s2_cry_sha512sig0,
+input  wire                 s2_cry_sha512sig1,
+input  wire                 s2_cry_sha512sum0,
+input  wire                 s2_cry_sha512sum1,
+input  wire                 s2_cry_sm4_ed    ,
+input  wire                 s2_cry_sm4_ks    ,
+input  wire                 s2_cry_sm3_p0    ,
+input  wire                 s2_cry_sm3_p1    ,
 
 input  wire                 s2_csr_set      , // CSR Operation
 input  wire                 s2_csr_clr      , //
@@ -100,6 +142,7 @@ input  wire                 s2_wb_alu       , // Writeback ALU result
 input  wire                 s2_wb_csr       , // Writeback CSR result
 input  wire                 s2_wb_mdu       , // Writeback MDU result
 input  wire                 s2_wb_lsu       , // Writeback LSU Loaded data
+input  wire                 s2_wb_cry       , // Writeback crypto result.
 input  wire                 s2_wb_npc       , // Writeback next PC value
 
 output wire                 s3_valid        , // New instruction ready
@@ -172,10 +215,10 @@ wire [XL:0] alu_result      ; // Operation result
 // ------------------------------------------------------------
 
 wire        mdu_valid   =
-    s2_mdu_mul      || s2_mdu_mulh     || s2_mdu_mulhsu   || s2_mdu_mulhu ||
-    s2_mdu_div      || s2_mdu_divu     || s2_mdu_rem      || s2_mdu_remu  ||
-    s2_mdu_mulw     || s2_mdu_divw     || s2_mdu_divuw    || s2_mdu_remw  ||
-    s2_mdu_remuw    ;
+    s2_mdu_mul      || s2_mdu_mulh    || s2_mdu_mulhsu   || s2_mdu_mulhu ||
+    s2_mdu_div      || s2_mdu_divu    || s2_mdu_rem      || s2_mdu_remu  ||
+    s2_mdu_mulw     || s2_mdu_divw    || s2_mdu_divuw    || s2_mdu_remw  ||
+    s2_mdu_remuw    || s2_mdu_clmul   || s2_mdu_clmulh ;
 
 wire        mdu_mul     = s2_mdu_mulw || s2_mdu_mul     ;
 wire        mdu_div     = s2_mdu_div  || s2_mdu_divw    ;
@@ -184,7 +227,7 @@ wire        mdu_rem     = s2_mdu_rem  || s2_mdu_remw    ;
 wire        mdu_remu    = s2_mdu_remu || s2_mdu_remuw   ;
 
 wire        mdu_word    =
-    s2_mdu_mulw     || s2_mdu_divw     || s2_mdu_divuw    || s2_mdu_remw  ||
+    s2_mdu_mulw     || s2_mdu_divw    || s2_mdu_divuw    || s2_mdu_remw  ||
     s2_mdu_remuw    ;
 
 wire [XL:0] s2_mdu_lhs  = s2_alu_lhs;
@@ -239,6 +282,20 @@ assign  lsu_new_op[LSU_OP_WORD  ] = s2_lsu_word ;
 assign  lsu_new_op[LSU_OP_DOUBLE] = s2_lsu_dbl  ;
 assign  lsu_new_op[LSU_OP_SEXT  ] = s2_lsu_sext ;
 
+//
+// Crypto extension interfacing.
+// ------------------------------------------------------------
+
+wire        cry_valid       =
+    s2_cry_aesks1     || s2_cry_aesks2     || s2_cry_aesimix    ||
+    s2_cry_aeses      || s2_cry_aesesm     || s2_cry_aesds      ||
+    s2_cry_aesdsm     || s2_cry_sha256sig0 || s2_cry_sha256sig1 ||
+    s2_cry_sha256sum0 || s2_cry_sha256sum1 || s2_cry_sha512sig0 ||
+    s2_cry_sha512sig1 || s2_cry_sha512sum0 || s2_cry_sha512sum1 ;
+
+wire        cry_ready       ;
+
+wire [XL:0] cry_result      ;
 
 //
 // CSR interfacing
@@ -262,12 +319,14 @@ assign               s2_ready    =
      s3_ready                           &&
     (cfu_op_any ? cfu_finished : 1'b1)  &&
     (lsu_valid  ? lsu_ready    : 1'b1)  &&
+    (cry_valid  ? cry_ready    : 1'b1)  &&
     (mdu_valid  ? mdu_ready    : 1'b1)  ;
 
 assign              s3_valid     =
      s2_valid                           &&
     (cfu_op_any ? cfu_finished : 1'b1)  &&
     (lsu_valid  ? lsu_ready    : 1'b1)  &&
+    (cry_valid  ? cry_ready    : 1'b1)  &&
     (mdu_valid  ? mdu_ready    : 1'b1)  ;
 
 wire                 n_s3_full   = s3_valid && s3_ready && !s2_flush;
@@ -298,6 +357,7 @@ wire [    WB_OP_R:0] n_s3_wb_op  =
     {WB_OP_W{s2_wb_alu}} & WB_OP_WDATA  |
     {WB_OP_W{s2_wb_mdu}} & WB_OP_WDATA  |
     {WB_OP_W{s2_wb_npc}} & WB_OP_WDATA  |
+    {WB_OP_W{s2_wb_cry}} & WB_OP_WDATA  |
     {WB_OP_W{s2_wb_lsu}} & WB_OP_LSU    |
     {WB_OP_W{s2_wb_csr}} & WB_OP_CSR    ;
 
@@ -306,6 +366,7 @@ wire [         XL:0] n_s3_wdata  =
     {XLEN{s2_wb_alu}}   &   alu_result  |
     {XLEN{s2_wb_mdu}}   &   mdu_result  |
     {XLEN{s2_wb_npc}}   &   s2_npc      |
+    {XLEN{s2_wb_cry}}   &   cry_result  |
     {XLEN{wdata_csr}}   &   s2_rs1_data ;
 
 wire [         11:0] n_s3_csr_addr = s2_csr_addr;
@@ -380,11 +441,64 @@ core_pipe_exec_alu i_core_pipe_exec_alu (
 .op_srl     (s2_alu_srl     ), // Shift right logical
 .op_sll     (s2_alu_sll     ), // Shift left logical
 .op_sra     (s2_alu_sra     ), // Shift right arithmetic
+.op_xorn    (s2_alu_xorn    ), // 
+.op_andn    (s2_alu_andn    ), // 
+.op_orn     (s2_alu_orn     ), // 
+.op_ror     (s2_alu_ror     ), //
+.op_rol     (s2_alu_rol     ), //
+.op_pack    (s2_alu_pack    ), //
+.op_packh   (s2_alu_packh   ), //
+.op_packu   (s2_alu_packu   ), //
+.op_grev    (s2_alu_grev    ), //
+.op_gorc    (s2_alu_gorc    ), //
+.op_xpermn  (s2_alu_xpermn  ), //
+.op_xpermb  (s2_alu_xpermb  ), //
 .add_out    (alu_add_out    ), // Result of adding opr_a and opr_b
 .cmp_eq     (alu_cmp_eq     ), // Result of opr_a == opr_b
 .cmp_lt     (alu_cmp_lt     ), // Result of opr_a <  opr_b
 .cmp_ltu    (alu_cmp_ltu    ), // Result of opr_a <  opr_b
 .result     (alu_result     )  // Operation result
+);
+
+
+riscv_crypto_fu #(
+.XLEN          (        64), // Must be one of: 32, 64.
+.SAES_ENC_EN   (F_ZKNE    ), // Enable AES encrypt instructions
+.SAES_DEC_EN   (F_ZKND    ), // Enable AES decrypt instructions
+.SAES64_SBOXES (        4 ), // saes64 sbox instances. Valid values: 8,4
+.SSHA256_EN    (F_ZKNH    ), // Enable the ssha256.* instructions.
+.SSHA512_EN    (F_ZKNH    ), // Enable the ssha256.* instructions.
+.SSM3_EN       (F_ZKSH    ), // Enable the ssm3.* instructions.
+.SSM4_EN       (F_ZKSED   ), // Enable the ssm4.* instructions.
+.LOGIC_GATING  (        0 )  // Gate sub-module inputs to save toggling
+) i_core_pipe_exec_crypto (
+.g_clk           (g_clk             ), // Global clock
+.g_resetn        (g_resetn          ), // Synchronous active low reset.
+.valid           (cry_valid         ), // Inputs valid.
+.rs1             (s2_rs1_data       ), // Source register 1
+.rs2             (s2_rs2_data       ), // Source register 2
+.imm             (s2_rs2_addr[3:0]  ), // enc_rcon for aes64.
+.op_saes64_ks1   (s2_cry_aesks1     ), // RV64 AES Encrypt KeySchedule 1
+.op_saes64_ks2   (s2_cry_aesks2     ), // RV64 AES Encrypt KeySchedule 2
+.op_saes64_imix  (s2_cry_aesimix    ), // RV64 AES Decrypt KeySchedule Mix
+.op_saes64_encs  (s2_cry_aeses      ), // RV64 AES Encrypt SBox
+.op_saes64_encsm (s2_cry_aesesm     ), // RV64 AES Encrypt SBox + MixCols
+.op_saes64_decs  (s2_cry_aesds      ), // RV64 AES Decrypt SBox
+.op_saes64_decsm (s2_cry_aesdsm     ), // RV64 AES Decrypt SBox + MixCols
+.op_ssha256_sig0 (s2_cry_sha256sig0 ), //      SHA256 Sigma 0
+.op_ssha256_sig1 (s2_cry_sha256sig1 ), //      SHA256 Sigma 1
+.op_ssha256_sum0 (s2_cry_sha256sum0 ), //      SHA256 Sum 0
+.op_ssha256_sum1 (s2_cry_sha256sum1 ), //      SHA256 Sum 1
+.op_ssha512_sig0 (s2_cry_sha512sig0 ), // RV64 SHA512 Sigma 0
+.op_ssha512_sig1 (s2_cry_sha512sig1 ), // RV64 SHA512 Sigma 1
+.op_ssha512_sum0 (s2_cry_sha512sum0 ), // RV64 SHA512 Sum 0
+.op_ssha512_sum1 (s2_cry_sha512sum1 ), // RV64 SHA512 Sum 1
+.op_ssm3_p0      (s2_cry_sm3_p0     ), //      SSM3 P0
+.op_ssm3_p1      (s2_cry_sm3_p1     ), //      SSM3 P1
+.op_ssm4_ks      (s2_cry_sm4_ks     ), //      SSM4 KeySchedule
+.op_ssm4_ed      (s2_cry_sm4_ed     ), //      SSM4 Encrypt/Decrypt
+.ready           (cry_ready         ), // Outputs ready.
+.rd              (cry_result        )
 );
 
 //
@@ -401,6 +515,8 @@ core_pipe_exec_mdu i_core_pipe_exec_mdu(
 .op_mulh    (s2_mdu_mulh    ) , //
 .op_mulhu   (s2_mdu_mulhu   ) , //
 .op_mulhsu  (s2_mdu_mulhsu  ) , //
+.op_clmul   (s2_mdu_clmul   ) , //
+.op_clmulh  (s2_mdu_clmulh  ) , //
 .op_div     (mdu_div        ) , //
 .op_divu    (mdu_divu       ) , //
 .op_rem     (mdu_rem        ) , //

@@ -18,6 +18,8 @@ input  wire         op_mul      , //
 input  wire         op_mulh     , //
 input  wire         op_mulhu    , //
 input  wire         op_mulhsu   , //
+input  wire         op_clmul    , //
+input  wire         op_clmulh   , //
 input  wire         op_div      , //
 input  wire         op_divu     , //
 input  wire         op_rem      , //
@@ -43,16 +45,21 @@ assign      g_clk_req   = valid || flush;
 // ------------------------------------------------------------
 
 wire [XL:0] result_mul  ;
+wire [XL:0] result_clmul;
 wire [XL:0] result_div  ;
 
 wire        any_div     = op_div || op_divu || op_rem   || op_remu  ;
 wire        any_mul     = op_mul || op_mulh || op_mulhu || op_mulhsu;
+wire        any_clmul   = op_clmul || op_clmulh;
 
-assign      rd          = any_mul ? result_mul  : result_div;
+assign      rd          = any_mul   ? result_mul  : 
+                          any_clmul ? result_clmul:
+                                      result_div  ;
 
-assign      ready       = any_mul ? mul_done    :
-                          any_div ? div_done    : 
-                                    1'b0        ;
+assign      ready       = any_mul   ? mul_done    :
+                          any_div   ? div_done    : 
+                          any_clmul ? clmul_done  : 
+                                      1'b0        ;
 
 //
 // Argument / Variable storage
@@ -67,6 +74,9 @@ reg  [XL:0] n_rs2_mul;
 wire [XL:0] n_rs1_div;
 wire [XL:0] n_rs2_div;
 
+reg  [XL:0] n_rs1_clmul;
+reg  [XL:0] n_rs2_clmul;
+
 reg  [MW:0]   mdu_state;
 
 always @(posedge g_clk) begin
@@ -77,7 +87,7 @@ always @(posedge g_clk) begin
         s_rs1       <= n_rs1_div;
         s_rs2       <= n_rs2_div;
         mdu_state   <= n_divisor;
-    end else if(mul_start) begin
+    end else if(mul_start || clmul_start) begin
         s_rs1       <= rs1;
         s_rs2       <= rs2;
         mdu_state   <= {2*XLEN{1'b0}};
@@ -86,6 +96,12 @@ always @(posedge g_clk) begin
         s_rs2       <= n_rs2_mul;
         if(!n_mul_done || MUL_UNROLL == 1) begin
             mdu_state   <= n_mul_state;
+        end
+    end else if(clmul_run) begin
+        s_rs1       <= n_rs1_clmul;
+        s_rs2       <= n_rs2_clmul;
+        if(!n_clmul_done || CLMUL_UNROLL == 1) begin
+            mdu_state   <= n_clmul_state;
         end
     end
 end
@@ -96,10 +112,10 @@ end
 
 reg  [ 6:0 ]    mdu_ctr ;
 reg             mdu_done;
-wire          n_mdu_done = n_mul_done || n_div_done;
+wire          n_mdu_done = n_mul_done || n_div_done || n_clmul_done;
 reg             mdu_run ;
 
-wire            mdu_start = mul_start || div_start;
+wire            mdu_start = mul_start || div_start || clmul_start;
 
 always @(posedge g_clk) begin
     if (!g_resetn || flush) begin
@@ -111,12 +127,63 @@ always @(posedge g_clk) begin
         mdu_done    <= 1'b0;
         mdu_ctr     <= op_word ? 'd32 : 'd64;
     end else if(mdu_run) begin
-        if(any_mul && mdu_ctr == MUL_END    ||
-           any_div && mdu_ctr ==       0    ) begin
+        if(any_mul   && mdu_ctr == MUL_END    ||
+           any_clmul && mdu_ctr == CLMUL_END  ||
+           any_div   && mdu_ctr ==       0    ) begin
             mdu_done    <= n_mdu_done;
             mdu_run     <= 1'b0;
         end else begin
-            mdu_ctr     <= mdu_ctr - (any_mul ? MUL_UNROLL : 7'd1);
+            mdu_ctr     <= mdu_ctr - (any_mul   ? MUL_UNROLL   : 
+                                      any_clmul ? CLMUL_UNROLL : 7'd1);
+        end
+    end
+end
+
+//
+// Carry-less Multiplier
+// ------------------------------------------------------------
+
+parameter  CLMUL_UNROLL = 8;
+localparam CLMUL_END    = 0;
+
+wire       clmul_start  = valid && any_clmul && !clmul_run && !clmul_done;
+reg        clmul_run    ; // Is the carry-less multiplier currently running?
+reg        clmul_done   ; // Is the carry-less multiplier complete.
+wire     n_clmul_done   = mdu_ctr == CLMUL_END && clmul_run;
+
+// This is what we write back to GPR[rd].
+assign result_clmul = op_clmulh   ? mdu_state[MW:XLEN] : mdu_state[XL:0] ;
+
+reg [MW:0] n_clmul_state;
+reg [XL:0] clmul_rhs    ;
+
+integer j;
+always @(*) begin
+    n_clmul_state = mdu_state;
+    n_rs1_clmul = s_rs1;
+    n_rs2_clmul = s_rs2 >> CLMUL_UNROLL;
+
+    for(j = 0; j < CLMUL_UNROLL; j = j + 1) begin
+        clmul_rhs = s_rs2[j] ? s_rs1 : {XLEN{1'b0}};
+        n_clmul_state = {
+            1'b0                                ,
+            n_clmul_state[MW:XLEN] ^ clmul_rhs  ,
+            n_clmul_state[XL:1]            
+        };
+    end
+end
+
+always @(posedge g_clk) begin
+    if (!g_resetn || flush) begin
+        clmul_run     <= 1'b0;
+        clmul_done    <= 1'b0;
+    end else if (clmul_start) begin
+        clmul_run     <= 1'b1;
+        clmul_done    <= 1'b0;
+    end else if(clmul_run) begin
+        if(mdu_ctr == CLMUL_END) begin
+            clmul_done    <= n_clmul_done;
+            clmul_run     <= 1'b0;
         end
     end
 end

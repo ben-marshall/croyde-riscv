@@ -13,6 +13,14 @@ read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec_alu.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec_cfu.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec_lsu.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec_mdu.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec_crypto_aes_mix_columns.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec_crypto_sboxes.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec_crypto_aes64.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec_crypto_sha256.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec_crypto_sha512.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec_crypto_sm3.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec_crypto_sm4.sv
+read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec_crypto.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_exec.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_pipe_wb.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_csrs.sv
@@ -20,11 +28,8 @@ read_verilog -sv $::env(REPO_HOME)/rtl/core/core_regfile.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_interrupts.sv
 read_verilog -sv $::env(REPO_HOME)/rtl/core/core_top.sv
 
-# Synthesise processes ready for SCC check.
-procs
-
 # Generic yosys synthesis command
-synth -top core_top
+synth -top core_top -flatten
 
 # Map to CMOS cells
 abc -g cmos4
@@ -33,7 +38,6 @@ abc -g cmos4
 opt fast
 
 write_verilog   $::env(SYNTH_DIR)/synth-cmos.v
-flatten
 
 # Statistics: size and latency
 tee -o $::env(SYNTH_DIR)/synth-cmos.rpt stat
