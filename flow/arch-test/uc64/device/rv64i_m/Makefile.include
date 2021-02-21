@@ -1,0 +1,79 @@
+
+
+#
+# 1. symbol name
+# 2. objdump file
+define get_address
+0x$(strip $(shell grep "<${1}>:" ${2} | grep -o ".* "))
+endef
+
+# From flow/verilator/Makefile.in
+TARGET_SIM   ?= $(EXE_CORE)
+TARGET_FLAGS ?= $(RISCV_TARGET_FLAGS)
+ifeq ($(shell command -v $(TARGET_SIM) 2> /dev/null),)
+    $(error Target simulator executable $(TARGET_SIM) not found)
+endif
+
+RISCV_PREFIX   ?= $(RISCV)/bin/riscv64-unknown-elf-
+RISCV_GCC      ?= $(RISCV_PREFIX)gcc
+RISCV_OBJDUMP  ?= $(RISCV_PREFIX)objdump
+RISCV_OBJCOPY  ?= $(RISCV_PREFIX)objcopy
+RISCV_READELF  ?= $(RISCV_PREFIX)readelf
+RISCV_GCC_OPTS ?= -static -mcmodel=medany -fvisibility=hidden -nostdlib -nostartfiles -DXLEN=$(XLEN) $(RVTEST_DEFINES)
+
+COMPILE_CMD=\
+	$$(RISCV_GCC) $(1) $$(RISCV_GCC_OPTS) \
+		-I$(ROOTDIR)/riscv-test-suite/env/ \
+		-I$(TARGETDIR)/$(RISCV_TARGET)/ \
+		-T$(TARGETDIR)/$(RISCV_TARGET)/env/linkmono.ld $$< \
+		-o $$@; \
+	$$(RISCV_OBJCOPY) -O binary $$@ $$@.bin
+
+OBJ_CMD = $$(RISCV_OBJDUMP) $$@ -D -M numeric,no-aliases > $$@.objdump
+GTKW_CMD= echo "GTKWave annotations todo"
+SREC_CMD= $$(RISCV_OBJCOPY) -O srec --srec-forceS3 $$@ $$@.srec
+SYMS_CMD= $$(RISCV_READELF) -s $$@ | grep -o ":.*" | sed 's/  .* / /' | sed 's/: //' > $$@.symbols
+
+
+COMPILE_TARGET=\
+		$(COMPILE_CMD); \
+        if [ $$$$? -ne 0 ] ; \
+            then \
+            echo "\e[31m$$(RISCV_GCC) failed for target $$(@) \e[39m" ; \
+            exit 1 ; \
+        fi ; \
+		$(OBJ_CMD); \
+        if [ $$$$? -ne 0 ] ; \
+            then \
+            echo "\e[31m $$(RISCV_OBJDUMP) failed for target $$(@) \e[39m" ; \
+            exit 1 ; \
+        fi ; \
+		$(SREC_CMD); \
+        if [ $$$$? -ne 0 ] ; \
+            then \
+            echo "\e[31m $$(SREC_CMD) failed for target $$(@) \e[39m" ; \
+            exit 1 ; \
+        fi ; \
+		$(SYMS_CMD); \
+        if [ $$$$? -ne 0 ] ; \
+            then \
+            echo "\e[31m $$(SYMS_CMD) failed for target $$(@) \e[39m" ; \
+            exit 1 ; \
+        fi ; \
+
+
+RUN_CMD=\
+	$(TARGET_SIM) \
+        +IMEM=$<.srec \
+        +SIG_PATH=$(<:%.elf=%.signature.output) \
+        +SIG_START=0x`grep "begin_signature" $<.symbols| grep -o ".* "`\
+        +SIG_END=0x`grep "end_signature" $<.symbols | grep -o ".* "`\
+        +PASS_ADDR=0x`grep "uc64_halt" $<.symbols | grep -o ".* "`\
+        +FAIL_ADDR=0x`grep "uc64_fail" $<.symbols | grep -o ".* "`\
+        +WAVES=$<.vcd \
+        +TIMEOUT=200000
+
+RUN_TARGET=\
+	$(RUN_CMD)
+
+

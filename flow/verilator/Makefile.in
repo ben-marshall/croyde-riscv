@@ -41,10 +41,10 @@ endef
 # Core level testbench
 # ------------------------------------------------------------
 
-CMD_CORE = $(REPO_HOME)/flow/verilator/cmd-core.txt
-TOP_CORE = core_top
-EXE_CORE = $(call map_vl_exe,$(TOP_CORE))
-FLG_CORE =
+export CMD_CORE = $(REPO_HOME)/flow/verilator/cmd-core.txt
+export TOP_CORE = core_top
+export EXE_CORE = $(call map_vl_exe,$(TOP_CORE))
+export FLG_CORE =
 
 $(eval $(call add_vl_target,$(TOP_CORE),$(CMD_CORE),$(FLG_CORE)))
 
@@ -52,11 +52,11 @@ $(eval $(call add_vl_target,$(TOP_CORE),$(CMD_CORE),$(FLG_CORE)))
 # Core Complex (CCX) level testbench
 # ------------------------------------------------------------
 
-CMD_CCX  = $(REPO_HOME)/flow/verilator/cmd-ccx.txt
-TOP_CCX  = ccx_top 
-EXE_CCX  = $(call map_vl_exe,$(TOP_CCX))
-FLG_CCX  = -GROM_MEMH=\"rom.hex\"
-FLG_CCX += -GRAM_MEMH=\"ram.hex\"
+export CMD_CCX  = $(REPO_HOME)/flow/verilator/cmd-ccx.txt
+export TOP_CCX  = ccx_top 
+export EXE_CCX  = $(call map_vl_exe,$(TOP_CCX))
+export FLG_CCX  = -GROM_MEMH=\"rom.hex\"
+export FLG_CCX += -GRAM_MEMH=\"ram.hex\"
 
 $(eval $(call add_vl_target,$(TOP_CCX),$(CMD_CCX),$(FLG_CCX)))
 

@@ -7,3 +7,6 @@
 [submodule "extern/riscv-opcodes"]
 	path = extern/riscv-opcodes
 	url = https://github.com/riscv/riscv-opcodes.git
+[submodule "extern/riscv-arch-test"]
+	path = extern/riscv-arch-test
+	url = https://github.com/riscv/riscv-compliance.git

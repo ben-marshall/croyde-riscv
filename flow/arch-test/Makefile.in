@@ -1,0 +1,47 @@
+
+COMPLIANCE_ROOT=$(REPO_HOME)/extern/riscv-arch-test
+COMPLIANCE_WORK=$(REPO_WORK)/riscv-arch-test
+
+BUILD_TARGETS=
+CLEAN_TARGET =
+
+#
+# Add a compile target for a suite of tests.
+# 1. The target configuration directory
+# 2. The RISCV_DEVICE {I,M,C}
+# 3. The makefile target
+define add_compliance_tgt
+
+.PHONY: arch-test-${3}-${1}-${2}
+arch-test-${3}-${1}-${2}: $(EXE_CORE)
+	+$(MAKE) -C $(COMPLIANCE_ROOT)              \
+        ${3}                                    \
+        XLEN=64                                 \
+        RISCV_TARGET=${1}                       \
+        RISCV_DEVICE=${2}                       \
+        TARGETDIR=$(REPO_HOME)/flow/arch-test   \
+        WORK=$(COMPLIANCE_WORK)/${1}
+
+TARGETS += arch-test-${3}-${1}-${2}
+
+CLEAN_TARGET  += $(COMPLIANCE_WORK)/${1}
+
+endef
+
+$(eval $(call add_compliance_tgt,uc64,I,compile))
+$(eval $(call add_compliance_tgt,uc64,M,compile))
+$(eval $(call add_compliance_tgt,uc64,C,compile))
+
+$(eval $(call add_compliance_tgt,uc64,I,simulate))
+$(eval $(call add_compliance_tgt,uc64,M,simulate))
+$(eval $(call add_compliance_tgt,uc64,C,simulate))
+
+$(eval $(call add_compliance_tgt,uc64,I,verify))
+$(eval $(call add_compliance_tgt,uc64,M,verify))
+$(eval $(call add_compliance_tgt,uc64,C,verify))
+
+arch-test-all: $(TARGETS)
+
+.PHONY: clean
+arch-test-clean:
+	rm -rf $(CLEAN_TARGET)

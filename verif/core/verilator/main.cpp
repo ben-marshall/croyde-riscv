@@ -80,7 +80,7 @@ void process_arguments(int argc, char ** argv) {
         }
         else if(s.find("+PASS_ADDR=") != std::string::npos) {
             std::string addr = s.substr(11);
-            TB_PASS_ADDRESS = std::stoul(addr,NULL,0) & 0xFFFFFFFF;
+            TB_PASS_ADDRESS = std::stoul(addr,NULL,0) ;
             if(!quiet){
             std::cout << ">> Pass Address: 0x" << std::hex << TB_PASS_ADDRESS
                       << std::endl;
@@ -88,7 +88,7 @@ void process_arguments(int argc, char ** argv) {
         }
         else if(s.find("+FAIL_ADDR=") != std::string::npos) {
             std::string addr = s.substr(11);
-            TB_FAIL_ADDRESS = std::stoul(addr,NULL,0) & 0xFFFFFFFF;
+            TB_FAIL_ADDRESS = std::stoul(addr,NULL,0) ;
             if(!quiet){
             std::cout << ">> Fail Address: 0x" << std::hex << TB_FAIL_ADDRESS
                       << std::endl;
@@ -96,7 +96,7 @@ void process_arguments(int argc, char ** argv) {
         }
         else if(s.find("+SIG_START=") != std::string::npos) {
             std::string addr = s.substr(11);
-            SIG_START= std::stoul(addr,NULL,0) & 0xFFFFFFFF;
+            SIG_START= std::stoul(addr,NULL,0) ;
             if(!quiet){
             std::cout << ">> Signature Start: 0x" << std::hex << SIG_START
                       << std::endl;
@@ -104,7 +104,7 @@ void process_arguments(int argc, char ** argv) {
         }
         else if(s.find("+SIG_END=") != std::string::npos) {
             std::string addr = s.substr(9);
-            SIG_END = std::stoul(addr,NULL,0) & 0xFFFFFFFF;
+            SIG_END = std::stoul(addr,NULL,0) ;
             if(!quiet){
             std::cout << ">> Signature End: 0x" << std::hex << SIG_END
                       << std::endl;
@@ -112,7 +112,7 @@ void process_arguments(int argc, char ** argv) {
         }
         else if(s.find("+REG_ADDR=") != std::string::npos) {
             std::string addr = s.substr(10);
-            REG_ADDR = std::stoul(addr,NULL,0) & 0xFFFFFFFF;
+            REG_ADDR = std::stoul(addr,NULL,0) ;
             if(!quiet){
             std::cout << ">> Regstate Address: 0x" << std::hex << REG_ADDR
                       << std::endl;

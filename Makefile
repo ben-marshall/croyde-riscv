@@ -37,6 +37,7 @@ include $(REPO_HOME)/verif/core/unit/Makefile.in
 include $(REPO_HOME)/verif/ccx/unit/Makefile.in
 
 include $(REPO_HOME)/flow/embench/Makefile.in
+include $(REPO_HOME)/flow/arch-test/Makefile.in
 
 build-unit-tests-core: $(filter build-unit-core%,$(UNIT_TEST_BUILD_TARGETS))
 build-unit-tests-ccx : $(filter build-unit-ccx%,$(UNIT_TEST_BUILD_TARGETS))
