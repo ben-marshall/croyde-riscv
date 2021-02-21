@@ -17,8 +17,11 @@ jobs:
     - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
     - make -B build-core_top
-    - make -B build-unit-tests-core
-    - make -B run-unit-tests-core
+    - make run-unit-core-example
+    - make run-unit-core-branch-tgt-trap
+    - make run-unit-core-imem-access-trap
+    - make run-unit-core-mul
+    - make run-unit-core-div
   - name: "Confidence Checks - CCX"
     script:
     - source ./bin/install-verilator.sh
@@ -27,6 +30,27 @@ jobs:
     - make -B build-ccx_top
     - make -B build-unit-tests-ccx
     - make -B run-unit-tests-ccx
+  - name: "Arch Tests - I"
+    script:
+    - source ./bin/install-verilator.sh
+    - source ./bin/install-toolchain.sh
+    - source ./bin/conf.sh
+    - make -B build-ccx_top
+    - make arch-test-verify-uc64-I
+  - name: "Arch Tests - M"
+    script:
+    - source ./bin/install-verilator.sh
+    - source ./bin/install-toolchain.sh
+    - source ./bin/conf.sh
+    - make -B build-ccx_top
+    - make arch-test-verify-uc64-M
+  - name: "Arch Tests - C"
+    script:
+    - source ./bin/install-verilator.sh
+    - source ./bin/install-toolchain.sh
+    - source ./bin/conf.sh
+    - make -B build-ccx_top
+    - make arch-test-verify-uc64-C
   - name: "Designer Assertions"
     script:
     - source ./bin/install-yosys.sh
