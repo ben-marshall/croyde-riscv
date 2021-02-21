@@ -143,6 +143,7 @@ wire dec_c_mv               = (s1_instr & 32'hf003) == 32'h8002 && s1_instr[6:2]
 wire dec_c_add              = (s1_instr & 32'hf003) == 32'h9002 && s1_instr[6:2]!= 0;
 wire dec_c_swsp             = (s1_instr & 32'he003) == 32'hc002;
 wire dec_c_sdsp             = (s1_instr & 32'he003) == 32'he002;
+wire dec_c_ebreak           = (s1_instr & 32'hFFFF) == 32'h9002;
 wire [ 4:0] dec_rd                 = s1_instr[11: 7];
 wire [ 4:0] dec_rs1                = s1_instr[19:15];
 wire [ 4:0] dec_rs2                = s1_instr[24:20];
@@ -176,7 +177,7 @@ dec_and        || dec_addiw      || dec_slliw      || dec_srliw      ||
 dec_sraiw      || dec_addw       || dec_subw       || dec_sllw       ||
 dec_srlw       || dec_sraw       || dec_lb         || dec_lh         ||
 dec_lw         || dec_ld         || dec_lbu        || dec_lhu        ||
-dec_lwu        ||
+dec_lwu        || dec_c_ebreak   ||
 dec_sb         || dec_sh         || dec_sw         || dec_sd         ||
 dec_fence      || dec_fence_i    || dec_mul        || dec_mulh       ||
 dec_mulhsu     || dec_mulhu      || dec_div        || dec_divu       ||
