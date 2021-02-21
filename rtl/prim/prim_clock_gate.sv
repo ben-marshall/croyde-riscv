@@ -34,9 +34,11 @@ assign  clk_out= latch_out && clk_in;
 
 //
 // Negative level latch.
+/* verilator lint_off LATCH */
 always @(*) begin if(!clk_in) begin
     latch_out = clk_en;
 end end
+/* verilator lint_on LATCH */
 
 `endif
 
