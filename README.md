@@ -2,7 +2,7 @@
 # Croyde RISC-V
 
 *A 3-stage, 64-bit RISC-V rv64imc micro-controller.*
-[![Build Status](https://travis-ci.org/ben-marshall/croyde-riscv.svg?branch=master)](https://travis-ci.org/ben-marshall/croyde-riscv)
+[![Build Status](https://www.travis-ci.com/ben-marshall/croyde-riscv.svg?branch=master)](https://www.travis-ci.com/ben-marshall/croyde-riscv)
 [![Documentation Status](https://readthedocs.org/projects/croyde-riscv/badge/?version=latest)](https://croyde-riscv.readthedocs.io/en/latest/?badge=latest)
 
 ---

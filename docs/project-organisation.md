@@ -26,7 +26,7 @@
     [Travis CI](https://travis-ci.org/)
     configuration file.
     Used to coordinate the 
-    [continuous integration flows](https://travis-ci.org/github/ben-marshall/croyde-riscv).
+    [continuous integration flows](https://www.travis-ci.com/github/ben-marshall/croyde-riscv).
 
 - `bin/`
     Miscellaneous project scripts.
