@@ -2,10 +2,10 @@
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
 [*] Mon Jun 29 13:10:41 2020
 [*]
-[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/embench/src/aha-mont64/aha-mont64.vcd"
+[dumpfile] "/home/ben/projects/riscv/cores/croyde/work/embench/src/aha-mont64/aha-mont64.vcd"
 [dumpfile_mtime] "Mon Jun 29 13:10:22 2020"
 [dumpfile_size] 25105820
-[savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/ccx.gtkw"
+[savefile] "/home/ben/projects/riscv/cores/croyde/flow/gtkwave/ccx.gtkw"
 [timestart] 1
 [size] 1920 1025
 [pos] -1 -1
@@ -31,7 +31,7 @@ TOP.ccx_top.trs_valid
 @22
 TOP.ccx_top.trs_pc[63:0]
 @2022
-^1 /home/ben/projects/riscv/cores/uc64/work/ccx/unit/ccx-access-traps/ccx-access-traps.gtkwl
+^1 /home/ben/projects/riscv/cores/croyde/work/ccx/unit/ccx-access-traps/ccx-access-traps.gtkwl
 TOP.ccx_top.trs_instr[31:0]
 @22
 TOP.ccx_top.trs_instr[31:0]
@@ -304,7 +304,7 @@ TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_iaccess_trap_32
 @22
 TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_imm[63:0]
 @2022
-^2 /home/ben/projects/riscv/cores/uc64/work/ccx/unit/ccx-example/ccx-example.gtkwl
+^2 /home/ben/projects/riscv/cores/croyde/work/ccx/unit/ccx-example/ccx-example.gtkwl
 TOP.ccx_top.i_core_top.i_core_pipe_decode.s2_instr[31:0]
 @c00200
 -LSU

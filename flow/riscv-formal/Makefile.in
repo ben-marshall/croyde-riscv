@@ -1,6 +1,6 @@
 
 RV_FORMAL_DIR   = $(REPO_HOME)/extern/riscv-formal
-RV_FORMAL_CORE  = $(RV_FORMAL_DIR)/cores/uc64
+RV_FORMAL_CORE  = $(RV_FORMAL_DIR)/cores/croyde
 
 RV_FORMAL_CFG   = $(REPO_HOME)/flow/riscv-formal/checks.cfg
 

@@ -1,4 +1,4 @@
-site_name: uc64
+site_name: Croyde RISC-V
 theme: readthedocs
 nav:
   - Home: index.md

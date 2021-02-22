@@ -29,7 +29,7 @@ if [ ! -e  $VERILATOR_BIN ]; then
 
     cd $VERILATOR_ROOT
 
-    git checkout stable
+    git checkout v4.100
 
     autoconf
 

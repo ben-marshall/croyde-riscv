@@ -1,5 +1,5 @@
 
-#include "uc64_csp.h"
+#include "croyde_csp.h"
 #include "unit_test.h"
 
 /*!
@@ -9,11 +9,11 @@ the test.
 */
 int test_main() {
 
-    uint64_t fst_mtime      = uc64_csp_rd_mtime();
-    uint64_t fst_mtimecmp   = uc64_csp_rd_mtimecmp();
+    uint64_t fst_mtime      = croyde_csp_rd_mtime();
+    uint64_t fst_mtimecmp   = croyde_csp_rd_mtimecmp();
 
-    uint64_t snd_mtime      = uc64_csp_rd_mtime();
-    uint64_t snd_mtimecmp   = uc64_csp_rd_mtimecmp();
+    uint64_t snd_mtime      = croyde_csp_rd_mtime();
+    uint64_t snd_mtimecmp   = croyde_csp_rd_mtimecmp();
 
     if(fst_mtime > snd_mtime) {
         // Second reading of mtime should be a larger value.
@@ -25,7 +25,7 @@ int test_main() {
         return 2;
     }
     
-    if(uc64_csp_rd_mtimecmp() != uc64_csp_rd_mtimecmp()) {
+    if(croyde_csp_rd_mtimecmp() != croyde_csp_rd_mtimecmp()) {
         // Shouldn't matter how we access mtimecmp
         return 2;
     }

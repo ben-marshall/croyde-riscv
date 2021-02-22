@@ -31,7 +31,7 @@ CCX_ROM_UNIT_CFLAGS+= -T $(FSBL_LD)
 CCX_UNIT_SRCS       = $(REPO_HOME)/verif/share/unit/boot.S \
                       $(REPO_HOME)/verif/share/unit/util.S \
                       $(REPO_HOME)/verif/share/unit/unit_test.c \
-                      $(REPO_HOME)/src/csp/uc64_csp.c
+                      $(REPO_HOME)/src/csp/croyde_csp.c
 
 define cxx_model
 $(call unit_test_build_dir,ccx)/${1}/verilated_cxx

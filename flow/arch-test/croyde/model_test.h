@@ -25,7 +25,7 @@
   li  t1, 'N';  sw  t1, 0(t0);                \
   li  t1, 'E';  sw  t1, 0(t0);                \
   li  t1, '\n';  sw  t1, 0(t0);               \
-  uc64_halt:  j uc64_halt;
+  croyde_halt:  j croyde_halt;
 
 //TODO: declare the start of your signature region here. Nothing else to be used here.
 // The .align 4 ensures that the signature ends at a 16-byte boundary
@@ -42,14 +42,14 @@
 //TODO:Any specific target init code should be put here or the macro can be left empty
 #define RVMODEL_BOOT    \
     nop;nop;nop;nop;    \
-uc64_boot:              \
-    la  t0, uc64_fail;  \
+croyde_boot:              \
+    la  t0, croyde_fail;  \
     csrw    mtvec, t0;  \
     j   rvtest_init;    \
     nop;nop;nop;nop;    \
 .align 8;               \
-uc64_fail:              \
-    j uc64_fail;
+croyde_fail:              \
+    j croyde_fail;
     //RVTEST_IO_INIT
 
 // _SP = (volatile register)

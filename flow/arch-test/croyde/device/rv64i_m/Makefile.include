@@ -68,9 +68,8 @@ RUN_CMD=\
         +SIG_PATH=$(<:%.elf=%.signature.output) \
         +SIG_START=0x`grep "begin_signature" $<.symbols| grep -o ".* "`\
         +SIG_END=0x`grep "end_signature" $<.symbols | grep -o ".* "`\
-        +PASS_ADDR=0x`grep "uc64_halt" $<.symbols | grep -o ".* "`\
-        +FAIL_ADDR=0x`grep "uc64_fail" $<.symbols | grep -o ".* "`\
-        +WAVES=$<.vcd \
+        +PASS_ADDR=0x`grep "croyde_halt" $<.symbols | grep -o ".* "`\
+        +FAIL_ADDR=0x`grep "croyde_fail" $<.symbols | grep -o ".* "`\
         +TIMEOUT=200000
 
 RUN_TARGET=\

@@ -28,17 +28,17 @@ CLEAN_TARGET  += $(COMPLIANCE_WORK)/${1}
 
 endef
 
-$(eval $(call add_compliance_tgt,uc64,I,compile))
-$(eval $(call add_compliance_tgt,uc64,M,compile))
-$(eval $(call add_compliance_tgt,uc64,C,compile))
+$(eval $(call add_compliance_tgt,croyde,I,compile))
+$(eval $(call add_compliance_tgt,croyde,M,compile))
+$(eval $(call add_compliance_tgt,croyde,C,compile))
 
-$(eval $(call add_compliance_tgt,uc64,I,simulate))
-$(eval $(call add_compliance_tgt,uc64,M,simulate))
-$(eval $(call add_compliance_tgt,uc64,C,simulate))
+$(eval $(call add_compliance_tgt,croyde,I,simulate))
+$(eval $(call add_compliance_tgt,croyde,M,simulate))
+$(eval $(call add_compliance_tgt,croyde,C,simulate))
 
-$(eval $(call add_compliance_tgt,uc64,I,verify))
-$(eval $(call add_compliance_tgt,uc64,M,verify))
-$(eval $(call add_compliance_tgt,uc64,C,verify))
+$(eval $(call add_compliance_tgt,croyde,I,verify))
+$(eval $(call add_compliance_tgt,croyde,M,verify))
+$(eval $(call add_compliance_tgt,croyde,C,verify))
 
 arch-test-all: $(TARGETS)
 

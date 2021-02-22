@@ -36,21 +36,21 @@ jobs:
     - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
     - make -B build-ccx_top
-    - make arch-test-verify-uc64-I
+    - make arch-test-verify-croyde-I
   - name: "Arch Tests - M"
     script:
     - source ./bin/install-verilator.sh
     - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
     - make -B build-ccx_top
-    - make arch-test-verify-uc64-M
+    - make arch-test-verify-croyde-M
   - name: "Arch Tests - C"
     script:
     - source ./bin/install-verilator.sh
     - source ./bin/install-toolchain.sh
     - source ./bin/conf.sh
     - make -B build-ccx_top
-    - make arch-test-verify-uc64-C
+    - make arch-test-verify-croyde-C
   - name: "Designer Assertions"
     script:
     - source ./bin/install-yosys.sh

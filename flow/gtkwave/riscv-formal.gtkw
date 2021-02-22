@@ -2,10 +2,10 @@
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
 [*] Sun May  3 10:42:52 2020
 [*]
-[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/riscv-formal/insn_c_addi_ch0/engine_0/trace.vcd"
+[dumpfile] "/home/ben/projects/riscv/cores/croyde/work/riscv-formal/insn_c_addi_ch0/engine_0/trace.vcd"
 [dumpfile_mtime] "Sun May  3 10:19:17 2020"
 [dumpfile_size] 450321
-[savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/riscv-formal.gtkw"
+[savefile] "/home/ben/projects/riscv/cores/croyde/flow/gtkwave/riscv-formal.gtkw"
 [timestart] 1
 [size] 1920 1025
 [pos] -1 -1
@@ -25,7 +25,7 @@
 rvfi_testbench.wrapper.i_dut.i_core_pipe_fetch.g_clk
 rvfi_testbench.wrapper.i_dut.i_core_pipe_fetch.g_resetn
 @c02022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
+^1 /home/ben/projects/riscv/cores/croyde/work/unit/example/example.gtkwl
 rvfi_testbench.wrapper.i_dut.trs_instr[31:0]
 @28
 (0)rvfi_testbench.wrapper.i_dut.trs_instr[31:0]
@@ -322,7 +322,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_fetch.e_eat_4
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_fetch.s1_instr[31:0]
 @2022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
+^1 /home/ben/projects/riscv/cores/croyde/work/unit/example/example.gtkwl
 rvfi_testbench.wrapper.i_dut.i_core_pipe_fetch.s1_instr[31:0]
 @1401200
 -Fetch -> Decode
@@ -499,7 +499,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s2_ready
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s2_imm[63:0]
 @2022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
+^1 /home/ben/projects/riscv/cores/croyde/work/unit/example/example.gtkwl
 rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s2_instr[31:0]
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_decode.s2_npc[63:0]
@@ -614,7 +614,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_trap
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_imm[63:0]
 @2022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
+^1 /home/ben/projects/riscv/cores/croyde/work/unit/example/example.gtkwl
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_exec.s2_instr[31:0]
@@ -814,7 +814,7 @@ rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.s3_csr_op[3:0]
 @28
 rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.s3_full
 @2022
-^1 /home/ben/projects/riscv/cores/uc64/work/unit/example/example.gtkwl
+^1 /home/ben/projects/riscv/cores/croyde/work/unit/example/example.gtkwl
 rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.s3_instr[31:0]
 @22
 rvfi_testbench.wrapper.i_dut.i_core_pipe_wb.s3_pc[63:0]

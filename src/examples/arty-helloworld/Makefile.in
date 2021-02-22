@@ -2,9 +2,9 @@
 NAME        = arty-helloworld
 
 SRCS        = $(FSBL_ROOT)/fsbl_boot.S \
-              $(REPO_HOME)/src/csp/uc64_csp.c \
+              $(REPO_HOME)/src/csp/croyde_csp.c \
               $(REPO_HOME)/src/examples/arty-helloworld/arty_helloworld.c \
-              $(REPO_HOME)/src/bsp/uc64_bsp_arty.c
+              $(REPO_HOME)/src/bsp/croyde_bsp_arty.c
 
 LDSCRIPT    = $(FSBL_LD)
 

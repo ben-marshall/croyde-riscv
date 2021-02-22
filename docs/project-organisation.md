@@ -20,13 +20,13 @@
     Used by
     [readthedocs](https://readthedocs.org/)
     to generate
-    [project documentation](https://uc64.readthedocs.io/en/latest/).
+    [project documentation](https://croyde-riscv.readthedocs.io/en/latest/).
 
 - `.travis.yml`
     [Travis CI](https://travis-ci.org/)
     configuration file.
     Used to coordinate the 
-    [continuous integration flows](https://travis-ci.org/github/ben-marshall/uc64).
+    [continuous integration flows](https://travis-ci.org/github/ben-marshall/croyde-riscv).
 
 - `bin/`
     Miscellaneous project scripts.

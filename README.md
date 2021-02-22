@@ -1,9 +1,9 @@
 
-# uc64
+# Croyde RISC-V
 
 *A 3-stage, 64-bit RISC-V rv64imc micro-controller.*
-[![Build Status](https://travis-ci.org/ben-marshall/uc64.svg?branch=master)](https://travis-ci.org/ben-marshall/uc64)
-[![Documentation Status](https://readthedocs.org/projects/uc64/badge/?version=latest)](https://uc64.readthedocs.io/en/latest/?badge=latest)
+[![Build Status](https://travis-ci.org/ben-marshall/croyde-riscv.svg?branch=master)](https://travis-ci.org/ben-marshall/croyde-riscv)
+[![Documentation Status](https://readthedocs.org/projects/croyde-riscv/badge/?version=latest)](https://croyde-riscv.readthedocs.io/en/latest/?badge=latest)
 
 ---
 
@@ -31,8 +31,8 @@ This is a very simple 3-stage 64-bit micro-controller, implementing the
 
 - Checkout the repository:
   ```sh
-   git checkout https://github.com/ben-marshall/uc64.git
-   cd uc64/
+   git checkout https://github.com/ben-marshall/croyde-riscv.git
+   cd croyde-riscv/
    git submodule update --init --recursive
   ```
 
@@ -67,7 +67,7 @@ This is a very simple 3-stage 64-bit micro-controller, implementing the
 - Run the unit tests set:
 
   ```
-  make unit-tests-build
-  make unit-tests-run
+  make run-unit-tests-core
+  make run-unit-tests-ccx
   ```
 

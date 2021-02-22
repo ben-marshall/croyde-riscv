@@ -1,7 +1,7 @@
 
 # Core Complex
 
-*Describes the example core-complex for uc64. This module includes
+*Describes the example core-complex for Croyde RISC-V. This module includes
  tightly integrated memories and trace/debug modules external to the
  core.*
 

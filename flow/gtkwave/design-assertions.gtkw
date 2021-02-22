@@ -2,10 +2,10 @@
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
 [*] Sun Aug  2 15:28:12 2020
 [*]
-[dumpfile] "/home/ben/projects/riscv/cores/uc64/work/design-assertions/memory_interface_task_prove_dmem/engine_0/trace_induct.vcd"
+[dumpfile] "/home/ben/projects/riscv/cores/croyde/work/design-assertions/memory_interface_task_prove_dmem/engine_0/trace_induct.vcd"
 [dumpfile_mtime] "Sun Aug  2 15:25:02 2020"
 [dumpfile_size] 267896
-[savefile] "/home/ben/projects/riscv/cores/uc64/flow/gtkwave/design-assertions.gtkw"
+[savefile] "/home/ben/projects/riscv/cores/croyde/flow/gtkwave/design-assertions.gtkw"
 [timestart] 0
 [size] 1920 1025
 [pos] -1 -1

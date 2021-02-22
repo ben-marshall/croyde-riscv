@@ -1,12 +1,12 @@
 
-# uc64 - Documentation
+# Croyde RISC-V - Documentation
 
-*Documentation for the uc64 Core.*
+*Documentation for the Croyde RISC-V Core.*
 
 ---
 
-[![Build Status](https://travis-ci.org/ben-marshall/uc64.svg?branch=master)](https://travis-ci.org/ben-marshall/uc64)
-[![Documentation Status](https://readthedocs.org/projects/uc64/badge/?version=latest)](https://uc64.readthedocs.io/en/latest/?badge=latest)
+[![Build Status](https://travis-ci.org/ben-marshall/croyde-riscv.svg?branch=master)](https://travis-ci.org/ben-marshall/croyde-riscv)
+[![Documentation Status](https://readthedocs.org/projects/croyde-riscv/badge/?version=latest)](https://croyde-riscv.readthedocs.io/en/latest/?badge=latest)
 
 - [Functional Requirements](functional-requirements.md)
 

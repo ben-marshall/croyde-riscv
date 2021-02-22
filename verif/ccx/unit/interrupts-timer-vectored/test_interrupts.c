@@ -1,5 +1,5 @@
 
-#include "uc64_csp.h"
+#include "croyde_csp.h"
 #include "unit_test.h"
 
 #include "test_interrupts.h"
@@ -17,7 +17,7 @@ int trigger_timer_interrupt(volatile char * interrupt_seen, int delay) {
     __putstr("Triggering interrupt...\n");
 
     // Add a big value to mtime and set mtimecmp to this.
-    uc64_csp_mtimecmp[0] = uc64_csp_mtime[0] + delay;
+    croyde_csp_mtimecmp[0] = croyde_csp_mtime[0] + delay;
 
     // Re-enable interrupts.
     __set_mstatus(MSTATUS_MIE);

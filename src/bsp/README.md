@@ -7,7 +7,7 @@
 
 - The BSP provides simple hooks for accessing onboard peripherals.
 
-- Anything using the BSP simply includes `uc64_bsp.h`.
+- Anything using the BSP simply includes `croyde_bsp.h`.
 
-- Each SoC must implement `uc64_bsp_<soc name>.c`
+- Each SoC must implement `croyde_bsp_<soc name>.c`
 
