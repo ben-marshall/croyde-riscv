@@ -1,21 +1,26 @@
 
 # Croyde RISC-V
 
-*A 3-stage, 64-bit RISC-V rv64imc micro-controller.*
+*A 3-stage, 64-bit RISC-V rv64imck micro-controller.*
 [![Build Status](https://www.travis-ci.com/ben-marshall/croyde-riscv.svg?branch=master)](https://www.travis-ci.com/ben-marshall/croyde-riscv)
 [![Documentation Status](https://readthedocs.org/projects/croyde-riscv/badge/?version=latest)](https://croyde-riscv.readthedocs.io/en/latest/?badge=latest)
 
 ---
 
-This is a very simple 3-stage 64-bit micro-controller, implementing the
-`rv64imc` instruction set.
-
 - [Getting Started](#Getting-Started)
 - [Block Diagram](#Block-Diagram)
 - [Documentaton](docs/)
-- [Todo List](docs/todo.md)
+- [FAQ](#FAQ)
 
-## Block Diagram
+## Features & Block Diagram
+
+This is a very simple 3-stage 64-bit micro-controller, implementing the
+`rv64imc` instruction set.
+It comes as a *core* module, and a *core complex* (CCX), which wraps the
+core with timers, boot ROM, some RAM and other small peripherals, with
+a memory port to the outside world.
+
+The full 
 
 ![Block Diagram](docs/pipeline-diagram.png)
 
@@ -41,33 +46,20 @@ This is a very simple 3-stage 64-bit micro-controller, implementing the
   source bin/conf.sh
   ```
 
-- Synthesise the core using Yosys:
-  ```
-  make synthesise-cmos
-  ```
-  The results will be placed in `$REPO_WORK/synthesise`.
-
+- [Synthesise the core](docs/flows-synthesis.md) using Yosys
+  [Yosys](http://www.clifford.at/yosys/documentation.html).
 
 - Verify the core using the 
-  [riscv-formal](https://github.com/SymbioticEDA/riscv-formal/)
+  [riscv-formal](docs/flows-riscv-formal.md)
   framework.
 
-  ```sh
-  make riscv-formal-clean
-  make riscv-formal-prepare
-  make riscv-formal-run RV_FORMAL_NJOBS=$(nproc)
-  ```
+- Run the RISC-V
+  [architectural compliance tests](docs/flows-arch-tests.md).
 
-- Run designer assertions on the internals of the core:
+- Run the [confidence tests](docs/flows-unit-tests.md) set.
 
-  ```
-  make  design-assertions
-  ```
 
-- Run the unit tests set:
+## FAQ
 
-  ```
-  make run-unit-tests-core
-  make run-unit-tests-ccx
-  ```
+- 
 

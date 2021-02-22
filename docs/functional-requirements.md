@@ -18,13 +18,15 @@ implement.
 
 - `C` standard extension.
 
+- `K` [scalar cryptography](https://github.com/riscv/riscv-crypto) extension.
+
 ### Privilieged ISA Support
 
 **Machine Mode:**
 
 - Physical memory only.
 
-- `misa`        CSR - hard wired to show `rv64imc`.
+- `misa`        CSR - hard wired to show `rv64imck`.
 - `mvendorid`   CSR - parameterised.
 - `marchid`     CSR - parameterised.
 - `mimpid`      CSR - parameterised.
