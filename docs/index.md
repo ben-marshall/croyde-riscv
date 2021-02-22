@@ -17,6 +17,8 @@
     - [Unit Tests](flows-unit-tests.md)
     
     - [riscv-formal](flows-riscv-formal.md)
+    
+    - [Architectural Tests](flows-arch-tests.md)
 
 - [Memory Interface](memory-interface.md)
 
