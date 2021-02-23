@@ -1,0 +1,24 @@
+
+RVK_CSRC    = $(wildcard $(REPO_HOME)/extern/rvkrypto-fips/*.c) 
+RVK_CSRC   += $(wildcard $(REPO_HOME)/extern/rvkrypto-fips/*/*.c) 
+RVK_SSRC    = $(wildcard $(REPO_HOME)/extern/rvkrypto-fips/*.S)
+RVK_CFLAGS  = -Wall -Wextra -O2 -march=rv64imac -mabi=lp64 -static
+RVK_CFLAGS += -nostartfiles
+RVK_CFLAGS += -I$(REPO_HOME)/extern/rvkrypto-fips
+RVK_CFLAGS += -T$(REPO_HOME)/src/share/ram.ld
+
+RVK_ELF     = $(REPO_WORK)/rvkrypto/rvkrypto.elf
+RVK_DIS     = $(REPO_WORK)/rvkrypto/rvkrypto.dis
+RVK_SREC    = $(REPO_WORK)/rvkrypto/rvkrypto.srec
+
+$(RVK_ELF) : $(RVK_CSRC) $(RVK_SSRC)
+	@mkdir -p $(dir $(RVK_ELF))
+	$(CC) $(RVK_CFLAGS) -o $@ $^
+
+$(RVK_DIS) : $(RVK_ELF)
+	$(OBJDUMP) -D $< > $@
+
+$(RVK_SREC): $(RVK_ELF)
+	$(OBJCOPY) -O srec --srec-forceS3 $< $@
+
+rvkrypto-build: $(RVK_ELF) $(RVK_DIS) $(RVK_SREC)

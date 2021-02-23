@@ -10,3 +10,6 @@
 [submodule "extern/riscv-arch-test"]
 	path = extern/riscv-arch-test
 	url = https://github.com/riscv/riscv-compliance.git
+[submodule "extern/rvkrypto-fips"]
+	path = extern/rvkrypto-fips
+	url = https://github.com/rvkrypto/rvkrypto-fips.git

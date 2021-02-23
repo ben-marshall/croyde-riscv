@@ -25,6 +25,7 @@ OBJDUMP         = $(RISCV)/bin/riscv$(RISCV_XLEN)-unknown-elf-objdump
 OBJCOPY         = $(RISCV)/bin/riscv$(RISCV_XLEN)-unknown-elf-objcopy
 
 include $(REPO_HOME)/src/fsbl/Makefile.in
+include $(REPO_HOME)/src/rvkrypto/Makefile.in
 include $(REPO_HOME)/src/examples/arty-helloworld/Makefile.in
 
 include $(REPO_HOME)/flow/verilator/Makefile.in
