@@ -15,12 +15,15 @@
 ## Features & Block Diagram
 
 This is a very simple 3-stage 64-bit micro-controller, implementing the
-`rv64imc` instruction set.
+`rv64imck` instruction set.
 It comes as a *core* module, and a *core complex* (CCX), which wraps the
 core with timers, boot ROM, some RAM and other small peripherals, with
 a memory port to the outside world.
 
 ![Block Diagram](docs/pipeline-diagram.png)
+
+Note that the [`K` extension](https://github.com/riscv/riscv-crypto)
+is for cryptography, and is still under development.
 
 ## Getting Started
 
