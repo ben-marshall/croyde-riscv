@@ -20,8 +20,6 @@ It comes as a *core* module, and a *core complex* (CCX), which wraps the
 core with timers, boot ROM, some RAM and other small peripherals, with
 a memory port to the outside world.
 
-The full 
-
 ![Block Diagram](docs/pipeline-diagram.png)
 
 ## Getting Started
@@ -61,5 +59,28 @@ The full
 
 ## FAQ
 
-- 
+- Can I use this for X? - Yes you can. It's all MIT licensed.
+
+- Should I use this for X? - Maybe. If you want a little RV64 core
+  for your project, that is free, go for it. However, see the next bullet
+  point.
+
+- Has this been verified? - I have high confidence the user level
+  ISA and instructions is correct though the riscv-formal framework.
+  Plus the basic RISC-V architectural tests all pass, which is a basic
+  tyre kick. I have less confidence in the priviliged architecture
+  and interrupts implementation, or the core complex. It works for me,
+  and my needs, but I've not done any exhaustive verification on it.
+
+- What's the point of a 64-bit *micro-controller*? - If it's good enough
+  for [SiFive](https://www.sifive.com/cores/s21) 
+  it's good enough for me. I wanted to implement RV64 in the
+  simplest way possible to play around with on an cheap FPGA, which meant it
+  had to be small to fit! More seriously, if your key workloads involve
+  working on large variables, you might find a 64-bit core makes a lot
+  of sense.
+
+- What's in the name? - Nothing really. *Croyde* is a fantastic beach for
+  surfing near where I grew up and there wasn't much chance of someone
+  else picking the same name.
 
