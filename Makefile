@@ -25,7 +25,6 @@ OBJDUMP         = $(RISCV)/bin/riscv$(RISCV_XLEN)-unknown-elf-objdump
 OBJCOPY         = $(RISCV)/bin/riscv$(RISCV_XLEN)-unknown-elf-objcopy
 
 include $(REPO_HOME)/src/fsbl/Makefile.in
-include $(REPO_HOME)/src/rvkrypto/Makefile.in
 include $(REPO_HOME)/src/examples/arty-helloworld/Makefile.in
 
 include $(REPO_HOME)/flow/verilator/Makefile.in
@@ -39,6 +38,8 @@ include $(REPO_HOME)/verif/ccx/unit/Makefile.in
 
 include $(REPO_HOME)/flow/embench/Makefile.in
 include $(REPO_HOME)/flow/arch-test/Makefile.in
+
+include $(REPO_HOME)/src/rvkrypto/Makefile.in
 
 build-unit-tests-core: $(filter build-unit-core%,$(UNIT_TEST_BUILD_TARGETS))
 build-unit-tests-ccx : $(filter build-unit-ccx%,$(UNIT_TEST_BUILD_TARGETS))

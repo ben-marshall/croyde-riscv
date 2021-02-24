@@ -7,9 +7,24 @@ RVK_CFLAGS += -nostartfiles
 RVK_CFLAGS += -I$(REPO_HOME)/extern/rvkrypto-fips
 RVK_CFLAGS += -T$(REPO_HOME)/src/share/ram.ld
 
-RVK_ELF     = $(REPO_WORK)/rvkrypto/rvkrypto.elf
-RVK_DIS     = $(REPO_WORK)/rvkrypto/rvkrypto.dis
-RVK_SREC    = $(REPO_WORK)/rvkrypto/rvkrypto.srec
+RVK_WORK    =$(REPO_WORK)/rvkrypto
+
+RVK_ELF     =$(RVK_WORK)/rvkrypto.elf
+RVK_DIS     =$(RVK_WORK)/rvkrypto.dis
+RVK_SREC    =$(RVK_WORK)/rvkrypto.srec
+RVK_HEX     =$(RVK_WORK)/ram.hex
+
+RVK_FSBL    = $(call map_fsbl_hex,ccx)
+RVK_EXE     = $(RVK_WORK)/ccx
+
+RVK_WAVES   = $(RVK_WORK)/waves.vcd
+
+RVK_DEPS    = \
+    $(RVK_ELF) \
+    $(RVK_DIS) \
+    $(RVK_SREC) \
+    $(RVK_HEX) \
+    $(RVK_FSBL) \
 
 $(RVK_ELF) : $(RVK_CSRC) $(RVK_SSRC)
 	@mkdir -p $(dir $(RVK_ELF))
@@ -21,4 +36,17 @@ $(RVK_DIS) : $(RVK_ELF)
 $(RVK_SREC): $(RVK_ELF)
 	$(OBJCOPY) -O srec --srec-forceS3 $< $@
 
-rvkrypto-build: $(RVK_ELF) $(RVK_DIS) $(RVK_SREC)
+$(RVK_HEX): $(RVK_ELF)
+	$(OBJCOPY) -O verilog --change-addresses 0xFFFF0000 $< $@
+
+.PHONY: rvkrypto-build
+rvkrypto-build: $(RVK_DEPS)
+	cp $(RVK_FSBL) $(RVK_WORK)/rom.hex
+
+rvkrypto-run: rvkrypto-build $(EXE_CCX)
+	cp $(EXE_CCX)  $(RVK_EXE)
+	cd $(RVK_WORK) && $(RVK_EXE) \
+        +WAVES=$(RVK_WAVES) \
+        +PASS_ADDR=0x70 \
+        +FAIL_ADDR=0x78 \
+        +TIMEOUT=1000000

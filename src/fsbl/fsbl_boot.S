@@ -56,7 +56,17 @@ __fsbl_boot:
     csrw    mscratch, 0     // Clear scratch register.
     csrw    mtval   , 0     // Clear mtval.
 
-    j       __fsbl_main     // Jump to FSBL main function.
+    //j       __fsbl_main     // Jump to FSBL main function.
+    la      t0, __ram_begin
+    jalr    t0
+    bnez    a0, __fsbl_trap_vector
+    j       __fsbl_halt
+
+.balign 4
+__fsbl_halt:
+    nop
+    nop
+    j       __fsbl_halt
 
 //
 // FSBL trap handler
@@ -65,6 +75,7 @@ __fsbl_boot:
 .balign 4
 .global __fsbl_trap_vector
 __fsbl_trap_vector:         // Un-handled trap.
+    nop
     wfi                     // Slow pause loop.
     j __fsbl_trap_vector    // Loop forever.
 
