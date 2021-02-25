@@ -12,6 +12,7 @@ RVK_WORK    =$(REPO_WORK)/rvkrypto
 RVK_ELF     =$(RVK_WORK)/rvkrypto.elf
 RVK_DIS     =$(RVK_WORK)/rvkrypto.dis
 RVK_SREC    =$(RVK_WORK)/rvkrypto.srec
+RVK_GTKW    =$(RVK_WORK)/rvkrypto.gtkwl
 RVK_HEX     =$(RVK_WORK)/ram.hex
 
 RVK_FSBL    = $(call map_fsbl_hex,ccx)
@@ -25,6 +26,7 @@ RVK_DEPS    = \
     $(RVK_SREC) \
     $(RVK_HEX) \
     $(RVK_FSBL) \
+    $(RVK_GTKW)
 
 $(RVK_ELF) : $(RVK_CSRC) $(RVK_SSRC)
 	@mkdir -p $(dir $(RVK_ELF))
@@ -38,6 +40,13 @@ $(RVK_SREC): $(RVK_ELF)
 
 $(RVK_HEX): $(RVK_ELF)
 	$(OBJCOPY) -O verilog --change-addresses 0xFFFF0000 $< $@
+	
+$(RVK_GTKW) : $(RVK_DIS)
+	grep "10.*:" $< \
+	    | grep -v ">:" | cut -c 10- | sed 's/\t//' \
+	    | sort | uniq | sed 's/ +/ /' | sed 's/\t/ /' \
+	    | sed 's/\(^....    \)    /0000\1/' \
+	    > $@
 
 .PHONY: rvkrypto-build
 rvkrypto-build: $(RVK_DEPS)
@@ -46,7 +55,7 @@ rvkrypto-build: $(RVK_DEPS)
 rvkrypto-run: rvkrypto-build $(EXE_CCX)
 	cp $(EXE_CCX)  $(RVK_EXE)
 	cd $(RVK_WORK) && $(RVK_EXE) \
-        +WAVES=$(RVK_WAVES) \
         +PASS_ADDR=0x70 \
         +FAIL_ADDR=0x78 \
-        +TIMEOUT=1000000
+        +TIMEOUT=1000000 \
+        #+WAVES=$(RVK_WAVES)
