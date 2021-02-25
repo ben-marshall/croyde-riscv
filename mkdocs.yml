@@ -12,6 +12,7 @@ nav:
   - Flow - Unit Tests: flows-unit-tests.md
   - Flow - riscv-formal: flows-riscv-formal.md
   - Flow - Embench: embench.md
+  - Flow - rvkrypto: flows-rvkrypto.md
   - Energy Efficiency : energy-efficiency.md
   - Todo: todo.md
   
