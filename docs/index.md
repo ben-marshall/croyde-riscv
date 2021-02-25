@@ -19,6 +19,8 @@
     - [riscv-formal](flows-riscv-formal.md)
     
     - [Architectural Tests](flows-arch-tests.md)
+    
+    - [rvkrypto-fips](flows-rvkrypto.md)
 
 - [Memory Interface](memory-interface.md)
 
