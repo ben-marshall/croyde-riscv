@@ -254,6 +254,7 @@ wire                 s2_cry_sm4_ed    ;
 wire                 s2_cry_sm4_ks    ;
 wire                 s2_cry_sm3_p0    ;
 wire                 s2_cry_sm3_p1    ;
+wire [          3:0] s2_cry_imm       ;
 
 wire                 s2_csr_set     ; // CSR Operation
 wire                 s2_csr_clr     ; //
@@ -520,6 +521,7 @@ core_pipe_decode #(
 .s2_cry_sm4_ks    (s2_cry_sm4_ks    ),
 .s2_cry_sm3_p0    (s2_cry_sm3_p0    ),
 .s2_cry_sm3_p1    (s2_cry_sm3_p1    ),
+.s2_cry_imm       (s2_cry_imm       ),
 .s2_csr_set      (s2_csr_set      ), // CSR Operation
 .s2_csr_clr      (s2_csr_clr      ), //
 .s2_csr_rd       (s2_csr_rd       ), //
@@ -655,6 +657,7 @@ core_pipe_exec #(
 .s2_cry_sm4_ks    (s2_cry_sm4_ks    ),
 .s2_cry_sm3_p0    (s2_cry_sm3_p0    ),
 .s2_cry_sm3_p1    (s2_cry_sm3_p1    ),
+.s2_cry_imm       (s2_cry_imm       ),
 .s2_csr_set      (s2_csr_set      ), // CSR Operation
 .s2_csr_clr      (s2_csr_clr      ), //
 .s2_csr_rd       (s2_csr_rd       ), //

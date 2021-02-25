@@ -131,6 +131,7 @@ input  wire                 s2_cry_sm4_ed    ,
 input  wire                 s2_cry_sm4_ks    ,
 input  wire                 s2_cry_sm3_p0    ,
 input  wire                 s2_cry_sm3_p1    ,
+output wire [          3:0] s2_cry_imm       ,
 
 input  wire                 s2_csr_set      , // CSR Operation
 input  wire                 s2_csr_clr      , //
@@ -291,7 +292,9 @@ wire        cry_valid       =
     s2_cry_aeses      || s2_cry_aesesm     || s2_cry_aesds      ||
     s2_cry_aesdsm     || s2_cry_sha256sig0 || s2_cry_sha256sig1 ||
     s2_cry_sha256sum0 || s2_cry_sha256sum1 || s2_cry_sha512sig0 ||
-    s2_cry_sha512sig1 || s2_cry_sha512sum0 || s2_cry_sha512sum1 ;
+    s2_cry_sha512sig1 || s2_cry_sha512sum0 || s2_cry_sha512sum1 ||
+    s2_cry_sm3_p0     || s2_cry_sm3_p1     || s2_cry_sm4_ks     ||
+    s2_cry_sm4_ed     ;
 
 wire        cry_ready       ;
 
@@ -477,7 +480,7 @@ riscv_crypto_fu #(
 .valid           (cry_valid         ), // Inputs valid.
 .rs1             (s2_rs1_data       ), // Source register 1
 .rs2             (s2_rs2_data       ), // Source register 2
-.imm             (s2_rs2_addr[3:0]  ), // enc_rcon for aes64.
+.imm             (s2_cry_imm        ), // enc_rcon for aes64, bs for sm4
 .op_saes64_ks1   (s2_cry_aesks1     ), // RV64 AES Encrypt KeySchedule 1
 .op_saes64_ks2   (s2_cry_aesks2     ), // RV64 AES Encrypt KeySchedule 2
 .op_saes64_imix  (s2_cry_aesimix    ), // RV64 AES Decrypt KeySchedule Mix

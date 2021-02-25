@@ -134,6 +134,7 @@ output wire                 s2_cry_sm4_ed    ,
 output wire                 s2_cry_sm4_ks    ,
 output wire                 s2_cry_sm3_p0    ,
 output wire                 s2_cry_sm3_p1    ,
+output wire [          3:0] s2_cry_imm       ,
 
 output wire                 s2_csr_set      , // CSR Operation
 output wire                 s2_csr_clr      , //
@@ -362,8 +363,11 @@ assign s2_rs2_addr  = s1_rs2_addr;
 
 wire   zero_rd      = major_op_store || major_op_branch;
 
+wire   rs1_as_rd    = dec_sm4ed || dec_sm4ks;
+
 assign s2_rd        = s1_i16bit     ? dec_rd_16         :
                       zero_rd       ? {REG_ADDR_W{1'b0}}:
+                      rs1_as_rd     ? s2_rs1_addr       :
                                       dec_rd            ;
 
 assign s2_rs1_data  = s1_rs1_data   ;
@@ -557,6 +561,9 @@ assign  s2_cry_sm4_ed       = dec_sm4ed     ;
 assign  s2_cry_sm4_ks       = dec_sm4ks     ;
 assign  s2_cry_sm3_p0       = dec_sm3p0     ;
 assign  s2_cry_sm3_p1       = dec_sm3p1     ;
+
+assign  s2_cry_imm          = dec_aes64ks1i ? s1_instr[23:20]          :
+                              /*dec_sm4* */   {2'b00, s1_instr[31:30]} ;
 
 //
 // CSRs
