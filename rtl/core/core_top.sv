@@ -403,7 +403,6 @@ core_pipe_fetch #(
 //
 core_pipe_decode #(
 .PC_RESET_ADDRESS(PC_RESET_ADDRESS),
-.MEM_ADDR_W      (MEM_ADDR_W      ),
 .F_ZKB           (F_ZKB  ), // Turn on Bitmanip-borrowed crypto instructions
 .F_ZKG           (F_ZKG  ), // Turn on CLMUL/CLMULH
 .F_ZKNE          (F_ZKNE ), // Turn on NIST AES encrypt
@@ -542,7 +541,6 @@ core_pipe_decode #(
 //  Top level for the execute stage of the pipeline.
 //
 core_pipe_exec #(
-.MEM_ADDR_W     (MEM_ADDR_W     ),
 .F_ZKB           (F_ZKB  ), // Turn on Bitmanip-borrowed crypto instructions
 .F_ZKG           (F_ZKG  ), // Turn on CLMUL/CLMULH
 .F_ZKNE          (F_ZKNE ), // Turn on NIST AES encrypt
@@ -713,7 +711,6 @@ core_pipe_exec #(
 //  Load data processing, trap raising.
 //
 core_pipe_wb #(
-.MEM_ADDR_W     (MEM_ADDR_W     )
 ) i_core_pipe_wb (
 .g_clk           (g_clk           ), // Global clock
 .g_resetn        (g_resetn        ), // Global active low sync reset.

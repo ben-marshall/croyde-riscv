@@ -5,6 +5,8 @@
 //  Pipeline decode / operand gather stage.
 //
 module core_pipe_decode #(
+// Inital address of the program counter post reset.
+parameter   PC_RESET_ADDRESS      = 'h10000000,
 parameter F_ZKB  = 1, // Turn on Bitmanip-borrowed crypto instructions
 parameter F_ZKG  = 1, // Turn on CLMUL/CLMULH
 parameter F_ZKNE = 1, // Turn on NIST AES encrypt
@@ -171,8 +173,6 @@ assign s2_instr     = {s1_i32bit ? s1_instr[31:16] : 16'b0, s1_instr[15:0]};
 // Program Counter Tracking
 // ------------------------------------------------------------
 
-// Inital address of the program counter post reset.
-parameter   PC_RESET_ADDRESS      = 'h10000000;
 
 // Only use as many register bits for the PC as there are physical
 // memory address bits.
